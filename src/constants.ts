@@ -1,25 +1,48 @@
 import type { ModelConfig, ModelKey, BackgroundPrompt } from './types';
 
 export const MODELS: Record<ModelKey, ModelConfig> = {
-  espcn: {
-    name: 'ESPCN Turbo (2× / 4×)',
-    file: 'models/model.onnx',
-    tileSize: 224,
-    scale: 3,
-    color: 'y',
-    size: '235KB',
+  clearreality: {
+    name: '4x-ClearReality V1 (Fast / Clean)',
+    file: 'models/4x-ClearRealityV1.onnx',
+    tileSize: 128,
+    scale: 4,
+    color: 'rgb',
+    size: '1.9MB',
     badges: {
-      quality: 'Ultra Fast',
-      time: '~30ms',
-      req: 'Ultra Low',
+      quality: 'Ultra Fast & Crisp',
+      time: '~120ms',
+      req: 'Ultra-Lightweight / SIMD',
     },
     description:
-      'Efficient Sub-Pixel CNN — a lightweight model optimized for lightning-fast 60fps inference. Processes luminance channel with crisp sub-pixel interpolation.',
-    recommendation: 'Best for instant preview, quick batch jobs, and lower-spec hardware.',
-    maxScale: 4,
-    presets: ['Standard', 'Fast', 'Crisp'],
+      '4x ClearReality V1 — a lightweight high-clarity super-resolution model engineered for crisp edge reconstruction, de-blurring, and clean textures with minimal memory footprint.',
+    recommendation: 'Best for instant previews, illustrations, portraits, anime, and fast processing on any hardware.',
+    maxScale: 8,
+    presets: ['Standard', 'Fast', 'Crisp', 'Illustration'],
     features: {
-      faceRestore: false,
+      faceRestore: true,
+      colorEnhance: true,
+      hdrBoost: true,
+    },
+  },
+  ultrasharp: {
+    name: '4x-UltraSharp (Extreme Clarity & 8K)',
+    file: 'models/4x-UltraSharp.onnx',
+    tileSize: 128,
+    scale: 4,
+    color: 'rgb',
+    size: '67MB',
+    badges: {
+      quality: '8K Ultra Precision',
+      time: '~650ms',
+      req: 'WebGPU Preferred',
+    },
+    description:
+      '4x-UltraSharp — premier generative super-resolution model that reconstructs intricate realistic textures, micro-edges, and sharp photographic depth.',
+    recommendation: 'Best for high-end photography, complex scenery, architectural details, and 8K fine-art prints.',
+    maxScale: 8,
+    presets: ['Balanced', 'UltraSharp', 'Photography', 'Landscape'],
+    features: {
+      faceRestore: true,
       colorEnhance: true,
       hdrBoost: true,
     },

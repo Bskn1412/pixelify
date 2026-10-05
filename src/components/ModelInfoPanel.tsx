@@ -6,7 +6,7 @@ interface ModelInfoPanelProps {
   currentModel: ModelKey;
 }
 
-const MODEL_KEYS: ModelKey[] = ['espcn', 'realesrgan'];
+const MODEL_KEYS: ModelKey[] = ['clearreality', 'ultrasharp', 'realesrgan'];
 
 export default function ModelInfoPanel({ currentModel }: ModelInfoPanelProps) {
   const [open, setOpen] = useState(false);
@@ -36,7 +36,7 @@ export default function ModelInfoPanel({ currentModel }: ModelInfoPanelProps) {
       </button>
 
       {open && (
-        <div className="mt-3 animate-slide-up grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="mt-3 animate-slide-up grid grid-cols-1 md:grid-cols-3 gap-3">
           {MODEL_KEYS.map((key) => {
             const m = MODELS[key];
             const isActive = key === currentModel;

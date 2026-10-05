@@ -9,7 +9,7 @@ import {
   applyCanvasEnhancements,
   upscaleWithCanvas,
 } from '../utils/imageProcessing';
-import { runPass } from '../utils/upscale';
+import { runPass, createSession, loadONNX } from '../utils/upscale';
 import type { ModelKey, UpscaleResult, ProgressState, EnhancementOptions } from '../types';
 
 interface UseUpscaleParams {
@@ -46,17 +46,19 @@ export function useUpscale({ ortRef, sessionRef }: UseUpscaleParams): UseUpscale
 
       const start = performance.now();
       const enhancementsApplied: string[] = [];
-      const faceLevel = (options as any).faceRestoreLevel ?? (options.faceRestore ? 60 : 0);
-      const noiseLevel = (options as any).removeNoiseLevel ?? (options.removeNoise ? 50 : 0);
-      const sharpLevel = (options as any).sharpenLevel ?? (options.sharpen ? 60 : 0);
-      const colorLevel = (options as any).colorLevel ?? (options.colorEnhance ? 60 : 0);
-      const hdrLevel = (options as any).hdrLevel ?? (options.hdrBoost ? 60 : 0);
+      const faceLevel = (options as any).faceEnhancement ?? (options as any).faceRestoreLevel ?? (options.faceRestore ? 50 : 50);
+      const noiseLevel = (options as any).denoise ?? (options as any).removeNoiseLevel ?? (options.removeNoise ? 50 : 50);
+      const sharpLevel = (options as any).sharpness ?? (options as any).sharpenLevel ?? (options.sharpen ? 50 : 50);
+      const colorLevel = (options as any).colorLevel ?? (options.colorEnhance ? 60 : 50);
+      const hdrLevel = (options as any).hdrLevel ?? (options.hdrBoost ? 60 : 50);
 
-      if (faceLevel > 0) enhancementsApplied.push('Face Restoration');
-      if (noiseLevel > 0) enhancementsApplied.push('Noise Reduction');
-      if (sharpLevel > 0) enhancementsApplied.push('Edge Sharpening');
-      if (colorLevel > 0) enhancementsApplied.push('Color Enhancement');
-      if (hdrLevel > 0) enhancementsApplied.push('HDR Dynamic Range');
+      if (faceLevel > 50) enhancementsApplied.push('Face Restoration');
+      if (noiseLevel > 50) enhancementsApplied.push('Noise Reduction');
+      if (sharpLevel > 50) enhancementsApplied.push('Edge Sharpening');
+      if (options.colorEnhance || colorLevel !== 50) enhancementsApplied.push('Color Enhancement');
+      if (options.hdrBoost || hdrLevel !== 50) enhancementsApplied.push('HDR Dynamic Range');
+      if (typeof options.brightness === 'number' && options.brightness !== 50) enhancementsApplied.push('Brightness Tuning');
+      if (typeof options.contrast === 'number' && options.contrast !== 50) enhancementsApplied.push('Contrast Tuning');
 
       // Multi-stage visual logging steps
       const steps = [
@@ -68,11 +70,30 @@ export function useUpscale({ ortRef, sessionRef }: UseUpscaleParams): UseUpscale
       ];
 
       onProgress({ percent: 10, text: steps[0], stepIndex: 1, totalSteps: steps.length });
-      await new Promise((r) => setTimeout(r, 120));
+      await new Promise((r) => setTimeout(r, 100));
 
-      const ort = ortRef.current;
-      const session = sessionRef.current;
+      let ort = ortRef.current;
+      if (!ort) {
+        onProgress({ percent: 12, text: 'Initializing ONNX runtime...', stepIndex: 1, totalSteps: steps.length });
+        ort = await loadONNX();
+        ortRef.current = ort;
+      }
+
+      let session = sessionRef.current;
       const m = MODELS[modelKey];
+
+      // CRITICAL: Guarantee the session matches the selected modelKey!
+      if (!session || (session as any).__modelKey !== modelKey) {
+        onProgress({ percent: 15, text: `Loading ${m.name}…`, stepIndex: 1, totalSteps: steps.length });
+        try {
+          session = await createSession(ort, modelKey);
+          sessionRef.current = session;
+        } catch (loadErr) {
+          console.warn(`Failed to create session for ${modelKey}, trying WASM fallback:`, loadErr);
+          session = await createSession(ort, modelKey, 'wasm');
+          sessionRef.current = session;
+        }
+      }
 
       let rawRgba: Uint8ClampedArray;
       let outW = finalW;
@@ -80,11 +101,15 @@ export function useUpscale({ ortRef, sessionRef }: UseUpscaleParams): UseUpscale
 
       if (ort && session) {
         try {
-          const numPasses = Math.max(1, Math.round(Math.log2(scale) / Math.log2(m.scale)));
+          // Native 4x models. Run 1 pass for 4x and 2x (downscaled after).
+          // Allow 2 passes for 8x only on small images (<= 256px) to avoid massive OOM explosion.
+          const canDo2Passes = scale >= 8 && img.width <= 256 && img.height <= 256;
+          const numPasses = canDo2Passes ? 2 : 1;
+
           const tc = document.createElement('canvas');
           tc.width = img.width;
           tc.height = img.height;
-          const ctx = tc.getContext('2d')!;
+          const ctx = tc.getContext('2d', { willReadFrequently: true })!;
           ctx.drawImage(img, 0, 0);
           const fullImg = ctx.getImageData(0, 0, img.width, img.height);
 
@@ -92,18 +117,33 @@ export function useUpscale({ ortRef, sessionRef }: UseUpscaleParams): UseUpscale
           let ch = img.height;
 
           onProgress({ percent: 25, text: steps[1], stepIndex: 2, totalSteps: steps.length });
-          await new Promise((r) => setTimeout(r, 100));
+          await new Promise((r) => setTimeout(r, 80));
+
+          const onSessionUpdated = (newSession: any) => {
+            session = newSession;
+            sessionRef.current = newSession;
+          };
 
           if (m.color === 'rgb') {
             let data = extractRGB(fullImg);
             for (let pass = 0; pass < numPasses; pass++) {
-              data = await runPass(ort, session, data, cw, ch, pass, numPasses, modelKey, (pct, txt) =>
-                onProgress({ 
-                  percent: Math.min(80, 25 + Math.round(pct * 0.55)), 
-                  text: `${steps[3]} (${txt})`,
-                  stepIndex: 3,
-                  totalSteps: steps.length
-                }),
+              data = await runPass(
+                ort, 
+                session, 
+                data, 
+                cw, 
+                ch, 
+                pass, 
+                numPasses, 
+                modelKey, 
+                (pct, txt) =>
+                  onProgress({ 
+                    percent: Math.min(82, 25 + Math.round(pct * 0.57)), 
+                    text: `${steps[3]} (${txt})`,
+                    stepIndex: 3,
+                    totalSteps: steps.length
+                  }),
+                onSessionUpdated
               );
               cw *= m.scale;
               ch *= m.scale;
@@ -118,13 +158,23 @@ export function useUpscale({ ortRef, sessionRef }: UseUpscaleParams): UseUpscale
               const passDstH = ch * m.scale;
               Cb = resizeChannel(Cb, cw, ch, passDstW, passDstH);
               Cr = resizeChannel(Cr, cw, ch, passDstW, passDstH);
-              Y = await runPass(ort, session, Y, cw, ch, pass, numPasses, modelKey, (pct, txt) =>
-                onProgress({ 
-                  percent: Math.min(80, 25 + Math.round(pct * 0.55)), 
-                  text: `${steps[3]} (${txt})`,
-                  stepIndex: 4,
-                  totalSteps: steps.length
-                }),
+              Y = await runPass(
+                ort, 
+                session, 
+                Y, 
+                cw, 
+                ch, 
+                pass, 
+                numPasses, 
+                modelKey, 
+                (pct, txt) =>
+                  onProgress({ 
+                    percent: Math.min(82, 25 + Math.round(pct * 0.57)), 
+                    text: `${steps[3]} (${txt})`,
+                    stepIndex: 4,
+                    totalSteps: steps.length
+                  }),
+                onSessionUpdated
               );
               cw = passDstW;
               ch = passDstH;
@@ -133,14 +183,15 @@ export function useUpscale({ ortRef, sessionRef }: UseUpscaleParams): UseUpscale
             outW = cw;
             outH = ch;
           }
-        } catch (e) {
-          console.warn('ONNX inference fallback to Canvas super-sampling:', e);
+        } catch (e: any) {
+          console.error('[useUpscale] ONNX INFERENCE ERROR:', e?.message || e, e?.stack);
           const fallback = upscaleWithCanvas(img, scale, options);
           rawRgba = fallback.rgba;
           outW = fallback.width;
           outH = fallback.height;
         }
       } else {
+        console.warn('[useUpscale] Ort or session missing! ort:', !!ort, 'session:', !!session);
         // High quality local super-sampling
         onProgress({ percent: 50, text: steps[2], stepIndex: 3, totalSteps: steps.length });
         await new Promise((r) => setTimeout(r, 200));
@@ -151,19 +202,35 @@ export function useUpscale({ ortRef, sessionRef }: UseUpscaleParams): UseUpscale
       }
 
       onProgress({ percent: 88, text: steps[4], stepIndex: 5, totalSteps: steps.length });
-      await new Promise((r) => setTimeout(r, 150));
+      await new Promise((r) => setTimeout(r, 120));
 
-      // Final canvas buffer post-processing & data URL conversion
-      const canvas = document.createElement('canvas');
-      canvas.width = outW;
-      canvas.height = outH;
-      const ctx = canvas.getContext('2d')!;
-      ctx.putImageData(new ImageData(new Uint8ClampedArray(rawRgba), outW, outH), 0, 0);
+      // Final canvas buffer post-processing & exact target scale fitting
+      let finalCanvas = document.createElement('canvas');
+      finalCanvas.width = outW;
+      finalCanvas.height = outH;
+      const fCtx = finalCanvas.getContext('2d', { willReadFrequently: true })!;
+      fCtx.putImageData(new ImageData(new Uint8ClampedArray(rawRgba), outW, outH), 0, 0);
 
-      applyCanvasEnhancements(canvas, options);
+      // If neural output dimensions differ from requested target (e.g. 2x requested from a 4x model, or 8x),
+      // cleanly scale to finalW × finalH using high-quality image smoothing.
+      if (outW !== finalW || outH !== finalH) {
+        const scaledCanvas = document.createElement('canvas');
+        scaledCanvas.width = finalW;
+        scaledCanvas.height = finalH;
+        const sCtx = scaledCanvas.getContext('2d')!;
+        sCtx.imageSmoothingEnabled = true;
+        sCtx.imageSmoothingQuality = 'high';
+        sCtx.drawImage(finalCanvas, 0, 0, finalW, finalH);
+        finalCanvas = scaledCanvas;
+        outW = finalW;
+        outH = finalH;
+      }
 
-      const finalImgData = ctx.getImageData(0, 0, outW, outH);
-      const dataUrl = canvas.toDataURL('image/png');
+      applyCanvasEnhancements(finalCanvas, options);
+
+      const finalCtx = finalCanvas.getContext('2d', { willReadFrequently: true })!;
+      const finalImgData = finalCtx.getImageData(0, 0, outW, outH);
+      const dataUrl = finalCanvas.toDataURL('image/png');
       const elapsed = Math.max(120, Math.round(performance.now() - start));
 
       const psnrGain = `+${(12.5 + scale * 1.8).toFixed(1)} dB`;

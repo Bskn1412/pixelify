@@ -1,12 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Scissors, Image as ImageIcon, Sparkles, SlidersHorizontal, PanelsTopLeft, Columns2, Undo2, Redo2, Download as DownloadIcon, ChevronDown, ZoomIn, ZoomOut, RotateCcw, RotateCw, Crop as CropIcon, Plus } from 'lucide-react';
 import Icon from './Icon';
 import UploadArea from './UploadArea';
 import BGComparator, { ImageAdjustments, ImageEffects } from './BGComparator';
-import CanvasEditor from './CanvasEditor';
+import type { FabricEditMode, FabricCropRatio } from './bgremove/FabricImageEditor';
 import { makeId, downloadName } from '../lib/bgUtils';
 import { writeBGHistory } from '../lib/bgDb';
 import type { BGJob, HistoryItem } from '../types';
+import {
+  TextLayer,
+  ElementLayer,
+  ElementPreset,
+  FONT_FAMILIES,
+  COLOR_PALETTE,
+  ELEMENT_PRESETS,
+  renderDesignLayersToCanvas,
+} from './bgremove/DesignAssets';
 
 interface BGRemoveWorkspaceProps {
   jobs: BGJob[];
@@ -21,21 +31,38 @@ interface BGRemoveWorkspaceProps {
 
 type TabType = 'cutout' | 'background' | 'effects' | 'adjust' | 'design';
 type BgSubTab = 'photo' | 'color';
-
-const DEMO_SAMPLES = [
-  { src: '/samples/s1.png', name: 'Street style', tag: 'Portrait Cutout' },
-  { src: '/samples/s2.png', name: 'Studio portrait', tag: 'Studio Cutout' },
-  { src: '/samples/s3.png', name: 'Product shot', tag: 'Product Cutout' },
-];
+type DesignSubTab = 'text' | 'elements' | 'layers';
+type CropRatio = FabricCropRatio;
 
 const COLOR_PRESETS = [
-  { id: 'transparent', label: 'Transparent', style: 'bg-[radial-gradient(#ddd_1px,transparent_1px)] [background-size:16px_16px] bg-slate-100 dark:bg-[radial-gradient(#333_1px,transparent_1px)] dark:bg-neutral-950', fill: null },
-  { id: 'white', label: 'White', style: 'bg-white', fill: '#ffffff' },
-  { id: 'dark', label: 'Midnight', style: 'bg-[#09090D]', fill: '#09090D' },
-  { id: 'mint', label: 'Mint Studio', style: 'bg-gradient-to-br from-[#050507] via-[#00FF85]/20 to-[#0A0A0E]', fill: '#050507' },
-  { id: 'blue', label: 'Sky Blue', style: 'bg-gradient-to-tr from-sky-400 to-blue-600', fill: '#38bdf8' },
-  { id: 'pink', label: 'Pastel Pink', style: 'bg-gradient-to-tr from-pink-300 to-rose-400', fill: '#f472b6' },
+  { id: 'transparent', label: 'Transparent', style: 'bg-[repeating-conic-gradient(#26282e_0%_25%,#1b1d22_0%_50%)] [background-size:20px_20px]', fill: null },
+  { id: 'white', label: 'White', style: '', fill: '#ffffff' },
+  { id: 'dark', label: 'Midnight', style: '', fill: '#09090D' },
+  { id: 'mint', label: 'Mint Studio', style: '', fill: '#00FF85' },
+  { id: 'blue', label: 'Sky Blue', style: '', fill: '#38bdf8' },
+  { id: 'pink', label: 'Pastel Pink', style: '', fill: '#f9a8d4' },
+  { id: 'sunset', label: 'Coral', style: '', fill: '#fb7185' },
+  { id: 'slate', label: 'Dark Slate', style: '', fill: '#64748b' },
 ];
+
+interface EditorSnapshot {
+  selectedBg: (typeof COLOR_PRESETS)[number];
+  customBgColor?: string;
+  customBgImage?: string;
+  subjectBgBlur: number;
+  bgBlur: number;
+  bgDarken: number;
+  adjustments: ImageAdjustments;
+  effects: ImageEffects;
+  subjectScale: number;
+  rotation: number;
+  cropRatio: CropRatio;
+  textLayers: TextLayer[];
+  elementLayers: ElementLayer[];
+  selectedLayerId: string | null;
+  selectedJobId: string | null;
+  resultBlob: Blob | null;
+}
 
 const PHOTO_PRESETS = [
   { id: 'street', label: 'Architecture', url: '/samples/s1.png' },
@@ -56,23 +83,38 @@ export default function BGRemoveWorkspace({
   const [selectedId, setSelectedId] = useState<string | null>(jobs[0]?.id || null);
   const [activeTab, setActiveTab] = useState<TabType>('cutout');
   const [bgSubTab, setBgSubTab] = useState<BgSubTab>('photo');
+  const [designSubTab, setDesignSubTab] = useState<DesignSubTab>('text');
+  const [elementCategory, setElementCategory] = useState<'all' | 'badges' | 'shapes' | 'stickers'>('all');
+
   const [isCompareMode, setIsCompareMode] = useState(false);
-  const [showDownloadMenu, setShowDownloadMenu] = useState(false);
+  const [viewportZoom, setViewportZoom] = useState(1);
+  const [downloadFormat, setDownloadFormat] = useState<'png' | 'webp' | 'jpeg'>('png');
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadMenuOpen, setDownloadMenuOpen] = useState(false);
+  const downloadMenuRef = useRef<HTMLDivElement | null>(null);
 
-  // Subject scale state
+  // Cutout options
+  const [cutoutTool, setCutoutTool] = useState<'erase' | 'restore' | 'move'>('move');
+  const [brushSize, setBrushSize] = useState(40);
   const [subjectScale, setSubjectScale] = useState(1);
+  const [canUndoEditor, setCanUndoEditor] = useState(false);
+  const [canRedoEditor, setCanRedoEditor] = useState(false);
+  const [rotation, setRotation] = useState(0);
+  const [cropRatio, setCropRatio] = useState<CropRatio>('free');
+  const [fabricEditMode, setFabricEditMode] = useState<FabricEditMode | null>(null);
+  const [fabricCropRatioDraft, setFabricCropRatioDraft] = useState<CropRatio>('free');
+  const editorHistoryRef = useRef<{ past: EditorSnapshot[]; future: EditorSnapshot[] }>({ past: [], future: [] });
 
-  // Undo / Redo clickable state (disabled by default until edits occur)
-  const [canUndo, setCanUndo] = useState(false);
-  const [canRedo, setCanRedo] = useState(false);
-
+  // Background options
   const [selectedBg, setSelectedBg] = useState(COLOR_PRESETS[0]);
   const [customBgColor, setCustomBgColor] = useState<string | undefined>(undefined);
   const [customBgImage, setCustomBgImage] = useState<string | undefined>(undefined);
-
+  const [subjectBgBlur, setSubjectBgBlur] = useState(0);
+  const [bgBlur, setBgBlur] = useState(0);
+  const [bgDarken, setBgDarken] = useState(0);
   const bgFileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Image adjustments & effects state
+  // Image adjustments & effects
   const [adjustments, setAdjustments] = useState<ImageAdjustments>({
     brightness: 100,
     contrast: 100,
@@ -82,18 +124,25 @@ export default function BGRemoveWorkspace({
 
   const [effects, setEffects] = useState<ImageEffects>({
     shadow: false,
-    shadowBlur: 15,
+    shadowBlur: 16,
+    shadowOffsetY: 14,
+    shadowOpacity: 50,
+    shadowColor: '#000000',
     stroke: false,
     strokeColor: '#00FF85',
     strokeWidth: 4,
+    glow: false,
+    glowColor: '#00FF85',
   });
+
+  // Design layers (Text and Vector Elements)
+  const [textLayers, setTextLayers] = useState<TextLayer[]>([]);
+  const [elementLayers, setElementLayers] = useState<ElementLayer[]>([]);
+  const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
 
   /* ----------------------------------------------------------
      OFF-MAIN-THREAD PIPELINE (Web Worker)
-     The BiRefNet model used to run on the main thread, which
-     froze the whole page during inference. It now runs inside a
-     dedicated Web Worker — same approach as the ONNX proxy in
-     the upscaler — so the UI stays smooth while processing.
+     Dedicated Web Worker for smooth inference and processing.
      ---------------------------------------------------------- */
   const workerRef = useRef<Worker | null>(null);
   const progressCbRef = useRef<((pct: number) => void) | null>(null);
@@ -130,7 +179,6 @@ export default function BGRemoveWorkspace({
         }
 
         if (msg.type === 'READY') {
-          // Worker finished loading the pipeline: report its REAL engine
           onEngineReport?.(msg.engine === 'webgpu' ? 'webgpu' : 'wasm', !!msg.webgpuAvailable);
           return;
         }
@@ -146,7 +194,6 @@ export default function BGRemoveWorkspace({
 
         if (msg.type === 'ERROR') {
           if (msg.id == null) {
-            // Worker-level failure (e.g. model init): reject everything pending
             jobResolversRef.current.forEach((entry) => entry.reject(new Error(msg.message)));
             jobResolversRef.current.clear();
           } else {
@@ -164,7 +211,7 @@ export default function BGRemoveWorkspace({
     return workerRef.current;
   }
 
-  // Pre-warm the worker (and start the model download) as soon as the page opens
+  // Pre-warm the worker as soon as page opens
   useEffect(() => {
     try {
       getWorker().postMessage({ type: 'INIT' });
@@ -176,14 +223,53 @@ export default function BGRemoveWorkspace({
 
   const selected = jobs.find((job) => job.id === selectedId) ?? jobs[0];
 
-  // RESET BACKGROUND & CANVAS SETTINGS WHEN SELECTING/UPLOADING A NEW IMAGE
+  useEffect(() => {
+    if (!downloadMenuOpen) return;
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      if (!downloadMenuRef.current?.contains(event.target as Node)) setDownloadMenuOpen(false);
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setDownloadMenuOpen(false);
+    };
+    document.addEventListener('pointerdown', closeOnOutsidePointer);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutsidePointer);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [downloadMenuOpen]);
+
+  // Reset stage settings when switching images
   useEffect(() => {
     setSelectedBg(COLOR_PRESETS[0]);
     setCustomBgColor(undefined);
     setCustomBgImage(undefined);
+    setSubjectBgBlur(0);
+    setBgBlur(0);
+    setBgDarken(0);
     setSubjectScale(1);
+    setRotation(0);
+    setCropRatio('free');
+    setCutoutTool('move');
     setAdjustments({ brightness: 100, contrast: 100, saturation: 100, blur: 0 });
-    setEffects({ shadow: false, shadowBlur: 15, stroke: false, strokeColor: '#00FF85', strokeWidth: 4 });
+    setEffects({
+      shadow: false,
+      shadowBlur: 16,
+      shadowOffsetY: 14,
+      shadowOpacity: 50,
+      shadowColor: '#000000',
+      stroke: false,
+      strokeColor: '#00FF85',
+      strokeWidth: 4,
+      glow: false,
+      glowColor: '#00FF85',
+    });
+    setTextLayers([]);
+    setElementLayers([]);
+    setSelectedLayerId(null);
+    editorHistoryRef.current = { past: [], future: [] };
+    setCanUndoEditor(false);
+    setCanRedoEditor(false);
   }, [selectedId]);
 
   const updateJob = (id: string, changes: Partial<BGJob>) => {
@@ -191,15 +277,14 @@ export default function BGRemoveWorkspace({
   };
 
   async function processJob(job: BGJob) {
-    updateJob(job.id, { status: 'loading', progress: 5, message: 'Loading AI model...' });
+    updateJob(job.id, { status: 'loading', progress: 5, message: 'Loading AI vision model...' });
     try {
       const worker = getWorker();
 
-      // Model download progress arrives via the shared PROGRESS channel
       progressCbRef.current = (pct) =>
         updateJob(job.id, {
-          progress: Math.min(78, Math.max(5, Math.round(pct * 0.78))),
-          message: 'Downloading neural network...',
+          progress: Math.min(80, Math.max(5, Math.round(pct * 0.8))),
+          message: 'Downloading neural network weights...',
         });
 
       const { blob, elapsedMs } = await new Promise<{ blob: Blob; elapsedMs: number }>((resolve, reject) => {
@@ -211,7 +296,7 @@ export default function BGRemoveWorkspace({
       });
       progressCbRef.current = null;
 
-      updateJob(job.id, { status: 'processing', progress: 85, message: 'Detecting background cutout...' });
+      updateJob(job.id, { status: 'processing', progress: 88, message: 'Extracting clean subject cutout...' });
 
       const url = URL.createObjectURL(blob);
 
@@ -256,7 +341,7 @@ export default function BGRemoveWorkspace({
     }
   }
 
-  // AUTOMATIC BACKGROUND REMOVAL ON IMAGE UPLOAD OR ADDITION
+  // Automatic background removal on upload
   useEffect(() => {
     const readyJob = jobs.find((job) => job.status === 'ready');
     if (readyJob) {
@@ -278,38 +363,249 @@ export default function BGRemoveWorkspace({
     addToast('info', 'Image removed from workspace.');
   }
 
-  // COMPOSITE IMAGE EXPORT FUNCTION
+  // Save manual brush modifications
+  async function handleBrushStroke(newBlob: Blob, newUrl: string) {
+    if (!selected) return;
+    recordEditorEdit();
+    const oldUrl = selected.resultUrl;
+    updateJob(selected.id, { resultBlob: newBlob, resultUrl: newUrl });
+
+    await writeBGHistory({
+      id: selected.id,
+      name: selected.name,
+      original: selected.file,
+      result: newBlob,
+      elapsedMs: selected.elapsedMs,
+      updatedAt: Date.now(),
+    });
+
+    if (oldUrl && oldUrl !== selected.sourceUrl) {
+      URL.revokeObjectURL(oldUrl);
+    }
+  }
+
+  // -------------------------------------------------------------
+  // DESIGN LAYERS: TEXT & ELEMENTS HELPERS
+  // -------------------------------------------------------------
+  function addCustomText(title = 'Add Your Text Here', fontSize = 36) {
+    recordEditorEdit();
+    const newLayer: TextLayer = {
+      id: `text-${makeId()}`,
+      text: title,
+      x: 50,
+      y: 40 + textLayers.length * 6,
+      fontSize,
+      fontFamily: 'Plus Jakarta Sans',
+      fontWeight: 'bold',
+      color: '#FFFFFF',
+      align: 'center',
+      bgPill: 'black',
+      shadow: true,
+    };
+    setTextLayers((prev) => [...prev, newLayer]);
+    setSelectedLayerId(newLayer.id);
+    addToast('success', 'Custom text added to canvas');
+  }
+
+  function addElementPreset(preset: ElementPreset) {
+    recordEditorEdit();
+    const newLayer: ElementLayer = {
+      id: `el-${makeId()}`,
+      type: preset.type,
+      name: preset.name,
+      key: preset.key,
+      x: 50,
+      y: 65,
+      size: preset.defaultSize,
+      color: preset.defaultColor,
+      rotation: 0,
+      opacity: 1,
+      badgeText: preset.badgeText,
+    };
+    setElementLayers((prev) => [...prev, newLayer]);
+    setSelectedLayerId(newLayer.id);
+    addToast('success', `Added element: ${preset.name}`);
+  }
+
+  function updateTextLayer(id: string, changes: Partial<TextLayer>) {
+    recordEditorEdit();
+    setTextLayers((prev) => prev.map((l) => (l.id === id ? { ...l, ...changes } : l)));
+  }
+
+  function updateElementLayer(id: string, changes: Partial<ElementLayer>) {
+    recordEditorEdit();
+    setElementLayers((prev) => prev.map((l) => (l.id === id ? { ...l, ...changes } : l)));
+  }
+
+  function deleteLayer(id: string) {
+    recordEditorEdit();
+    setTextLayers((prev) => prev.filter((l) => l.id !== id));
+    setElementLayers((prev) => prev.filter((l) => l.id !== id));
+    if (selectedLayerId === id) setSelectedLayerId(null);
+  }
+
+  const selectedTextLayer = textLayers.find((l) => l.id === selectedLayerId);
+  const selectedElementLayer = elementLayers.find((l) => l.id === selectedLayerId);
+
+  function captureEditorSnapshot(): EditorSnapshot {
+    return {
+      selectedBg,
+      customBgColor,
+      customBgImage,
+      subjectBgBlur,
+      bgBlur,
+      bgDarken,
+      adjustments,
+      effects,
+      subjectScale,
+      rotation,
+      cropRatio,
+      textLayers,
+      elementLayers,
+      selectedLayerId,
+      selectedJobId: selected?.id || null,
+      resultBlob: selected?.resultBlob || null,
+    };
+  }
+
+  function updateEditorHistoryAvailability() {
+    setCanUndoEditor(editorHistoryRef.current.past.length > 0);
+    setCanRedoEditor(editorHistoryRef.current.future.length > 0);
+  }
+
+  function recordEditorEdit() {
+    editorHistoryRef.current.past.push(captureEditorSnapshot());
+    if (editorHistoryRef.current.past.length > 50) editorHistoryRef.current.past.shift();
+    editorHistoryRef.current.future = [];
+    updateEditorHistoryAvailability();
+  }
+
+  function restoreEditorSnapshot(snapshot: EditorSnapshot) {
+    setSelectedBg(snapshot.selectedBg);
+    setCustomBgColor(snapshot.customBgColor);
+    setCustomBgImage(snapshot.customBgImage);
+    setSubjectBgBlur(snapshot.subjectBgBlur);
+    setBgBlur(snapshot.bgBlur);
+    setBgDarken(snapshot.bgDarken);
+    setAdjustments(snapshot.adjustments);
+    setEffects(snapshot.effects);
+    setSubjectScale(snapshot.subjectScale);
+    setRotation(snapshot.rotation);
+    setCropRatio(snapshot.cropRatio);
+    setTextLayers(snapshot.textLayers);
+    setElementLayers(snapshot.elementLayers);
+    setSelectedLayerId(snapshot.selectedLayerId);
+    if (snapshot.selectedJobId && snapshot.resultBlob) {
+      updateJob(snapshot.selectedJobId, {
+        resultBlob: snapshot.resultBlob,
+        resultUrl: URL.createObjectURL(snapshot.resultBlob),
+        status: 'done',
+      });
+    }
+  }
+
+  function undoEditorEdit() {
+    const snapshot = editorHistoryRef.current.past.pop();
+    if (!snapshot) return;
+    editorHistoryRef.current.future.push(captureEditorSnapshot());
+    restoreEditorSnapshot(snapshot);
+    updateEditorHistoryAvailability();
+  }
+
+  function redoEditorEdit() {
+    const snapshot = editorHistoryRef.current.future.pop();
+    if (!snapshot) return;
+    editorHistoryRef.current.past.push(captureEditorSnapshot());
+    restoreEditorSnapshot(snapshot);
+    updateEditorHistoryAvailability();
+  }
+
+  function handleFabricEditApply(blob: Blob) {
+    const url = URL.createObjectURL(blob);
+    void handleBrushStroke(blob, url);
+    setSubjectScale(1);
+    setRotation(0);
+    setCropRatio('free');
+    setFabricCropRatioDraft('free');
+    setFabricEditMode(null);
+  }
+
+  // -------------------------------------------------------------
+  // HIGH-RESOLUTION COMPOSITE EXPORT (BACKGROUND + CUTOUT + DESIGN)
+  // -------------------------------------------------------------
   async function download(job: BGJob, format: 'png' | 'webp' | 'jpeg' = 'png') {
     if (!job?.resultUrl) return;
-    setShowDownloadMenu(false);
+    setIsDownloading(true);
+    addToast('info', 'Rendering full composite artwork...');
 
-    addToast('info', 'Rendering composite image for download...');
+    try {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('Could not create canvas context');
 
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+      const cutoutImg = new Image();
+      cutoutImg.crossOrigin = 'anonymous';
 
-    const cutoutImg = new Image();
-    cutoutImg.crossOrigin = 'anonymous';
+      await new Promise<void>((resolve, reject) => {
+        cutoutImg.onload = () => resolve();
+        cutoutImg.onerror = () => reject(new Error('Failed to load cutout image'));
+        cutoutImg.src = job.resultUrl!;
+      });
 
-    cutoutImg.onload = async () => {
       const width = cutoutImg.width;
       const height = cutoutImg.height;
-
       canvas.width = width;
       canvas.height = height;
 
+      let sourceImg: HTMLImageElement | null = null;
+      if (subjectBgBlur > 0) {
+        sourceImg = new Image();
+        sourceImg.crossOrigin = 'anonymous';
+        await new Promise<void>((resolve, reject) => {
+          sourceImg!.onload = () => resolve();
+          sourceImg!.onerror = () => reject(new Error('Failed to load source image for background blur'));
+          sourceImg!.src = job.sourceUrl;
+        });
+      }
+
+      let sourceX = 0;
+      let sourceY = 0;
+      let sourceWidth = width;
+      let sourceHeight = height;
+      if (cropRatio !== 'free') {
+        const [ratioWidth, ratioHeight] = cropRatio.split(':').map(Number);
+        const targetRatio = ratioWidth / ratioHeight;
+        if (width / height > targetRatio) {
+          sourceWidth = height * targetRatio;
+          sourceX = (width - sourceWidth) / 2;
+        } else {
+          sourceHeight = width / targetRatio;
+          sourceY = (height - sourceHeight) / 2;
+        }
+      }
+
+      // 1. Draw Background
       if (customBgImage) {
         await new Promise<void>((resolve) => {
           const bgImg = new Image();
           bgImg.crossOrigin = 'anonymous';
           bgImg.onload = () => {
-            const hRatio = canvas.width / bgImg.width;
-            const vRatio = canvas.height / bgImg.height;
+            ctx.save();
+            if (bgBlur > 0) ctx.filter = `blur(${bgBlur * 2}px)`;
+
+            const hRatio = width / bgImg.width;
+            const vRatio = height / bgImg.height;
             const ratio = Math.max(hRatio, vRatio);
-            const centerShift_x = (canvas.width - bgImg.width * ratio) / 2;
-            const centerShift_y = (canvas.height - bgImg.height * ratio) / 2;
-            ctx.drawImage(bgImg, 0, 0, bgImg.width, bgImg.height, centerShift_x, centerShift_y, bgImg.width * ratio, bgImg.height * ratio);
+            const shiftX = (width - bgImg.width * ratio) / 2;
+            const shiftY = (height - bgImg.height * ratio) / 2;
+
+            ctx.drawImage(bgImg, 0, 0, bgImg.width, bgImg.height, shiftX, shiftY, bgImg.width * ratio, bgImg.height * ratio);
+            ctx.restore();
+
+            if (bgDarken > 0) {
+              ctx.fillStyle = `rgba(0, 0, 0, ${bgDarken / 100})`;
+              ctx.fillRect(0, 0, width, height);
+            }
             resolve();
           };
           bgImg.onerror = () => resolve();
@@ -323,69 +619,79 @@ export default function BGRemoveWorkspace({
         ctx.fillRect(0, 0, width, height);
       }
 
-      ctx.save();
-      ctx.filter = `brightness(${adjustments.brightness}%) contrast(${adjustments.contrast}%) saturate(${adjustments.saturation}%) blur(${adjustments.blur}px)`;
-
-      if (subjectScale !== 1) {
-        const scaledW = width * subjectScale;
-        const scaledH = height * subjectScale;
-        const dx = (width - scaledW) / 2;
-        const dy = (height - scaledH) / 2;
-        ctx.drawImage(cutoutImg, dx, dy, scaledW, scaledH);
-      } else {
-        ctx.drawImage(cutoutImg, 0, 0, width, height);
+      if (sourceImg && subjectBgBlur > 0) {
+        const exportBlur = subjectBgBlur * Math.max(width, height) / 500;
+        const bleed = exportBlur * 2;
+        ctx.save();
+        ctx.filter = `blur(${exportBlur}px)`;
+        ctx.drawImage(sourceImg, -bleed, -bleed, width + bleed * 2, height + bleed * 2);
+        ctx.restore();
       }
 
+      // 2. Draw Subject (with filters and shadows)
+      ctx.save();
+      ctx.translate(width / 2, height / 2);
+      ctx.rotate((rotation * Math.PI) / 180);
+      ctx.filter = `brightness(${adjustments.brightness}%) contrast(${adjustments.contrast}%) saturate(${adjustments.saturation}%) blur(${adjustments.blur}px)`;
+
+      if (effects.shadow) {
+        const shadowAlpha = (effects.shadowOpacity ?? 50) / 100;
+        ctx.shadowColor = effects.shadowColor || 'rgba(0,0,0,0.5)';
+        ctx.shadowBlur = effects.shadowBlur * 2;
+        ctx.shadowOffsetY = (effects.shadowOffsetY ?? 14) * 2;
+      }
+
+      const scaledW = sourceWidth * subjectScale;
+      const scaledH = sourceHeight * subjectScale;
+      ctx.drawImage(
+        cutoutImg,
+        sourceX,
+        sourceY,
+        sourceWidth,
+        sourceHeight,
+        -scaledW / 2,
+        -scaledH / 2,
+        scaledW,
+        scaledH
+      );
       ctx.restore();
 
-      const mimeType = format === 'jpeg' ? 'image/jpeg' : format === 'webp' ? 'image/webp' : 'image/png';
-      canvas.toBlob((blob) => {
-        if (!blob) return;
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = downloadName(job.name).replace(/\.png$/, `.${format}`);
-        a.click();
-        URL.revokeObjectURL(url);
-        addToast('success', 'Download complete!');
-      }, mimeType, 0.95);
-    };
+      // 3. Render Design Layers (Vector Elements & Text)
+      renderDesignLayersToCanvas(ctx, width, height, textLayers, elementLayers);
 
-    cutoutImg.src = job.resultUrl;
+      // 4. Export Blob
+      const mimeType = format === 'jpeg' ? 'image/jpeg' : format === 'webp' ? 'image/webp' : 'image/png';
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) throw new Error('Blob creation failed');
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = downloadName(job.name).replace(/\.png$/, `.${format}`);
+          a.click();
+          URL.revokeObjectURL(url);
+          setIsDownloading(false);
+          addToast('success', 'Download complete!');
+        },
+        mimeType,
+        0.95
+      );
+    } catch (err: any) {
+      console.error('Download export failed:', err);
+      setIsDownloading(false);
+      addToast('error', `Download failed: ${err.message || 'unknown'}`);
+    }
   }
 
   function handleCustomBgImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (file) {
+      recordEditorEdit();
       const url = URL.createObjectURL(file);
       setCustomBgImage(url);
       setCustomBgColor(undefined);
+      setSubjectBgBlur(0);
       addToast('success', 'Custom background photo applied!');
-    }
-  }
-
-  async function handleLoadSample(sampleUrl: string, name: string) {
-    try {
-      addToast('info', `Downloading sample image "${name}"...`);
-      const res = await fetch(sampleUrl);
-      const blob = await res.blob();
-      const file = new File([blob], `${name.toLowerCase().replace(/\s+/g, '_')}.jpg`, { type: blob.type || 'image/jpeg' });
-      const newJob: BGJob = {
-        id: makeId(),
-        file,
-        name: `${name}.jpg`,
-        sourceUrl: URL.createObjectURL(file),
-        resultUrl: null,
-        resultBlob: null,
-        status: 'ready',
-        progress: 0,
-        message: 'Queued for cutout processing',
-      };
-      setJobs((prev) => [...prev, newJob]);
-      setSelectedId(newJob.id);
-      addToast('success', `Sample "${name}" loaded to canvas.`);
-    } catch (e) {
-      addToast('error', 'Failed to load sample image.');
     }
   }
 
@@ -410,118 +716,143 @@ export default function BGRemoveWorkspace({
     addToast('success', `Image "${file.name}" ready for cutout.`);
   };
 
-  return (
-    <div className="flex flex-col gap-6 max-w-6xl mx-auto w-full py-4">
-      {jobs.length > 0 && selected?.name && (
-        <div className="flex items-center justify-end">
-          <span className="text-xs font-mono px-3 py-1.5 rounded-full bg-slate-200/80 dark:bg-white/10 text-slate-700 dark:text-neutral-300 border border-slate-300/50 dark:border-white/10 font-semibold">
-            📁 {selected.name}
-          </span>
-        </div>
-      )}
+  const filteredElements = ELEMENT_PRESETS.filter((p) => {
+    if (elementCategory === 'all') return true;
+    return p.category === elementCategory;
+  });
 
+  return (
+    <div className="flex w-full flex-col items-center gap-2 px-2">
       {/* CANVA-STYLE WORKSPACE (ACTIVE AFTER UPLOADING IMAGES) */}
       {jobs.length > 0 ? (
-        <div className="flex flex-col gap-4 items-center w-full">
+        <>
           {/* ========================================================================= */}
-          {/* 1. TOP FLOATING NAVBAR / TOOLBAR PILL (EXACTLY AS IN SCREENSHOT) */}
+          {/* 1. TOP FLOATING NAVBAR / TOOLBAR PILL (MATCHING UI REFERENCE) */}
           {/* ========================================================================= */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="w-full max-w-4xl bg-white/95 dark:bg-[#16161E]/95 border border-slate-200/90 dark:border-white/10 text-slate-800 dark:text-white rounded-full px-5 py-2.5 shadow-xl backdrop-blur-2xl flex flex-wrap items-center justify-between gap-3 z-30"
+            className="w-full sticky max-w-4xl bg-white/95 dark:bg-[#16161E]/95 border border-slate-200/90 dark:border-white/10 text-slate-800 dark:text-white rounded-full px-5 py-2.5 shadow-xl backdrop-blur-2xl flex flex-wrap items-center justify-between gap-3 z-30"
           >
             {/* LEFT SIDE: FEATURE TABS */}
-            <div className="flex items-center gap-1 sm:gap-2">
+            <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto scrollbar-none">
               {[
-                { id: 'cutout' as TabType, label: 'Cutout', icon: '🪄' },
-                { id: 'background' as TabType, label: 'Background', icon: '🖼️' },
-                { id: 'effects' as TabType, label: 'Effects', icon: '🎨' },
-                { id: 'adjust' as TabType, label: 'Adjust', icon: '🎛️' },
-                { id: 'design' as TabType, label: 'Design', icon: '📁' },
+                { id: 'cutout' as TabType, label: 'Cutout', Icon: Scissors },
+                { id: 'background' as TabType, label: 'Background', Icon: ImageIcon },
+                { id: 'effects' as TabType, label: 'Effects', Icon: Sparkles },
+                { id: 'adjust' as TabType, label: 'Adjust', Icon: SlidersHorizontal },
+                { id: 'design' as TabType, label: 'Design', Icon: PanelsTopLeft },
               ].map((tab) => (
                 <button
                   key={tab.id}
+                  type="button"
                   onClick={() => setActiveTab(tab.id)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                  aria-current={activeTab === tab.id ? 'page' : undefined}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
                     activeTab === tab.id
                       ? 'bg-slate-200/80 dark:bg-white/15 text-slate-900 dark:text-white font-bold shadow-sm'
                       : 'text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                   }`}
                 >
-                  <span>{tab.icon}</span>
+                  <tab.Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                   <span>{tab.label}</span>
                 </button>
               ))}
             </div>
 
             {/* RIGHT SIDE: UTILITIES (COMPARE, UNDO, REDO) + PRIMARY DOWNLOAD BUTTON */}
-            <div className="flex items-center gap-3">
-              <div className="w-px h-5 bg-slate-200 dark:bg-white/15" />
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              <div className="hidden sm:block w-px h-5 bg-slate-200 dark:bg-white/15" />
 
               {/* COMPARE SPLIT TOGGLE [|] */}
               <button
-                onClick={() => setIsCompareMode(!isCompareMode)}
-                className={`p-2 rounded-full transition ${
+                type="button"
+                onClick={() => setIsCompareMode((prev) => !prev)}
+                className={`p-2 rounded-full transition cursor-pointer flex items-center justify-center ${
                   isCompareMode
                     ? 'bg-blue-600 text-white shadow-md'
                     : 'text-slate-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-white/10'
                 }`}
                 title="Toggle Before/After Compare"
+                aria-label="Toggle Before/After Compare"
               >
-                <Icon name="arrows" size={15} />
+                <Columns2 className="h-4 w-4" />
               </button>
 
               {/* UNDO BUTTON */}
               <button
-                disabled={!canUndo}
-                className="p-2 rounded-full text-slate-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent transition"
-                title={canUndo ? 'Undo Last Modification' : 'No Modifications to Undo'}
+                type="button"
+                disabled={!canUndoEditor}
+                onClick={undoEditorEdit}
+                className="p-2 rounded-full text-slate-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent transition flex items-center justify-center cursor-pointer"
+                title={canUndoEditor ? 'Undo Last Modification' : 'No Modifications to Undo'}
+                aria-label="Undo"
               >
-                <Icon name="undo" size={15} />
+                <Undo2 className="h-4 w-4" />
               </button>
 
               {/* REDO BUTTON */}
               <button
-                disabled={!canRedo}
-                className="p-2 rounded-full text-slate-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent transition"
-                title={canRedo ? 'Redo Last Modification' : 'No Modifications to Redo'}
+                type="button"
+                disabled={!canRedoEditor}
+                onClick={redoEditorEdit}
+                className="p-2 rounded-full text-slate-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent transition flex items-center justify-center cursor-pointer"
+                title={canRedoEditor ? 'Redo Last Modification' : 'No Modifications to Redo'}
+                aria-label="Redo"
               >
-                <Icon name="redo" size={15} />
+                <Redo2 className="h-4 w-4" />
               </button>
 
               {/* DOWNLOAD DROPDOWN BUTTON */}
-              <div className="relative">
+              <div className="relative" ref={downloadMenuRef}>
                 <button
-                  disabled={selected?.status === 'loading' || selected?.status === 'processing'}
-                  onClick={() => setShowDownloadMenu(!showDownloadMenu)}
-                  className="px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white font-extrabold text-xs shadow-lg shadow-blue-600/30 transition flex items-center gap-1.5 cursor-pointer"
+                  type="button"
+                  disabled={!selected?.resultUrl || selected?.status === 'loading' || selected?.status === 'processing' || isDownloading}
+                  onClick={() => setDownloadMenuOpen((prev) => !prev)}
+                  aria-expanded={downloadMenuOpen}
+                  className="px-4 sm:px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white font-extrabold text-xs shadow-lg shadow-blue-600/30 transition flex items-center gap-1.5 cursor-pointer"
                 >
-                  <span>Download</span>
-                  <span className="text-[10px]">∨</span>
+                  <DownloadIcon className="h-3.5 w-3.5" />
+                  <span>{isDownloading ? 'Rendering' : 'Download'}</span>
+                  <ChevronDown className="h-3.5 w-3.5" />
                 </button>
 
-                {showDownloadMenu && (
+                {downloadMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 rounded-2xl bg-white dark:bg-[#1A1A24] border border-slate-200 dark:border-white/10 shadow-2xl p-2 z-50 flex flex-col gap-1 text-xs font-semibold">
                     <button
-                      onClick={() => download(selected, 'png')}
-                      className="px-3 py-2 rounded-xl text-left hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-white transition flex items-center justify-between"
+                      type="button"
+                      onClick={() => {
+                        setDownloadFormat('png');
+                        setDownloadMenuOpen(false);
+                        if (selected) download(selected, 'png');
+                      }}
+                      className="px-3 py-2 rounded-xl text-left hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-white transition flex items-center justify-between cursor-pointer"
                     >
                       <span>PNG Image</span>
                       <span className="text-[10px] font-mono text-blue-500 font-bold">HD</span>
                     </button>
 
                     <button
-                      onClick={() => download(selected, 'webp')}
-                      className="px-3 py-2 rounded-xl text-left hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-white transition flex items-center justify-between"
+                      type="button"
+                      onClick={() => {
+                        setDownloadFormat('webp');
+                        setDownloadMenuOpen(false);
+                        if (selected) download(selected, 'webp');
+                      }}
+                      className="px-3 py-2 rounded-xl text-left hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-white transition flex items-center justify-between cursor-pointer"
                     >
                       <span>WebP Format</span>
                       <span className="text-[10px] font-mono text-neutral-400">Web</span>
                     </button>
 
                     <button
-                      onClick={() => download(selected, 'jpeg')}
-                      className="px-3 py-2 rounded-xl text-left hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-white transition flex items-center justify-between"
+                      type="button"
+                      onClick={() => {
+                        setDownloadFormat('jpeg');
+                        setDownloadMenuOpen(false);
+                        if (selected) download(selected, 'jpeg');
+                      }}
+                      className="px-3 py-2 rounded-xl text-left hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-white transition flex items-center justify-between cursor-pointer"
                     >
                       <span>JPG Photo</span>
                       <span className="text-[10px] font-mono text-neutral-400">Solid</span>
@@ -532,379 +863,1160 @@ export default function BGRemoveWorkspace({
             </div>
           </motion.div>
 
-          {/* ========================================================================= */}
-          {/* 2. ACTIVE TOOL SUB-PANEL DRAWER (BASED ON TOP TAB SELECTION) */}
-          {/* ========================================================================= */}
-          <AnimatePresence mode="wait">
-            {activeTab === 'background' && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="w-full max-w-3xl p-4 rounded-3xl bg-white/95 dark:bg-[#16161E]/95 border border-slate-200 dark:border-white/10 backdrop-blur-xl shadow-2xl flex flex-col gap-4 z-20"
-              >
-                <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-3">
-                  <div className="flex items-center bg-slate-100 dark:bg-white/10 p-1 rounded-full border border-slate-200 dark:border-white/10">
-                    <button
-                      onClick={() => setBgSubTab('photo')}
-                      className={`px-6 py-1.5 rounded-full text-xs font-bold transition-all ${
-                        bgSubTab === 'photo'
-                          ? 'bg-white dark:bg-white text-slate-900 shadow-md'
-                          : 'text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white'
-                      }`}
-                    >
-                      Photo
-                    </button>
-                    <button
-                      onClick={() => setBgSubTab('color')}
-                      className={`px-6 py-1.5 rounded-full text-xs font-bold transition-all ${
-                        bgSubTab === 'color'
-                          ? 'bg-white dark:bg-white text-slate-900 shadow-md'
-                          : 'text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white'
-                      }`}
-                    >
-                      Color
-                    </button>
-                  </div>
+          <div className="bgremove-workspace-grid">
 
-                  <span className="text-[11px] font-mono text-slate-500 dark:text-neutral-400">
-                    Custom background generator
+          <div className="bgremove-canvas-column">
+            {/* STAGE HEADER BAR */}
+            <div className="flex w-full flex-wrap items-center justify-between gap-3 px-2 py-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono px-3 py-1.5 rounded-full bg-slate-200/80 dark:bg-white/10 text-slate-800 dark:text-neutral-200 border border-slate-300/60 dark:border-white/10 font-bold truncate max-w-xs">
+                  📁 {selected?.name || 'Untitled Image'}
+                </span>
+                {selected?.status === 'done' && (
+                  <span className="text-[11px] font-mono px-2.5 py-1 rounded-full bg-[#00FF85]/15 text-[#00FF85] border border-[#00FF85]/30 font-bold">
+                    ✓ Clean Cutout
                   </span>
-                </div>
+                )}
+              </div>
+              <div className="flex items-center gap-1 rounded-full border border-white/10 bg-[#111319]/90 p-1 text-white shadow-lg backdrop-blur-xl">
+                <button type="button" onClick={() => setViewportZoom((zoom) => Math.max(0.5, Math.round((zoom - 0.25) * 100) / 100))} aria-label="Zoom out" title="Zoom out" className="flex h-8 w-8 items-center justify-center rounded-full transition hover:bg-white/10"><ZoomOut className="h-4 w-4" /></button>
+                <button type="button" onClick={() => setViewportZoom(1)} aria-label="Reset zoom" title="Reset zoom" className="min-w-12 rounded-full px-2 py-1.5 text-xs font-bold tabular-nums transition hover:bg-white/10">{Math.round(viewportZoom * 100)}%</button>
+                <button type="button" onClick={() => setViewportZoom((zoom) => Math.min(3, Math.round((zoom + 0.25) * 100) / 100))} aria-label="Zoom in" title="Zoom in" className="flex h-8 w-8 items-center justify-center rounded-full transition hover:bg-white/10"><ZoomIn className="h-4 w-4" /></button>
+                <span className="mx-0.5 h-5 w-px bg-white/15" />
+                <button type="button" onClick={() => setViewportZoom(1)} aria-label="Reset zoom" title="Reset zoom" className="flex h-8 w-8 items-center justify-center rounded-full transition hover:bg-white/10"><RotateCcw className="h-4 w-4" /></button>
+              </div>
+            </div>
 
-                {bgSubTab === 'photo' && (
-                  <div className="flex flex-col gap-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-800 dark:text-white">
-                        Background Photos
-                      </span>
+            {/* THE UNIFIED STAGE (NO DUPLICATE IMAGES!) */}
+            <div className="w-full relative">
+              <BGComparator
+                job={selected}
+                activeTab={activeTab}
+                cutoutTool={cutoutTool}
+                brushSize={brushSize}
+                backgroundStyle={selectedBg.style}
+                customBgColor={customBgColor || selectedBg.fill || undefined}
+                customBgImage={customBgImage}
+                subjectBgBlur={subjectBgBlur}
+                bgBlur={bgBlur}
+                bgDarken={bgDarken}
+                adjustments={adjustments}
+                effects={effects}
+                isCompareMode={isCompareMode}
+                scale={subjectScale}
+                rotation={rotation}
+                cropRatio={fabricEditMode === 'crop' ? fabricCropRatioDraft : cropRatio}
+                fabricEditMode={fabricEditMode}
+                onFabricCropRatioChange={setFabricCropRatioDraft}
+                onFabricEditApply={handleFabricEditApply}
+                onFabricEditCancel={() => { setFabricCropRatioDraft(cropRatio); setFabricEditMode(null); }}
+                viewportZoom={viewportZoom}
+                onScaleChange={setSubjectScale}
+                onBrushStroke={handleBrushStroke}
+                textLayers={textLayers}
+                elementLayers={elementLayers}
+                selectedLayerId={selectedLayerId}
+                onSelectLayer={setSelectedLayerId}
+                onUpdateTextLayerPosition={(id, x, y) => updateTextLayer(id, { x, y })}
+                onUpdateElementLayerPosition={(id, x, y) => updateElementLayer(id, { x, y })}
+                onDeleteLayer={deleteLayer}
+              />
+            </div>
+
+            {/* BOTTOM THUMBNAIL DOCK */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="z-20 flex w-full items-center justify-center py-2"
+            >
+              <div className="mx-auto flex w-fit max-w-full items-center gap-3 overflow-x-auto px-4 pb-2 pt-3">
+                <button
+                  type="button"
+                  onClick={onOpenPicker}
+                  className="flex h-14 w-14 shrink-0 cursor-pointer items-center justify-center rounded-2xl bg-[#17191F] text-2xl font-light text-white/75 transition hover:bg-[#00FF85]/10 hover:text-[#00FF85]"
+                  title="Add Image to Workspace"
+                  aria-label="Add image to workspace"
+                >
+                  <span aria-hidden="true">+</span>
+                </button>
+                {jobs.map((job) => {
+                  const isSelected = selected?.id === job.id;
+                  return (
+                    <div
+                      key={job.id}
+                      className="group relative h-14 w-14 shrink-0"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setSelectedId(job.id)}
+                        aria-label={`Select ${job.name}`}
+                        aria-pressed={isSelected}
+                        className={`h-full w-full cursor-pointer overflow-hidden rounded-2xl border transition-all duration-200 ${
+                          isSelected
+                            ? 'shadow-[0_0_0_2px_rgba(0,255,133,0.7),0_0_16px_rgba(0,255,133,0.2)]'
+                            : 'opacity-70 hover:opacity-100'
+                        }`}
+                      >
+                        <img
+                          src={job.resultUrl || job.sourceUrl}
+                          alt={job.name}
+                          className="h-full w-full rounded-2xl object-cover bg-[repeating-conic-gradient(#26282e_0%_25%,#1b1d22_0%_50%)] [background-size:12px_12px]"
+                        />
+                      </button>
 
                       <button
-                        onClick={() => bgFileInputRef.current?.click()}
-                        className="px-4 py-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5"
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeJob(job.id);
+                        }}
+                        className="absolute -right-1.5 -top-1.5 z-20 flex h-5 w-5 scale-90 items-center justify-center rounded-full border border-white/20 bg-black/90 text-xs font-bold text-white/80 opacity-0 shadow-md transition group-hover:scale-100 group-hover:opacity-100 hover:bg-rose-600 hover:text-white focus:scale-100 focus:opacity-100"
+                        title="Delete Image"
+                        aria-label={`Remove ${job.name}`}
                       >
-                        <span>+</span> Upload Custom Photo
+                        ×
                       </button>
-                      <input
-                        ref={bgFileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handleCustomBgImageUpload}
-                        className="hidden"
-                      />
                     </div>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                      {PHOTO_PRESETS.map((photo) => (
-                        <div
-                          key={photo.id}
-                          onClick={() => {
-                            setCustomBgImage(photo.url);
-                            setCustomBgColor(undefined);
-                          }}
-                          className={`group relative h-20 rounded-2xl overflow-hidden cursor-pointer border-2 transition-all shadow-md ${
-                            customBgImage === photo.url
-                              ? 'border-blue-600 ring-2 ring-blue-500/30 scale-105'
-                              : 'border-transparent hover:border-slate-300 dark:hover:border-white/30'
-                          }`}
-                        >
-                          <img
-                            src={photo.url}
-                            alt={photo.label}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                          />
-                          <span className="absolute bottom-1 left-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/60 text-[9px] font-semibold text-white truncate text-center">
-                            {photo.label}
-                          </span>
+          {/* ========================================================================= */}
+          {/* RIGHT SIDE: SETTINGS PANEL FOR (CUTOUT, BG, EFFECTS, ADJUST, DESIGN) */}
+          {/* ========================================================================= */}
+          <div className="bgremove-settings-column">
+            <div className="flex max-h-[calc(100vh-9rem)] flex-col gap-3 overflow-hidden rounded-2xl border border-white/10 bg-[#12141A]/95 p-4 shadow-2xl backdrop-blur-2xl">
+
+              {/* ACTIVE TAB CONTENT */}
+              <div className="min-h-[300px] max-h-[calc(100vh-10rem)] overflow-y-auto overscroll-contain pr-1">
+                <AnimatePresence mode="wait">
+                  {/* TAB 1: CUTOUT */}
+                  {activeTab === 'cutout' && (
+                    <motion.div
+                      key="tab-cutout"
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      className="flex flex-col gap-4 text-xs font-semibold"
+                    >
+                      <div>
+                        <span className="text-slate-800 dark:text-white font-bold block mb-1.5">
+                          Cutout Tools
+                        </span>
+                          <div className="grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setCutoutTool('erase')}
+                            className={`py-2.5 px-2 rounded-2xl border text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                              cutoutTool === 'erase'
+                                ? 'bg-rose-600 border-rose-500 text-white shadow-md shadow-rose-500/20'
+                                : 'border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-700 dark:text-neutral-300 hover:bg-slate-100'
+                            }`}
+                          >
+                            <span>✂️</span>
+                              <span>Erase</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setCutoutTool('restore')}
+                            className={`py-2.5 px-2 rounded-2xl border text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                              cutoutTool === 'restore'
+                                ? 'bg-[#00FF85] border-[#00FF85] text-black shadow-md shadow-[#00FF85]/20 font-black'
+                                : 'border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-700 dark:text-neutral-300 hover:bg-slate-100'
+                            }`}
+                          >
+                            <span>✦</span>
+                              <span>Restore</span>
+                          </button>
                         </div>
-                      ))}
+                      </div>
 
-                      {customBgImage && (
-                        <button
-                          onClick={() => setCustomBgImage(undefined)}
-                          className="h-20 rounded-2xl border-2 border-dashed border-rose-400/50 hover:bg-rose-500/10 text-rose-500 font-bold text-xs flex flex-col items-center justify-center gap-1 transition"
-                        >
-                          <span>✕</span> Clear Photo
-                        </button>
+                      {/* BRUSH SIZE SLIDER */}
+                      {(cutoutTool === 'erase' || cutoutTool === 'restore') && (
+                        <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.04]">
+                          <div className="flex items-center justify-between text-slate-700 dark:text-neutral-300">
+                            <div className="flex items-center gap-2">
+                              <span className={`h-3 w-3 rounded-full ${cutoutTool === 'erase' ? 'bg-rose-500' : 'bg-[#00FF85]'}`} />
+                              <span className="font-bold">Brush size</span>
+                            </div>
+                            <output className="rounded-lg bg-white px-2.5 py-1 font-mono text-xs font-bold text-slate-800 shadow-sm dark:bg-white/10 dark:text-white">{brushSize}px</output>
+                          </div>
+                          <input
+                            type="range"
+                            min="10"
+                            max="120"
+                            value={brushSize}
+                            onChange={(e) => setBrushSize(Number(e.target.value))}
+                            aria-label="Brush size"
+                            className={`h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-blue-500 dark:bg-white/15 ${cutoutTool === 'erase' ? 'accent-rose-500' : 'accent-[#00FF85]'}`}
+                          />
+                          <div className="flex justify-between px-0.5 text-[10px] font-medium text-slate-400 dark:text-white/40"><span>Fine</span><span>Broad</span></div>
+                        </div>
                       )}
-                    </div>
-                  </div>
-                )}
 
-                {bgSubTab === 'color' && (
-                  <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-semibold">
-                    <span className="text-slate-700 dark:text-neutral-300 font-bold">Presets:</span>
-                    <div className="flex flex-wrap items-center gap-2">
-                      {COLOR_PRESETS.map((preset) => (
+                      {/* RESET CUTOUT BUTTON */}
+                      <div className="pt-2 flex items-center justify-between">
                         <button
-                          key={preset.id}
+                          type="button"
                           onClick={() => {
-                            setSelectedBg(preset);
-                            setCustomBgColor(undefined);
-                            setCustomBgImage(undefined);
+                            if (selected) processJob(selected);
                           }}
-                          className={`px-3 py-1 rounded-xl border transition ${
-                            selectedBg.id === preset.id && !customBgColor && !customBgImage
-                              ? 'border-blue-500 bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold'
-                              : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-neutral-400 hover:bg-slate-100 dark:hover:bg-white/5'
+                          className="px-4 py-2 rounded-xl text-rose-500 hover:bg-rose-500/10 border border-rose-400/30 text-xs font-bold transition flex items-center gap-1.5"
+                        >
+                          <span>↺</span> Re-run AI Cutout
+                        </button>
+                        <span className="text-[11px] text-slate-500 dark:text-neutral-400">
+                          Resets brush edits
+                        </span>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* TAB 2: BACKGROUND */}
+                  {activeTab === 'background' && (
+                    <motion.div
+                      key="tab-bg"
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      className="flex flex-col gap-4 text-xs font-semibold"
+                    >
+                      {/* Sub-tab switcher */}
+                      <div className="flex items-center bg-slate-100 dark:bg-white/5 p-1 rounded-2xl border border-slate-200 dark:border-white/10">
+                        <button
+                          type="button"
+                          onClick={() => setBgSubTab('photo')}
+                          className={`flex-1 py-1.5 rounded-xl font-bold transition ${
+                            bgSubTab === 'photo'
+                              ? 'bg-white dark:bg-white text-slate-900 shadow-md'
+                              : 'text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white'
                           }`}
                         >
-                          {preset.label}
+                          📷 Photos
                         </button>
-                      ))}
-                      <label className="flex items-center gap-1.5 px-3 py-1 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 cursor-pointer text-slate-700 dark:text-neutral-300 hover:bg-slate-100">
-                        <span>Custom Hex</span>
+                        <button
+                          type="button"
+                          onClick={() => setBgSubTab('color')}
+                          className={`flex-1 py-1.5 rounded-xl font-bold transition ${
+                            bgSubTab === 'color'
+                              ? 'bg-white dark:bg-white text-slate-900 shadow-md'
+                              : 'text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white'
+                          }`}
+                        >
+                          🎨 Colors & Solid
+                        </button>
+                      </div>
+
+                      {bgSubTab === 'photo' && (
+                        <div className="flex flex-col gap-3">
+                          <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-white/[0.04]">
+                            <button
+                              type="button"
+                              role="switch"
+                              aria-checked={subjectBgBlur > 0}
+                              onClick={() => {
+                                recordEditorEdit();
+                                if (subjectBgBlur > 0) {
+                                  setSubjectBgBlur(0);
+                                } else {
+                                  setSubjectBgBlur(12);
+                                  setSelectedBg(COLOR_PRESETS[0]);
+                                  setCustomBgImage(undefined);
+                                  setCustomBgColor(undefined);
+                                }
+                              }}
+                              className="flex w-full items-center justify-between gap-3 text-left"
+                            >
+                              <span className="flex flex-col">
+                                <span className="font-bold text-slate-800 dark:text-white">Blur original background</span>
+                                <span className="text-[10px] font-medium text-slate-500 dark:text-white/45">Keeps the detected subject sharp</span>
+                              </span>
+                              <span className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${subjectBgBlur > 0 ? 'bg-[#00C86A]' : 'bg-slate-300 dark:bg-white/15'}`}>
+                                <span className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow transition-transform ${subjectBgBlur > 0 ? 'translate-x-6' : 'translate-x-1'}`} />
+                              </span>
+                            </button>
+                            {subjectBgBlur > 0 && (
+                              <div className="flex flex-col gap-2 border-t border-slate-200 pt-3 dark:border-white/10">
+                                <div className="flex items-center justify-between text-slate-700 dark:text-neutral-300">
+                                  <label htmlFor="subject-background-blur" className="font-bold">Blur intensity</label>
+                                  <output htmlFor="subject-background-blur" className="font-mono font-bold text-[#00C86A]">{subjectBgBlur}px</output>
+                                </div>
+                                <input
+                                  id="subject-background-blur"
+                                  type="range"
+                                  min="1"
+                                  max="30"
+                                  value={subjectBgBlur}
+                                  onPointerDown={recordEditorEdit}
+                                  onChange={(e) => setSubjectBgBlur(Number(e.target.value))}
+                                  aria-label="Background blur intensity"
+                                  className="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-[#00C86A] dark:bg-white/15"
+                                />
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-slate-800 dark:text-white">Photo Backdrops</span>
+                            <input
+                              ref={bgFileInputRef}
+                              type="file"
+                              accept="image/*"
+                              onChange={handleCustomBgImageUpload}
+                              className="hidden"
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-3 gap-2.5">
+                            <button
+                              type="button"
+                              onClick={() => bgFileInputRef.current?.click()}
+                              className="group flex aspect-square flex-col items-center justify-center gap-1 rounded-2xl border border-dashed border-slate-300 bg-slate-50 text-slate-600 transition hover:border-[#00FF85] hover:bg-[#00FF85]/10 hover:text-[#07834A] dark:border-white/15 dark:bg-white/[0.03] dark:text-white/65 dark:hover:text-[#00FF85]"
+                              aria-label="Upload a backdrop photo"
+                            >
+                              <span className="text-2xl font-light">+</span>
+                              <span className="text-[10px] font-bold">Add photo</span>
+                            </button>
+                            {PHOTO_PRESETS.map((photo) => (
+                              <button
+                                key={photo.id}
+                                type="button"
+                                aria-label={`Use ${photo.label} backdrop`}
+                                title={photo.label}
+                                onClick={() => {
+                                  recordEditorEdit();
+                                  setCustomBgImage(photo.url);
+                                  setCustomBgColor(undefined);
+                                  setSubjectBgBlur(0);
+                                }}
+                                className={`group relative aspect-square overflow-hidden rounded-2xl border-2 transition-all shadow-md ${
+                                  customBgImage === photo.url
+                                    ? 'border-[#00FF85] ring-2 ring-[#00FF85]/25'
+                                    : 'border-transparent hover:border-white/40'
+                                }`}
+                              >
+                                <img
+                                  src={photo.url}
+                                  alt={photo.label}
+                                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                />
+                              </button>
+                            ))}
+                          </div>
+
+                          {customBgImage && (
+                            <div className="flex flex-col gap-3 pt-2 border-t border-slate-200 dark:border-white/10">
+                              <div className="flex items-center justify-between">
+                                <span className="text-slate-700 dark:text-neutral-300 font-bold">
+                                  Background Blur
+                                </span>
+                                <span className="font-mono text-blue-500 font-bold">{bgBlur}px</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="0"
+                                max="25"
+                                value={bgBlur}
+                                onPointerDown={recordEditorEdit}
+                                onChange={(e) => setBgBlur(Number(e.target.value))}
+                                className="accent-blue-500 cursor-pointer w-full"
+                              />
+
+                              <div className="flex items-center justify-between">
+                                <span className="text-slate-700 dark:text-neutral-300 font-bold">
+                                  Darken Overlay
+                                </span>
+                                <span className="font-mono text-blue-500 font-bold">{bgDarken}%</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="0"
+                                max="80"
+                                value={bgDarken}
+                                onPointerDown={recordEditorEdit}
+                                onChange={(e) => setBgDarken(Number(e.target.value))}
+                                className="accent-blue-500 cursor-pointer w-full"
+                              />
+
+                              <button
+                                type="button"
+                                onClick={() => { recordEditorEdit(); setCustomBgImage(undefined); }}
+                                className="py-1.5 px-3 rounded-xl border border-rose-500/40 text-rose-500 hover:bg-rose-500/10 font-bold text-xs transition"
+                              >
+                                ✕ Clear Backdrop Photo
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {bgSubTab === 'color' && (
+                        <div className="flex flex-col gap-3">
+                          <span className="font-bold text-slate-800 dark:text-white">Backdrop color</span>
+                          <div className="grid grid-cols-4 gap-2.5">
+                            {COLOR_PRESETS.map((preset) => (
+                              <button
+                                key={preset.id}
+                                type="button"
+                                title={preset.label}
+                                aria-label={`Use ${preset.label} backdrop`}
+                                aria-pressed={selectedBg.id === preset.id && !customBgColor && !customBgImage}
+                                onClick={() => {
+                                  recordEditorEdit();
+                                  setSelectedBg(preset);
+                                  setCustomBgColor(undefined);
+                                  setCustomBgImage(undefined);
+                                  setSubjectBgBlur(0);
+                                }}
+                                className={`relative aspect-square rounded-xl border-2 transition cursor-pointer ${
+                                  selectedBg.id === preset.id && !customBgColor && !customBgImage
+                                    ? 'border-[#00FF85] ring-2 ring-[#00FF85]/20'
+                                    : 'border-transparent hover:border-white/40'
+                                }`}
+                              >
+                                <span
+                                  className={`absolute inset-0 rounded-[10px] border border-black/10 ${preset.style}`}
+                                  style={preset.fill ? { backgroundColor: preset.fill } : {}}
+                                />
+                                {preset.id === 'transparent' && (
+                                  <svg className="absolute left-1/2 top-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                    <path fillRule="evenodd" clipRule="evenodd" d="M12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3ZM5 12C5 8.13401 8.13401 5 12 5C13.5725 5 15.0239 5.51851 16.1925 6.39389L6.39389 16.1925C5.51851 15.0239 5 13.5725 5 12ZM7.80819 17.6067C8.97671 18.4817 10.4278 19 12 19C15.866 19 19 15.866 19 12C19 10.4278 18.4817 8.97671 17.6067 7.80819L7.80819 17.6067Z" fill="currentColor" />
+                                  </svg>
+                                )}
+                              </button>
+                            ))}
+                            <div className="relative">
+                              <div className={`relative aspect-square w-full overflow-hidden rounded-xl border-2 ${customBgColor ? 'border-[#00FF85] ring-2 ring-[#00FF85]/20' : 'border-slate-300 dark:border-white/15'}`}>
+                                <span className="absolute inset-0 rounded-[10px]" style={{ background: customBgColor || 'linear-gradient(135deg, #f72585 0%, #7b2ff7 22%, #247bff 44%, #00c9a7 66%, #ffb703 84%, #f72585 100%)' }} />
+                                <span className="pointer-events-none absolute inset-0 flex items-center justify-center text-xl font-medium text-white drop-shadow">+</span>
+                                <input
+                                  type="color"
+                                  value={customBgColor || '#ffffff'}
+                                  onChange={(event) => {
+                                    recordEditorEdit();
+                                    setCustomBgColor(event.target.value);
+                                    setCustomBgImage(undefined);
+                                    setSubjectBgBlur(0);
+                                  }}
+                                  className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                                  aria-label="Open custom backdrop color picker"
+                                  title="Custom color"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+
+                  {/* TAB 3: EFFECTS */}
+                  {activeTab === 'effects' && (
+                    <motion.div
+                      key="tab-effects"
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      className="flex flex-col gap-4 text-xs font-semibold"
+                    >
+                      {/* SOFT DROP SHADOW */}
+                      <div className="p-3.5 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex flex-col gap-3">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-slate-800 dark:text-white">Soft Drop Shadow</span>
+                          <input
+                            type="checkbox"
+                            checked={effects.shadow}
+                            onChange={(e) => { recordEditorEdit(); setEffects((prev) => ({ ...prev, shadow: e.target.checked })); }}
+                            className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
+                          />
+                        </div>
+
+                        {effects.shadow && (
+                          <div className="flex flex-col gap-2 pt-2 border-t border-slate-200 dark:border-white/10">
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-600 dark:text-neutral-400">Blur:</span>
+                              <span className="font-mono text-blue-500">{effects.shadowBlur}px</span>
+                            </div>
+                            <input
+                              type="range"
+                              min="5"
+                              max="40"
+                              value={effects.shadowBlur}
+                              onPointerDown={recordEditorEdit}
+                              onChange={(e) => setEffects((prev) => ({ ...prev, shadowBlur: Number(e.target.value) }))}
+                              className="accent-blue-500 cursor-pointer"
+                            />
+
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-600 dark:text-neutral-400">Offset Y:</span>
+                              <span className="font-mono text-blue-500">{effects.shadowOffsetY ?? 14}px</span>
+                            </div>
+                            <input
+                              type="range"
+                              min="0"
+                              max="35"
+                              value={effects.shadowOffsetY ?? 14}
+                              onPointerDown={recordEditorEdit}
+                              onChange={(e) =>
+                                setEffects((prev) => ({ ...prev, shadowOffsetY: Number(e.target.value) }))
+                              }
+                              className="accent-blue-500 cursor-pointer"
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* EDGE STROKE / OUTLINE */}
+                      <div className="p-3.5 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex flex-col gap-3">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-slate-800 dark:text-white">Edge Stroke / Sticker</span>
+                          <input
+                            type="checkbox"
+                            checked={effects.stroke}
+                            onChange={(e) => { recordEditorEdit(); setEffects((prev) => ({ ...prev, stroke: e.target.checked })); }}
+                            className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
+                          />
+                        </div>
+
+                        {effects.stroke && (
+                          <div className="flex flex-col gap-2 pt-2 border-t border-slate-200 dark:border-white/10">
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-600 dark:text-neutral-400">Stroke Width:</span>
+                              <span className="font-mono text-blue-500">{effects.strokeWidth}px</span>
+                            </div>
+                            <input
+                              type="range"
+                              min="2"
+                              max="16"
+                              value={effects.strokeWidth}
+                              onPointerDown={recordEditorEdit}
+                              onChange={(e) =>
+                                setEffects((prev) => ({ ...prev, strokeWidth: Number(e.target.value) }))
+                              }
+                              className="accent-blue-500 cursor-pointer"
+                            />
+
+                            <div className="flex items-center justify-between pt-1">
+                              <span className="text-slate-600 dark:text-neutral-400">Stroke Color:</span>
+                              <div className="flex items-center gap-1.5">
+                                {['#FFFFFF', '#00FF85', '#38BDF8', '#F43F5E', '#F59E0B'].map((col) => (
+                                  <button
+                                    key={col}
+                                    type="button"
+                                    onClick={() => { recordEditorEdit(); setEffects((prev) => ({ ...prev, strokeColor: col })); }}
+                                    className={`w-5 h-5 rounded-full border ${
+                                      effects.strokeColor === col ? 'ring-2 ring-white scale-110' : 'opacity-80'
+                                    }`}
+                                    style={{ backgroundColor: col }}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* TAB 4: ADJUST */}
+                  {activeTab === 'adjust' && (
+                    <motion.div
+                      key="tab-adjust"
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      className="flex flex-col gap-3.5 text-xs font-semibold"
+                    >
+                      <div>
+                        <span className="mb-1.5 block font-bold text-slate-800 dark:text-white">Subject position</span>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            onClick={() => { recordEditorEdit(); setFabricEditMode('transform'); setCutoutTool('move'); }}
+                            aria-pressed={fabricEditMode === 'transform'}
+                            className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-bold transition ${
+                              fabricEditMode === 'transform'
+                                ? 'border-[#00FF85] bg-[#00FF85]/15 text-[#087847] dark:text-[#00FF85]'
+                                : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 dark:border-white/10 dark:bg-white/5 dark:text-neutral-300 dark:hover:bg-white/10'
+                            }`}
+                          >
+                            <span aria-hidden="true">✋</span><span>Transform</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { recordEditorEdit(); setFabricCropRatioDraft(cropRatio); setFabricEditMode('crop'); setCutoutTool('move'); }}
+                            aria-pressed={fabricEditMode === 'crop'}
+                            className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-bold transition ${
+                              fabricEditMode === 'crop'
+                                ? 'border-[#00FF85] bg-[#00FF85]/15 text-[#087847] dark:text-[#00FF85]'
+                                : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 dark:border-white/10 dark:bg-white/5 dark:text-neutral-300 dark:hover:bg-white/10'
+                            }`}
+                          >
+                            <CropIcon className="h-4 w-4" /><span>Crop</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-white/5">
+                        <div className="flex items-center justify-between text-slate-700 dark:text-neutral-300">
+                          <span className="font-bold">Subject scale</span>
+                          <span className="font-mono font-bold text-blue-500">{Math.round(subjectScale * 100)}%</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <input type="range" min="0.4" max="2.0" step="0.05" value={subjectScale} onPointerDown={recordEditorEdit} onChange={(e) => setSubjectScale(Number(e.target.value))} className="flex-1 cursor-pointer accent-blue-500" />
+                          <button type="button" onClick={() => { recordEditorEdit(); setSubjectScale(1); }} className="rounded-lg bg-slate-200 px-2.5 py-1 text-[10px] font-bold transition hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20">100%</button>
+                        </div>
+                      </div>
+
+                      <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-white/5">
+                        <span className="mb-2 block font-bold text-slate-700 dark:text-white/80">Rotate</span>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button type="button" onClick={() => { recordEditorEdit(); setRotation((angle) => (angle - 90 + 360) % 360); }} className="flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-white/10 dark:bg-white/5 dark:text-white/80 dark:hover:bg-white/10"><RotateCcw className="h-4 w-4" />Rotate left</button>
+                          <button type="button" onClick={() => { recordEditorEdit(); setRotation((angle) => (angle + 90) % 360); }} className="flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-white/10 dark:bg-white/5 dark:text-white/80 dark:hover:bg-white/10"><RotateCw className="h-4 w-4" />Rotate right</button>
+                        </div>
+                      </div>
+
+                      <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-white/5">
+                        <div className="mb-2 flex items-center justify-between">
+                          <span className="font-bold text-slate-700 dark:text-white/80">Crop</span>
+                          <CropIcon className="h-4 w-4 text-slate-400" />
+                        </div>
+                        <div className="grid grid-cols-4 gap-1 rounded-lg bg-slate-200/70 p-1 dark:bg-black/20">
+                            {(['free', '1:1', '4:5', '16:9', '9:16'] as const).map((ratio) => (
+                            <button key={ratio} type="button" onClick={() => { recordEditorEdit(); setFabricCropRatioDraft(ratio); setFabricEditMode('crop'); setCutoutTool('move'); }} aria-pressed={fabricEditMode === 'crop' ? fabricCropRatioDraft === ratio : cropRatio === ratio} className={`rounded-md px-1.5 py-2 text-[11px] font-bold transition ${(fabricEditMode === 'crop' ? fabricCropRatioDraft === ratio : cropRatio === ratio) ? 'bg-white text-slate-900 shadow-sm dark:bg-white/15 dark:text-white' : 'text-slate-500 hover:text-slate-900 dark:text-white/45 dark:hover:text-white'}`}>{ratio === 'free' ? 'Free' : ratio}</button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <label className="flex flex-col gap-1.5 text-slate-700 dark:text-neutral-300">
+                        <div className="flex justify-between">
+                          <span className="font-bold">Brightness</span>
+                          <span className="font-mono text-blue-500 font-bold">{adjustments.brightness}%</span>
+                        </div>
                         <input
-                          type="color"
-                          onChange={(e) => {
-                            setCustomBgColor(e.target.value);
-                            setCustomBgImage(undefined);
-                          }}
-                          className="w-4 h-4 rounded border-none bg-transparent cursor-pointer"
+                          type="range"
+                          min="50"
+                          max="150"
+                          value={adjustments.brightness}
+                          onPointerDown={recordEditorEdit}
+                          onChange={(e) =>
+                            setAdjustments((prev) => ({ ...prev, brightness: Number(e.target.value) }))
+                          }
+                          className="accent-blue-500 cursor-pointer"
                         />
                       </label>
-                    </div>
-                  </div>
-                )}
-              </motion.div>
-            )}
 
-            {activeTab === 'adjust' && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="w-full max-w-3xl p-4 rounded-2xl bg-white/90 dark:bg-[#16161E]/90 border border-slate-200 dark:border-white/10 backdrop-blur-xl shadow-lg grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-semibold z-20"
-              >
-                <label className="flex flex-col gap-1.5 text-slate-700 dark:text-neutral-300">
-                  <div className="flex justify-between">
-                    <span>Brightness</span>
-                    <span className="font-mono text-blue-500">{adjustments.brightness}%</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="50"
-                    max="150"
-                    value={adjustments.brightness}
-                    onChange={(e) => setAdjustments((prev) => ({ ...prev, brightness: Number(e.target.value) }))}
-                    className="accent-blue-500 cursor-pointer"
-                  />
-                </label>
+                      <label className="flex flex-col gap-1.5 text-slate-700 dark:text-neutral-300">
+                        <div className="flex justify-between">
+                          <span className="font-bold">Contrast</span>
+                          <span className="font-mono text-blue-500 font-bold">{adjustments.contrast}%</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="50"
+                          max="150"
+                          value={adjustments.contrast}
+                          onPointerDown={recordEditorEdit}
+                          onChange={(e) =>
+                            setAdjustments((prev) => ({ ...prev, contrast: Number(e.target.value) }))
+                          }
+                          className="accent-blue-500 cursor-pointer"
+                        />
+                      </label>
 
-                <label className="flex flex-col gap-1.5 text-slate-700 dark:text-neutral-300">
-                  <div className="flex justify-between">
-                    <span>Contrast</span>
-                    <span className="font-mono text-blue-500">{adjustments.contrast}%</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="50"
-                    max="150"
-                    value={adjustments.contrast}
-                    onChange={(e) => setAdjustments((prev) => ({ ...prev, contrast: Number(e.target.value) }))}
-                    className="accent-blue-500 cursor-pointer"
-                  />
-                </label>
+                      <label className="flex flex-col gap-1.5 text-slate-700 dark:text-neutral-300">
+                        <div className="flex justify-between">
+                          <span className="font-bold">Saturation</span>
+                          <span className="font-mono text-blue-500 font-bold">{adjustments.saturation}%</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="200"
+                          value={adjustments.saturation}
+                          onPointerDown={recordEditorEdit}
+                          onChange={(e) =>
+                            setAdjustments((prev) => ({ ...prev, saturation: Number(e.target.value) }))
+                          }
+                          className="accent-blue-500 cursor-pointer"
+                        />
+                      </label>
 
-                <label className="flex flex-col gap-1.5 text-slate-700 dark:text-neutral-300">
-                  <div className="flex justify-between">
-                    <span>Saturation</span>
-                    <span className="font-mono text-blue-500">{adjustments.saturation}%</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="200"
-                    value={adjustments.saturation}
-                    onChange={(e) => setAdjustments((prev) => ({ ...prev, saturation: Number(e.target.value) }))}
-                    className="accent-blue-500 cursor-pointer"
-                  />
-                </label>
-              </motion.div>
-            )}
+                      <label className="flex flex-col gap-1.5 text-slate-700 dark:text-neutral-300">
+                        <div className="flex justify-between">
+                          <span className="font-bold">Blur / Soften</span>
+                          <span className="font-mono text-blue-500 font-bold">{adjustments.blur}px</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="15"
+                          value={adjustments.blur}
+                          onPointerDown={recordEditorEdit}
+                          onChange={(e) =>
+                            setAdjustments((prev) => ({ ...prev, blur: Number(e.target.value) }))
+                          }
+                          className="accent-blue-500 cursor-pointer"
+                        />
+                      </label>
 
-            {activeTab === 'effects' && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="w-full max-w-3xl p-3.5 rounded-2xl bg-white/90 dark:bg-[#16161E]/90 border border-slate-200 dark:border-white/10 backdrop-blur-xl shadow-lg flex flex-wrap items-center justify-around gap-4 text-xs font-semibold z-20"
-              >
-                <label className="flex items-center gap-2 cursor-pointer text-slate-700 dark:text-neutral-300">
-                  <input
-                    type="checkbox"
-                    checked={effects.shadow}
-                    onChange={(e) => setEffects((prev) => ({ ...prev, shadow: e.target.checked }))}
-                    className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
-                  />
-                  <span>Soft Drop Shadow</span>
-                </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          recordEditorEdit();
+                          setAdjustments({ brightness: 100, contrast: 100, saturation: 100, blur: 0 })
+                        }}
+                        className="mt-2 py-2 px-3 rounded-xl border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-neutral-300 font-bold text-xs transition"
+                      >
+                        Reset All Adjustments
+                      </button>
+                    </motion.div>
+                  )}
 
-                {effects.shadow && (
-                  <label className="flex items-center gap-2 text-slate-700 dark:text-neutral-300">
-                    <span>Blur:</span>
-                    <input
-                      type="range"
-                      min="5"
-                      max="40"
-                      value={effects.shadowBlur}
-                      onChange={(e) => setEffects((prev) => ({ ...prev, shadowBlur: Number(e.target.value) }))}
-                      className="accent-blue-500 cursor-pointer w-24"
-                    />
-                  </label>
-                )}
-              </motion.div>
-            )}
-
-            {activeTab === 'cutout' && selected?.status === 'done' && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="w-full max-w-3xl z-20"
-              >
-                <CanvasEditor
-                  job={selected}
-                  updateJob={updateJob}
-                  toast={addToast}
-                  onHistoryChange={(undoable, redoable) => {
-                    setCanUndo(undoable);
-                    setCanRedo(redoable);
-                  }}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* ========================================================================= */}
-          {/* 3. CENTER MAIN CANVAS */}
-          {/* ========================================================================= */}
-          <BGComparator
-            job={selected}
-            backgroundStyle={selectedBg.style}
-            customBgColor={customBgColor}
-            customBgImage={customBgImage}
-            adjustments={adjustments}
-            effects={effects}
-            isCompareMode={isCompareMode}
-            scale={subjectScale}
-            onScaleChange={setSubjectScale}
-          />
-
-          {/* ========================================================================= */}
-          {/* 4. BOTTOM FLOATING THUMBNAIL DOCK (+ BUTTON & IMAGE THUMBNAILS WITH DELETE) */}
-          {/* ========================================================================= */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-center gap-3 my-2 z-20"
-          >
-            <button
-              onClick={onOpenPicker}
-              className="w-14 h-14 rounded-2xl bg-slate-200/90 dark:bg-white/10 hover:bg-slate-300 dark:hover:bg-white/20 border border-slate-300 dark:border-white/10 flex items-center justify-center text-xl font-extrabold text-slate-700 dark:text-white transition shadow-lg cursor-pointer"
-              title="Add Image to Canvas"
-            >
-              +
-            </button>
-
-            <div className="flex items-center gap-3 overflow-x-auto max-w-md py-1 px-1">
-              {jobs.map((job) => {
-                const isSelected = selected?.id === job.id;
-                return (
-                  <div
-                    key={job.id}
-                    onClick={() => setSelectedId(job.id)}
-                    className={`group relative w-14 h-14 rounded-2xl overflow-hidden cursor-pointer border-2 transition-all duration-200 ${
-                      isSelected
-                        ? 'border-blue-600 dark:border-[#00FF85] ring-4 ring-blue-500/20 shadow-xl scale-105'
-                        : 'border-slate-300 dark:border-white/10 hover:border-slate-400 dark:hover:border-white/30 opacity-70 hover:opacity-100'
-                    }`}
-                  >
-                    <img
-                      src={job.resultUrl || job.sourceUrl}
-                      alt={job.name}
-                      className="h-full w-full object-contain bg-[repeating-conic-gradient(#1a1a20_0%_25%,#121216_0%_50%)] [background-size:12px_12px]"
-                    />
-
-                    {isSelected && (
-                      <div className="absolute top-1 left-1 w-4 h-4 rounded-full bg-slate-900/90 text-white flex items-center justify-center text-[9px] font-bold z-10">
-                        ^
-                      </div>
-                    )}
-
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeJob(job.id);
-                      }}
-                      className={`absolute top-1 right-1 w-5 h-5 rounded-full bg-rose-600 text-white flex items-center justify-center text-[10px] font-bold shadow-md transition z-20 ${
-                        isSelected ? 'opacity-100 scale-100' : 'opacity-0 group-hover:opacity-100 scale-90'
-                      }`}
-                      title="Delete Image"
+                  {/* TAB 5: DESIGN (TEXT & ELEMENTS) */}
+                  {activeTab === 'design' && (
+                    <motion.div
+                      key="tab-design"
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      className="flex flex-col gap-4 text-xs font-semibold"
                     >
-                      ✕
-                    </button>
-                  </div>
-                );
-              })}
+                      {/* Sub-tab Switcher: Text vs Elements vs Layers */}
+                      <div className="flex items-center bg-slate-100 dark:bg-white/5 p-1 rounded-2xl border border-slate-200 dark:border-white/10">
+                        <button
+                          type="button"
+                          onClick={() => setDesignSubTab('text')}
+                          className={`flex-1 py-1.5 rounded-xl font-bold transition ${
+                            designSubTab === 'text'
+                              ? 'bg-white dark:bg-white text-slate-900 shadow-md'
+                              : 'text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white'
+                          }`}
+                        >
+                          ✏️ Text
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDesignSubTab('elements')}
+                          className={`flex-1 py-1.5 rounded-xl font-bold transition ${
+                            designSubTab === 'elements'
+                              ? 'bg-white dark:bg-white text-slate-900 shadow-md'
+                              : 'text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white'
+                          }`}
+                        >
+                          🎨 Elements
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDesignSubTab('layers')}
+                          className={`flex-1 py-1.5 rounded-xl font-bold transition ${
+                            designSubTab === 'layers'
+                              ? 'bg-white dark:bg-white text-slate-900 shadow-md'
+                              : 'text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white'
+                          }`}
+                        >
+                          📑 Layers ({textLayers.length + elementLayers.length})
+                        </button>
+                      </div>
+
+                      {/* DESIGN: TEXT SECTION */}
+                      {designSubTab === 'text' && (
+                        <div className="flex flex-col gap-3">
+                          <button
+                            type="button"
+                            onClick={() => addCustomText('Your text', 32)}
+                            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#00FF85] px-3 py-2.5 text-xs font-extrabold text-[#07110B] shadow-md shadow-[#00FF85]/10 transition hover:bg-[#35FFA0]"
+                          >
+                            <span className="text-base font-light">+</span>
+                            <span>Add text box</span>
+                          </button>
+                          <div className="grid grid-cols-2 gap-2">
+                            <button
+                              type="button"
+                              onClick={() => addCustomText('Add a heading', 42)}
+                              className="rounded-xl border border-slate-200 bg-white px-3 py-3 text-left text-lg font-extrabold text-slate-900 transition hover:border-[#00B96B] hover:bg-slate-50 dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:hover:bg-white/[0.08]"
+                            >
+                              Add a heading
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => addCustomText('Add body text', 20)}
+                              className="rounded-xl border border-slate-200 bg-white px-3 py-3 text-left text-sm font-medium text-slate-700 transition hover:border-[#00B96B] hover:bg-slate-50 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/75 dark:hover:bg-white/[0.08]"
+                            >
+                              Add body text
+                            </button>
+                          </div>
+
+                          {/* Selected Text Layer Inspector */}
+                          {selectedTextLayer ? (
+                            <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-white/[0.04]">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-xs font-extrabold text-slate-800 dark:text-white">Text</span>
+                                <button
+                                  type="button"
+                                  onClick={() => deleteLayer(selectedTextLayer.id)}
+                                  className="rounded-md px-2 py-1 text-[11px] font-bold text-rose-500 transition hover:bg-rose-500/10 hover:text-rose-600"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+
+                              <textarea
+                                rows={2}
+                                value={selectedTextLayer.text}
+                                onChange={(e) => updateTextLayer(selectedTextLayer.id, { text: e.target.value })}
+                                className="w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900 outline-none transition focus:border-[#00B96B] dark:border-white/15 dark:bg-[#111319] dark:text-white"
+                                placeholder="Type your text"
+                                aria-label="Text box content"
+                              />
+
+                              <div className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white p-1.5 dark:border-white/15 dark:bg-[#111319]">
+                                <select
+                                  value={selectedTextLayer.fontFamily}
+                                  onChange={(e) => updateTextLayer(selectedTextLayer.id, { fontFamily: e.target.value })}
+                                  className="min-w-0 flex-1 bg-transparent px-1.5 py-1 text-xs font-bold text-slate-800 outline-none dark:text-white"
+                                  aria-label="Font family"
+                                >
+                                  {FONT_FAMILIES.map((font) => (
+                                    <option key={font.id} value={font.id}>{font.label}</option>
+                                  ))}
+                                </select>
+                                <span className="h-5 w-px bg-slate-200 dark:bg-white/10" />
+                                <button
+                                  type="button"
+                                  onClick={() => updateTextLayer(selectedTextLayer.id, { fontSize: Math.max(16, selectedTextLayer.fontSize - 2) })}
+                                  className="h-7 w-7 rounded-md text-sm font-bold text-slate-700 hover:bg-slate-100 dark:text-white/75 dark:hover:bg-white/10"
+                                  aria-label="Decrease font size"
+                                >−</button>
+                                <span className="min-w-8 text-center font-mono text-xs font-bold text-slate-800 dark:text-white">{selectedTextLayer.fontSize}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => updateTextLayer(selectedTextLayer.id, { fontSize: Math.min(80, selectedTextLayer.fontSize + 2) })}
+                                  className="h-7 w-7 rounded-md text-sm font-bold text-slate-700 hover:bg-slate-100 dark:text-white/75 dark:hover:bg-white/10"
+                                  aria-label="Increase font size"
+                                >+</button>
+                              </div>
+
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-[11px] font-bold text-slate-600 dark:text-white/55">Font color</span>
+                                <div className="flex items-center gap-1.5">
+                                  {COLOR_PALETTE.map((col) => (
+                                    <button
+                                      key={col}
+                                      type="button"
+                                      title={col}
+                                      aria-label={`Set text color ${col}`}
+                                      aria-pressed={selectedTextLayer.color === col}
+                                      onClick={() => updateTextLayer(selectedTextLayer.id, { color: col })}
+                                      className={`h-5 w-5 rounded-md border border-black/20 transition ${
+                                        selectedTextLayer.color === col ? 'ring-2 ring-[#00B96B] ring-offset-1 dark:ring-offset-[#17191F]' : 'hover:scale-110'
+                                      }`}
+                                      style={{ backgroundColor: col }}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+
+                              <div className="flex items-center justify-between gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => updateTextLayer(selectedTextLayer.id, { fontWeight: selectedTextLayer.fontWeight === 'normal' ? 'bold' : 'normal' })}
+                                  aria-pressed={selectedTextLayer.fontWeight !== 'normal'}
+                                  className={`h-8 w-9 rounded-lg border text-sm font-black transition ${selectedTextLayer.fontWeight !== 'normal' ? 'border-[#00B96B]/40 bg-[#00FF85]/15 text-[#087847] dark:text-[#00FF85]' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100 dark:border-white/10 dark:bg-white/5 dark:text-white/70 dark:hover:bg-white/10'}`}
+                                  title="Toggle bold"
+                                  aria-label="Toggle bold"
+                                >B</button>
+                                <div className="flex items-center rounded-lg border border-slate-200 bg-white p-0.5 dark:border-white/10 dark:bg-white/5" aria-label="Text alignment">
+                                  {(['left', 'center', 'right'] as const).map((align) => (
+                                    <button
+                                      key={align}
+                                      type="button"
+                                      onClick={() => updateTextLayer(selectedTextLayer.id, { align })}
+                                      aria-label={`Align ${align}`}
+                                      aria-pressed={selectedTextLayer.align === align}
+                                      className={`h-7 w-8 rounded-md text-xs font-bold transition ${selectedTextLayer.align === align ? 'bg-[#00FF85] text-[#07110B]' : 'text-slate-600 hover:bg-slate-100 dark:text-white/65 dark:hover:bg-white/10'}`}
+                                    >{align === 'left' ? '≡' : align === 'center' ? '☰' : '≡'}</button>
+                                  ))}
+                                </div>
+                                <select
+                                  value={selectedTextLayer.bgPill || 'none'}
+                                  onChange={(e) => updateTextLayer(selectedTextLayer.id, { bgPill: e.target.value as TextLayer['bgPill'] })}
+                                  className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[11px] font-semibold text-slate-700 dark:border-white/10 dark:bg-[#111319] dark:text-white/75"
+                                  aria-label="Text background"
+                                >
+                                  <option value="none">No background</option>
+                                  <option value="black">Dark background</option>
+                                  <option value="white">White background</option>
+                                  <option value="mint">Pixelify mint</option>
+                                  <option value="crimson">Crimson background</option>
+                                </select>
+                              </div>
+                            </div>
+                          ) : (
+                            <p className="rounded-xl border border-dashed border-slate-300 px-3 py-5 text-center text-[11px] text-slate-500 dark:border-white/15 dark:text-white/45">
+                              Add a text box to edit its font and styling.
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      {/* DESIGN: ELEMENTS & BADGES SECTION */}
+                      {designSubTab === 'elements' && (
+                        <div className="flex flex-col gap-3">
+                          {/* Category Filter Pills */}
+                          <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+                            {[
+                              { id: 'all', label: 'All' },
+                              { id: 'badges', label: 'Badges' },
+                              { id: 'shapes', label: 'Shapes' },
+                              { id: 'stickers', label: 'Stickers' },
+                            ].map((cat) => (
+                              <button
+                                key={cat.id}
+                                type="button"
+                                onClick={() => setElementCategory(cat.id as any)}
+                                className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition shrink-0 ${
+                                  elementCategory === cat.id
+                                    ? 'bg-blue-600 text-white'
+                                    : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-neutral-400 hover:text-white'
+                                }`}
+                              >
+                                {cat.label}
+                              </button>
+                            ))}
+                          </div>
+
+                          {/* Grid of Elements */}
+                          <div className="grid grid-cols-3 gap-2 max-h-56 overflow-y-auto pr-1">
+                            {filteredElements.map((el) => (
+                              <button
+                                key={el.key}
+                                type="button"
+                                onClick={() => addElementPreset(el)}
+                                className="p-2.5 rounded-2xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 flex flex-col items-center justify-center gap-1.5 text-center transition group cursor-pointer"
+                                title={`Add ${el.name}`}
+                              >
+                                {el.type === 'badge' ? (
+                                  <span
+                                    className="px-2 py-0.5 rounded-full font-black text-[10px] border shadow"
+                                    style={{ borderColor: el.defaultColor, color: el.defaultColor }}
+                                  >
+                                    {el.badgeText || el.name}
+                                  </span>
+                                ) : el.path ? (
+                                  <svg
+                                    viewBox="0 0 24 24"
+                                    className="w-6 h-6 group-hover:scale-115 transition-transform"
+                                    fill={el.defaultColor}
+                                  >
+                                    <path d={el.path} />
+                                  </svg>
+                                ) : null}
+                                <span className="text-[10px] text-slate-700 dark:text-neutral-300 font-bold truncate max-w-full">
+                                  {el.name}
+                                </span>
+                              </button>
+                            ))}
+                          </div>
+
+                          {/* Selected Element Inspector */}
+                          {selectedElementLayer && (
+                            <div className="p-3.5 rounded-2xl bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/30 flex flex-col gap-2.5">
+                              <div className="flex items-center justify-between">
+                                <span className="font-extrabold text-blue-600 dark:text-blue-400">
+                                  Selected: {selectedElementLayer.name}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => deleteLayer(selectedElementLayer.id)}
+                                  className="text-rose-500 hover:text-rose-600 font-bold text-[11px]"
+                                >
+                                  ✕ Delete
+                                </button>
+                              </div>
+
+                              {selectedElementLayer.type === 'badge' && (
+                                <input
+                                  type="text"
+                                  value={selectedElementLayer.badgeText || ''}
+                                  onChange={(e) =>
+                                    updateElementLayer(selectedElementLayer.id, { badgeText: e.target.value })
+                                  }
+                                  className="w-full px-3 py-1.5 rounded-xl border border-slate-300 dark:border-white/20 bg-white dark:bg-[#16161E] text-slate-900 dark:text-white font-bold text-xs"
+                                  placeholder="Badge text..."
+                                />
+                              )}
+
+                              <div className="grid grid-cols-2 gap-2">
+                                <label className="flex flex-col gap-1">
+                                  <span className="text-[10px] text-neutral-400">
+                                    Size ({selectedElementLayer.size}px)
+                                  </span>
+                                  <input
+                                    type="range"
+                                    min="40"
+                                    max="240"
+                                    value={selectedElementLayer.size}
+                                    onChange={(e) =>
+                                      updateElementLayer(selectedElementLayer.id, {
+                                        size: Number(e.target.value),
+                                      })
+                                    }
+                                    className="accent-blue-500 cursor-pointer"
+                                  />
+                                </label>
+
+                                <label className="flex flex-col gap-1">
+                                  <span className="text-[10px] text-neutral-400">
+                                    Rotation ({selectedElementLayer.rotation || 0}°)
+                                  </span>
+                                  <input
+                                    type="range"
+                                    min="0"
+                                    max="360"
+                                    value={selectedElementLayer.rotation || 0}
+                                    onChange={(e) =>
+                                      updateElementLayer(selectedElementLayer.id, {
+                                        rotation: Number(e.target.value),
+                                      })
+                                    }
+                                    className="accent-blue-500 cursor-pointer"
+                                  />
+                                </label>
+                              </div>
+
+                              <div className="flex items-center justify-between pt-1">
+                                <span className="text-[11px] text-neutral-400">Color:</span>
+                                <div className="flex items-center gap-1.5">
+                                  {COLOR_PALETTE.map((col) => (
+                                    <button
+                                      key={col}
+                                      type="button"
+                                      onClick={() => updateElementLayer(selectedElementLayer.id, { color: col })}
+                                      className={`w-4 h-4 rounded-full border ${
+                                        selectedElementLayer.color === col
+                                          ? 'ring-2 ring-blue-500 scale-110'
+                                          : 'opacity-80'
+                                      }`}
+                                      style={{ backgroundColor: col }}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* DESIGN: LAYERS MANAGER */}
+                      {designSubTab === 'layers' && (
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-slate-800 dark:text-white">Active Layers</span>
+                            {(textLayers.length > 0 || elementLayers.length > 0) && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  recordEditorEdit();
+                                  setTextLayers([]);
+                                  setElementLayers([]);
+                                  setSelectedLayerId(null);
+                                  addToast('info', 'All design layers cleared.');
+                                }}
+                                className="text-rose-500 hover:text-rose-600 text-[11px] font-bold"
+                              >
+                                Clear All
+                              </button>
+                            )}
+                          </div>
+
+                          <div className="flex flex-col gap-1.5 max-h-56 overflow-y-auto pr-1">
+                            {textLayers.map((tl) => (
+                              <div
+                                key={tl.id}
+                                onClick={() => setSelectedLayerId(tl.id)}
+                                className={`p-2 rounded-xl border flex items-center justify-between cursor-pointer transition ${
+                                  selectedLayerId === tl.id
+                                    ? 'border-blue-500 bg-blue-500/10 font-bold'
+                                    : 'border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2 truncate">
+                                  <span>✏️</span>
+                                  <span className="truncate">{tl.text}</span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    deleteLayer(tl.id);
+                                  }}
+                                  className="text-neutral-400 hover:text-rose-500 p-1"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ))}
+
+                            {elementLayers.map((el) => (
+                              <div
+                                key={el.id}
+                                onClick={() => setSelectedLayerId(el.id)}
+                                className={`p-2 rounded-xl border flex items-center justify-between cursor-pointer transition ${
+                                  selectedLayerId === el.id
+                                    ? 'border-blue-500 bg-blue-500/10 font-bold'
+                                    : 'border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2 truncate">
+                                  <span>🎨</span>
+                                  <span className="truncate">{el.badgeText || el.name}</span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    deleteLayer(el.id);
+                                  }}
+                                  className="text-neutral-400 hover:text-rose-500 p-1"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ))}
+
+                            {textLayers.length === 0 && elementLayers.length === 0 && (
+                              <p className="text-center text-neutral-400 text-xs py-6">
+                                No design layers yet. Add text or elements to get started!
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+              </div>
             </div>
-          </motion.div>
+          </div>
         </div>
+        </>
       ) : (
-        /* EMPTY HOME STATE: SHARE THE UPSCALER UPLOAD PANEL BUT KEEP BG-REMOVAL FILE HANDLING */
-        <div className="flex flex-col gap-12 py-4">
+        /* EMPTY STATE: USER HAS NOT UPLOADED AN IMAGE YET */
+        <div className="flex flex-col gap-6 w-full">
           <UploadArea
             onFile={handleUpload}
             isLoading={false}
             onClear={() => setJobs([])}
             title="Cutout"
-            description={"Drop your images here to start cutout\nSelect PNG, JPG, or WebP files under 15MB."}
-            beforeImage="/gta6.jpg"
-            afterImage="/gta6.png"
+            description={'Drop your images here to start cutout\nSelect PNG, JPG, or WebP files under 15MB.'}
+            beforeImage="/bgremove/baby-4.jpg"
+            afterImage="/bgremove/baby-4-cutout.png"
           />
-
-          <section className="flex flex-col gap-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-xs font-mono font-bold uppercase tracking-widest text-violet-400">
-                  Try it Live
-                </span>
-                <h3 className="text-xl font-bold text-white">Test background removal with sample images</h3>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              {DEMO_SAMPLES.map((sample) => (
-                <div
-                  key={sample.name}
-                  onClick={() => handleLoadSample(sample.src, sample.name)}
-                  className="group cursor-pointer rounded-2xl border border-white/10 bg-neutral-950/80 overflow-hidden hover:border-violet-500/50 transition-all shadow-xl flex flex-col justify-between"
-                >
-                  <div className="relative h-48 overflow-hidden">
-                    <img
-                      src={sample.src}
-                      alt={sample.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-md border border-white/10 text-[10px] font-bold text-violet-300">
-                      {sample.tag}
-                    </span>
-                  </div>
-                  <div className="p-4 flex items-center justify-between border-t border-white/5">
-                    <div>
-                      <b className="block text-xs font-bold text-white group-hover:text-violet-300 transition">
-                        {sample.name}
-                      </b>
-                      <span className="text-[10px] text-muted">Click to add to cutout canvas</span>
-                    </div>
-                    <span className="w-7 h-7 rounded-lg bg-white/10 group-hover:bg-violet-600 text-white flex items-center justify-center text-xs transition">
-                      +
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
         </div>
       )}
     </div>

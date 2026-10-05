@@ -9,24 +9,22 @@ import UpscaleWorkspace from './components/UpscaleWorkspace';
 // ProcessingOverlay and StatsBar are no longer used here
 import ErrorMessage from './components/ErrorMessage';
 import HistoryDrawer from './components/HistoryDrawer';
-import FeatureGrid from './components/FeatureGrid';
-import HowItWorks from './components/HowItWorks';
-import FAQSection from './components/FAQSection';
-import AdvantagesSection from './components/AdvantagesSection';
+
+import UpscaleShowcase from './components/upscaler/UpscaleShowcase';
+import UpscaleShowreel from './components/upscaler/UpscaleShowreel';
+import UpscaleCapabilities from './components/upscaler/UpscaleCapabilities';
+import UpscaleJourney from './components/upscaler/UpscaleJourney';
+import UpscaleFaq from './components/upscaler/UpscaleFaq';
+
+import { BgSampleGallery, BgShowcase, BgPipeline, BgPrecision, BgFaq } from './components/bgremove/BgSections';
+
 import Footer from './components/Footer';
 
 import { useONNX } from './hooks/useONNX';
 import { useUpscale } from './hooks/useUpscale';
 import { makeId } from './lib/bgUtils';
-import {
-  FAQS,
-  UPSCALER_ADVANTAGES,
-  BG_FEATURES,
-  BG_HOW_IT_WORKS,
-  BG_FAQS,
-  BG_ADVANTAGES,
-} from './constants';
 
+import Bgmarquee from './components/bgremove/Bgmarquee';
 
 import TruckBg from './components/TruckBg';
 
@@ -40,6 +38,7 @@ import {
 import CardDeck from './components/CardsTest';
 
 import PixelifyStory from './components/PixelifyStory';
+import { MODELS } from './constants';
 
 import type {
   Step,
@@ -54,6 +53,7 @@ import type {
   ToastMessage,
   UpscaleItem,
 } from './types';
+import NotFound from './components/NotFound';
 
 const STORAGE_KEY = 'pixelify_upscaler_history_2026';
 const THEME_KEY = 'pixelify_theme_pref';
@@ -194,12 +194,12 @@ export default function App() {
   }, [initONNX]);
 
   // Pre-warm the upscaler model when visiting /upscaler so the engine badge
-  // reports LIVE immediately (and first upscale starts faster). ESPCN is tiny (~235KB).
+  // reports LIVE immediately (and first upscale starts faster). ClearReality V1 is only 1.9MB.
   const engineWarmupTried = useRef(false);
   useEffect(() => {
     if (activeTab === 'upscaler' && !engineWarmupTried.current && !execEngine && !modelLoading) {
       engineWarmupTried.current = true;
-      loadModel('espcn').catch(() => { /* badge stays DETECTING; retried on first upload */ });
+      loadModel('clearreality').catch(() => { /* badge stays DETECTING; retried on first upload */ });
     }
   }, [activeTab, execEngine, modelLoading, loadModel]);
 
@@ -228,12 +228,12 @@ export default function App() {
         result: null,
         error: null,
         options: { ...DEFAULT_OPTIONS },
-        modelKey: 'espcn',
+        modelKey: 'clearreality',
       };
       setItems((prev) => [...prev, newItem]);
       setSelectedId(newItem.id);
       setStep('config');
-      loadModel('espcn');
+      loadModel('clearreality');
     };
     img.onerror = () => {
       addToast('error', 'Failed to load image file.');
@@ -253,7 +253,7 @@ export default function App() {
       );
       const ok = await loadModel(key);
       if (!ok) {
-        addToast('error', `Failed to load ${key === 'espcn' ? 'ESPCN' : 'Real-ESRGAN'} model.`);
+        addToast('error', `Failed to load ${MODELS[key]?.name || key} model.`);
       }
     },
     [loadModel, addToast]
@@ -437,6 +437,18 @@ export default function App() {
     [items]
   );
 
+  // Load a BG-remover sample image from the landing sections onto the canvas
+  const loadBgSample = useCallback(async (sampleUrl: string, name: string) => {
+    try {
+      const res = await fetch(sampleUrl);
+      const blob = await res.blob();
+      const file = new File([blob], `${name.toLowerCase().replace(/\s+/g, '_')}.png`, { type: blob.type || 'image/png' });
+      handleBGFiles([file]);
+    } catch {
+      addToast('error', 'Could not load sample.');
+    }
+  }, []);
+
   // Global File Picker Handler for BG Remove
   const handleBGFiles = (fileList: FileList | File[]) => {
     const files = Array.from(fileList);
@@ -510,13 +522,7 @@ export default function App() {
       />
 
       {/* MAIN CONTENT AREA */}
-      <main className={`flex-1 w-full mx-auto transition-all duration-300 ${
-        activeTab === 'home'
-          ? 'w-full max-w-none p-0'
-          : activeTab === 'upscaler' && step !== 'upload'
-          ? 'max-w-[1600px] px-4 sm:px-6 pb-12'
-          : 'max-w-7xl px-4 sm:px-6 pb-12'
-      }`}>
+      <main className="flex-1 w-full mx-auto transition-all duration-300 w-full max-w-none p-0">
         <Routes>
           {/* ROUTE 1: HOME PAGE (/) */}
 
@@ -558,7 +564,7 @@ export default function App() {
           <Route
             path="/upscaler"
             element={
-              <div className="flex flex-col gap-8 py-4">
+              <div className="flex flex-col gap-8 w-full px-2">
 
                 {step === 'upload' && (
                   <UploadArea
@@ -567,8 +573,8 @@ export default function App() {
                     fileName={items[0]?.name}
                     fileSize={items[0]?.size}
                     onClear={handleClearAll}
-                    beforeImage="/spiderman3.jpeg"
-                    afterImage="/sm3_out_hdr_2ndmodel.png"
+                    beforeImage="/upscaler/shoes.jpeg"
+                    afterImage="/upscaler/shoes.png"
                   />
                 )}
 
@@ -576,27 +582,14 @@ export default function App() {
 
                 {step === 'upload' && (
                   <>
-                    <FeatureGrid />
-                    <HowItWorks />  
+                    <UpscaleShowcase />
+                    <UpscaleShowreel />
+                    <UpscaleCapabilities />
+                    <UpscaleJourney />
+                    <UpscaleFaq />
                   </>
                 )}
-                {step === 'upload' && (
-                  <AdvantagesSection
-                    eyebrow="Quick Advantages"
-                    title="Fast. Free. Private."
-                    subtitle="Built for speed and privacy — the four reasons users keep Pixelify bookmarked."
-                    items={UPSCALER_ADVANTAGES}
-                  />
-                )}
-                {step === 'upload' && (
-                  <FAQSection
-                    title="Upscaler FAQ"
-                    subtitle="Common questions about AI super-resolution, formats, and privacy."
-                    faqs={FAQS}
-                    withJsonLd
-                    jsonLdIdSuffix="upscaler-ws"
-                  />
-                )}
+
                 {step !== 'upload' && (
                   <UpscaleWorkspace
                     items={items}
@@ -613,6 +606,7 @@ export default function App() {
                     onReset={handleClearAll}
                   />
                 )}
+
                 <Footer onTabChange={navigateTo} />
               </div>
             }
@@ -620,7 +614,7 @@ export default function App() {
           <Route
             path="/bg_remove"
             element={
-              <div className="py-4">
+              <div className="w-full flex flex-col gap-8">
                 <BGRemoveWorkspace
                   jobs={bgJobs}
                   setJobs={setBgJobs}
@@ -634,31 +628,12 @@ export default function App() {
                 />
                 {bgJobs.length === 0 && (
                   <>
-                    <FeatureGrid
-                      eyebrow="Cutout Studio Capabilities"
-                      title="Why choose Pixelify Background Remover?"
-                      subtitle="Everything you need for one-click neural cutouts, background replacement, and studio-ready exports — right in your browser."
-                      features={BG_FEATURES}
-                    />
-                    <HowItWorks
-                      title="How to remove a background"
-                      subtitle="From upload to transparent PNG in under a minute."
-                      steps={BG_HOW_IT_WORKS}
-                    />
-                    <AdvantagesSection
-                      eyebrow="Advantages of Pixelify Cutout"
-                      title="Built for speed, privacy & polish"
-                      subtitle="The four reasons teams switch from cloud background removers to Pixelify."
-                      items={BG_ADVANTAGES}
-                      accent="text-cyan-400"
-                    />
-                    <FAQSection
-                      title="Background Remover FAQ"
-                      subtitle="Everything to know about AI cutouts, formats, privacy, and exports."
-                      faqs={BG_FAQS}
-                      withJsonLd
-                      jsonLdIdSuffix="bg-remove"
-                    />
+                    <BgShowcase />
+                    <Bgmarquee />
+                    <BgSampleGallery onLoadSample={loadBgSample} />
+                    <BgPipeline />
+                    <BgPrecision />
+                    <BgFaq />
                   </>
                 )}
                 <Footer onTabChange={navigateTo} />
@@ -670,26 +645,16 @@ export default function App() {
             <PixelifyStory />
           } />
 
-
-
-
           <Route path="truckbg" element={
             <TruckBg />
-
           }>
-
           </Route>
-
-
-
-
-
-
-
-
 
           {/* FALLBACK ROUTE: Redirect to / */}
           <Route path="*" element={<Navigate to="/" replace />} />
+        
+          <Route path="/404" element={<NotFound />} />
+
         </Routes>
       </main>
 

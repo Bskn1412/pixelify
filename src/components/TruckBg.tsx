@@ -1,229 +1,440 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from "react";
 
-export default function AnimationPage() {
+type TruckBGProps = {
+  className?: string;
+  opacity?: number;
+  backgroundColor?: string;
+};
+
+type Star = {
+  x: number;
+  y: number;
+
+  // Visual size
+  radius: number;
+
+  // Brightness when ON
+  brightness: number;
+
+  // Current state
+  visible: boolean;
+
+  // Current alpha
+  alpha: number;
+
+  // Target alpha
+  targetAlpha: number;
+
+  // How quickly this star changes
+  fadeSpeed: number;
+
+  // When it is allowed to change again
+  nextChange: number;
+
+  // Random timing seed
+  seed: number;
+};
+
+export default function TruckBG({
+  className = "",
+  opacity = 1,
+  backgroundColor = "#000000",
+}: TruckBGProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
   useEffect(() => {
-    const embedScript = document.createElement('script');
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    embedScript.type = 'text/javascript';
+    const ctx = canvas.getContext("2d", {
+      alpha: false,
+      desynchronized: true,
+    });
 
-    embedScript.textContent = `
-      !function(){
-        if(!window.UnicornStudio){
-          window.UnicornStudio={isInitialized:!1};
+    if (!ctx) return;
 
-          var i=document.createElement("script");
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
 
-          i.src="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v1.4.33/dist/unicornStudio.umd.js";
+    let animationFrame = 0;
 
-          i.onload=function(){
-            window.UnicornStudio.isInitialized ||
-            (
-              UnicornStudio.init(),
-              window.UnicornStudio.isInitialized=!0
-            )
-          };
+    const stars: Star[] = [];
 
-          (document.head || document.body).appendChild(i)
-        }
-      }();
-    `;
+    /*
+     * ---------------------------------------------------------
+     * Deterministic random generator
+     * ---------------------------------------------------------
+     *
+     * The positions stay identical between renders.
+     */
+    let randomSeed = 918273;
 
-    document.head.appendChild(embedScript);
+    const random = () => {
+      randomSeed =
+        (randomSeed * 1664525 + 1013904223) >>> 0;
 
-    const style = document.createElement('style');
-
-    style.textContent = `
-      [data-us-project] {
-        position: relative !important;
-        overflow: hidden !important;
-      }
-
-      [data-us-project] canvas {
-        clip-path: inset(0 0 10% 0) !important;
-      }
-
-      [data-us-project] * {
-        pointer-events: none !important;
-      }
-
-      [data-us-project] a[href*="unicorn"],
-      [data-us-project] button[title*="unicorn"],
-      [data-us-project] div[title*="Made with"],
-      [data-us-project] .unicorn-brand,
-      [data-us-project] [class*="brand"],
-      [data-us-project] [class*="credit"],
-      [data-us-project] [class*="watermark"] {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        position: absolute !important;
-        left: -9999px !important;
-        top: -9999px !important;
-      }
-
-      /*
-       * Blinking background dots
-       */
-      .blinking-dots {
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-
-        background-image:
-          radial-gradient(circle at 8% 18%, rgba(255,255,255,.75) 0 1px, transparent 1.5px),
-          radial-gradient(circle at 18% 72%, rgba(255,255,255,.45) 0 1px, transparent 1.5px),
-          radial-gradient(circle at 29% 35%, rgba(255,255,255,.65) 0 1px, transparent 1.5px),
-          radial-gradient(circle at 41% 82%, rgba(255,255,255,.4) 0 1px, transparent 1.5px),
-          radial-gradient(circle at 53% 24%, rgba(255,255,255,.7) 0 1px, transparent 1.5px),
-          radial-gradient(circle at 64% 66%, rgba(255,255,255,.5) 0 1px, transparent 1.5px),
-          radial-gradient(circle at 75% 38%, rgba(255,255,255,.7) 0 1px, transparent 1.5px),
-          radial-gradient(circle at 87% 78%, rgba(255,255,255,.45) 0 1px, transparent 1.5px),
-          radial-gradient(circle at 94% 20%, rgba(255,255,255,.65) 0 1px, transparent 1.5px);
-
-        animation: pixelifyDots 4s ease-in-out infinite alternate;
-      }
-
-      @keyframes pixelifyDots {
-        0% {
-          opacity: .25;
-        }
-
-        25% {
-          opacity: .55;
-        }
-
-        50% {
-          opacity: .3;
-        }
-
-        75% {
-          opacity: .7;
-        }
-
-        100% {
-          opacity: .4;
-        }
-      }
-
-      /*
-       * Second dot layer with different timing
-       */
-      .blinking-dots::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-
-        background-image:
-          radial-gradient(circle at 14% 45%, rgba(255,255,255,.5) 0 1px, transparent 1.5px),
-          radial-gradient(circle at 36% 12%, rgba(255,255,255,.6) 0 1px, transparent 1.5px),
-          radial-gradient(circle at 48% 55%, rgba(255,255,255,.4) 0 1px, transparent 1.5px),
-          radial-gradient(circle at 71% 15%, rgba(255,255,255,.55) 0 1px, transparent 1.5px),
-          radial-gradient(circle at 82% 52%, rgba(255,255,255,.65) 0 1px, transparent 1.5px);
-
-        animation: pixelifyDotsReverse 3s ease-in-out infinite alternate;
-      }
-
-      @keyframes pixelifyDotsReverse {
-        0% {
-          opacity: .65;
-        }
-
-        35% {
-          opacity: .2;
-        }
-
-        70% {
-          opacity: .7;
-        }
-
-        100% {
-          opacity: .3;
-        }
-      }
-    `;
-
-    document.head.appendChild(style);
-
-    const hideBranding = () => {
-      const selectors = [
-        '[data-us-project]',
-        '[data-us-project="OMzqyUv6M3kSnv0JeAtC"]',
-        '.unicorn-studio-container',
-        'canvas[aria-label*="Unicorn"]',
-      ];
-
-      selectors.forEach((selector) => {
-        const containers = document.querySelectorAll(selector);
-
-        containers.forEach((container) => {
-          const allElements = container.querySelectorAll('*');
-
-          allElements.forEach((el) => {
-            const text = (el.textContent || '').toLowerCase();
-            const title = (el.getAttribute('title') || '').toLowerCase();
-            const href = (el.getAttribute('href') || '').toLowerCase();
-
-            if (
-              text.includes('made with') ||
-              text.includes('unicorn') ||
-              title.includes('made with') ||
-              title.includes('unicorn') ||
-              href.includes('unicorn.studio')
-            ) {
-              el.style.display = 'none';
-              el.style.visibility = 'hidden';
-              el.style.opacity = '0';
-              el.style.pointerEvents = 'none';
-              el.style.position = 'absolute';
-              el.style.left = '-9999px';
-              el.style.top = '-9999px';
-
-              try {
-                el.remove();
-              } catch {}
-            }
-          });
-        });
-      });
+      return randomSeed / 4294967296;
     };
 
-    hideBranding();
+    /*
+     * ---------------------------------------------------------
+     * Create star field
+     * ---------------------------------------------------------
+     */
+    const createStars = () => {
+      stars.length = 0;
 
-    const interval = setInterval(hideBranding, 100);
+      randomSeed = 918273;
+
+      /*
+       * Larger spacing than the previous version.
+       *
+       * This is important because the supplied video has
+       * noticeably larger individual dots.
+       */
+      const spacing = Math.max(
+        26,
+        Math.min(38, Math.min(width, height) / 22)
+      );
+
+      const columns =
+        Math.ceil(width / spacing) + 2;
+
+      const rows =
+        Math.ceil(height / spacing) + 2;
+
+      for (let row = -1; row < rows; row++) {
+        for (let col = -1; col < columns; col++) {
+          /*
+           * Don't make it a mathematically perfect grid.
+           */
+          const jitterX =
+            (random() - 0.5) *
+            spacing *
+            0.35;
+
+          const jitterY =
+            (random() - 0.5) *
+            spacing *
+            0.35;
+
+          const x =
+            col * spacing +
+            spacing * 0.5 +
+            jitterX;
+
+          const y =
+            row * spacing +
+            spacing * 0.5 +
+            jitterY;
+
+          /*
+           * Most dots have roughly the same size,
+           * with some slightly larger ones.
+           */
+          let radius =
+            1.25 +
+            random() * 0.8;
+
+          /*
+           * Occasional larger star.
+           */
+          if (random() > 0.90) {
+            radius += 0.45 + random() * 0.45;
+          }
+
+          /*
+           * Most stars aren't fully white.
+           */
+          const brightness =
+            0.55 +
+            random() * 0.40;
+
+          /*
+           * Random initial state.
+           *
+           * This is important:
+           * the entire field does NOT appear simultaneously.
+           */
+          const visible =
+            random() > 0.45;
+
+          const alpha =
+            visible
+              ? brightness
+              : 0;
+
+          /*
+           * Individual fade speed.
+           */
+          const fadeSpeed =
+            0.025 +
+            random() * 0.065;
+
+          /*
+           * Each star receives its own independent
+           * future activation time.
+           */
+          const nextChange =
+            performance.now() +
+            300 +
+            random() * 2200;
+
+          stars.push({
+            x,
+            y,
+            radius,
+            brightness,
+            visible,
+            alpha,
+            targetAlpha: alpha,
+            fadeSpeed,
+            nextChange,
+            seed: random(),
+          });
+        }
+      }
+    };
+
+    /*
+     * ---------------------------------------------------------
+     * Resize
+     * ---------------------------------------------------------
+     */
+    const resize = () => {
+      const rect =
+        canvas.getBoundingClientRect();
+
+      if (!rect.width || !rect.height) return;
+
+      width = rect.width;
+      height = rect.height;
+
+      dpr = Math.min(
+        window.devicePixelRatio || 1,
+        2
+      );
+
+      canvas.width =
+        Math.round(width * dpr);
+
+      canvas.height =
+        Math.round(height * dpr);
+
+      ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+      );
+
+      createStars();
+    };
+
+    /*
+     * ---------------------------------------------------------
+     * Random ON/OFF behavior
+     * ---------------------------------------------------------
+     */
+    const updateStar = (
+      star: Star,
+      now: number
+    ) => {
+      /*
+       * When the star reaches its random change time,
+       * switch it to the opposite state.
+       */
+      if (now >= star.nextChange) {
+        star.visible = !star.visible;
+
+        if (star.visible) {
+          /*
+           * TURN ON
+           */
+          star.targetAlpha =
+            star.brightness;
+
+          /*
+           * Once ON, keep it there for a random
+           * amount of time.
+           */
+          star.nextChange =
+            now +
+            180 +
+            Math.random() * 1400;
+        } else {
+          /*
+           * TURN OFF
+           */
+          star.targetAlpha = 0;
+
+          /*
+           * Stay OFF for a random amount of time.
+           *
+           * This creates the actual blinking behavior.
+           */
+          star.nextChange =
+            now +
+            250 +
+            Math.random() * 2200;
+        }
+      }
+
+      /*
+       * Smoothly approach target alpha.
+       *
+       * This prevents ugly hard cuts while still
+       * producing a genuine ON/OFF cycle.
+       */
+      const difference =
+        star.targetAlpha -
+        star.alpha;
+
+      star.alpha +=
+        difference *
+        star.fadeSpeed;
+
+      /*
+       * Snap very small values to zero.
+       */
+      if (
+        !star.visible &&
+        star.alpha < 0.015
+      ) {
+        star.alpha = 0;
+      }
+
+      /*
+       * Snap almost fully ON stars.
+       */
+      if (
+        star.visible &&
+        Math.abs(
+          star.targetAlpha -
+          star.alpha
+        ) < 0.01
+      ) {
+        star.alpha =
+          star.targetAlpha;
+      }
+    };
+
+    /*
+     * ---------------------------------------------------------
+     * Render
+     * ---------------------------------------------------------
+     */
+    const render = (now: number) => {
+      /*
+       * Background color (configurable, defaults to pure black).
+       */
+      ctx.fillStyle = backgroundColor;
+      ctx.fillRect(
+        0,
+        0,
+        width,
+        height
+      );
+
+      for (const star of stars) {
+        updateStar(star, now);
+
+        if (star.alpha <= 0.005) {
+          continue;
+        }
+
+        /*
+         * Main star.
+         */
+        ctx.beginPath();
+
+        ctx.arc(
+          star.x,
+          star.y,
+          star.radius,
+          0,
+          Math.PI * 2
+        );
+
+        ctx.fillStyle =
+          `rgba(235, 238, 242, ${star.alpha})`;
+
+        ctx.fill();
+
+        /*
+         * Very subtle glow for brighter stars.
+         *
+         * Not every star gets this.
+         */
+        if (
+          star.alpha > 0.65 &&
+          star.radius > 1.45
+        ) {
+          ctx.beginPath();
+
+          ctx.arc(
+            star.x,
+            star.y,
+            star.radius * 1.8,
+            0,
+            Math.PI * 2
+          );
+
+          ctx.fillStyle =
+            `rgba(235, 240, 245, ${
+              star.alpha * 0.08
+            })`;
+
+          ctx.fill();
+        }
+      }
+
+      animationFrame =
+        requestAnimationFrame(render);
+    };
+
+    /*
+     * Initial setup.
+     */
+    resize();
+
+    const resizeObserver =
+      new ResizeObserver(resize);
+
+    resizeObserver.observe(canvas);
+
+    animationFrame =
+      requestAnimationFrame(render);
 
     return () => {
-      clearInterval(interval);
+      cancelAnimationFrame(
+        animationFrame
+      );
 
-      if (document.head.contains(embedScript)) {
-        document.head.removeChild(embedScript);
-      }
-
-      if (document.head.contains(style)) {
-        document.head.removeChild(style);
-      }
+      resizeObserver.disconnect();
     };
   }, []);
 
   return (
-    <main className="relative min-h-screen w-full overflow-hidden bg-black">
-      
-      {/* Unicorn Studio background */}
-      <div className="absolute inset-0 w-full h-full hidden lg:block">
-        <div
-          data-us-project="OMzqyUv6M3kSnv0JeAtC"
-          style={{
-            width: '100%',
-            height: '100%',
-            minHeight: '100vh',
-          }}
-        />
-      </div>
-
-      {/* Blinking dots */}
-      <div className="blinking-dots absolute inset-0 z-10" />
-
-    </main>
+    <canvas
+      ref={canvasRef}
+      aria-hidden="true"
+      className={`
+        pointer-events-none
+        absolute
+        inset-0
+        h-full
+        w-full
+        ${className}
+      `}
+      style={{
+        opacity,
+      }}
+    />
   );
 }

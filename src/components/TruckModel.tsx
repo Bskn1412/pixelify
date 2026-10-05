@@ -1,4 +1,5 @@
 import { useGLTF } from '@react-three/drei'
+import { useThree } from '@react-three/fiber'
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 
@@ -26,22 +27,50 @@ export interface TruckModelProps {
 }
 
 /**
- * Scroll-triggered 3D Truck Model:
- * Drives smoothly from right to left across the scene when triggered by scrolling into view.
+ * Responsive Scroll-triggered 3D Truck Model:
+ * Drives smoothly from right to left across the screen. Dynamically calculates
+ * viewport edge bounds so it enters immediately without empty off-screen delays,
+ * and continuously continues moving in an endless highway loop.
  */
 function TruckModel({
-  travelStart = 48,
-  travelEnd = -48,
-  duration = 10,
+  travelStart,
+  travelEnd,
+  duration,
   yaw = Math.PI / 2,
   pathZ = 0,
-  scale = 1.55,
+  scale,
   isActive = false,
   triggerId = 0,
 }: TruckModelProps) {
   const { scene } = useGLTF('/truck.glb')
+  const { viewport } = useThree()
   const groupRef = useRef<any>(null)
   const wheelsRef = useRef<any[]>([])
+
+  // Responsive scale: adapt slightly for smaller viewports so the truck is well-proportioned
+  const effectiveScale =
+    scale ?? (viewport.width < 18 ? 1.15 : viewport.width < 28 ? 1.35 : 1.55)
+
+  // Truck model spans ~19.36 units along z (half-length ~9.68). With effectiveScale:
+  const halfTruckLength = 9.68 * effectiveScale
+  const halfScreenWidth = viewport.width / 2
+
+  // Start position: front bumper is positioned just outside the right edge (+1.2 units)
+  const actualStart =
+    travelStart !== undefined
+      ? travelStart
+      : halfScreenWidth + halfTruckLength + 1.2
+
+  // End position: rear bumper fully exits past the left edge (-2.0 units)
+  const actualEnd =
+    travelEnd !== undefined
+      ? travelEnd
+      : -halfScreenWidth - halfTruckLength - 2.5
+
+  const totalDistance = Math.abs(actualEnd - actualStart)
+  // Constant physical road cruise speed ~7.5 units/second across all screen sizes
+  const actualDuration =
+    duration !== undefined ? duration : Math.max(5.0, totalDistance / 7.5)
 
   // Collect wheel meshes from model
   useEffect(() => {
@@ -55,13 +84,13 @@ function TruckModel({
     wheelsRef.current = wheels
   }, [scene])
 
-  // Keep group at travelStart initially
+  // Keep group at actualStart initially
   useEffect(() => {
     const group = groupRef.current
     if (!group) return
-    group.position.x = travelStart
+    group.position.x = actualStart
     group.position.z = pathZ
-  }, [travelStart, pathZ])
+  }, [actualStart, pathZ])
 
   // Trigger drive from right to left when isActive becomes true or triggerId changes
   useEffect(() => {
@@ -72,38 +101,37 @@ function TruckModel({
     if (!isActive) {
       gsap.killTweensOf(group.position)
       wheelsRef.current.forEach((wheel) => gsap.killTweensOf(wheel.rotation))
-      group.position.x = travelStart
+      group.position.x = actualStart
       wheelsRef.current.forEach((wheel) => {
         wheel.rotation.x = 0
       })
       return
     }
 
-    // Scrolled into view: trigger drive animation from right to left
+    // Scrolled into view / active: trigger drive animation from right to left
     gsap.killTweensOf(group.position)
     wheelsRef.current.forEach((wheel) => gsap.killTweensOf(wheel.rotation))
 
-    group.position.x = travelStart
+    group.position.x = actualStart
     wheelsRef.current.forEach((wheel) => {
       wheel.rotation.x = 0
     })
 
-    const distance = Math.abs(travelEnd - travelStart)
-    const wheelAngle = 45.6 * (distance / 50)
-    // When moving right to left (+X to -X) with yaw = Math.PI/2, positive wheel rotation rolls forward
-    const direction = travelEnd < travelStart ? -1 : 1
+    // Wheel rotation proportional to distance traveled so tires roll accurately on asphalt
+    const wheelAngle = (totalDistance * 0.912) * (1.55 / effectiveScale)
+    const direction = actualEnd < actualStart ? -1 : 1
 
     // Smooth drive across viewport - loops continuously as long as user remains on the section
     gsap.fromTo(
       group.position,
-      { x: travelStart },
+      { x: actualStart },
       {
-        x: travelEnd,
-        duration,
-        delay: 0.2, // Small cinematic pause when first scrolled into view
+        x: actualEnd,
+        duration: actualDuration,
+        delay: 0.1, // Near-instant start so it immediately sweeps in when user arrives
         ease: 'none',
         repeat: -1,
-        repeatDelay: 0.8, // Brief realistic gap between passes
+        repeatDelay: 0.8, // Brief realistic gap between highway passes
       }
     )
 
@@ -114,8 +142,8 @@ function TruckModel({
         { x: 0 },
         {
           x: wheelAngle * direction,
-          duration,
-          delay: 0.2,
+          duration: actualDuration,
+          delay: 0.1,
           ease: 'none',
           repeat: -1,
           repeatDelay: 0.8,
@@ -127,10 +155,15 @@ function TruckModel({
       gsap.killTweensOf(group.position)
       wheelsRef.current.forEach((wheel) => gsap.killTweensOf(wheel.rotation))
     }
-  }, [isActive, triggerId, scene, travelStart, travelEnd, duration])
+  }, [isActive, triggerId, scene, actualStart, actualEnd, actualDuration, totalDistance, effectiveScale])
 
   return (
-    <group ref={groupRef} position={[travelStart, -2.2, pathZ]} rotation={[0, yaw, 0]} scale={scale}>
+    <group
+      ref={groupRef}
+      position={[actualStart, -2.2, pathZ]}
+      rotation={[0, yaw, 0]}
+      scale={effectiveScale}
+    >
       <group position={CENTER_OFFSET}>
         <primitive object={scene} />
       </group>

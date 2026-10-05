@@ -1,27 +1,105 @@
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import "../index.css";
 
-const WORDS = [
+/* --------------------------------------------------------------------------
+   Cubic bezier solver from the original Camera Follow Captions specification.
+   Newton first, bisection as fallback, exact and deterministic.
+-------------------------------------------------------------------------- */
+function bezier(x1: number, y1: number, x2: number, y2: number) {
+  function curve(t: number, a1: number, a2: number) {
+    const A = 1 - 3 * a2 + 3 * a1;
+    const B = 3 * a2 - 6 * a1;
+    const C = 3 * a1;
+    return ((A * t + B) * t + C) * t;
+  }
+  function slope(t: number, a1: number, a2: number) {
+    const A = 1 - 3 * a2 + 3 * a1;
+    const B = 3 * a2 - 6 * a1;
+    const C = 3 * a1;
+    return (3 * A * t + 2 * B) * t + C;
+  }
+  return function (p: number) {
+    if (p <= 0) return 0;
+    if (p >= 1) return 1;
+    let t = p;
+    for (let i = 0; i < 8; i++) {
+      const d = slope(t, x1, x2);
+      if (Math.abs(d) < 1e-6) break;
+      const e = curve(t, x1, x2) - p;
+      if (Math.abs(e) < 1e-7) return curve(t, y1, y2);
+      t -= e / d;
+    }
+    let lo = 0;
+    let hi = 1;
+    t = p;
+    for (let j = 0; j < 24; j++) {
+      const x = curve(t, x1, x2);
+      if (Math.abs(x - p) < 1e-7) break;
+      if (x > p) hi = t;
+      else lo = t;
+      t = (lo + hi) / 2;
+    }
+    return curve(t, y1, y2);
+  };
+}
+
+/* Leaves the mark fast, spends most of its time arriving */
+const EASE_STEP = bezier(0.31, 0, 0.11, 1);
+/* The closing pull back: slower to leave, glides a long way out */
+const EASE_WIDE = bezier(0.42, 0, 0.14, 1);
+/* Word ink coming up */
+const EASE_INK = bezier(0.2, 0.7, 0.3, 1);
+
+export type WordPlacement =
+  | "right"
+  | "below"
+  | "right-box"
+  | "below-box"
+  | "auto";
+
+export type WordConfig = {
+  text: string;
+  accent?: boolean;
+  dim?: boolean;
+  italic?: boolean;
+  pos?: WordPlacement;
+  relativeTo?: number | string;
+  size?: number;
+  gap?: number;
+  dx?: number;
+  dy?: number;
+};
+
+export const DEFAULT_WORDS: WordConfig[] = [
+  // 1. "first word to your one by one below, images is right to the word your"
   { text: "PIXELIFY", accent: true },
-  { text: "local", accent: false },
-  { text: "AI", accent: true },
-  { text: "for", accent: false },
-  { text: "your", accent: false },
-  { text: "images", accent: true },
-  { text: "upscale", accent: true },
-  { text: "restore", accent: false },
-  { text: "enhance", accent: true },
-  { text: "without", accent: false },
-  { text: "uploading", accent: false },
-  { text: "anything", accent: true },
-  { text: "to", accent: false },
-  { text: "the", accent: false },
-  { text: "cloud", accent: true },
-  { text: "your", accent: false },
-  { text: "pixels", accent: true },
-  { text: "stay", accent: false },
-  { text: "yours", accent: true },
+  { text: "local", accent: false, pos: "below" },
+  { text: "AI", accent: true, pos: "below" },
+  { text: "for", accent: false, pos: "below" },
+  { text: "your", accent: false, pos: "below" },
+  { text: "images", accent: true, pos: "right" },
+
+  // 2. "next upscale word below your untill word without"
+  { text: "upscale", accent: true, pos: "below", relativeTo: "your" },
+  { text: "restore", accent: false, pos: "below" },
+  { text: "enhance", accent: true, pos: "below" },
+  { text: "without", accent: false, pos: "below" },
+
+  // 3. "uploading word goes right side of word without"
+  { text: "uploading", accent: false, pos: "right" },
+
+  // 4. "next words(anything, to, the, cloud) below the word without, but the cloud as one line like after word the right side of it word cloud."
+  { text: "anything", accent: true, pos: "below", relativeTo: "without" },
+  { text: "to", accent: false, pos: "below" },
+  { text: "the", accent: false, pos: "below" },
+  { text: "cloud", accent: true, pos: "right" },
+
+  // 5. "next words goes below the cloud, (your, pixels) one right to other like after word your right side of it word pixels and words stay and yours one below one."
+  { text: "your", accent: false, pos: "below", relativeTo: "the" },
+  { text: "pixels", accent: true, pos: "right" },
+  { text: "stay", accent: false, pos: "below", relativeTo: "your" },
+  { text: "yours", accent: true, pos: "below" },
 ];
 
 type Box = {
@@ -31,736 +109,372 @@ type Box = {
   y1: number;
 };
 
-type WordData = {
+type Word = {
   text: string;
   accent: boolean;
+  dim: boolean;
+  italic: boolean;
   fs: number;
   x: number;
   y: number;
+  width: number;
+  height: number;
   box: Box;
 };
 
-export default function PixelifyStory() {
+function findTarget(words: Word[], relativeTo?: number | string): Word | null {
+  if (words.length === 0) return null;
+  if (relativeTo === undefined) return words[words.length - 1];
+  if (typeof relativeTo === "number") {
+    return words[relativeTo] || words[words.length - 1];
+  }
+  const query = String(relativeTo).toLowerCase();
+  for (let idx = words.length - 1; idx >= 0; idx--) {
+    if (words[idx].text.toLowerCase() === query) {
+      return words[idx];
+    }
+  }
+  return words[words.length - 1];
+}
+
+interface PixelifyStoryProps {
+  words?: WordConfig[];
+  fixed?: boolean;
+  className?: string;
+  accentColor?: string;
+  framing?: "tight" | "standard" | "wide";
+  smear?: "off" | "subtle" | "standard" | "heavy";
+}
+
+export default function PixelifyStory({
+  words: customWords,
+  fixed = false,
+  className = "",
+  accentColor = "#c7ff00",
+  framing = "standard",
+  smear: smearSetting = "standard",
+}: PixelifyStoryProps) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
   const worldRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const root = rootRef.current;
-    const world = worldRef.current;
+  const wordList = customWords || DEFAULT_WORDS;
 
-    if (!root || !world) return;
-
+  useLayoutEffect(() => {
     let timeline: gsap.core.Timeline | null = null;
-
-    let resizeTimer: ReturnType<typeof setTimeout> | null =
-      null;
-
-    /*
-     * ------------------------------------------------
-     * BUILD
-     * ------------------------------------------------
-     */
+    let resizeTimer: number | undefined;
+    let lastW = 0;
+    let lastH = 0;
 
     const build = () => {
-      /*
-       * Kill previous animation before rebuilding.
-       */
-      timeline?.kill();
-      timeline = null;
+      const root = rootRef.current;
+      const stage = stageRef.current;
+      const world = worldRef.current;
 
-      world.innerHTML = "";
+      if (!root || !stage || !world) return;
 
-      /*
-       * Get current section size.
-       */
-      const frameW = root.clientWidth;
-      const frameH = root.clientHeight;
+      if (timeline) {
+        timeline.kill();
+        timeline = null;
+      }
+      gsap.killTweensOf(world);
+      gsap.set(world, { clearProps: "all" });
+      world.replaceChildren();
 
-      if (!frameW || !frameH) return;
+      const FRAME_W = root.clientWidth || 1080;
+      const FRAME_H = root.clientHeight || 1920;
 
-      const mobile = frameW <= 640;
+      if (!FRAME_W || !FRAME_H) return;
 
-      /*
-       * ------------------------------------------------
-       * RESPONSIVE SETTINGS
-       * ------------------------------------------------
-       */
+      lastW = FRAME_W;
+      lastH = FRAME_H;
 
-      const base = Math.max(
-        mobile ? 48 : 70,
-        Math.min(frameW, frameH) *
-          (mobile ? 0.15 : 0.14)
-      );
+      const FRAMINGS = { tight: 0.82, standard: 1, wide: 1.25 };
+      const SMEARS = { off: 0, subtle: 0.5, standard: 1, heavy: 1.9 };
 
-      const ratio = mobile ? 0.68 : 0.72;
+      const FRAMING = FRAMINGS[framing] || 1;
+      const SMEAR = SMEARS[smearSetting] || 1;
 
-      const gapRatio = mobile ? 0.055 : 0.07;
+      const STEP = 0.52;
+      const MOVE = 0.4;
+      const MARGIN = 1.36 * FRAMING;
 
-      const cameraMargin = mobile
-        ? 1.12
-        : 1.28;
+      root.style.setProperty("--cf-accent", accentColor);
+      root.style.setProperty("--ink", "#ffffff");
 
-      /*
-       * ------------------------------------------------
-       * MEASUREMENT ELEMENT
-       * ------------------------------------------------
-       */
+      /* Base size is picked so opening shot sits near 1:1. Everything after it
+         is a pull back, so the world is only ever scaled down and type stays crisp. */
+      const BASE = Math.max(FRAME_W, FRAME_H) * 0.16;
 
-      const ruler =
-        document.createElement("div");
+      const ruler = document.createElement("div");
+      ruler.style.cssText =
+        "position:absolute;left:-99999px;top:0;white-space:nowrap;visibility:hidden;pointer-events:none;" +
+        'font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-weight:700;' +
+        "text-transform:uppercase;letter-spacing:0.005em;line-height:0.78";
+      root.appendChild(ruler);
 
-      ruler.style.cssText = `
-        position: absolute;
-        left: -10000px;
-        top: 0;
+      /* Re-derive camera framing: Centers the active box in the frame */
+      function poseFor(b: Box, margin: number) {
+        const bw = (b.x1 - b.x0) * margin;
+        const bh = (b.y1 - b.y0) * margin;
+        const s = Math.min(FRAME_W / bw, FRAME_H / bh);
+        return {
+          x: FRAME_W / 2 - (s * (b.x0 + b.x1)) / 2,
+          y: FRAME_H / 2 - (s * (b.y0 + b.y1)) / 2,
+          scale: s,
+        };
+      }
 
-        white-space: nowrap;
-        visibility: hidden;
-        pointer-events: none;
+      // Initial word dimensions and camera scale
+      ruler.style.fontSize = `${BASE}px`;
+      ruler.textContent = wordList[0].text;
+      const w0 = Math.ceil(ruler.getBoundingClientRect().width);
+      const h0 = BASE * 0.78;
+      const s0 = poseFor({ x0: 0, y0: 0, x1: w0, y1: h0 }, MARGIN).scale;
 
-        font-family:
-          "Helvetica Neue",
-          Helvetica,
-          Arial,
-          sans-serif;
+      let box: Box | null = null;
+      const words: Word[] = [];
+      let currentScale = s0;
 
-        font-weight: 700;
-        text-transform: uppercase;
+      wordList.forEach((wd, i) => {
+        const target = i > 0 ? findTarget(words, wd.relativeTo) : null;
+        const pos: WordPlacement = wd.pos || "auto";
 
-        letter-spacing: -0.02em;
-        line-height: 0.78;
-      `;
-
-      world.appendChild(ruler);
-
-      /*
-       * ------------------------------------------------
-       * CALCULATE WORD POSITIONS
-       * ------------------------------------------------
-       */
-
-      const words: WordData[] = [];
-
-      let currentBox: Box | null = null;
-
-      WORDS.forEach((word, index) => {
-        /*
-         * First word is the largest.
-         */
-        const fs =
-          index === 0
-            ? base
-            : Math.max(
-                mobile ? 20 : 24,
-                (currentBox!.y1 -
-                  currentBox!.y0) *
-                  ratio
-              );
+        let fs: number;
+        if (i === 0) {
+          fs = BASE;
+        } else if (pos === "right" && target) {
+          // Words on the same line share the exact font size of their row
+          fs = target.fs;
+        } else {
+          // Dynamic scaling: guarantees EVERY incoming word (including after AI)
+          // has the same big, impactful view size as PIXELIFY, while previous words
+          // smoothly shrink and retain in the composition!
+          const nextIsRight = i + 1 < wordList.length && wordList[i + 1].pos === "right";
+          const nextWord = nextIsRight ? wordList[i + 1] : null;
+          const totalChars = wd.text.length + (nextWord ? nextWord.text.length + 1 : 0);
+          const widthFactor = totalChars > 9 ? Math.max(0.68, 9.5 / totalChars) : 1;
+          fs = BASE * (s0 / currentScale) * widthFactor;
+          if (wd.size !== undefined) fs *= wd.size;
+        }
 
         ruler.style.fontSize = `${fs}px`;
-
-        ruler.textContent = word.text;
-
-        /*
-         * Use offsetWidth because the element
-         * is hidden from the visual layout.
-         */
-        const width = ruler.offsetWidth;
-
-        const height = fs * 0.78;
-
-        const gap = fs * gapRatio;
+        ruler.textContent = wd.text;
+        const w = Math.ceil(ruler.getBoundingClientRect().width);
+        const h = fs * 0.78;
+        const lineGap = fs * 0.08;
+        const spaceGap = Math.round(fs * 0.22);
 
         let x = 0;
         let y = 0;
 
-        /*
-         * First word.
-         */
-        if (index === 0) {
+        if (i === 0) {
           x = 0;
           y = 0;
-        }
-
-        /*
-         * Continue horizontally or vertically
-         * depending on the current world ratio.
-         */
-        else if (
-          (currentBox!.x1 -
-            currentBox!.x0) /
-            (currentBox!.y1 -
-              currentBox!.y0) <
-          frameW / frameH
-        ) {
-          /*
-           * Grow horizontally.
-           */
-          x =
-            currentBox!.x1 +
-            gap;
-
-          y =
-            currentBox!.y1 -
-            height;
+        } else if (pos === "right" && target) {
+          x = target.x + target.width + (wd.gap !== undefined ? wd.gap : spaceGap);
+          y = target.y;
+        } else if (pos === "below" && target) {
+          x = target.x;
+          y = target.y + target.height + (wd.gap !== undefined ? wd.gap : lineGap);
+        } else if (pos === "right-box") {
+          x = box!.x1 + (wd.gap !== undefined ? wd.gap : spaceGap);
+          y = box!.y1 - h;
+        } else if (pos === "below-box") {
+          x = box!.x0;
+          y = box!.y1 + (wd.gap !== undefined ? wd.gap : lineGap);
         } else {
-          /*
-           * Grow vertically.
-           */
-          x =
-            currentBox!.x0;
-
-          y =
-            currentBox!.y1 +
-            gap;
+          // Source HTML auto-flow condition
+          if ((box!.x1 - box!.x0) / (box!.y1 - box!.y0) < FRAME_W / FRAME_H) {
+            x = box!.x1 + spaceGap;
+            y = box!.y1 - h;
+          } else {
+            x = box!.x0;
+            y = box!.y1 + lineGap;
+          }
         }
 
-        /*
-         * Update bounding box.
-         */
-        const nextBox: Box = currentBox
+        if (wd.dx) x += wd.dx;
+        if (wd.dy) y += wd.dy;
+
+        const nextBox: Box = box
           ? {
-              x0: Math.min(
-                currentBox.x0,
-                x
-              ),
-
-              y0: Math.min(
-                currentBox.y0,
-                y
-              ),
-
-              x1: Math.max(
-                currentBox.x1,
-                x + width
-              ),
-
-              y1: Math.max(
-                currentBox.y1,
-                y + height
-              ),
+              x0: Math.min(box.x0, x),
+              y0: Math.min(box.y0, y),
+              x1: Math.max(box.x1, x + w),
+              y1: Math.max(box.y1, y + h),
             }
-          : {
-              x0: x,
-              y0: y,
-              x1: x + width,
-              y1: y + height,
-            };
+          : { x0: x, y0: y, x1: x + w, y1: y + h };
 
-        currentBox = nextBox;
+        box = nextBox;
+        const p = poseFor(nextBox, MARGIN);
+        currentScale = p.scale;
 
         words.push({
-          text: word.text,
-          accent: word.accent,
+          text: wd.text,
+          accent: !!wd.accent,
+          dim: !!wd.dim,
+          italic: !!wd.italic,
           fs,
           x,
           y,
-          box: {
-            ...nextBox,
-          },
+          width: w,
+          height: h,
+          box: { ...nextBox },
         });
       });
 
-      /*
-       * Remove measurement element.
-       */
-      world.removeChild(ruler);
+      root.removeChild(ruler);
 
-      /*
-       * ------------------------------------------------
-       * CREATE ACTUAL WORD ELEMENTS
-       * ------------------------------------------------
-       */
-
-      const elements =
-        words.map((word) => {
-          const element =
-            document.createElement("div");
-
-          element.className =
-            word.accent
-              ? "pixelify-word pixelify-accent"
-              : "pixelify-word";
-
-          element.textContent =
-            word.text;
-
-          element.style.left =
-            `${word.x}px`;
-
-          element.style.top =
-            `${word.y}px`;
-
-          element.style.fontSize =
-            `${word.fs}px`;
-
-          world.appendChild(
-            element
-          );
-
-          return element;
-        });
-
-      /*
-       * ------------------------------------------------
-       * FORCE BROWSER LAYOUT
-       * ------------------------------------------------
-       */
-
-      elements.forEach((element) => {
-        void element.offsetWidth;
+      /* Create word elements */
+      const els: HTMLDivElement[] = words.map((wd) => {
+        const el = document.createElement("div");
+        el.className =
+          "cf-word pixelify-word" + (wd.accent ? " is-accent pixelify-accent" : "");
+        if (wd.dim) el.classList.add("pixelify-dim");
+        if (wd.italic) el.classList.add("pixelify-italic");
+        el.textContent = wd.text;
+        el.style.left = `${wd.x}px`;
+        el.style.top = `${wd.y}px`;
+        el.style.fontSize = `${wd.fs}px`;
+        world.appendChild(el);
+        return el;
       });
 
-      /*
-       * ------------------------------------------------
-       * CALCULATE ACTUAL WORLD BOUNDS
-       * ------------------------------------------------
-       */
+      /* Force browser layout */
+      els.forEach((el) => {
+        void el.offsetWidth;
+      });
 
-      let fullBox: Box | null = null;
-
-      elements.forEach((element) => {
-        const rect: Box = {
-          x0: element.offsetLeft,
-
-          y0: element.offsetTop,
-
-          x1:
-            element.offsetLeft +
-            element.offsetWidth,
-
-          y1:
-            element.offsetTop +
-            element.offsetHeight,
+      /* Re-derive framing box from real browser layout coordinates */
+      let run: Box | null = null;
+      els.forEach((el, i) => {
+        const r: Box = {
+          x0: el.offsetLeft,
+          y0: el.offsetTop,
+          x1: el.offsetLeft + el.offsetWidth,
+          y1: el.offsetTop + el.offsetHeight,
         };
-
-        fullBox = fullBox
+        run = run
           ? {
-              x0: Math.min(
-                fullBox.x0,
-                rect.x0
-              ),
-
-              y0: Math.min(
-                fullBox.y0,
-                rect.y0
-              ),
-
-              x1: Math.max(
-                fullBox.x1,
-                rect.x1
-              ),
-
-              y1: Math.max(
-                fullBox.y1,
-                rect.y1
-              ),
+              x0: Math.min(run.x0, r.x0),
+              y0: Math.min(run.y0, r.y0),
+              x1: Math.max(run.x1, r.x1),
+              y1: Math.max(run.y1, r.y1),
             }
-          : rect;
+          : r;
+        words[i].box = { x0: run.x0, y0: run.y0, x1: run.x1, y1: run.y1 };
       });
+      const FULL = run || box;
+      if (!FULL) return;
 
-      if (!fullBox) return;
-
-      /*
-       * ------------------------------------------------
-       * CAMERA CALCULATION
-       * ------------------------------------------------
-       */
-
-      const poseFor = (
-        box: Box,
-        multiplier: number
-      ) => {
-        const width =
-          (box.x1 - box.x0) *
-          multiplier;
-
-        const height =
-          (box.y1 - box.y0) *
-          multiplier;
-
-        /*
-         * Safety check.
-         */
-        if (
-          width <= 0 ||
-          height <= 0
-        ) {
-          return {
-            x: 0,
-            y: 0,
-            scale: 1,
-          };
-        }
-
-        /*
-         * Fit world inside viewport.
-         */
-        const scale =
-          Math.min(
-            frameW / width,
-            frameH / height
-          );
-
-        return {
-          x:
-            frameW / 2 -
-            ((box.x0 + box.x1) *
-              scale) /
-              2,
-
-          y:
-            frameH / 2 -
-            ((box.y0 + box.y1) *
-              scale) /
-              2,
-
-          scale,
-        };
-      };
-
-      /*
-       * ------------------------------------------------
-       * CAMERA POSITIONS
-       * ------------------------------------------------
-       */
-
-      const firstPose =
-        poseFor(
-          words[0].box,
-          cameraMargin
-        );
-
-      const finalPose =
-        poseFor(
-          fullBox,
-          mobile ? 1.08 : 1.18
-        );
-
-      /*
-       * ------------------------------------------------
-       * STATIC WORLD CONFIGURATION
-       * ------------------------------------------------
-       *
-       * Only properties that don't change
-       * during the animation go here.
-       */
-
+      /* Rest state pinned outside timeline */
+      const first = poseFor(words[0].box, MARGIN);
       gsap.set(world, {
         transformOrigin: "0 0",
-
+        x: first.x,
+        y: first.y,
+        scale: first.scale,
         force3D: true,
       });
+      gsap.set(els, { opacity: 0 });
+      gsap.set(els[0], { opacity: 1 });
 
-      /*
-       * ------------------------------------------------
-       * TIMELINE
-       * ------------------------------------------------
-       *
-       * IMPORTANT:
-       *
-       * The initial camera state and word state
-       * are INSIDE the timeline.
-       *
-       * Therefore repeat:-1 always starts from
-       * the same position.
-       */
+      const tl = gsap.timeline({ paused: true });
+      timeline = tl;
 
-      timeline =
-        gsap.timeline({
-          repeat: -1,
+      /* Step through all words with ink arrival and camera follow (sharp, zero blur) */
+      words.forEach((wd, i) => {
+        const t = i * STEP;
+        if (i === 0) return;
 
-          /*
-           * Small pause before restarting.
-           */
-          repeatDelay: 0.5,
-        });
+        tl.fromTo(
+          els[i],
+          { opacity: 0 },
+          { opacity: 1, duration: 0.16, ease: EASE_INK },
+          t
+        );
 
-      /*
-       * ------------------------------------------------
-       * RESET CAMERA
-       * ------------------------------------------------
-       */
+        const p = poseFor(wd.box, MARGIN);
+        tl.to(
+          world,
+          { x: p.x, y: p.y, scale: p.scale, duration: MOVE, ease: EASE_STEP },
+          t
+        );
+      });
 
-      timeline.set(
+      /* The resolve: full word view pull back carried all the way out */
+      const wide = poseFor(FULL, 1.2 * FRAMING);
+      const wideAt = (words.length - 1) * STEP + 0.62;
+      tl.to(
         world,
         {
-          x: firstPose.x,
-
-          y: firstPose.y,
-
-          scale: firstPose.scale,
+          x: wide.x,
+          y: wide.y,
+          scale: wide.scale,
+          duration: 0.94,
+          ease: EASE_WIDE,
         },
-        0
+        wideAt
       );
 
-      /*
-       * ------------------------------------------------
-       * RESET ALL WORDS
-       * ------------------------------------------------
-       */
+      /* Hold on the full word view resolve before looping cleanly */
+      const holdDuration = 2.4;
+      const totalDur = wideAt + 0.94 + holdDuration;
+      tl.set({}, {}, totalDur);
 
-      timeline.set(
-        elements,
-        {
-          opacity: 0,
+      function play() {
+        tl.restart();
+      }
 
-          y: 10,
-
-          scale: 0.985,
-
-          force3D: true,
-        },
-        0
-      );
-
-      /*
-       * ------------------------------------------------
-       * SHOW FIRST WORD
-       * ------------------------------------------------
-       */
-
-      timeline.set(
-        elements[0],
-        {
-          opacity: 1,
-
-          y: 0,
-
-          scale: 1,
-        },
-        0
-      );
-
-      /*
-       * ------------------------------------------------
-       * TIMING
-       * ------------------------------------------------
-       */
-
-      const STEP = mobile
-        ? 0.48
-        : 0.55;
-
-      const MOVE = mobile
-        ? 0.42
-        : 0.48;
-
-      /*
-       * ------------------------------------------------
-       * ANIMATE WORDS
-       * ------------------------------------------------
-       */
-
-      words.forEach(
-        (word, index) => {
-          if (index === 0) return;
-
-          const time =
-            index * STEP;
-
-          const pose =
-            poseFor(
-              word.box,
-              cameraMargin
-            );
-
-          /*
-           * WORD REVEAL
-           *
-           * Only opacity + transform.
-           *
-           * No blur/filter.
-           */
-
-          timeline!.to(
-            elements[index],
-            {
-              opacity: 1,
-
-              y: 0,
-
-              scale: 1,
-
-              duration: 0.2,
-
-              ease: "power2.out",
-
-              overwrite: "auto",
-
-              force3D: true,
-            },
-            time
-          );
-
-          /*
-           * CAMERA MOVEMENT
-           */
-
-          timeline!.to(
-            world,
-            {
-              x: pose.x,
-
-              y: pose.y,
-
-              scale: pose.scale,
-
-              duration: MOVE,
-
-              ease: "power3.inOut",
-
-              overwrite: "auto",
-
-              force3D: true,
-            },
-            time
-          );
-        }
-      );
-
-      /*
-       * ------------------------------------------------
-       * FINAL PULL BACK
-       * ------------------------------------------------
-       */
-
-      timeline.to(
-        world,
-        {
-          x: finalPose.x,
-
-          y: finalPose.y,
-
-          scale: finalPose.scale,
-
-          duration: 1.1,
-
-          ease: "power3.inOut",
-
-          overwrite: "auto",
-
-          force3D: true,
-        },
-        words.length *
-          STEP +
-          0.35
-      );
-
-      /*
-       * ------------------------------------------------
-       * HOLD COMPLETE MESSAGE
-       * ------------------------------------------------
-       */
-
-      timeline.to(
-        {},
-        {
-          duration: 2.2,
-        }
-      );
+      tl.eventCallback("onComplete", play);
+      play();
     };
-
-    /*
-     * ------------------------------------------------
-     * INITIAL BUILD
-     * ------------------------------------------------
-     */
 
     build();
 
-    /*
-     * ------------------------------------------------
-     * INTERSECTION OBSERVER
-     * ------------------------------------------------
-     *
-     * Pause GSAP when the section isn't visible.
-     */
-
-    const intersectionObserver =
-      new IntersectionObserver(
-        ([entry]) => {
-          if (!timeline) return;
-
-          if (
-            entry.isIntersecting
-          ) {
-            timeline.resume();
-          } else {
-            timeline.pause();
-          }
-        },
-        {
-          threshold: 0.05,
+    const ro = new ResizeObserver(() => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => {
+        const root = rootRef.current;
+        if (!root) return;
+        const w = root.clientWidth || window.innerWidth;
+        const h = root.clientHeight || window.innerHeight;
+        if (Math.abs(w - lastW) > 10 || Math.abs(h - lastH) > 40) {
+          build();
         }
-      );
+      }, 150);
+    });
 
-    intersectionObserver.observe(
-      root
-    );
-
-    /*
-     * ------------------------------------------------
-     * RESIZE OBSERVER
-     * ------------------------------------------------
-     */
-
-    const resizeObserver =
-      new ResizeObserver(() => {
-        if (resizeTimer) {
-          clearTimeout(
-            resizeTimer
-          );
-        }
-
-        resizeTimer =
-          setTimeout(() => {
-            build();
-          }, 150);
-      });
-
-    resizeObserver.observe(
-      root
-    );
-
-    /*
-     * ------------------------------------------------
-     * CLEANUP
-     * ------------------------------------------------
-     */
+    if (rootRef.current) {
+      ro.observe(rootRef.current);
+    }
 
     return () => {
-      intersectionObserver.disconnect();
-
-      resizeObserver.disconnect();
-
-      if (resizeTimer) {
-        clearTimeout(
-          resizeTimer
-        );
+      window.clearTimeout(resizeTimer);
+      ro.disconnect();
+      if (timeline) {
+        timeline.kill();
+        timeline = null;
       }
-
-      timeline?.kill();
-
-      timeline = null;
-
-      world.innerHTML = "";
+      if (worldRef.current) {
+        gsap.killTweensOf(worldRef.current);
+        worldRef.current.replaceChildren();
+      }
     };
-  }, []);
+  }, [wordList, accentColor, framing, smearSetting]);
 
   return (
-    <section
+    <div
       ref={rootRef}
-      className="pixelify-story"
+      className={`clip cf-root pixelify-story ${fixed ? "cf-root--fixed pixelify-story--fixed" : ""} ${className}`}
+      data-composition-id="caption-camera-follow"
     >
-      <div className="pixelify-stage">
-        <div
-          ref={worldRef}
-          className="pixelify-world"
-        />
+      <div id="cf-stage" ref={stageRef} className="cf-stage pixelify-stage">
+        <div id="cf-world" ref={worldRef} className="cf-world pixelify-world" />
       </div>
-
-      <div className="pixelify-vignette" />
-    </section>
+      <div id="cf-vignette" className="cf-vignette pixelify-vignette" />
+    </div>
   );
 }
+

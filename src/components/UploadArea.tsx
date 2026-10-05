@@ -160,10 +160,9 @@ export default function UploadArea({
           duration-300
           outline-none
 
-          ${
-            dragging
-              ? "border-white/60 bg-white/[0.025]"
-              : "border-white/[0.22] hover:border-white/[0.32]"
+          ${dragging
+            ? "border-white/60 bg-white/[0.025]"
+            : "border-white/[0.22] hover:border-white/[0.32]"
           }
 
           ${isLoading ? "cursor-wait" : "cursor-pointer"}
@@ -248,7 +247,7 @@ export default function UploadArea({
                 inset-0
                 h-full
                 w-full
-                object-contain
+                object-cover
               "
             />
 
@@ -268,7 +267,7 @@ export default function UploadArea({
                   inset-0
                   h-full
                   w-full
-                  object-contain
+                  object-cover
                 "
               />
             </div>
@@ -298,8 +297,8 @@ export default function UploadArea({
                 top-1/2
                 z-30
                 flex
-                h-[42px]
-                w-[50px]
+                h-[30px]
+                w-[30px]
                 -translate-x-1/2
                 -translate-y-1/2
                 items-center
@@ -599,10 +598,9 @@ export default function UploadArea({
             transition-all
             duration-200
 
-            ${
-              dragging
-                ? "visible opacity-100"
-                : "invisible opacity-0"
+            ${dragging
+              ? "visible opacity-100"
+              : "invisible opacity-0"
             }
           `}
         >

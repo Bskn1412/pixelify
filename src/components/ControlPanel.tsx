@@ -42,18 +42,30 @@ export default function ControlPanel({
         <div className="flex items-center justify-between flex-wrap gap-3 pb-4 border-b border-white/10">
           <div className="flex items-center gap-3">
             <span className="text-xs font-bold text-muted uppercase tracking-wider">AI Model Engine:</span>
-            <div className="flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/10">
+            <div className="flex items-center gap-1.5 bg-white/5 p-1 rounded-xl border border-white/10 flex-wrap">
               <button
                 type="button"
-                onClick={() => onModelChange('espcn')}
+                onClick={() => onModelChange('clearreality')}
                 disabled={busy}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  modelKey === 'espcn'
+                  modelKey === 'clearreality'
                     ? 'bg-primary text-white shadow'
                     : 'text-muted hover:text-white'
                 }`}
               >
-                ESPCN Turbo (60fps)
+                ClearReality V1 (Fast)
+              </button>
+              <button
+                type="button"
+                onClick={() => onModelChange('ultrasharp')}
+                disabled={busy}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  modelKey === 'ultrasharp'
+                    ? 'bg-primary text-white shadow'
+                    : 'text-muted hover:text-white'
+                }`}
+              >
+                UltraSharp (8K Extreme)
               </button>
               <button
                 type="button"
@@ -65,7 +77,7 @@ export default function ControlPanel({
                     : 'text-muted hover:text-white'
                 }`}
               >
-                Real-ESRGAN Studio (8K)
+                Real-ESRGAN (Studio)
               </button>
             </div>
           </div>

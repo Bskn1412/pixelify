@@ -202,7 +202,7 @@ export default function PixelifyHero({
             {/* FIRST 3 LINES: YOUR + [IMAGES / DEVICE / CONTROL] */}
             <span className="hero-trio-row">
               <span className="hero-trio-wrap">
-                <span className="hero-serif-your dim-1">
+                <span className="hero-serif-your dim-3">
                   <span className="ht">YOUR</span>
                 </span>
                 <span className="hero-trio-stack">
@@ -221,21 +221,19 @@ export default function PixelifyHero({
 
             {/* LINE 4 */}
             <span className="line bright step-4">
-              <span aria-hidden="true">
+              <span className="step-4-row" aria-hidden="true">
                 <span className="ht word-powered">
                   powered
-                </span>{' '}
+                </span>
                 <span className="ht">
                   by
-                </span>{' '}
-
+                </span>
                 <span className="glow-wrap">
                   <ThinkingOrb
                     state="solving"
                     size={64}
                   />
-                </span>{' '}
-
+                </span>
                 <span className="ht ai-token">
                   Pixelify
                 </span>

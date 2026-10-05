@@ -123,15 +123,20 @@ function ModelDropdown({
   const activeModel = MODELS[selectedKey];
 
   const MODEL_METADATA: Record<ModelKey, { label: string; desc: string; badge: string }> = {
-    espcn: {
-      label: MODELS.espcn?.name || "ESPCN Turbo (2× / 4×)",
-      desc: "Ultra-fast 60fps inference • Best for instant previews & low-spec hardware",
-      badge: "Ultra Fast",
+    clearreality: {
+      label: MODELS.clearreality?.name || "4x-ClearReality V1 (Fast / Clean)",
+      desc: "Ultra-fast neural inference • Crisp edges, de-blurring & illustration clarity",
+      badge: "Fast & Crisp",
+    },
+    ultrasharp: {
+      label: MODELS.ultrasharp?.name || "4x-UltraSharp (Extreme Clarity & 8K)",
+      desc: "Deep generative ESRGAN • Extreme micro-textures, photorealism & 8K clarity",
+      badge: "8K UltraSharp",
     },
     realesrgan: {
       label: MODELS.realesrgan?.name || "Real-ESRGAN Studio (4× / 8×)",
-      desc: "Deep residual network • Incredible realism, edge detail & 8K clarity",
-      badge: "8K Quality",
+      desc: "Deep residual network • Studio portrait restoration, artifact removal & precision",
+      badge: "Studio 8K",
     },
   };
 
@@ -622,32 +627,32 @@ export default function UpscaleWorkspace({
               {/* Sliders with disabled={busy} and fixed tooltips */}
               <ParameterSlider
                 label="Sharpness"
-                value={options.sharpness ?? 50}
+                value={options.sharpness ?? options.sharpenLevel ?? 50}
                 min={0}
                 max={100}
                 disabled={busy}
-                onChange={(value) => onOptionsChange(activeItem.id, { ...options, sharpness: value })}
+                onChange={(value) => onOptionsChange(activeItem.id, { ...options, sharpness: value, sharpenLevel: value, sharpen: true })}
                 info="Controls how strongly fine edges and details are enhanced."
               />
 
               <ParameterSlider
                 label="Denoise"
-                value={options.denoise ?? 50}
+                value={options.denoise ?? options.removeNoiseLevel ?? 50}
                 min={0}
                 max={100}
                 disabled={busy}
-                onChange={(value) => onOptionsChange(activeItem.id, { ...options, denoise: value })}
+                onChange={(value) => onOptionsChange(activeItem.id, { ...options, denoise: value, removeNoiseLevel: value, removeNoise: true })}
                 info="Reduces noise, grain and compression artifacts."
               />
 
               {model?.features?.faceRestore && (
                 <ParameterSlider
                   label="Face enhancement"
-                  value={options.faceEnhancement ?? 50}
+                  value={options.faceEnhancement ?? options.faceRestoreLevel ?? 50}
                   min={0}
                   max={100}
                   disabled={busy}
-                  onChange={(value) => onOptionsChange(activeItem.id, { ...options, faceEnhancement: value } as EnhancementOptions)}
+                  onChange={(value) => onOptionsChange(activeItem.id, { ...options, faceEnhancement: value, faceRestoreLevel: value, faceRestore: true } as EnhancementOptions)}
                   info="Controls the strength of facial detail restoration."
                 />
               )}
@@ -655,11 +660,11 @@ export default function UpscaleWorkspace({
               {model?.features?.colorEnhance && (
                 <ParameterSlider
                   label="Color enhancement"
-                  value={options.colorLevel ?? (options.colorEnhance ? 60 : 50)}
+                  value={options.colorLevel ?? 50}
                   min={0}
                   max={100}
                   disabled={busy}
-                  onChange={(value) => onOptionsChange(activeItem.id, { ...options, colorLevel: value, colorEnhance: value > 0 } as EnhancementOptions)}
+                  onChange={(value) => onOptionsChange(activeItem.id, { ...options, colorLevel: value, colorEnhance: value !== 50 } as EnhancementOptions)}
                   info="Enhances color richness, vibrancy and overall color balance."
                 />
               )}
@@ -667,11 +672,11 @@ export default function UpscaleWorkspace({
               {model?.features?.hdrBoost && (
                 <ParameterSlider
                   label="HDR"
-                  value={options.hdrLevel ?? (options.hdrBoost ? 60 : 50)}
+                  value={options.hdrLevel ?? 50}
                   min={0}
                   max={100}
                   disabled={busy}
-                  onChange={(value) => onOptionsChange(activeItem.id, { ...options, hdrLevel: value, hdrBoost: value > 0 } as EnhancementOptions)}
+                  onChange={(value) => onOptionsChange(activeItem.id, { ...options, hdrLevel: value, hdrBoost: value !== 50 } as EnhancementOptions)}
                   info="Enhances dynamic range, highlights and shadow details."
                 />
               )}
@@ -806,131 +811,99 @@ function BeforeAfterSlider({
   before: string;
   after: string;
 }) {
-  const containerRef =
-    useRef<HTMLDivElement | null>(null);
-
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const [pos, setPos] = useState(50);
-
-  const draggingRef =
-    useRef(false);
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const draggingRef = useRef(false);
+  const panStartRef = useRef<{ startX: number; startY: number; initPanX: number; initPanY: number } | null>(null);
 
   /* ----------------------------------------------------------
      Update slider position
      ---------------------------------------------------------- */
-
-  const updatePosition = (
-    clientX: number
-  ) => {
-    const container =
-      containerRef.current;
-
+  const updatePosition = (clientX: number) => {
+    const container = containerRef.current;
     if (!container) return;
-
-    const rect =
-      container.getBoundingClientRect();
-
+    const rect = container.getBoundingClientRect();
     if (!rect.width) return;
-
-    const x =
-      clientX - rect.left;
-
-    const percentage =
-      (x / rect.width) * 100;
-
-    setPos(
-      Math.min(
-        100,
-        Math.max(0, percentage)
-      )
-    );
+    const x = clientX - rect.left;
+    const percentage = (x / rect.width) * 100;
+    setPos(Math.min(100, Math.max(0, percentage)));
   };
 
   /* ----------------------------------------------------------
      Global pointer movement
      ---------------------------------------------------------- */
-
   useEffect(() => {
-    const handlePointerMove = (
-      e: PointerEvent
-    ) => {
+    const handlePointerMove = (e: PointerEvent) => {
+      if (panStartRef.current) {
+        const dx = e.clientX - panStartRef.current.startX;
+        const dy = e.clientY - panStartRef.current.startY;
+        setPan({
+          x: panStartRef.current.initPanX + dx,
+          y: panStartRef.current.initPanY + dy,
+        });
+        return;
+      }
       if (!draggingRef.current) return;
-
       updatePosition(e.clientX);
     };
 
     const handlePointerUp = () => {
       draggingRef.current = false;
+      panStartRef.current = null;
     };
 
-    window.addEventListener(
-      "pointermove",
-      handlePointerMove
-    );
-
-    window.addEventListener(
-      "pointerup",
-      handlePointerUp
-    );
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
 
     return () => {
-      window.removeEventListener(
-        "pointermove",
-        handlePointerMove
-      );
-
-      window.removeEventListener(
-        "pointerup",
-        handlePointerUp
-      );
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
     };
   });
 
   /* ----------------------------------------------------------
-     Start dragging
+     Start dragging / panning
      ---------------------------------------------------------- */
-
-  const handlePointerDown = (
-    e: React.PointerEvent<HTMLDivElement>
-  ) => {
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.shiftKey || e.button === 1 || e.button === 2) {
+      panStartRef.current = { startX: e.clientX, startY: e.clientY, initPanX: pan.x, initPanY: pan.y };
+      return;
+    }
     e.preventDefault();
-
     draggingRef.current = true;
-
     updatePosition(e.clientX);
+  };
+
+  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const delta = e.deltaY < 0 ? 0.3 : -0.3;
+    setZoom((z) => Math.min(4, Math.max(1, +(z + delta).toFixed(1))));
   };
 
   /* ----------------------------------------------------------
      Keyboard support
      ---------------------------------------------------------- */
-
-  const handleKeyDown = (
-    e: React.KeyboardEvent<HTMLDivElement>
-  ) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     let next = pos;
-
     switch (e.key) {
       case "ArrowLeft":
         next = Math.max(0, pos - 2);
         break;
-
       case "ArrowRight":
         next = Math.min(100, pos + 2);
         break;
-
       case "Home":
         next = 0;
         break;
-
       case "End":
         next = 100;
         break;
-
       default:
         return;
     }
-
     e.preventDefault();
-
     setPos(next);
   };
 
@@ -938,7 +911,8 @@ function BeforeAfterSlider({
     <div
       ref={containerRef}
       onPointerDown={handlePointerDown}
-      className="
+      onWheel={handleWheel}
+      className={`
         relative
         h-full
         w-full
@@ -946,183 +920,104 @@ function BeforeAfterSlider({
         rounded-xl
         touch-none
         select-none
-        cursor-ew-resize
-      "
+        ${zoom > 1 ? "cursor-grab active:cursor-grabbing" : "cursor-ew-resize"}
+      `}
     >
       {/* =====================================================
-          NEW / UPSCALED IMAGE
-
-          This establishes the canvas dimensions.
+          ZOOMABLE WRAPPER
          ===================================================== */}
-
-      <img
-        src={after}
-        alt="Enhanced result"
-        draggable={false}
-        className="
-          block
-          h-full
-          w-full
-          object-contain
-          select-none
-        "
-      />
-
-      {/* =====================================================
-          OLD / ORIGINAL IMAGE
-
-          It sits exactly over the new image.
-
-          clip-path reveals only the required percentage.
-         ===================================================== */}
-
-      <img
-        src={before}
-        alt="Original"
-        draggable={false}
-        className="
-          absolute
-          inset-0
-          block
-          h-full
-          w-full
-          object-contain
-          select-none
-        "
-        style={{
-          clipPath:
-            `inset(0 ${100 - pos}% 0 0)`,
-        }}
-      />
-
-      {/* =====================================================
-          SLIDER LINE
-         ===================================================== */}
-
       <div
-        className="
-          pointer-events-none
-          absolute
-          inset-y-0
-          z-20
-          w-[2px]
-          -translate-x-1/2
-          bg-white
-          shadow-[0_0_10px_rgba(0,0,0,.5)]
-        "
+        className="relative h-full w-full flex items-center justify-center transition-transform duration-100 ease-out"
         style={{
-          left: `${pos}%`,
+          transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
+          transformOrigin: "center center",
         }}
       >
-        {/* ===================================================
-            HANDLE
-           =================================================== */}
+        {/* NEW / UPSCALED IMAGE */}
+        <img
+          src={after}
+          alt="Enhanced result"
+          draggable={false}
+          className="block h-full w-full object-contain select-none"
+        />
 
+        {/* OLD / ORIGINAL IMAGE */}
+        <img
+          src={before}
+          alt="Original"
+          draggable={false}
+          className="absolute inset-0 block h-full w-full object-contain select-none"
+          style={{
+            clipPath: `inset(0 ${100 - pos}% 0 0)`,
+          }}
+        />
+
+        {/* SLIDER LINE */}
         <div
-          className="
-            absolute
-            left-1/2
-            top-1/2
-            flex
-            h-[48px]
-            w-[48px]
-            -translate-x-1/2
-            -translate-y-1/2
-            items-center
-            justify-center
-            rounded-[14px]
-            bg-white
-            shadow-[0_8px_30px_rgba(0,0,0,.4)]
-          "
+          className="pointer-events-none absolute inset-y-0 z-20 w-[2px] -translate-x-1/2 bg-white shadow-[0_0_10px_rgba(0,0,0,.5)]"
+          style={{
+            left: `${pos}%`,
+          }}
         >
-          <div className="flex items-center gap-[5px] text-black">
-            {/* LEFT ARROW */}
-
-            <svg
-              width="7"
-              height="12"
-              viewBox="0 0 7 12"
-              fill="none"
-            >
-              <path
-                d="M6 1L1 6L6 11"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-
-            {/* RIGHT ARROW */}
-
-            <svg
-              width="7"
-              height="12"
-              viewBox="0 0 7 12"
-              fill="none"
-            >
-              <path
-                d="M1 1L6 6L1 11"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+          {/* HANDLE */}
+          <div className="absolute left-1/2 top-1/2 flex h-[48px] w-[48px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-[14px] bg-white shadow-[0_8px_30px_rgba(0,0,0,.4)] pointer-events-auto cursor-ew-resize">
+            <div className="flex items-center gap-[5px] text-black">
+              <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
+                <path d="M6 1L1 6L6 11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
+                <path d="M1 1L6 6L1 11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* =====================================================
-          ORIGINAL LABEL
-         ===================================================== */}
-
-      <div
-        className="
-          pointer-events-none
-          absolute
-          left-3
-          top-3
-          z-30
-          rounded-md
-          bg-black/60
-          px-2.5
-          py-1
-          text-[10px]
-          font-bold
-          uppercase
-          tracking-wider
-          text-white
-          backdrop-blur-sm
-        "
-      >
+      {/* ORIGINAL LABEL */}
+      <div className="pointer-events-none absolute left-3 top-3 z-30 rounded-md bg-black/60 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
         Original
       </div>
 
-      {/* =====================================================
-          ENHANCED LABEL
-         ===================================================== */}
-
-      <div
-        className="
-          pointer-events-none
-          absolute
-          right-3
-          top-3
-          z-30
-          rounded-md
-          bg-black/60
-          px-2.5
-          py-1
-          text-[10px]
-          font-bold
-          uppercase
-          tracking-wider
-          text-white
-          backdrop-blur-sm
-        "
-      >
+      {/* ENHANCED LABEL */}
+      <div className="pointer-events-none absolute right-3 top-3 z-30 rounded-md bg-black/60 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
         Enhanced
+      </div>
+
+      {/* INTERACTIVE ZOOM CONTROLS (Fit, 2x, 4x) */}
+      <div
+        className="absolute bottom-3 right-3 z-30 flex items-center gap-1 rounded-xl border border-white/15 bg-black/75 p-1.5 backdrop-blur-md shadow-2xl"
+        onPointerDown={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }}
+          className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
+            zoom === 1 ? "bg-white/20 text-white shadow-sm" : "text-white/60 hover:text-white"
+          }`}
+          title="Fit to view"
+        >
+          Fit
+        </button>
+        <button
+          type="button"
+          onClick={() => { setZoom(2); }}
+          className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
+            zoom === 2 ? "bg-[#00FF85] text-black font-bold shadow-sm" : "text-white/60 hover:text-white"
+          }`}
+          title="2× Zoom (Inspect edges)"
+        >
+          2× Zoom
+        </button>
+        <button
+          type="button"
+          onClick={() => { setZoom(4); }}
+          className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
+            zoom === 4 ? "bg-[#00FF85] text-black font-bold shadow-sm" : "text-white/60 hover:text-white"
+          }`}
+          title="4× Zoom (Pixel-level detail)"
+        >
+          4× Zoom
+        </button>
       </div>
 
       {/* =====================================================

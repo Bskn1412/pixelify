@@ -45,24 +45,57 @@ export async function loadONNX(): Promise<OrtModule> {
 }
 
 async function fetchModelWithCache(path: string): Promise<Uint8Array> {
-  const cache = await caches.open('onnx-models');
-  const cached = await cache.match(path);
-  if (cached) {
-    return new Uint8Array(await cached.arrayBuffer());
+  try {
+    const cache = await caches.open('onnx-models');
+    const cached = await cache.match(path);
+    if (cached) {
+      const buf = new Uint8Array(await cached.arrayBuffer());
+      // Valid ONNX models in our app are at least 1.5MB. If a 404 or corrupted stub was cached, invalidate it!
+      if (buf.byteLength > 100000) {
+        return buf;
+      }
+      await cache.delete(path);
+    }
+    const res = await fetch(path);
+    if (!res.ok) {
+      throw new Error(`Failed to load model file ${path}: HTTP ${res.status}`);
+    }
+    const data = new Uint8Array(await res.arrayBuffer());
+    if (data.byteLength > 100000) {
+      cache.put(path, new Response(data));
+    }
+    return data;
+  } catch (err) {
+    // Direct network fallback if Cache API fails or throws
+    const res = await fetch(path);
+    if (!res.ok) {
+      throw new Error(`Failed to load model file ${path}: HTTP ${res.status}`);
+    }
+    return new Uint8Array(await res.arrayBuffer());
   }
-  const res = await fetch(path);
-  const data = new Uint8Array(await res.arrayBuffer());
-  cache.put(path, new Response(data));
-  return data;
 }
 
-export async function createSession(ort: OrtModule, modelKey: ModelKey): Promise<InferenceSession> {
+export async function createSession(
+  ort: OrtModule, 
+  modelKey: ModelKey, 
+  forceEngine?: 'wasm' | 'webgpu'
+): Promise<InferenceSession> {
   const m = MODELS[modelKey];
   const data = await fetchModelWithCache(m.file);
-  // WebGPU FIRST, automatic WASM fallback: probe for a real GPU adapter up
-  // front. No adapter (or session creation failure) → wasm through the proxy
-  // worker. The session is tagged with the EP that ACTUALLY won so the
-  // Settings indicator reports the truth, not a guess.
+
+  // ClearReality uses DepthToSpace / PixelShuffle. In ORT Web 1.19.2+, WebGPU JSEP kernel for DepthToSpace
+  // has a known dimension mismatch bug with 4D output tensors [1, 512, 512, 3].
+  // Running ClearReality on WASM SIMD is ultra-fast (~100ms for 1.9MB model) and 100% stable.
+  const targetEngine = modelKey === 'clearreality' ? 'wasm' : forceEngine;
+
+  if (targetEngine === 'wasm') {
+    const session = await ort.InferenceSession.create(data, { executionProviders: ['wasm'] });
+    (session as any).__engine = 'wasm';
+    (session as any).__modelKey = modelKey;
+    return session;
+  }
+
+  // WebGPU FIRST for heavy generative models (UltraSharp 67MB, Real-ESRGAN 65MB): probe GPU adapter
   let adapterOk = false;
   try {
     const gpu = (navigator as any).gpu;
@@ -75,13 +108,16 @@ export async function createSession(ort: OrtModule, modelKey: ModelKey): Promise
     try {
       const session = await ort.InferenceSession.create(data, { executionProviders: ['webgpu'] });
       (session as any).__engine = 'webgpu';
+      (session as any).__modelKey = modelKey;
       return session;
     } catch (e) {
-      console.warn('WebGPU session creation failed, falling back to WASM:', e);
+      console.warn(`WebGPU session creation failed for ${modelKey}, falling back to WASM:`, e);
     }
   }
+
   const session = await ort.InferenceSession.create(data, { executionProviders: ['wasm'] });
   (session as any).__engine = 'wasm';
+  (session as any).__modelKey = modelKey;
   return session;
 }
 
@@ -95,6 +131,7 @@ export async function runPass(
   totalPasses: number,
   modelKey: ModelKey,
   onProgress: (pct: number, text: string) => void,
+  onSessionUpdated?: (newSession: InferenceSession) => void,
 ): Promise<Float32Array> {
   const m = MODELS[modelKey];
   const tileSize = m.tileSize;
@@ -106,7 +143,6 @@ export async function runPass(
   const numVTiles = Math.ceil(dstH / (tileSize * scale));
   const totalTiles = numHTiles * numVTiles;
   const outData = new Float32Array(dstW * dstH * ch);
-  const inputName = session.inputNames[0];
   let done = 0;
 
   await new Promise((r) => setTimeout(r, 0));
@@ -148,9 +184,27 @@ export async function runPass(
       }
 
       const shape = [1, ch, tileSize, tileSize];
-      const t = new ort.Tensor('float32', tensorData, shape);
-      const r = await session.run({ [inputName]: t });
-      const rawOut = r[session.outputNames[0]].data;
+      // Always pass a fresh Float32Array copy to guarantee underlying ArrayBuffer is never shared or detached
+      const inputTensor = new ort.Tensor('float32', new Float32Array(tensorData), shape);
+      let rawOut: Float32Array;
+      try {
+        const r = await session.run({ [session.inputNames[0]]: inputTensor });
+        rawOut = r[session.outputNames[0]].data;
+      } catch (runErr: any) {
+        if ((session as any)?.__engine === 'webgpu') {
+          console.warn(`WebGPU execution error during tile run for ${modelKey}. Switching to WASM engine fallback:`, runErr);
+          session = await createSession(ort, modelKey, 'wasm');
+          (session as any).__engine = 'wasm';
+          if (onSessionUpdated) onSessionUpdated(session);
+
+          // Re-create a fresh tensor with a new Float32Array to guarantee buffer is never detached
+          const freshTensor = new ort.Tensor('float32', new Float32Array(tensorData), shape);
+          const r = await session.run({ [session.inputNames[0]]: freshTensor });
+          rawOut = r[session.outputNames[0]].data;
+        } else {
+          throw runErr;
+        }
+      }
       await new Promise((r) => setTimeout(r, 0));
 
       const tw = Math.min(tileSize * scale, dstW - tx * tileSize * scale);

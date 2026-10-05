@@ -1,52 +1,33 @@
 # ONNX Super-Resolution Models
 
-## Available Models
+## Active Models
 
-### Current Model (Included)
-- `model.onnx` - ONNX Model Zoo Super-Resolution-10
-- 240KB, 224×224 → 448×448 (2x upscale)
-- Works out of the box
+### 1. 4x-ClearReality V1
+- **File**: `4x-ClearRealityV1.onnx`
+- **Size**: ~1.9 MB
+- **Scale**: 4×
+- **Architecture**: Compact CNN Super-Resolution
+- **Input**: NCHW `[1, 3, H, W]`, float32 [0, 1] normalized RGB (input name: `input`)
+- **Output**: NCHW `[1, 3, 4H, 4W]`, float32 RGB (output name: `output`)
+- **Acceleration**: WebGPU (JSEP) with automatic WASM SIMD fallback
+- **Characteristics**: Ultra-fast (~100ms), low memory footprint, crystal-clear edges and de-blurring. Ideal for quick previews, anime, and illustrations.
 
----
+### 2. 4x-UltraSharp
+- **File**: `4x-UltraSharp.onnx`
+- **Size**: ~66.9 MB
+- **Scale**: 4×
+- **Architecture**: Deep Generative Residual Dense Network (ESRGAN / RRDBNet)
+- **Input**: NCHW `[1, 3, H, W]`, float32 [0, 1] normalized RGB (input name: `data`)
+- **Output**: NCHW `[1, 3, 4H, 4W]`, float32 RGB (output name: `output`)
+- **Acceleration**: WebGPU (JSEP) with automatic WASM SIMD fallback
+- **Characteristics**: High-fidelity micro-texture reconstruction, sharp photographic depth, and 8K clarity.
 
-### Alternative Models
-
-Replace `model.onnx` with any of these for different quality/speed:
-
-#### 1. ESPCN (lightweight, fast)
-- Size: ~100KB
-- Scale: 2x
-- Download: https://github.com/krasserm/onnx-espcn/releases
-- File: `espcn_16_192.onnx`
-
-#### 2. FSRCNN (fast)
-- Size: ~200KB
-- Scale: 2x-4x
-- Download: Hugging Face search "fsrcnn onnx"
-
-#### 3. Real-ESRGAN (high quality)
-- Size: 10-20MB
-- Scale: 2x-4x
-- Search: Hugging Face for "real-esrgan onnx"
-
-#### 4. LapSRN (deep learning)
-- Size: ~500KB
-- Scale: 8x
-- Search: Hugging Face for "lapsrn onnx"
-
----
-
-### To Swap Models
-
-1. Download your preferred model
-2. Rename to `model.onnx` (or keep name for script update)
-3. Replace `/models/model.onnx`
-4. Restart dev server
-
-### Model Requirements
-
-The current script expects:
-- Input: NCHW format, float32 [0,1] normalized
-- Or: Grayscale Y channel for Super-Resolution-10
-
-Adjust preprocessing in `script.js` if your model has different input requirements.
+### 3. Real-ESRGAN Studio
+- **File**: `Real-ESRGAN-x4plus.onnx`
+- **Size**: ~67.1 MB
+- **Scale**: 4×
+- **Architecture**: Real-ESRGAN+
+- **Input**: NCHW `[1, 3, H, W]`, float32 [0, 1] normalized RGB (input name: `image`)
+- **Output**: NCHW `[1, 3, 4H, 4W]`, float32 RGB (output name: `upscaled_image`)
+- **Acceleration**: WebGPU (JSEP) with automatic WASM SIMD fallback
+- **Characteristics**: Studio portrait enhancement, heavy artifact removal, and balanced restoration.

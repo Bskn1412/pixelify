@@ -58,7 +58,7 @@ export function resizeChannel(data: Float32Array, srcW: number, srcH: number, ds
   const c = document.createElement('canvas');
   c.width = srcW;
   c.height = srcH;
-  const ctx = c.getContext('2d')!;
+  const ctx = c.getContext('2d', { willReadFrequently: true })!;
   const tmp = new Uint8ClampedArray(srcW * srcH * 4);
   for (let i = 0; i < data.length; i++) {
     const v = Math.min(255, Math.max(0, data[i] * 255));
@@ -69,7 +69,7 @@ export function resizeChannel(data: Float32Array, srcW: number, srcH: number, ds
   const d = document.createElement('canvas');
   d.width = dstW;
   d.height = dstH;
-  const dCtx = d.getContext('2d')!;
+  const dCtx = d.getContext('2d', { willReadFrequently: true })!;
   dCtx.imageSmoothingEnabled = true;
   dCtx.imageSmoothingQuality = 'high';
   dCtx.drawImage(c, 0, 0, dstW, dstH);
@@ -88,7 +88,7 @@ export function applyCanvasEnhancements(
   canvas: HTMLCanvasElement,
   options: EnhancementOptions
 ): void {
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
   if (!ctx) return;
 
   const w = canvas.width;
@@ -104,58 +104,27 @@ export function applyCanvasEnhancements(
   const clamp = (value: number) =>
     Math.max(0, Math.min(255, value));
 
-  const getLevel = (
-    value: unknown,
-    enabled: unknown,
-    fallback = 0
-  ) => {
-    if (typeof value === 'number') return value;
-    return enabled ? fallback : 0;
+  const resolveLevel = (valA: unknown, valB: unknown, fallback = 50): number => {
+    if (typeof valA === 'number') return valA;
+    if (typeof valB === 'number') return valB;
+    return fallback;
   };
 
   // ---------------------------------------------------------
-  // Levels
+  // Levels (50 = Neutral Baseline / Pure AI output)
   // ---------------------------------------------------------
 
-  const noiseLevel = getLevel(
-    (options as any).removeNoiseLevel,
-    options.removeNoise,
-    50
-  );
-
-  const faceLevel = getLevel(
-    (options as any).faceRestoreLevel,
-    options.faceRestore,
-    50
-  );
-
-  const colorLevel = getLevel(
-    (options as any).colorLevel,
-    options.colorEnhance,
-    50
-  );
-
-  const hdrLevel = getLevel(
-    (options as any).hdrLevel,
-    options.hdrBoost,
-    50
-  );
-
-  const sharpenLevel = getLevel(
-    (options as any).sharpenLevel,
-    options.sharpen,
-    50
-  );
+  const noiseVal = resolveLevel(options.denoise, options.removeNoiseLevel);
+  const faceVal = resolveLevel(options.faceEnhancement, options.faceRestoreLevel);
+  const colorVal = resolveLevel(options.colorLevel, (options as any).colorEnhanceLevel);
+  const hdrVal = resolveLevel(options.hdrLevel, (options as any).hdrBoostLevel);
+  const sharpVal = resolveLevel(options.sharpness, options.sharpenLevel);
 
   const brightness =
-    typeof (options as any).brightness === 'number'
-      ? (options as any).brightness
-      : 50;
+    typeof options.brightness === 'number' ? options.brightness : 50;
 
   const contrast =
-    typeof (options as any).contrast === 'number'
-      ? (options as any).contrast
-      : 50;
+    typeof options.contrast === 'number' ? options.contrast : 50;
 
   // ---------------------------------------------------------
   // 1. DENOISE
@@ -163,10 +132,8 @@ export function applyCanvasEnhancements(
   //
   // Simple browser-friendly neighborhood blur.
   // Strength is controlled by removeNoiseLevel.
-  //
-
-  if (noiseLevel > 0) {
-    const strength = noiseLevel / 100;
+  if (options.removeNoise !== false && noiseVal > 50) {
+    const strength = (noiseVal - 50) / 50;
 
     const source = new Uint8ClampedArray(data);
 
@@ -235,10 +202,8 @@ export function applyCanvasEnhancements(
   //
   // Lightweight skin-tone enhancement.
   // This is NOT an AI face-restoration model.
-  //
-
-  if (faceLevel > 0) {
-    const strength = faceLevel / 100;
+  if (options.faceRestore !== false && faceVal > 50) {
+    const strength = (faceVal - 50) / 50;
 
     for (let i = 0; i < data.length; i += 4) {
       const r = data[i];
@@ -274,12 +239,12 @@ export function applyCanvasEnhancements(
   // 3. COLOR ENHANCEMENT
   // ---------------------------------------------------------
 
-  if (colorLevel > 0) {
-    const strength = colorLevel / 100;
+  if ((options.colorEnhance || colorVal !== 50) && colorVal !== 50) {
+    const strength = (colorVal - 50) / 50;
 
-    // 1.0 at 0%
-    // ~1.35 at 100%
-    const saturation = 1 + 0.35 * strength;
+    // 1.0 at 50%
+    // ~1.40 at 100%, ~0.6 at 0%
+    const saturation = 1 + 0.4 * strength;
 
     for (let i = 0; i < data.length; i += 4) {
       const r = data[i];
@@ -309,8 +274,8 @@ export function applyCanvasEnhancements(
   // 4. HDR / LOCAL CONTRAST
   // ---------------------------------------------------------
 
-  if (hdrLevel > 0) {
-    const strength = hdrLevel / 100;
+  if ((options.hdrBoost || hdrVal !== 50) && hdrVal > 50) {
+    const strength = (hdrVal - 50) / 50;
 
     for (let i = 0; i < data.length; i += 4) {
       let r = data[i] / 255;
@@ -340,18 +305,12 @@ export function applyCanvasEnhancements(
   //
 
   if (brightness !== 50) {
-    const brightnessOffset =
-      ((brightness - 50) / 50) * 100;
+    const brightnessOffset = ((brightness - 50) / 50) * 35;
 
     for (let i = 0; i < data.length; i += 4) {
-      data[i] =
-        clamp(data[i] + brightnessOffset);
-
-      data[i + 1] =
-        clamp(data[i + 1] + brightnessOffset);
-
-      data[i + 2] =
-        clamp(data[i + 2] + brightnessOffset);
+      data[i] = clamp(data[i] + brightnessOffset);
+      data[i + 1] = clamp(data[i + 1] + brightnessOffset);
+      data[i + 2] = clamp(data[i + 2] + brightnessOffset);
     }
   }
 
@@ -365,24 +324,14 @@ export function applyCanvasEnhancements(
   //
 
   if (contrast !== 50) {
-    const normalized =
-      (contrast - 50) / 50;
-
-    const contrastFactor =
-      1 + normalized * 1.2;
+    const normalized = (contrast - 50) / 50;
+    // Bounded between 0.55 and 1.45: preserves dynamic range and details even at 0 contrast
+    const contrastFactor = 1 + normalized * 0.45;
 
     for (let i = 0; i < data.length; i += 4) {
-      data[i] = clamp(
-        128 + (data[i] - 128) * contrastFactor
-      );
-
-      data[i + 1] = clamp(
-        128 + (data[i + 1] - 128) * contrastFactor
-      );
-
-      data[i + 2] = clamp(
-        128 + (data[i + 2] - 128) * contrastFactor
-      );
+      data[i] = clamp(128 + (data[i] - 128) * contrastFactor);
+      data[i + 1] = clamp(128 + (data[i + 1] - 128) * contrastFactor);
+      data[i + 2] = clamp(128 + (data[i + 2] - 128) * contrastFactor);
     }
   }
 
@@ -392,8 +341,8 @@ export function applyCanvasEnhancements(
   // 7. SHARPENING
   // ---------------------------------------------------------
 
-  if (sharpenLevel > 0) {
-    const strength = sharpenLevel / 100;
+  if (options.sharpen !== false && sharpVal > 50) {
+    const strength = (sharpVal - 50) / 50;
 
     const amount =
       0.35 + 1.15 * strength;
@@ -405,7 +354,7 @@ export function applyCanvasEnhancements(
     tempCanvas.height = h;
 
     const tempCtx =
-      tempCanvas.getContext('2d')!;
+      tempCanvas.getContext('2d', { willReadFrequently: true })!;
 
     tempCtx.filter =
       'blur(1px)';
@@ -477,7 +426,7 @@ export function upscaleWithCanvas(
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
-  const ctx = canvas.getContext('2d')!;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(img, 0, 0, width, height);

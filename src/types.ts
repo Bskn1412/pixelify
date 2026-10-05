@@ -1,6 +1,6 @@
 export type Step = 'upload' | 'config' | 'processing' | 'result';
 export type Backend = 'webgpu' | 'wasm';
-export type ModelKey = 'espcn' | 'realesrgan';
+export type ModelKey = 'clearreality' | 'ultrasharp' | 'realesrgan';
 export type ScaleFactor = 2 | 4 | 8;
 export type ViewTab = 'home' | 'upscaler' | 'bg_remove' | 'history' | 'prompts' | 'batch';
 export type ThemeMode = 'dark' | 'light' | 'system';

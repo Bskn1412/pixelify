@@ -17,8 +17,8 @@ const defaultCards: CardItem[] = [
     image: "/cards_imgs/spiderman.jpeg",
   },
   {
-    title: "Model: ESPCN Turbo",
-    subtitle: "Instant background cutout",
+    title: "Model: ClearReality V1",
+    subtitle: "High-speed clean upscaling",
     color: "from-cyan-500 via-sky-500 to-blue-700",
     image: "/cards_imgs/spiderman_1model.png",
   },
