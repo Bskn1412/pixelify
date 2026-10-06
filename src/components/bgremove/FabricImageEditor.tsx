@@ -1,18 +1,63 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useImperativeHandle, forwardRef } from 'react';
 import { Canvas as FabricCanvas, FabricImage, Line, Rect, controlsUtils } from 'fabric';
-import { Check, FlipHorizontal, FlipVertical, RotateCcw, X } from 'lucide-react';
 
 export type FabricEditMode = 'transform' | 'crop';
 export type FabricCropRatio = 'free' | '1:1' | '4:5' | '16:9' | '9:16';
 
-interface FabricImageEditorProps {
+export interface SubjectTransform {
+  relX: number; // Normalized offset from artboard center (-0.5 to 0.5)
+  relY: number; // Normalized offset from artboard center (-0.5 to 0.5)
+  scale: number; // Scale multiplier (1 = default fit size)
+  rotation: number; // Angle in degrees (-180 to 180)
+  flipX: boolean;
+  flipY: boolean;
+}
+
+export const DEFAULT_SUBJECT_TRANSFORM: SubjectTransform = {
+  relX: 0,
+  relY: 0,
+  scale: 1,
+  rotation: 0,
+  flipX: false,
+  flipY: false,
+};
+
+export interface FabricImageEditorHandle {
+  flipX: () => void;
+  flipY: () => void;
+  resetTransform: () => void;
+  apply: () => Promise<void> | void;
+  cancel: () => void;
+  selectCropFrame: () => void;
+  selectCropImage: () => void;
+  setCropZoom: (zoom: number) => void;
+  setRotation: (angle: number) => void;
+  getCurrentTransform?: () => SubjectTransform | null;
+}
+
+export interface FabricImageEditorProps {
   imageUrl: string;
+  artboardWidth?: number;
+  artboardHeight?: number;
+  naturalArtboardWidth?: number;
+  naturalArtboardHeight?: number;
   mode: FabricEditMode;
   cropRatio: FabricCropRatio;
-  initialScale: number;
-  initialRotation: number;
-  initialPosition: { x: number; y: number };
-  onCropRatioChange: (ratio: FabricCropRatio) => void;
+  backgroundStyle?: string;
+  customBgColor?: string;
+  rotation?: number;
+  initialScale?: number;
+  initialRotation?: number;
+  initialPosition?: { x: number; y: number };
+  subjectTransform?: SubjectTransform;
+  hasCustomBg?: boolean;
+  cropTarget?: 'frame' | 'image';
+  cropZoom?: number;
+  onCropTargetChange?: (target: 'frame' | 'image') => void;
+  onCropZoomChange?: (zoom: number) => void;
+  onCropRatioChange?: (ratio: FabricCropRatio) => void;
+  onRotationChange?: (angle: number) => void;
+  onApplyTransform?: (transform: SubjectTransform) => void;
   onApply: (blob: Blob) => void;
   onCancel: () => void;
 }
@@ -20,17 +65,32 @@ interface FabricImageEditorProps {
 const STAGE_MAX_WIDTH = 760;
 const STAGE_MAX_HEIGHT = 500;
 
-export default function FabricImageEditor({
+const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorProps>(function FabricImageEditor({
   imageUrl,
+  artboardWidth,
+  artboardHeight,
+  naturalArtboardWidth,
+  naturalArtboardHeight,
   mode,
   cropRatio,
-  initialScale,
-  initialRotation,
-  initialPosition,
+  backgroundStyle,
+  customBgColor,
+  rotation = 0,
+  initialScale = 1,
+  initialRotation = 0,
+  initialPosition = { x: 0, y: 0 },
+  subjectTransform,
+  hasCustomBg = false,
+  cropTarget: controlledCropTarget,
+  cropZoom: controlledCropZoom,
+  onCropTargetChange,
+  onCropZoomChange,
   onCropRatioChange,
+  onRotationChange,
+  onApplyTransform,
   onApply,
   onCancel,
-}: FabricImageEditorProps) {
+}, ref) {
   const canvasElementRef = useRef<HTMLCanvasElement | null>(null);
   const fabricRef = useRef<FabricCanvas | null>(null);
   const imageRef = useRef<FabricImage | null>(null);
@@ -43,11 +103,14 @@ export default function FabricImageEditor({
   const onCancelRef = useRef(onCancel);
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [cropZoom, setCropZoom] = useState(100);
+  const [internalCropZoom, setInternalCropZoom] = useState(100);
+  const cropZoom = controlledCropZoom ?? internalCropZoom;
   const [guides, setGuides] = useState({ x: false, y: false });
-  const [cropTarget, setCropTarget] = useState<'frame' | 'image'>('frame');
+  const [internalCropTarget, setInternalCropTarget] = useState<'frame' | 'image'>('frame');
+  const cropTarget = controlledCropTarget ?? internalCropTarget;
   const cropTargetRef = useRef<'frame' | 'image'>('frame');
   const cropPanRef = useRef<{ x: number; y: number } | null>(null);
+  const baseScaleRef = useRef(1);
 
   useEffect(() => {
     ratioRef.current = cropRatio;
@@ -74,28 +137,44 @@ export default function FabricImageEditor({
     });
     fabricRef.current = fabric;
 
+    const width = Math.max(1, Math.round(artboardWidth || STAGE_MAX_WIDTH));
+    const height = Math.max(1, Math.round(artboardHeight || STAGE_MAX_HEIGHT));
+    naturalSizeRef.current = {
+      width: Math.max(1, Math.round(naturalArtboardWidth || width)),
+      height: Math.max(1, Math.round(naturalArtboardHeight || height)),
+    };
+
+    fabric.setDimensions({ width, height });
+    fabric.set({ selection: false });
+
     FabricImage.fromURL(imageUrl, { crossOrigin: 'anonymous' }).then((image) => {
       if (disposed) {
         image.dispose();
         return;
       }
 
-      const naturalWidth = image.width || 1;
-      const naturalHeight = image.height || 1;
-      const fit = Math.min(STAGE_MAX_WIDTH / naturalWidth, STAGE_MAX_HEIGHT / naturalHeight, 1);
-      const width = Math.max(1, Math.round(naturalWidth * fit));
-      const height = Math.max(1, Math.round(naturalHeight * fit));
-      naturalSizeRef.current = { width: naturalWidth, height: naturalHeight };
-      fabric.setDimensions({ width, height });
-      fabric.set({ selection: false });
+      const cutoutWidth = image.width || 1;
+      const cutoutHeight = image.height || 1;
+      const fitFactor = hasCustomBg ? 0.75 : 1.0;
+      const fit = Math.min((width * fitFactor) / cutoutWidth, (height * fitFactor) / cutoutHeight, 1);
+      baseScaleRef.current = fit;
+
+      const tf = subjectTransform || DEFAULT_SUBJECT_TRANSFORM;
+      const initialX = tf.relX * width;
+      const initialY = tf.relY * height;
+      const currentScale = fit * tf.scale;
+      const initialAngle = tf.rotation || initialRotation || rotation;
+
       image.set({
         originX: 'center',
         originY: 'center',
-        left: width / 2 + initialPosition.x * fit,
-        top: height / 2 + initialPosition.y * fit,
-        scaleX: fit * initialScale,
-        scaleY: fit * initialScale,
-        angle: initialRotation,
+        left: width / 2 + initialX,
+        top: height / 2 + initialY,
+        scaleX: currentScale,
+        scaleY: currentScale,
+        angle: initialAngle,
+        flipX: tf.flipX,
+        flipY: tf.flipY,
         lockUniScaling: true,
         snapAngle: 45,
         snapThreshold: 6,
@@ -138,9 +217,9 @@ export default function FabricImageEditor({
         fabric.on('mouse:move', ({ e }) => {
           if (cropTargetRef.current !== 'image' || !cropPanRef.current || !imageRef.current) return;
           const pointer = fabric.getPointer(e);
-          const image = imageRef.current;
-          image.set({ left: (image.left || 0) + pointer.x - cropPanRef.current.x, top: (image.top || 0) + pointer.y - cropPanRef.current.y });
-          image.setCoords();
+          const currentImg = imageRef.current;
+          currentImg.set({ left: (currentImg.left || 0) + pointer.x - cropPanRef.current.x, top: (currentImg.top || 0) + pointer.y - cropPanRef.current.y });
+          currentImg.setCoords();
           cropPanRef.current = { x: pointer.x, y: pointer.y };
           fabric.requestRenderAll();
         });
@@ -148,6 +227,13 @@ export default function FabricImageEditor({
       } else {
         fabric.setActiveObject(image);
       }
+
+      fabric.on('object:rotating', () => {
+        if (imageRef.current) {
+          const currentAngle = Math.round(imageRef.current.angle || 0);
+          onRotationChange?.(currentAngle);
+        }
+      });
 
       const updateGuides = () => {
         const activeImage = imageRef.current;
@@ -191,7 +277,8 @@ export default function FabricImageEditor({
       fabric.on('mouse:up', hideGuides);
       fabric.requestRenderAll();
       setReady(true);
-      setCropTarget('frame');
+      setInternalCropTarget('frame');
+      cropTargetRef.current = 'frame';
     }).catch((error: unknown) => {
       console.error('Could not initialize Fabric editor:', error);
       onCancelRef.current();
@@ -199,8 +286,8 @@ export default function FabricImageEditor({
 
     const moveWithKeyboard = (event: KeyboardEvent) => {
       if (mode !== 'transform' || !imageRef.current || event.altKey || event.ctrlKey || event.metaKey) return;
-        const target = event.target;
-        if (target instanceof HTMLElement && target.closest('button, input, select, textarea, [contenteditable="true"]')) return;
+      const target = event.target;
+      if (target instanceof HTMLElement && target.closest('button, input, select, textarea, [contenteditable="true"]')) return;
       const deltas: Record<string, [number, number]> = {
         ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1],
       };
@@ -229,7 +316,7 @@ export default function FabricImageEditor({
       verticalGuideRef.current = null;
       horizontalGuideRef.current = null;
     };
-  }, [imageUrl, mode, initialScale, initialRotation, initialPosition]);
+  }, [imageUrl, mode, artboardWidth, artboardHeight, naturalArtboardWidth, naturalArtboardHeight]);
 
   useEffect(() => {
     const fabric = fabricRef.current;
@@ -237,6 +324,35 @@ export default function FabricImageEditor({
     createCropFrame(fabric, fabric.getWidth(), fabric.getHeight(), cropRatio);
     if (cropTarget === 'image') selectCropImage();
   }, [cropRatio, mode, ready]);
+
+  // Synchronize rotation prop
+  useEffect(() => {
+    if (typeof rotation === 'number' && imageRef.current && fabricRef.current) {
+      if (Math.round(imageRef.current.angle || 0) !== Math.round(rotation)) {
+        imageRef.current.set({ angle: rotation });
+        imageRef.current.setCoords();
+        fabricRef.current.requestRenderAll();
+      }
+    }
+  }, [rotation]);
+
+  // Synchronize controlled crop target
+  useEffect(() => {
+    if (controlledCropTarget && controlledCropTarget !== cropTargetRef.current) {
+      if (controlledCropTarget === 'frame') {
+        selectCropFrame();
+      } else {
+        selectCropImage();
+      }
+    }
+  }, [controlledCropTarget]);
+
+  // Synchronize controlled crop zoom
+  useEffect(() => {
+    if (typeof controlledCropZoom === 'number' && controlledCropZoom !== internalCropZoom) {
+      applyCropZoom(controlledCropZoom);
+    }
+  }, [controlledCropZoom]);
 
   function createCropFrame(fabric: FabricCanvas, width: number, height: number, ratio: FabricCropRatio) {
     const frame = cropRef.current;
@@ -257,7 +373,7 @@ export default function FabricImageEditor({
       top: (height - frameHeight) / 2,
       width: frameWidth,
       height: frameHeight,
-      fill: 'rgba(255,255,255,0.015)',
+      fill: 'transparent',
       stroke: '#ffffff',
       strokeWidth: 1.5,
       strokeDashArray: [7, 5],
@@ -289,7 +405,7 @@ export default function FabricImageEditor({
     cropRef.current = crop;
 
     const maskOptions = {
-      fill: 'rgba(0,0,0,0.56)',
+      fill: 'rgba(0,0,0,0.5)',
       selectable: false,
       evented: false,
       excludeFromExport: true,
@@ -318,8 +434,9 @@ export default function FabricImageEditor({
     crop.on('moving', updateCropMasks);
     crop.on('scaling', updateCropMasks);
     updateCropMasks();
-    setCropTarget('frame');
+    setInternalCropTarget('frame');
     cropTargetRef.current = 'frame';
+    onCropTargetChange?.('frame');
     fabric.setActiveObject(crop);
     fabric.requestRenderAll();
   }
@@ -332,8 +449,9 @@ export default function FabricImageEditor({
     image.set({ selectable: false, evented: false, hasControls: false, lockScalingX: true, lockScalingY: true });
     cropMasksRef.current.forEach((mask) => mask.set({ evented: false }));
     fabric.setActiveObject(image);
-    setCropTarget('image');
+    setInternalCropTarget('image');
     cropTargetRef.current = 'image';
+    onCropTargetChange?.('image');
     fabric.requestRenderAll();
   }
 
@@ -349,8 +467,9 @@ export default function FabricImageEditor({
     fabric.sendObjectToBack(image);
     fabric.bringObjectToFront(frame);
     fabric.setActiveObject(frame);
-    setCropTarget('frame');
+    setInternalCropTarget('frame');
     cropTargetRef.current = 'frame';
+    onCropTargetChange?.('frame');
     fabric.requestRenderAll();
   }
 
@@ -364,22 +483,25 @@ export default function FabricImageEditor({
     const image = imageRef.current;
     const fabric = fabricRef.current;
     if (!image || !fabric) return;
-    const center = image.getCenterPoint();
-    const scale = image.scaleX || 1;
-    const multiplier = zoom / cropZoom;
+    const baseScale = baseScaleRef.current || 1;
+    const targetScale = baseScale * (zoom / 100);
+    const prevScale = image.scaleX || baseScale;
+    const scaleRatio = targetScale / (prevScale || 1);
     const cropBounds = cropRef.current?.getBoundingRect();
     const anchor = cropBounds
       ? { x: cropBounds.left + cropBounds.width / 2, y: cropBounds.top + cropBounds.height / 2 }
       : { x: fabric.getWidth() / 2, y: fabric.getHeight() / 2 };
+
     image.set({
-      left: anchor.x + (center.x - anchor.x) * multiplier,
-      top: anchor.y + (center.y - anchor.y) * multiplier,
-      scaleX: scale * multiplier,
-      scaleY: scale * multiplier,
+      left: anchor.x + ((image.left || 0) - anchor.x) * scaleRatio,
+      top: anchor.y + ((image.top || 0) - anchor.y) * scaleRatio,
+      scaleX: targetScale,
+      scaleY: targetScale,
     });
     image.setCoords();
     fabric.requestRenderAll();
-    setCropZoom(zoom);
+    setInternalCropZoom(zoom);
+    onCropZoomChange?.(zoom);
   }
 
   async function apply() {
@@ -389,11 +511,10 @@ export default function FabricImageEditor({
     setBusy(true);
 
     try {
-      let output: HTMLCanvasElement;
       if (mode === 'crop' && cropRef.current) {
         const bounds = cropRef.current.getBoundingRect();
         const multiplier = naturalSizeRef.current.width / fabric.getWidth();
-        output = fabric.toCanvasElement(multiplier, {
+        const output = fabric.toCanvasElement(multiplier, {
           left: bounds.left,
           top: bounds.top,
           width: bounds.width,
@@ -402,16 +523,37 @@ export default function FabricImageEditor({
         });
         fabric.setActiveObject(cropRef.current);
         fabric.requestRenderAll();
-      } else {
-        const { width } = naturalSizeRef.current;
-        output = fabric.toCanvasElement(width / fabric.getWidth(), { filter: (object) => object === image });
-        cropMasksRef.current = [];
-      }
 
-      const blob = await new Promise<Blob>((resolve, reject) => {
-        output.toBlob((value) => value ? resolve(value) : reject(new Error('Could not render image edit')), 'image/png');
-      });
-      onApply(blob);
+        const blob = await new Promise<Blob>((resolve, reject) => {
+          output.toBlob((value) => value ? resolve(value) : reject(new Error('Could not render crop edit')), 'image/png');
+        });
+        onApply(blob);
+      } else {
+        const cWidth = fabric.getWidth();
+        const cHeight = fabric.getHeight();
+        const currentFit = baseScaleRef.current || 1;
+        const currentScaleX = Math.abs(image.scaleX || currentFit);
+        const newTransform: SubjectTransform = {
+          relX: Number((((image.left || 0) - cWidth / 2) / cWidth).toFixed(4)),
+          relY: Number((((image.top || 0) - cHeight / 2) / cHeight).toFixed(4)),
+          scale: Number((currentScaleX / currentFit).toFixed(3)),
+          rotation: Math.round(image.angle || 0),
+          flipX: !!image.flipX,
+          flipY: !!image.flipY,
+        };
+
+        if (onApplyTransform) {
+          onApplyTransform(newTransform);
+        } else {
+          const { width } = naturalSizeRef.current;
+          const output = fabric.toCanvasElement(width / fabric.getWidth(), { filter: (object) => object === image });
+          cropMasksRef.current = [];
+          const blob = await new Promise<Blob>((resolve, reject) => {
+            output.toBlob((value) => value ? resolve(value) : reject(new Error('Could not render image edit')), 'image/png');
+          });
+          onApply(blob);
+        }
+      }
     } catch (error) {
       console.error('Could not apply Fabric edit:', error);
     } finally {
@@ -432,11 +574,12 @@ export default function FabricImageEditor({
     const fabric = fabricRef.current;
     const image = imageRef.current;
     if (!fabric || !image) return;
-    const { width, height } = naturalSizeRef.current;
-    const fit = Math.min(fabric.getWidth() / width, fabric.getHeight() / height);
+    const cWidth = fabric.getWidth();
+    const cHeight = fabric.getHeight();
+    const fit = baseScaleRef.current || 1;
     image.set({
-      left: fabric.getWidth() / 2,
-      top: fabric.getHeight() / 2,
+      left: cWidth / 2,
+      top: cHeight / 2,
       scaleX: fit,
       scaleY: fit,
       angle: 0,
@@ -445,58 +588,63 @@ export default function FabricImageEditor({
     });
     image.setCoords();
     fabric.requestRenderAll();
+    onRotationChange?.(0);
+    onApplyTransform?.(DEFAULT_SUBJECT_TRANSFORM);
   }
 
-  const canvasWidth = fabricRef.current?.getWidth() || STAGE_MAX_WIDTH;
-  const canvasHeight = fabricRef.current?.getHeight() || STAGE_MAX_HEIGHT;
+  useImperativeHandle(ref, () => ({
+    flipX: () => flip('x'),
+    flipY: () => flip('y'),
+    resetTransform: () => resetTransform(),
+    apply: () => apply(),
+    cancel: () => onCancelRef.current(),
+    selectCropFrame: () => selectCropFrame(),
+    selectCropImage: () => selectCropImage(),
+    setCropZoom: (z: number) => applyCropZoom(z),
+    setRotation: (angle: number) => {
+      if (imageRef.current && fabricRef.current) {
+        imageRef.current.set({ angle });
+        imageRef.current.setCoords();
+        fabricRef.current.requestRenderAll();
+      }
+    },
+    getCurrentTransform: () => {
+      const img = imageRef.current;
+      const fab = fabricRef.current;
+      if (!img || !fab) return null;
+      const cWidth = fab.getWidth();
+      const cHeight = fab.getHeight();
+      const fit = baseScaleRef.current || 1;
+      return {
+        relX: Number((((img.left || 0) - cWidth / 2) / cWidth).toFixed(4)),
+        relY: Number((((img.top || 0) - cHeight / 2) / cHeight).toFixed(4)),
+        scale: Number((Math.abs(img.scaleX || fit) / fit).toFixed(3)),
+        rotation: Math.round(img.angle || 0),
+        flipX: !!img.flipX,
+        flipY: !!img.flipY,
+      };
+    },
+  }), []);
+
+  const canvasWidth = fabricRef.current?.getWidth() || Math.round(artboardWidth || STAGE_MAX_WIDTH);
+  const canvasHeight = fabricRef.current?.getHeight() || Math.round(artboardHeight || STAGE_MAX_HEIGHT);
 
   return (
-    <div className="flex w-full flex-col items-center gap-3">
-      <div className="relative flex min-h-[320px] w-full items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-[#101218] p-3 sm:min-h-[400px]">
-        <canvas
-          ref={canvasElementRef}
-          className="max-h-[500px] max-w-full touch-none"
-          style={{ width: `min(100%, ${canvasWidth}px)`, height: 'auto' }}
-          aria-label={mode === 'crop' ? 'Crop image with Fabric controls' : 'Transform image with Fabric controls'}
-        />
-        {mode === 'transform' && ready && (guides.x || guides.y) && <span className="pointer-events-none absolute right-3 top-3 z-10 rounded bg-black/70 px-2 py-1 text-[10px] font-bold text-[#00C86A]">Aligned</span>}
-        {!ready && <span className="absolute text-xs font-semibold text-white/55">Preparing editor…</span>}
-      </div>
-
-      {mode === 'crop' && (
-        <div className="flex w-full flex-wrap items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] p-3">
-          <div className="flex gap-1 rounded-lg bg-black/25 p-1">
-            <button type="button" onClick={selectCropFrame} aria-pressed={cropTarget === 'frame'} className={`rounded-md px-2.5 py-1.5 text-[11px] font-bold ${cropTarget === 'frame' ? 'bg-white text-slate-900' : 'text-white/55 hover:text-white'}`}>Crop frame</button>
-            <button type="button" onClick={selectCropImage} aria-pressed={cropTarget === 'image'} className={`rounded-md px-2.5 py-1.5 text-[11px] font-bold ${cropTarget === 'image' ? 'bg-white text-slate-900' : 'text-white/55 hover:text-white'}`}>Move image</button>
-          </div>
-          <label className="flex min-w-36 flex-1 items-center gap-2 text-xs font-semibold text-white/75">
-            Crop zoom
-            <input type="range" min="50" max="200" value={cropZoom} onChange={(event) => applyCropZoom(Number(event.target.value))} className="min-w-20 flex-1 accent-[#00C86A]" />
-            <output className="w-10 text-right font-mono text-[#00C86A]">{cropZoom}%</output>
-          </label>
-          <div className="flex flex-wrap gap-1 rounded-lg bg-black/25 p-1">
-            {(['free', '1:1', '4:5', '16:9', '9:16'] as const).map((ratio) => (
-              <button key={ratio} type="button" onClick={() => onCropRatioChange(ratio)} aria-pressed={cropRatio === ratio} className={`rounded-md px-2.5 py-1.5 text-[11px] font-bold ${cropRatio === ratio ? 'bg-white text-slate-900' : 'text-white/55 hover:text-white'}`}>
-                {ratio === 'free' ? 'Free' : ratio}
-              </button>
-            ))}
-          </div>
-        </div>
+    <div className="relative flex h-full w-full items-center justify-center overflow-hidden select-none">
+      <canvas
+        ref={canvasElementRef}
+        className="touch-none"
+        style={{ width: `${canvasWidth}px`, height: `${canvasHeight}px` }}
+        aria-label={mode === 'crop' ? 'Crop image with Fabric controls' : 'Transform image with Fabric controls'}
+      />
+      {mode === 'transform' && ready && (guides.x || guides.y) && (
+        <span className="pointer-events-none absolute right-3 top-3 z-10 rounded bg-black/70 px-2 py-1 text-[10px] font-bold text-[#00FF85]">
+          Aligned
+        </span>
       )}
-
-      <div className="flex w-full flex-wrap items-center justify-between gap-2">
-        {mode === 'transform' ? (
-          <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={() => flip('x')} title="Flip horizontal" aria-label="Flip horizontal" className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/80 hover:bg-white/10"><FlipHorizontal className="h-4 w-4" /></button>
-            <button type="button" onClick={() => flip('y')} title="Flip vertical" aria-label="Flip vertical" className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/80 hover:bg-white/10"><FlipVertical className="h-4 w-4" /></button>
-            <button type="button" onClick={resetTransform} className="flex h-9 items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 text-xs font-semibold text-white/80 hover:bg-white/10"><RotateCcw className="h-4 w-4" />Reset</button>
-          </div>
-        ) : <span className="text-[11px] text-white/45">Drag the image to reposition it inside the crop frame</span>}
-        <div className="ml-auto flex gap-2">
-          <button type="button" onClick={onCancel} disabled={busy} className="flex h-9 items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 text-xs font-semibold text-white/75 hover:bg-white/10 disabled:opacity-50"><X className="h-4 w-4" />Cancel</button>
-          <button type="button" onClick={apply} disabled={!ready || busy} className="flex h-9 items-center gap-2 rounded-lg bg-[#00C86A] px-3 text-xs font-bold text-black hover:bg-[#00b860] disabled:opacity-50"><Check className="h-4 w-4" />{busy ? 'Applying…' : mode === 'crop' ? 'Apply crop' : 'Apply transform'}</button>
-        </div>
-      </div>
+      {!ready && <span className="absolute text-xs font-semibold text-white/55">Preparing editor…</span>}
     </div>
   );
-}
+});
+
+export default FabricImageEditor;
