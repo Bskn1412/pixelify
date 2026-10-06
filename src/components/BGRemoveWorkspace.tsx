@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Scissors, Image as ImageIcon, Sparkles, SlidersHorizontal, PanelsTopLeft, Columns2, Undo2, Redo2, Download as DownloadIcon, ChevronDown, ZoomIn, ZoomOut, RotateCcw, RotateCw, Crop as CropIcon, Plus } from 'lucide-react';
+import { Scissors, Image as ImageIcon, Sparkles, SlidersHorizontal, PanelsTopLeft, Columns2, Undo2, Redo2, Download as DownloadIcon, ChevronDown, ZoomIn, ZoomOut, RotateCcw, RotateCw, Crop as CropIcon, Plus, FlipHorizontal, FlipVertical, Check, X } from 'lucide-react';
 import Icon from './Icon';
 import UploadArea from './UploadArea';
 import BGComparator, { ImageAdjustments, ImageEffects } from './BGComparator';
-import type { FabricEditMode, FabricCropRatio } from './bgremove/FabricImageEditor';
+import type { FabricEditMode, FabricCropRatio, FabricImageEditorHandle, SubjectTransform } from './bgremove/FabricImageEditor';
+import { DEFAULT_SUBJECT_TRANSFORM } from './bgremove/FabricImageEditor';
 import { makeId, downloadName } from '../lib/bgUtils';
 import { writeBGHistory } from '../lib/bgDb';
 import type { BGJob, HistoryItem } from '../types';
@@ -54,7 +55,6 @@ interface EditorSnapshot {
   bgDarken: number;
   adjustments: ImageAdjustments;
   effects: ImageEffects;
-  subjectScale: number;
   rotation: number;
   cropRatio: CropRatio;
   textLayers: TextLayer[];
@@ -62,6 +62,7 @@ interface EditorSnapshot {
   selectedLayerId: string | null;
   selectedJobId: string | null;
   resultBlob: Blob | null;
+  subjectTransform?: SubjectTransform;
 }
 
 const PHOTO_PRESETS = [
@@ -93,17 +94,25 @@ export default function BGRemoveWorkspace({
   const [downloadMenuOpen, setDownloadMenuOpen] = useState(false);
   const downloadMenuRef = useRef<HTMLDivElement | null>(null);
 
-  // Cutout options
+  // Cutout & edit options
   const [cutoutTool, setCutoutTool] = useState<'erase' | 'restore' | 'move'>('move');
   const [brushSize, setBrushSize] = useState(40);
-  const [subjectScale, setSubjectScale] = useState(1);
   const [canUndoEditor, setCanUndoEditor] = useState(false);
   const [canRedoEditor, setCanRedoEditor] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [cropRatio, setCropRatio] = useState<CropRatio>('free');
   const [fabricEditMode, setFabricEditMode] = useState<FabricEditMode | null>(null);
   const [fabricCropRatioDraft, setFabricCropRatioDraft] = useState<CropRatio>('free');
+  const [cropRotationDraft, setCropRotationDraft] = useState(0);
+  const [cropTarget, setCropTarget] = useState<'frame' | 'image'>('frame');
+  const [cropZoom, setCropZoom] = useState(100);
+  const [subjectTransform, setSubjectTransform] = useState<SubjectTransform>(DEFAULT_SUBJECT_TRANSFORM);
+  const fabricEditorRef = useRef<FabricImageEditorHandle | null>(null);
   const editorHistoryRef = useRef<{ past: EditorSnapshot[]; future: EditorSnapshot[] }>({ past: [], future: [] });
+
+  useEffect(() => {
+    setSubjectTransform(DEFAULT_SUBJECT_TRANSFORM);
+  }, [selectedId]);
 
   // Background options
   const [selectedBg, setSelectedBg] = useState(COLOR_PRESETS[0]);
@@ -247,7 +256,6 @@ export default function BGRemoveWorkspace({
     setSubjectBgBlur(0);
     setBgBlur(0);
     setBgDarken(0);
-    setSubjectScale(1);
     setRotation(0);
     setCropRatio('free');
     setCutoutTool('move');
@@ -457,7 +465,6 @@ export default function BGRemoveWorkspace({
       bgDarken,
       adjustments,
       effects,
-      subjectScale,
       rotation,
       cropRatio,
       textLayers,
@@ -465,6 +472,7 @@ export default function BGRemoveWorkspace({
       selectedLayerId,
       selectedJobId: selected?.id || null,
       resultBlob: selected?.resultBlob || null,
+      subjectTransform,
     };
   }
 
@@ -489,12 +497,12 @@ export default function BGRemoveWorkspace({
     setBgDarken(snapshot.bgDarken);
     setAdjustments(snapshot.adjustments);
     setEffects(snapshot.effects);
-    setSubjectScale(snapshot.subjectScale);
     setRotation(snapshot.rotation);
     setCropRatio(snapshot.cropRatio);
     setTextLayers(snapshot.textLayers);
     setElementLayers(snapshot.elementLayers);
     setSelectedLayerId(snapshot.selectedLayerId);
+    if (snapshot.subjectTransform) setSubjectTransform(snapshot.subjectTransform);
     if (snapshot.selectedJobId && snapshot.resultBlob) {
       updateJob(snapshot.selectedJobId, {
         resultBlob: snapshot.resultBlob,
@@ -523,11 +531,28 @@ export default function BGRemoveWorkspace({
   function handleFabricEditApply(blob: Blob) {
     const url = URL.createObjectURL(blob);
     void handleBrushStroke(blob, url);
-    setSubjectScale(1);
     setRotation(0);
+    setCropRotationDraft(0);
     setCropRatio('free');
     setFabricCropRatioDraft('free');
-    setFabricEditMode(null);
+    setSubjectTransform(DEFAULT_SUBJECT_TRANSFORM);
+    setFabricEditMode('transform');
+  }
+
+  function handleFabricSidebarApply() {
+    if (fabricEditorRef.current) {
+      fabricEditorRef.current.apply();
+    }
+  }
+
+  function handleFabricSidebarCancel() {
+    if (fabricEditorRef.current) {
+      fabricEditorRef.current.cancel();
+    }
+    setCropRotationDraft(0);
+    fabricEditorRef.current?.setRotation(0);
+    setFabricCropRatioDraft(cropRatio);
+    setFabricEditMode('transform');
   }
 
   // -------------------------------------------------------------
@@ -552,87 +577,103 @@ export default function BGRemoveWorkspace({
         cutoutImg.src = job.resultUrl!;
       });
 
-      const width = cutoutImg.width;
-      const height = cutoutImg.height;
-      canvas.width = width;
-      canvas.height = height;
+      // 1. Determine Artboard Dimensions (Option 2: Native Resolution, Zero Clipping)
+      let bgImg: HTMLImageElement | null = null;
+      if (customBgImage) {
+        bgImg = new Image();
+        bgImg.crossOrigin = 'anonymous';
+        await new Promise<void>((resolve) => {
+          bgImg!.onload = () => resolve();
+          bgImg!.onerror = () => {
+            bgImg = null;
+            resolve();
+          };
+          bgImg!.src = customBgImage;
+        });
+      }
+
+      let exportWidth = cutoutImg.width;
+      let exportHeight = cutoutImg.height;
+
+      if (bgImg && bgImg.naturalWidth > 0 && bgImg.naturalHeight > 0) {
+        exportWidth = bgImg.naturalWidth;
+        exportHeight = bgImg.naturalHeight;
+      } else if (cropRatio !== 'free') {
+        const [rw, rh] = cropRatio.split(':').map(Number);
+        if (rw && rh) {
+          const targetRatio = rw / rh;
+          if (cutoutImg.width / cutoutImg.height > targetRatio) {
+            exportHeight = cutoutImg.naturalHeight;
+            exportWidth = Math.round(exportHeight * targetRatio);
+          } else {
+            exportWidth = cutoutImg.naturalWidth;
+            exportHeight = Math.round(exportWidth / targetRatio);
+          }
+        }
+      }
+
+      canvas.width = exportWidth;
+      canvas.height = exportHeight;
 
       let sourceImg: HTMLImageElement | null = null;
       if (subjectBgBlur > 0) {
         sourceImg = new Image();
         sourceImg.crossOrigin = 'anonymous';
-        await new Promise<void>((resolve, reject) => {
+        await new Promise<void>((resolve) => {
           sourceImg!.onload = () => resolve();
-          sourceImg!.onerror = () => reject(new Error('Failed to load source image for background blur'));
+          sourceImg!.onerror = () => resolve();
           sourceImg!.src = job.sourceUrl;
         });
       }
 
-      let sourceX = 0;
-      let sourceY = 0;
-      let sourceWidth = width;
-      let sourceHeight = height;
-      if (cropRatio !== 'free') {
-        const [ratioWidth, ratioHeight] = cropRatio.split(':').map(Number);
-        const targetRatio = ratioWidth / ratioHeight;
-        if (width / height > targetRatio) {
-          sourceWidth = height * targetRatio;
-          sourceX = (width - sourceWidth) / 2;
-        } else {
-          sourceHeight = width / targetRatio;
-          sourceY = (height - sourceHeight) / 2;
+      // 1. Draw Background Layer
+      if (bgImg) {
+        ctx.save();
+        if (bgBlur > 0) ctx.filter = `blur(${bgBlur * 2}px)`;
+        ctx.drawImage(bgImg, 0, 0, exportWidth, exportHeight);
+        ctx.restore();
+
+        if (bgDarken > 0) {
+          ctx.fillStyle = `rgba(0, 0, 0, ${bgDarken / 100})`;
+          ctx.fillRect(0, 0, exportWidth, exportHeight);
         }
-      }
-
-      // 1. Draw Background
-      if (customBgImage) {
-        await new Promise<void>((resolve) => {
-          const bgImg = new Image();
-          bgImg.crossOrigin = 'anonymous';
-          bgImg.onload = () => {
-            ctx.save();
-            if (bgBlur > 0) ctx.filter = `blur(${bgBlur * 2}px)`;
-
-            const hRatio = width / bgImg.width;
-            const vRatio = height / bgImg.height;
-            const ratio = Math.max(hRatio, vRatio);
-            const shiftX = (width - bgImg.width * ratio) / 2;
-            const shiftY = (height - bgImg.height * ratio) / 2;
-
-            ctx.drawImage(bgImg, 0, 0, bgImg.width, bgImg.height, shiftX, shiftY, bgImg.width * ratio, bgImg.height * ratio);
-            ctx.restore();
-
-            if (bgDarken > 0) {
-              ctx.fillStyle = `rgba(0, 0, 0, ${bgDarken / 100})`;
-              ctx.fillRect(0, 0, width, height);
-            }
-            resolve();
-          };
-          bgImg.onerror = () => resolve();
-          bgImg.src = customBgImage;
-        });
       } else if (customBgColor) {
         ctx.fillStyle = customBgColor;
-        ctx.fillRect(0, 0, width, height);
+        ctx.fillRect(0, 0, exportWidth, exportHeight);
       } else if (selectedBg.fill) {
         ctx.fillStyle = selectedBg.fill;
-        ctx.fillRect(0, 0, width, height);
+        ctx.fillRect(0, 0, exportWidth, exportHeight);
       }
 
       if (sourceImg && subjectBgBlur > 0) {
-        const exportBlur = subjectBgBlur * Math.max(width, height) / 500;
+        const exportBlur = (subjectBgBlur * Math.max(exportWidth, exportHeight)) / 500;
         const bleed = exportBlur * 2;
         ctx.save();
         ctx.filter = `blur(${exportBlur}px)`;
-        ctx.drawImage(sourceImg, -bleed, -bleed, width + bleed * 2, height + bleed * 2);
+        ctx.drawImage(sourceImg, -bleed, -bleed, exportWidth + bleed * 2, exportHeight + bleed * 2);
         ctx.restore();
       }
 
-      // 2. Draw Subject (with filters and shadows)
+      // 2. Draw Subject Layer (Positioned & scaled relative to Artboard)
+      const currentTf = fabricEditorRef.current?.getCurrentTransform?.() || subjectTransform || DEFAULT_SUBJECT_TRANSFORM;
+      const cutoutCenterX = exportWidth / 2 + currentTf.relX * exportWidth;
+      const cutoutCenterY = exportHeight / 2 + currentTf.relY * exportHeight;
+
+      const fitFactor = bgImg ? 0.75 : 1.0;
+      const baseFit = Math.min((exportWidth * fitFactor) / cutoutImg.width, (exportHeight * fitFactor) / cutoutImg.height, 1);
+      const drawW = cutoutImg.width * baseFit * currentTf.scale;
+      const drawH = cutoutImg.height * baseFit * currentTf.scale;
+
       ctx.save();
-      ctx.translate(width / 2, height / 2);
-      ctx.rotate((rotation * Math.PI) / 180);
-      ctx.filter = `brightness(${adjustments.brightness}%) contrast(${adjustments.contrast}%) saturate(${adjustments.saturation}%) blur(${adjustments.blur}px)`;
+      ctx.translate(cutoutCenterX, cutoutCenterY);
+      ctx.rotate((currentTf.rotation * Math.PI) / 180);
+      ctx.scale(currentTf.flipX ? -1 : 1, currentTf.flipY ? -1 : 1);
+
+      let filterString = `brightness(${adjustments.brightness}%) contrast(${adjustments.contrast}%) saturate(${adjustments.saturation}%) blur(${adjustments.blur}px)`;
+      if (effects.stroke) {
+        filterString += ` drop-shadow(0 0 ${effects.strokeWidth}px ${effects.strokeColor}) drop-shadow(0 0 1px ${effects.strokeColor})`;
+      }
+      ctx.filter = filterString;
 
       if (effects.shadow) {
         const shadowAlpha = (effects.shadowOpacity ?? 50) / 100;
@@ -641,23 +682,11 @@ export default function BGRemoveWorkspace({
         ctx.shadowOffsetY = (effects.shadowOffsetY ?? 14) * 2;
       }
 
-      const scaledW = sourceWidth * subjectScale;
-      const scaledH = sourceHeight * subjectScale;
-      ctx.drawImage(
-        cutoutImg,
-        sourceX,
-        sourceY,
-        sourceWidth,
-        sourceHeight,
-        -scaledW / 2,
-        -scaledH / 2,
-        scaledW,
-        scaledH
-      );
+      ctx.drawImage(cutoutImg, -drawW / 2, -drawH / 2, drawW, drawH);
       ctx.restore();
 
       // 3. Render Design Layers (Vector Elements & Text)
-      renderDesignLayersToCanvas(ctx, width, height, textLayers, elementLayers);
+      renderDesignLayersToCanvas(ctx, exportWidth, exportHeight, textLayers, elementLayers);
 
       // 4. Export Blob
       const mimeType = format === 'jpeg' ? 'image/jpeg' : format === 'webp' ? 'image/webp' : 'image/png';
@@ -746,7 +775,18 @@ export default function BGRemoveWorkspace({
                 <button
                   key={tab.id}
                   type="button"
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => {
+                    if (activeTab === 'adjust' && fabricEditorRef.current?.getCurrentTransform) {
+                      const curTf = fabricEditorRef.current.getCurrentTransform();
+                      if (curTf) setSubjectTransform(curTf);
+                    }
+                    if (tab.id === 'adjust') {
+                      if (!fabricEditMode) setFabricEditMode('transform');
+                    } else if (fabricEditMode) {
+                      setFabricEditMode(null);
+                    }
+                    setActiveTab(tab.id);
+                  }}
                   aria-current={activeTab === tab.id ? 'page' : undefined}
                   className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
                     activeTab === tab.id
@@ -903,15 +943,25 @@ export default function BGRemoveWorkspace({
                 adjustments={adjustments}
                 effects={effects}
                 isCompareMode={isCompareMode}
-                scale={subjectScale}
                 rotation={rotation}
                 cropRatio={fabricEditMode === 'crop' ? fabricCropRatioDraft : cropRatio}
                 fabricEditMode={fabricEditMode}
+                fabricEditorRef={fabricEditorRef}
+                cropTarget={cropTarget}
+                cropZoom={cropZoom}
+                subjectTransform={subjectTransform}
+                onCropTargetChange={setCropTarget}
+                onCropZoomChange={setCropZoom}
+                onRotationChange={setRotation}
                 onFabricCropRatioChange={setFabricCropRatioDraft}
+                onApplyTransform={(tf) => {
+                  recordEditorEdit();
+                  setSubjectTransform(tf);
+                  addToast('success', 'Subject transform applied!');
+                }}
                 onFabricEditApply={handleFabricEditApply}
                 onFabricEditCancel={() => { setFabricCropRatioDraft(cropRatio); setFabricEditMode(null); }}
                 viewportZoom={viewportZoom}
-                onScaleChange={setSubjectScale}
                 onBrushStroke={handleBrushStroke}
                 textLayers={textLayers}
                 elementLayers={elementLayers}
@@ -1418,10 +1468,98 @@ export default function BGRemoveWorkspace({
                           </div>
                         )}
                       </div>
+
+                      {/* IMAGE ADJUSTMENTS */}
+                      <div className="p-3.5 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex flex-col gap-3">
+                        <span className="font-bold text-slate-800 dark:text-white">Adjustments</span>
+
+                        <label className="flex flex-col gap-1.5 text-slate-700 dark:text-neutral-300">
+                          <div className="flex justify-between">
+                            <span className="font-bold">Brightness</span>
+                            <span className="font-mono text-blue-500 font-bold">{adjustments.brightness}%</span>
+                          </div>
+                          <input
+                            type="range"
+                            min="50"
+                            max="150"
+                            value={adjustments.brightness}
+                            onPointerDown={recordEditorEdit}
+                            onChange={(e) =>
+                              setAdjustments((prev) => ({ ...prev, brightness: Number(e.target.value) }))
+                            }
+                            className="accent-blue-500 cursor-pointer"
+                          />
+                        </label>
+
+                        <label className="flex flex-col gap-1.5 text-slate-700 dark:text-neutral-300">
+                          <div className="flex justify-between">
+                            <span className="font-bold">Contrast</span>
+                            <span className="font-mono text-blue-500 font-bold">{adjustments.contrast}%</span>
+                          </div>
+                          <input
+                            type="range"
+                            min="50"
+                            max="150"
+                            value={adjustments.contrast}
+                            onPointerDown={recordEditorEdit}
+                            onChange={(e) =>
+                              setAdjustments((prev) => ({ ...prev, contrast: Number(e.target.value) }))
+                            }
+                            className="accent-blue-500 cursor-pointer"
+                          />
+                        </label>
+
+                        <label className="flex flex-col gap-1.5 text-slate-700 dark:text-neutral-300">
+                          <div className="flex justify-between">
+                            <span className="font-bold">Saturation</span>
+                            <span className="font-mono text-blue-500 font-bold">{adjustments.saturation}%</span>
+                          </div>
+                          <input
+                            type="range"
+                            min="0"
+                            max="200"
+                            value={adjustments.saturation}
+                            onPointerDown={recordEditorEdit}
+                            onChange={(e) =>
+                              setAdjustments((prev) => ({ ...prev, saturation: Number(e.target.value) }))
+                            }
+                            className="accent-blue-500 cursor-pointer"
+                          />
+                        </label>
+
+                        <label className="flex flex-col gap-1.5 text-slate-700 dark:text-neutral-300">
+                          <div className="flex justify-between">
+                            <span className="font-bold">Blur / Soften</span>
+                            <span className="font-mono text-blue-500 font-bold">{adjustments.blur}px</span>
+                          </div>
+                          <input
+                            type="range"
+                            min="0"
+                            max="15"
+                            value={adjustments.blur}
+                            onPointerDown={recordEditorEdit}
+                            onChange={(e) =>
+                              setAdjustments((prev) => ({ ...prev, blur: Number(e.target.value) }))
+                            }
+                            className="accent-blue-500 cursor-pointer"
+                          />
+                        </label>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            recordEditorEdit();
+                            setAdjustments({ brightness: 100, contrast: 100, saturation: 100, blur: 0 });
+                          }}
+                          className="mt-1 py-2 px-3 rounded-xl border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-neutral-300 font-bold text-xs transition cursor-pointer"
+                        >
+                          Reset All Adjustments
+                        </button>
+                      </div>
                     </motion.div>
                   )}
 
-                  {/* TAB 4: ADJUST */}
+                  {/* TAB 4: TRANSFORM & CROP */}
                   {activeTab === 'adjust' && (
                     <motion.div
                       key="tab-adjust"
@@ -1437,7 +1575,7 @@ export default function BGRemoveWorkspace({
                             type="button"
                             onClick={() => { recordEditorEdit(); setFabricEditMode('transform'); setCutoutTool('move'); }}
                             aria-pressed={fabricEditMode === 'transform'}
-                            className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-bold transition ${
+                            className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-bold transition cursor-pointer ${
                               fabricEditMode === 'transform'
                                 ? 'border-[#00FF85] bg-[#00FF85]/15 text-[#087847] dark:text-[#00FF85]'
                                 : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 dark:border-white/10 dark:bg-white/5 dark:text-neutral-300 dark:hover:bg-white/10'
@@ -1447,9 +1585,9 @@ export default function BGRemoveWorkspace({
                           </button>
                           <button
                             type="button"
-                            onClick={() => { recordEditorEdit(); setFabricCropRatioDraft(cropRatio); setFabricEditMode('crop'); setCutoutTool('move'); }}
+                            onClick={() => { recordEditorEdit(); setFabricCropRatioDraft(cropRatio); setCropRotationDraft(0); setFabricEditMode('crop'); setCutoutTool('move'); }}
                             aria-pressed={fabricEditMode === 'crop'}
-                            className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-bold transition ${
+                            className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-bold transition cursor-pointer ${
                               fabricEditMode === 'crop'
                                 ? 'border-[#00FF85] bg-[#00FF85]/15 text-[#087847] dark:text-[#00FF85]'
                                 : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 dark:border-white/10 dark:bg-white/5 dark:text-neutral-300 dark:hover:bg-white/10'
@@ -1460,119 +1598,219 @@ export default function BGRemoveWorkspace({
                         </div>
                       </div>
 
-                      <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-white/5">
-                        <div className="flex items-center justify-between text-slate-700 dark:text-neutral-300">
-                          <span className="font-bold">Subject scale</span>
-                          <span className="font-mono font-bold text-blue-500">{Math.round(subjectScale * 100)}%</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <input type="range" min="0.4" max="2.0" step="0.05" value={subjectScale} onPointerDown={recordEditorEdit} onChange={(e) => setSubjectScale(Number(e.target.value))} className="flex-1 cursor-pointer accent-blue-500" />
-                          <button type="button" onClick={() => { recordEditorEdit(); setSubjectScale(1); }} className="rounded-lg bg-slate-200 px-2.5 py-1 text-[10px] font-bold transition hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20">100%</button>
-                        </div>
-                      </div>
+                      {fabricEditMode !== 'crop' ? (
+                        /* TRANSFORM SECTION UI - FREEFORM */
+                        <div className="flex flex-col gap-4 py-1">
+                          <div className="flex flex-col gap-2">
+                            <span className="font-bold text-slate-800 dark:text-white">Transform Tools</span>
+                            <div className="grid grid-cols-3 gap-2">
+                              <button
+                                type="button"
+                                onClick={() => { recordEditorEdit(); fabricEditorRef.current?.flipX(); }}
+                                title="Mirror horizontal"
+                                className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-2.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-white/10 dark:bg-white/5 dark:text-neutral-300 dark:hover:bg-white/10 cursor-pointer"
+                              >
+                                <FlipHorizontal className="h-4 w-4" />
+                                <span>Mirror</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => { recordEditorEdit(); fabricEditorRef.current?.flipY(); }}
+                                title="UpDown vertical"
+                                className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-2.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-white/10 dark:bg-white/5 dark:text-neutral-300 dark:hover:bg-white/10 cursor-pointer"
+                              >
+                                <FlipVertical className="h-4 w-4" />
+                                <span>UpDown</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => { recordEditorEdit(); fabricEditorRef.current?.resetTransform(); }}
+                                title="Reset transform"
+                                className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-2.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-white/10 dark:bg-white/5 dark:text-neutral-300 dark:hover:bg-white/10 cursor-pointer"
+                              >
+                                <RotateCcw className="h-4 w-4" />
+                                <span>Reset</span>
+                              </button>
+                            </div>
+                          </div>
 
-                      <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-white/5">
-                        <span className="mb-2 block font-bold text-slate-700 dark:text-white/80">Rotate</span>
-                        <div className="grid grid-cols-2 gap-2">
-                          <button type="button" onClick={() => { recordEditorEdit(); setRotation((angle) => (angle - 90 + 360) % 360); }} className="flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-white/10 dark:bg-white/5 dark:text-white/80 dark:hover:bg-white/10"><RotateCcw className="h-4 w-4" />Rotate left</button>
-                          <button type="button" onClick={() => { recordEditorEdit(); setRotation((angle) => (angle + 90) % 360); }} className="flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-white/10 dark:bg-white/5 dark:text-white/80 dark:hover:bg-white/10"><RotateCw className="h-4 w-4" />Rotate right</button>
+                          {/* ACTION BUTTONS (NO LINE ABOVE) */}
+                          <div className="grid grid-cols-2 gap-2 pt-1">
+                            <button
+                              type="button"
+                              onClick={handleFabricSidebarCancel}
+                              className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-white/10 dark:bg-white/5 dark:text-neutral-300 dark:hover:bg-white/10 cursor-pointer"
+                            >
+                              <X className="h-4 w-4" />
+                              <span>Cancel</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleFabricSidebarApply}
+                              className="flex items-center justify-center gap-1.5 rounded-xl bg-[#00FF85] px-3 py-2.5 text-xs font-bold text-black transition hover:bg-[#00e676] cursor-pointer"
+                            >
+                              <Check className="h-4 w-4" />
+                              <span>Apply Transform</span>
+                            </button>
+                          </div>
                         </div>
-                      </div>
+                      ) : (
+                        /* CROP SECTION UI - FREEFORM */
+                        <div className="flex flex-col gap-4 py-1">
+                          {/* CROP TARGET: CROP FRAME VS MOVE IMAGE */}
+                          <div className="flex flex-col gap-2">
+                            <span className="font-bold text-slate-800 dark:text-white">Crop Target</span>
+                            <div className="grid grid-cols-2 gap-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setCropTarget('frame');
+                                  fabricEditorRef.current?.selectCropFrame();
+                                }}
+                                aria-pressed={cropTarget === 'frame'}
+                                className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-bold transition cursor-pointer ${
+                                  cropTarget === 'frame'
+                                    ? 'border-[#00FF85] bg-[#00FF85]/15 text-[#087847] dark:text-[#00FF85]'
+                                    : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 dark:border-white/10 dark:bg-white/5 dark:text-neutral-300 dark:hover:bg-white/10'
+                                }`}
+                              >
+                                <span>Crop frame</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setCropTarget('image');
+                                  fabricEditorRef.current?.selectCropImage();
+                                }}
+                                aria-pressed={cropTarget === 'image'}
+                                className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-bold transition cursor-pointer ${
+                                  cropTarget === 'image'
+                                    ? 'border-[#00FF85] bg-[#00FF85]/15 text-[#087847] dark:text-[#00FF85]'
+                                    : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 dark:border-white/10 dark:bg-white/5 dark:text-neutral-300 dark:hover:bg-white/10'
+                                }`}
+                              >
+                                <span>Move image</span>
+                              </button>
+                            </div>
+                          </div>
 
-                      <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-white/5">
-                        <div className="mb-2 flex items-center justify-between">
-                          <span className="font-bold text-slate-700 dark:text-white/80">Crop</span>
-                          <CropIcon className="h-4 w-4 text-slate-400" />
-                        </div>
-                        <div className="grid grid-cols-4 gap-1 rounded-lg bg-slate-200/70 p-1 dark:bg-black/20">
-                            {(['free', '1:1', '4:5', '16:9', '9:16'] as const).map((ratio) => (
-                            <button key={ratio} type="button" onClick={() => { recordEditorEdit(); setFabricCropRatioDraft(ratio); setFabricEditMode('crop'); setCutoutTool('move'); }} aria-pressed={fabricEditMode === 'crop' ? fabricCropRatioDraft === ratio : cropRatio === ratio} className={`rounded-md px-1.5 py-2 text-[11px] font-bold transition ${(fabricEditMode === 'crop' ? fabricCropRatioDraft === ratio : cropRatio === ratio) ? 'bg-white text-slate-900 shadow-sm dark:bg-white/15 dark:text-white' : 'text-slate-500 hover:text-slate-900 dark:text-white/45 dark:hover:text-white'}`}>{ratio === 'free' ? 'Free' : ratio}</button>
-                          ))}
-                        </div>
-                      </div>
+                          {/* CROP ZOOM SLIDER */}
+                          <div className="flex flex-col gap-2">
+                            <div className="flex items-center justify-between text-slate-800 dark:text-white">
+                              <span className="font-bold">Crop zoom</span>
+                              <span className="font-mono font-bold text-blue-500">{cropZoom}%</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <input
+                                type="range"
+                                min="50"
+                                max="200"
+                                value={cropZoom}
+                                onChange={(e) => {
+                                  const val = Number(e.target.value);
+                                  setCropZoom(val);
+                                  fabricEditorRef.current?.setCropZoom(val);
+                                }}
+                                className="flex-1 cursor-pointer accent-blue-500"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setCropZoom(100);
+                                  fabricEditorRef.current?.setCropZoom(100);
+                                }}
+                                className="rounded-lg bg-slate-200 px-2.5 py-1 text-[10px] font-bold transition hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20 cursor-pointer"
+                              >
+                                100%
+                              </button>
+                            </div>
+                          </div>
 
-                      <label className="flex flex-col gap-1.5 text-slate-700 dark:text-neutral-300">
-                        <div className="flex justify-between">
-                          <span className="font-bold">Brightness</span>
-                          <span className="font-mono text-blue-500 font-bold">{adjustments.brightness}%</span>
-                        </div>
-                        <input
-                          type="range"
-                          min="50"
-                          max="150"
-                          value={adjustments.brightness}
-                          onPointerDown={recordEditorEdit}
-                          onChange={(e) =>
-                            setAdjustments((prev) => ({ ...prev, brightness: Number(e.target.value) }))
-                          }
-                          className="accent-blue-500 cursor-pointer"
-                        />
-                      </label>
+                          {/* ASPECT RATIO FEATURES */}
+                          <div className="flex flex-col gap-2">
+                            <div className="flex items-center justify-between text-slate-800 dark:text-white">
+                              <span className="font-bold">Aspect Ratio</span>
+                              <CropIcon className="h-4 w-4 text-slate-400" />
+                            </div>
+                            <div className="grid grid-cols-5 gap-1.5 rounded-xl bg-slate-100 dark:bg-white/5 p-1">
+                              {(['free', '1:1', '4:5', '16:9', '9:16'] as const).map((ratio) => (
+                                <button
+                                  key={ratio}
+                                  type="button"
+                                  onClick={() => {
+                                    recordEditorEdit();
+                                    setFabricCropRatioDraft(ratio);
+                                    setCropRatio(ratio);
+                                  }}
+                                  aria-pressed={fabricCropRatioDraft === ratio}
+                                  className={`rounded-lg py-2 text-[11px] font-bold transition cursor-pointer text-center ${
+                                    fabricCropRatioDraft === ratio
+                                      ? 'bg-white text-slate-900 shadow-sm dark:bg-white/20 dark:text-white'
+                                      : 'text-slate-500 hover:text-slate-900 dark:text-white/45 dark:hover:text-white'
+                                  }`}
+                                >
+                                  {ratio === 'free' ? 'Free' : ratio}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
 
-                      <label className="flex flex-col gap-1.5 text-slate-700 dark:text-neutral-300">
-                        <div className="flex justify-between">
-                          <span className="font-bold">Contrast</span>
-                          <span className="font-mono text-blue-500 font-bold">{adjustments.contrast}%</span>
-                        </div>
-                        <input
-                          type="range"
-                          min="50"
-                          max="150"
-                          value={adjustments.contrast}
-                          onPointerDown={recordEditorEdit}
-                          onChange={(e) =>
-                            setAdjustments((prev) => ({ ...prev, contrast: Number(e.target.value) }))
-                          }
-                          className="accent-blue-500 cursor-pointer"
-                        />
-                      </label>
+                          {/* ROTATE SLIDER BAR (APPLIES ONLY WHEN DONE CLICKED) */}
+                          <div className="flex flex-col gap-2">
+                            <div className="flex items-center justify-between text-slate-800 dark:text-white">
+                              <span className="font-bold">Rotate</span>
+                              <span className="font-mono font-bold text-blue-500">{cropRotationDraft}°</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <input
+                                type="range"
+                                min="-180"
+                                max="180"
+                                step="1"
+                                value={cropRotationDraft}
+                                onPointerDown={recordEditorEdit}
+                                onChange={(e) => {
+                                  const angle = Number(e.target.value);
+                                  setCropRotationDraft(angle);
+                                  fabricEditorRef.current?.setRotation(angle);
+                                }}
+                                className="flex-1 cursor-pointer accent-blue-500"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  recordEditorEdit();
+                                  setCropRotationDraft(0);
+                                  fabricEditorRef.current?.setRotation(0);
+                                }}
+                                className="rounded-lg bg-slate-200 px-2.5 py-1 text-[10px] font-bold transition hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20 cursor-pointer"
+                              >
+                                0°
+                              </button>
+                            </div>
+                          </div>
 
-                      <label className="flex flex-col gap-1.5 text-slate-700 dark:text-neutral-300">
-                        <div className="flex justify-between">
-                          <span className="font-bold">Saturation</span>
-                          <span className="font-mono text-blue-500 font-bold">{adjustments.saturation}%</span>
+                          {/* ACTION BUTTONS (CANCEL & DONE) */}
+                          <div className="grid grid-cols-2 gap-2 pt-1">
+                            <button
+                              type="button"
+                              onClick={handleFabricSidebarCancel}
+                              className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-white/10 dark:bg-white/5 dark:text-neutral-300 dark:hover:bg-white/10 cursor-pointer"
+                            >
+                              <X className="h-4 w-4" />
+                              <span>Cancel</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleFabricSidebarApply}
+                              className="flex items-center justify-center gap-1.5 rounded-xl bg-[#00FF85] px-3 py-2.5 text-xs font-bold text-black transition hover:bg-[#00e676] cursor-pointer"
+                            >
+                              <Check className="h-4 w-4" />
+                              <span>Done</span>
+                            </button>
+                          </div>
                         </div>
-                        <input
-                          type="range"
-                          min="0"
-                          max="200"
-                          value={adjustments.saturation}
-                          onPointerDown={recordEditorEdit}
-                          onChange={(e) =>
-                            setAdjustments((prev) => ({ ...prev, saturation: Number(e.target.value) }))
-                          }
-                          className="accent-blue-500 cursor-pointer"
-                        />
-                      </label>
-
-                      <label className="flex flex-col gap-1.5 text-slate-700 dark:text-neutral-300">
-                        <div className="flex justify-between">
-                          <span className="font-bold">Blur / Soften</span>
-                          <span className="font-mono text-blue-500 font-bold">{adjustments.blur}px</span>
-                        </div>
-                        <input
-                          type="range"
-                          min="0"
-                          max="15"
-                          value={adjustments.blur}
-                          onPointerDown={recordEditorEdit}
-                          onChange={(e) =>
-                            setAdjustments((prev) => ({ ...prev, blur: Number(e.target.value) }))
-                          }
-                          className="accent-blue-500 cursor-pointer"
-                        />
-                      </label>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          recordEditorEdit();
-                          setAdjustments({ brightness: 100, contrast: 100, saturation: 100, blur: 0 })
-                        }}
-                        className="mt-2 py-2 px-3 rounded-xl border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-neutral-300 font-bold text-xs transition"
-                      >
-                        Reset All Adjustments
-                      </button>
+                      )}
                     </motion.div>
                   )}
 

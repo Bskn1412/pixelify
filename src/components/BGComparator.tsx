@@ -2,7 +2,13 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Crop as CropIcon } from 'lucide-react';
 import Icon from './Icon';
-import FabricImageEditor, { FabricEditMode, FabricCropRatio } from './bgremove/FabricImageEditor';
+import FabricImageEditor, {
+  FabricEditMode,
+  FabricCropRatio,
+  FabricImageEditorHandle,
+  SubjectTransform,
+  DEFAULT_SUBJECT_TRANSFORM,
+} from './bgremove/FabricImageEditor';
 import type { BGJob } from '../types';
 import type { TextLayer, ElementLayer } from './bgremove/DesignAssets';
 import { ELEMENT_PRESETS } from './bgremove/DesignAssets';
@@ -45,9 +51,17 @@ export interface BGComparatorProps {
   rotation?: number;
   cropRatio?: FabricCropRatio;
   fabricEditMode?: FabricEditMode | null;
+  fabricEditorRef?: React.Ref<FabricImageEditorHandle>;
+  subjectTransform?: SubjectTransform;
+  cropTarget?: 'frame' | 'image';
+  cropZoom?: number;
+  onCropTargetChange?: (target: 'frame' | 'image') => void;
+  onCropZoomChange?: (zoom: number) => void;
+  onRotationChange?: (angle: number) => void;
   onFabricCropRatioChange?: (ratio: FabricCropRatio) => void;
   onFabricEditApply?: (blob: Blob) => void;
   onFabricEditCancel?: () => void;
+  onApplyTransform?: (transform: SubjectTransform) => void;
   viewportZoom?: number;
   onViewportZoomChange?: (zoom: number) => void;
   onResetView?: () => void;
@@ -86,9 +100,17 @@ export default function BGComparator({
   rotation = 0,
   cropRatio = 'free',
   fabricEditMode = null,
+  fabricEditorRef,
+  subjectTransform,
+  cropTarget,
+  cropZoom,
+  onCropTargetChange,
+  onCropZoomChange,
+  onRotationChange,
   onFabricCropRatioChange,
   onFabricEditApply,
   onFabricEditCancel,
+  onApplyTransform,
   viewportZoom = 1,
   onViewportZoomChange,
   onResetView,
@@ -107,32 +129,103 @@ export default function BGComparator({
   onResetSubjectPosition,
 }: BGComparatorProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const artboardRef = useRef<HTMLDivElement | null>(null);
   const [split, setSplit] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const [subjectPos, setSubjectPos] = useState({ x: 0, y: 0 });
   const [resultAspectRatio, setResultAspectRatio] = useState<number | null>(null);
+
+  // Measure stage container dimensions to fit artboard cleanly
+  const [containerSize, setContainerSize] = useState({ width: 800, height: 540 });
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const updateSize = () => {
+      if (containerRef.current) {
+        setContainerSize({
+          width: containerRef.current.clientWidth || 800,
+          height: containerRef.current.clientHeight || 540,
+        });
+      }
+    };
+    updateSize();
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry?.contentRect) {
+        setContainerSize({
+          width: Math.round(entry.contentRect.width),
+          height: Math.round(entry.contentRect.height),
+        });
+      }
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  // Track background photo dimensions
+  const [bgDimensions, setBgDimensions] = useState<{ width: number; height: number } | null>(null);
+  useEffect(() => {
+    if (!customBgImage) {
+      setBgDimensions(null);
+      return;
+    }
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+        setBgDimensions({ width: img.naturalWidth, height: img.naturalHeight });
+      }
+    };
+    img.src = customBgImage;
+  }, [customBgImage]);
+
+  // Track cutout natural dimensions
+  const [cutoutDimensions, setCutoutDimensions] = useState<{ width: number; height: number } | null>(null);
+  useEffect(() => {
+    if (!job.resultUrl) {
+      setCutoutDimensions(null);
+      setResultAspectRatio(null);
+      return;
+    }
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+        setCutoutDimensions({ width: img.naturalWidth, height: img.naturalHeight });
+        setResultAspectRatio(img.naturalWidth / img.naturalHeight);
+      }
+    };
+    img.src = job.resultUrl;
+  }, [job.id, job.resultUrl]);
+
+  // Compute adaptive artboard dimensions (contain / fit without cropping)
+  const naturalArtboardWidth = bgDimensions?.width || cutoutDimensions?.width || 1200;
+  const naturalArtboardHeight = bgDimensions?.height || cutoutDimensions?.height || 900;
+
+  let artboardRatio = naturalArtboardWidth / naturalArtboardHeight;
+  if (!customBgImage && cropRatio !== 'free') {
+    const [rw, rh] = cropRatio.split(':').map(Number);
+    if (rw && rh) artboardRatio = rw / rh;
+  }
+
+  const maxW = Math.max(200, containerSize.width - 48);
+  const maxH = Math.max(200, containerSize.height - 48);
+
+  let artboardDisplayWidth = maxW;
+  let artboardDisplayHeight = Math.round(maxW / artboardRatio);
+  if (artboardDisplayHeight > maxH) {
+    artboardDisplayHeight = maxH;
+    artboardDisplayWidth = Math.round(maxH * artboardRatio);
+  }
 
   // Reset subject position when requested or when job changes
   useEffect(() => {
     setSubjectPos({ x: 0, y: 0 });
   }, [job?.id]);
 
-  useEffect(() => {
-    if (!job.resultUrl) {
-      setResultAspectRatio(null);
-      return;
-    }
-    const image = new Image();
-    image.onload = () => {
-      if (image.naturalHeight > 0) setResultAspectRatio(image.naturalWidth / image.naturalHeight);
-    };
-    image.src = job.resultUrl;
-  }, [job.id, job.resultUrl]);
-
   const isProcessing = job.status === 'loading' || job.status === 'processing';
   const isBrushMode = activeTab === 'cutout' && (cutoutTool === 'erase' || cutoutTool === 'restore') && !!job.resultUrl && !isProcessing && !isCompareMode;
   const isCropMode = fabricEditMode === 'crop';
-  const isMoveMode = activeTab === 'adjust' && cutoutTool === 'move' && !fabricEditMode && !!job.resultUrl && !isProcessing && !isCompareMode;
+  const isMoveMode = activeTab === 'cutout' && cutoutTool === 'move' && !fabricEditMode && !!job.resultUrl && !isProcessing && !isCompareMode;
 
   // -------------------------------------------------------------
   // INTERACTIVE BRUSH CANVAS (SINGLE IMAGE STAGE FOR CUTOUT REFINEMENT)
@@ -352,54 +445,15 @@ export default function BGComparator({
   return (
     <div className="relative w-full flex flex-col items-center justify-center select-none">
       {/* =========================================================
-          STAGE CONTAINER (EDGE-TO-EDGE IN COLUMN, ADAPTIVE HEIGHT)
+          STAGE CONTAINER (WORKSPACE MATTE)
          ========================================================= */}
       <div
         ref={containerRef}
         onClick={() => onSelectLayer?.(null)}
-        className={`relative h-[460px] w-full rounded-3xl overflow-hidden border border-white/[0.08] shadow-2xl flex items-center justify-center p-4 sm:h-[540px] sm:p-8 lg:h-[640px] transition-all duration-300 isolate ${
-          customBgImage || customBgColor ? '' : backgroundStyle
-        }`}
-        style={customBgColor ? { backgroundColor: customBgColor } : undefined}
+        className="relative h-[460px] w-full rounded-3xl overflow-hidden border border-white/[0.08] shadow-2xl flex items-center justify-center p-4 sm:h-[540px] sm:p-6 lg:h-[640px] transition-all duration-300 isolate bg-[#0d0f17] select-none"
       >
-        {/* Subtle stage grid pattern for transparent backgrounds */}
-        {!customBgImage && !customBgColor && (
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:24px_24px] opacity-40" />
-        )}
-
-        {subjectBgBlur > 0 && !isProcessing && !isCompareMode && !fabricEditMode && (
-          <div className="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center overflow-hidden">
-            <img
-              src={job.sourceUrl}
-              alt="Blurred original background"
-              className="max-h-[500px] w-auto max-w-full object-contain"
-              style={{
-                filter: `blur(${subjectBgBlur}px)`,
-              }}
-            />
-          </div>
-        )}
-
-        {/* CUSTOM BACKGROUND IMAGE LAYER */}
-        {customBgImage && !isProcessing && (
-          <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
-            <img
-              src={customBgImage}
-              alt="Custom Background"
-              className="w-full h-full object-cover transition-all"
-              style={{
-                filter: bgBlur > 0 ? `blur(${bgBlur}px)` : undefined,
-                transform: bgBlur > 0 ? 'scale(1.08)' : undefined,
-              }}
-            />
-            {bgDarken > 0 && (
-              <div
-                className="absolute inset-0 bg-black transition-opacity"
-                style={{ opacity: bgDarken / 100 }}
-              />
-            )}
-          </div>
-        )}
+        {/* Subtle stage matte grid pattern */}
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:24px_24px] opacity-40" />
 
         {/* =========================================================
             STAGE FLOATING STATUS & CONTROLS PILL
@@ -424,6 +478,10 @@ export default function BGComparator({
               <span className="flex items-center gap-1.5 text-[#00FF85]">
                 <span><CropIcon /></span> Crop frame active · {cropRatio}
               </span>
+            ) : (fabricEditMode === 'transform' || activeTab === 'adjust') ? (
+              <span className="flex items-center gap-1.5 text-[#00FF85]">
+                <span>✋</span> Transform active
+              </span>
             ) : (
               <span className="flex items-center gap-1.5 text-neutral-300">
                 <span>✋</span> Move & Canvas Active
@@ -438,11 +496,11 @@ export default function BGComparator({
                 type="button"
                 onClick={() => {
                   setSubjectPos({ x: 0, y: 0 });
-                  onScaleChange?.(1);
+                  onApplyTransform?.(DEFAULT_SUBJECT_TRANSFORM);
                   onResetSubjectPosition?.();
                 }}
                 className="px-3 py-1.5 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-xl border border-white/10 text-[11px] font-bold text-neutral-300 hover:text-white transition shadow-lg flex items-center gap-1.5 cursor-pointer"
-                title="Reset Subject Position & Scale"
+                title="Reset Subject Position"
               >
                 <span>↺</span> Reset Center
               </button>
@@ -485,267 +543,338 @@ export default function BGComparator({
               {job.progress || 15}% Complete
             </span>
           </div>
-        ) : fabricEditMode && !isProcessing && job.resultUrl ? (
-          <div className="relative z-10 flex h-full w-full items-center justify-center overflow-auto">
-            <FabricImageEditor
-              key={`${job.id}-${fabricEditMode}`}
-              imageUrl={job.resultUrl}
-              mode={fabricEditMode}
-              cropRatio={cropRatio as FabricCropRatio}
-              initialScale={scale}
-              initialRotation={rotation}
-              initialPosition={subjectPos}
-              onCropRatioChange={(ratio) => onFabricCropRatioChange?.(ratio)}
-              onApply={(blob) => {
-                setSubjectPos({ x: 0, y: 0 });
-                onFabricEditApply?.(blob);
-              }}
-              onCancel={() => onFabricEditCancel?.()}
-            />
-          </div>
-        ) : isCompareMode ? (
-          /* =========================================================
-              BEFORE / AFTER SPLIT COMPARISON SLIDER
-             ========================================================= */
-          <div className="relative w-full h-full flex items-center justify-center overflow-hidden z-10">
-            <img
-              src={job.resultUrl}
-              alt="Result cutout"
-              className="max-h-[500px] w-auto max-w-full object-contain transition-all"
-              style={{ filter: combinedFilter }}
-            />
-
-            <div
-              className="absolute inset-0 overflow-hidden flex items-center justify-center pointer-events-none"
-              style={{ clipPath: `inset(0 ${100 - split}% 0 0)` }}
-            >
-              <img
-                src={job.sourceUrl}
-                alt="Original photo"
-                className="max-h-[500px] w-auto max-w-full object-contain"
-              />
-            </div>
-
-            <div
-              className="absolute top-0 bottom-0 w-0.5 bg-[#00FF85] shadow-[0_0_15px_#00FF85] pointer-events-none z-20 flex items-center justify-center"
-              style={{ left: `${split}%` }}
-            >
-              <div className="w-9 h-9 rounded-full bg-slate-900 text-[#00FF85] border-2 border-[#00FF85] shadow-2xl flex items-center justify-center text-xs font-bold">
-                <Icon name="arrows" size={16} />
-              </div>
-            </div>
-
-            <input
-              aria-label="Compare original and cutout"
-              type="range"
-              min="0"
-              max="100"
-              value={split}
-              onChange={(e) => setSplit(Number(e.target.value))}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-30"
-            />
-          </div>
-        ) : isBrushMode ? (
-          /* =========================================================
-              INTERACTIVE ERASER / RESTORE BRUSH CANVAS (SINGLE IMAGE)
-             ========================================================= */
-          <div className="relative flex items-center justify-center w-full h-full z-10 overflow-hidden">
-            <canvas
-              ref={brushCanvasRef}
-              className="cursor-crosshair max-w-full max-h-[500px] object-contain rounded-xl shadow-2xl touch-none"
-              style={{
-                transform: `scale(${scale * viewportZoom}) rotate(${rotation}deg) translate(${subjectPos.x}px, ${subjectPos.y}px)`,
-                filter: combinedFilter,
-              }}
-              onPointerDown={startBrush}
-              onPointerEnter={(e) => setBrushCursor({ visible: true, x: e.clientX, y: e.clientY })}
-              onPointerMove={moveBrush}
-              onPointerUp={endBrush}
-              onPointerCancel={endBrush}
-              onPointerLeave={() => {
-                if (!isPaintingRef.current) setBrushCursor((v) => ({ ...v, visible: false }));
-              }}
-            />
-          </div>
         ) : (
           /* =========================================================
-              DRAGGABLE & SCALABLE CUTOUT SUBJECT (MOVE MODE / OTHER TABS)
+              THE ADAPTIVE ARTBOARD (FULL COVERAGE, ZERO CLIPPING)
              ========================================================= */
-          <div className="relative flex items-center justify-center w-full h-full z-10 overflow-hidden">
-            <motion.div
-              dragConstraints={containerRef}
-              dragElastic={0.05}
-              dragMomentum={false}
-              onDragStart={() => setIsDragging(true)}
-              onDragEnd={(_e, info) => {
-                setIsDragging(false);
-                setSubjectPos((p) => ({ x: p.x + info.offset.x, y: p.y + info.offset.y }));
-              }}
-              drag={isMoveMode}
-              className={`${isMoveMode ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'} relative p-1 rounded-2xl transition-shadow ${
-                isMoveMode && isDragging ? 'ring-2 ring-[#00FF85]/80 shadow-2xl scale-[1.01]' : isMoveMode ? 'hover:ring-1 hover:ring-white/20' : ''
-              }`}
-              style={{ scale: scale * viewportZoom, rotate: `${rotation}deg` }}
-            >
-              <img
-                src={job.resultUrl}
-                alt={job.name}
-                className="max-h-[500px] w-auto max-w-full object-contain pointer-events-none select-none"
-                style={{ filter: combinedFilter, clipPath: cropClipPath }}
-              />
-            </motion.div>
-          </div>
-        )}
-
-        {/* =========================================================
-            DESIGN OVERLAY LAYERS (TEXT & SHAPES / BADGES / STICKERS)
-           ========================================================= */}
-        {!isProcessing && !isCompareMode && !fabricEditMode && (
-          <div className="absolute inset-0 pointer-events-none z-30 overflow-hidden">
-            {/* 1. RENDER ELEMENT LAYERS */}
-            {elementLayers.map((el) => {
-              const isSelected = selectedLayerId === el.id;
-              const preset = ELEMENT_PRESETS.find((p) => p.key === el.key);
-
-              return (
-                <motion.div
-                  key={el.id}
-                  drag
-                  dragConstraints={containerRef}
-                  dragMomentum={false}
-                  onDragEnd={(_e, info) => {
-                    const rect = containerRef.current?.getBoundingClientRect();
-                    if (!rect) return;
-                    const deltaX = (info.offset.x / rect.width) * 100;
-                    const deltaY = (info.offset.y / rect.height) * 100;
-                    onUpdateElementLayerPosition?.(el.id, el.x + deltaX, el.y + deltaY);
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSelectLayer?.(el.id);
-                  }}
-                  className={`absolute pointer-events-auto cursor-move select-none p-1 rounded-xl transition-all ${
-                    isSelected ? 'ring-2 ring-[#00FF85] shadow-2xl' : 'hover:ring-1 hover:ring-white/40'
-                  }`}
-                  style={{
-                    left: `${el.x}%`,
-                    top: `${el.y}%`,
-                    transform: `translate(-50%, -50%) rotate(${el.rotation || 0}deg)`,
-                    opacity: el.opacity ?? 1,
-                  }}
-                >
-                  {el.type === 'badge' ? (
-                    <div
-                      className="px-4 py-2 rounded-full font-black text-sm border-2 shadow-2xl whitespace-nowrap bg-[#09090D] flex items-center justify-center"
-                      style={{
-                        borderColor: el.color,
-                        color: el.color,
-                        fontSize: `${Math.round(el.size * 0.22)}px`,
-                        boxShadow: `0 0 20px ${el.color}40`,
-                      }}
-                    >
-                      {el.badgeText || el.name}
-                    </div>
-                  ) : preset?.path ? (
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill={el.color}
-                      style={{
-                        width: `${el.size}px`,
-                        height: `${el.size}px`,
-                        filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.5))',
-                      }}
-                    >
-                      <path d={preset.path} />
-                    </svg>
-                  ) : null}
-
-                  {isSelected && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDeleteLayer?.(el.id);
-                      }}
-                      className="absolute -top-3 -right-3 w-5 h-5 rounded-full bg-rose-600 text-white flex items-center justify-center text-[10px] font-bold shadow-lg hover:bg-rose-700 transition"
-                      title="Delete Layer"
-                    >
-                      ✕
-                    </button>
-                  )}
-                </motion.div>
-              );
-            })}
-
-            {/* 2. RENDER TEXT LAYERS */}
-            {textLayers.map((tl) => {
-              const isSelected = selectedLayerId === tl.id;
-              let pillBg = 'transparent';
-              if (tl.bgPill === 'black') pillBg = 'rgba(9, 9, 13, 0.85)';
-              if (tl.bgPill === 'mint') pillBg = '#00FF85';
-              if (tl.bgPill === 'white') pillBg = '#FFFFFF';
-              if (tl.bgPill === 'crimson') pillBg = '#F43F5E';
-
-              return (
-                <motion.div
-                  key={tl.id}
-                  drag
-                  dragConstraints={containerRef}
-                  dragMomentum={false}
-                  onDragEnd={(_e, info) => {
-                    const rect = containerRef.current?.getBoundingClientRect();
-                    if (!rect) return;
-                    const deltaX = (info.offset.x / rect.width) * 100;
-                    const deltaY = (info.offset.y / rect.height) * 100;
-                    onUpdateTextLayerPosition?.(tl.id, tl.x + deltaX, tl.y + deltaY);
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSelectLayer?.(tl.id);
-                  }}
-                  className={`absolute pointer-events-auto cursor-move select-none p-1.5 rounded-xl transition-all ${
-                    isSelected ? 'ring-2 ring-[#00FF85] shadow-2xl' : 'hover:ring-1 hover:ring-white/40'
-                  }`}
-                  style={{
-                    left: `${tl.x}%`,
-                    top: `${tl.y}%`,
-                    transform: 'translate(-50%, -50%)',
-                  }}
-                >
-                  <div
-                    className="px-3 py-1 rounded-xl whitespace-pre-wrap transition-colors leading-tight"
+          <div
+            ref={artboardRef}
+            className="relative overflow-hidden rounded-2xl shadow-2xl border border-white/10 select-none flex items-center justify-center transition-all duration-200"
+            style={{
+              width: `${artboardDisplayWidth}px`,
+              height: `${artboardDisplayHeight}px`,
+            }}
+          >
+            {/* 1. ARTBOARD BACKGROUND LAYER */}
+            <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
+              {customBgImage ? (
+                <>
+                  <img
+                    src={customBgImage}
+                    alt="Custom Background"
+                    className="w-full h-full object-cover transition-all"
                     style={{
-                      fontFamily: tl.fontFamily,
-                      fontSize: `${tl.fontSize}px`,
-                      fontWeight: tl.fontWeight,
-                      color: tl.color,
-                      textAlign: tl.align,
-                      backgroundColor: pillBg,
-                      textShadow: tl.shadow ? '0 4px 14px rgba(0,0,0,0.8)' : undefined,
+                      filter: bgBlur > 0 ? `blur(${bgBlur}px)` : undefined,
+                    }}
+                  />
+                  {bgDarken > 0 && (
+                    <div
+                      className="absolute inset-0 bg-black transition-opacity"
+                      style={{ opacity: bgDarken / 100 }}
+                    />
+                  )}
+                </>
+              ) : customBgColor ? (
+                <div className="w-full h-full" style={{ backgroundColor: customBgColor }} />
+              ) : (
+                <div className={`w-full h-full ${backgroundStyle}`} />
+              )}
+
+              {subjectBgBlur > 0 && !fabricEditMode && (
+                <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+                  <img
+                    src={job.sourceUrl}
+                    alt="Blurred original background"
+                    className="w-full h-full object-cover"
+                    style={{ filter: `blur(${subjectBgBlur}px)` }}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* 2. FOREGROUND CONTENT: FABRIC EDITOR OR SPLIT/BRUSH/CUTOUT DISPLAY */}
+            {(fabricEditMode || activeTab === 'adjust') && !isProcessing && job.resultUrl ? (
+              <div className="relative z-10 flex h-full w-full items-center justify-center overflow-hidden">
+                <FabricImageEditor
+                  key={`${job.id}-${fabricEditMode || 'transform'}`}
+                  ref={fabricEditorRef}
+                  imageUrl={job.resultUrl}
+                  artboardWidth={artboardDisplayWidth}
+                  artboardHeight={artboardDisplayHeight}
+                  naturalArtboardWidth={naturalArtboardWidth}
+                  naturalArtboardHeight={naturalArtboardHeight}
+                  mode={(fabricEditMode || 'transform') as FabricEditMode}
+                  cropRatio={cropRatio as FabricCropRatio}
+                  backgroundStyle={backgroundStyle}
+                  customBgColor={customBgColor}
+                  hasCustomBg={!!customBgImage}
+                  subjectTransform={subjectTransform}
+                  rotation={rotation}
+                  initialRotation={rotation}
+                  cropTarget={cropTarget}
+                  cropZoom={cropZoom}
+                  onCropTargetChange={onCropTargetChange}
+                  onCropZoomChange={onCropZoomChange}
+                  onCropRatioChange={(ratio) => onFabricCropRatioChange?.(ratio)}
+                  onRotationChange={onRotationChange}
+                  onApplyTransform={onApplyTransform}
+                  onApply={(blob) => {
+                    setSubjectPos({ x: 0, y: 0 });
+                    onFabricEditApply?.(blob);
+                  }}
+                  onCancel={() => onFabricEditCancel?.()}
+                />
+              </div>
+            ) : isCompareMode ? (
+              /* BEFORE / AFTER SPLIT COMPARISON SLIDER */
+              <div className="relative w-full h-full flex items-center justify-center overflow-hidden z-10">
+                <img
+                  src={job.resultUrl}
+                  alt="Result cutout"
+                  className="max-h-full max-w-full object-contain transition-all"
+                  style={{ filter: combinedFilter }}
+                />
+
+                <div
+                  className="absolute inset-0 overflow-hidden flex items-center justify-center pointer-events-none"
+                  style={{ clipPath: `inset(0 ${100 - split}% 0 0)` }}
+                >
+                  <img
+                    src={job.sourceUrl}
+                    alt="Original photo"
+                    className="max-h-full max-w-full object-contain"
+                  />
+                </div>
+
+                <div
+                  className="absolute top-0 bottom-0 w-0.5 bg-[#00FF85] shadow-[0_0_15px_#00FF85] pointer-events-none z-20 flex items-center justify-center"
+                  style={{ left: `${split}%` }}
+                >
+                  <div className="w-9 h-9 rounded-full bg-slate-900 text-[#00FF85] border-2 border-[#00FF85] shadow-2xl flex items-center justify-center text-xs font-bold">
+                    <Icon name="arrows" size={16} />
+                  </div>
+                </div>
+
+                <input
+                  aria-label="Compare original and cutout"
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={split}
+                  onChange={(e) => setSplit(Number(e.target.value))}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-30"
+                />
+              </div>
+            ) : isBrushMode ? (
+              /* INTERACTIVE ERASER / RESTORE BRUSH CANVAS */
+              <div className="relative flex items-center justify-center w-full h-full z-10 overflow-hidden">
+                <canvas
+                  ref={brushCanvasRef}
+                  className="cursor-crosshair max-w-full max-h-full object-contain rounded-xl shadow-2xl touch-none"
+                  style={{
+                    transform: `scale(${viewportZoom}) rotate(${rotation}deg) translate(${subjectPos.x}px, ${subjectPos.y}px)`,
+                    filter: combinedFilter,
+                  }}
+                  onPointerDown={startBrush}
+                  onPointerEnter={(e) => setBrushCursor({ visible: true, x: e.clientX, y: e.clientY })}
+                  onPointerMove={moveBrush}
+                  onPointerUp={endBrush}
+                  onPointerCancel={endBrush}
+                  onPointerLeave={() => {
+                    if (!isPaintingRef.current) setBrushCursor((v) => ({ ...v, visible: false }));
+                  }}
+                />
+              </div>
+            ) : (
+              /* CUTOUT DISPLAY (POSITIONED AT TRANSFORM COORDINATES INSIDE ARTBOARD) */
+              (() => {
+                const currentTf = subjectTransform || DEFAULT_SUBJECT_TRANSFORM;
+                const cutoutCenterX = artboardDisplayWidth / 2 + currentTf.relX * artboardDisplayWidth;
+                const cutoutCenterY = artboardDisplayHeight / 2 + currentTf.relY * artboardDisplayHeight;
+                const baseCutoutFit = customBgImage
+                  ? Math.min(
+                      (artboardDisplayWidth * 0.75) / (cutoutDimensions?.width || 1),
+                      (artboardDisplayHeight * 0.75) / (cutoutDimensions?.height || 1),
+                      1
+                    )
+                  : Math.min(
+                      artboardDisplayWidth / (cutoutDimensions?.width || 1),
+                      artboardDisplayHeight / (cutoutDimensions?.height || 1),
+                      1
+                    );
+                const cutoutW = (cutoutDimensions?.width || artboardDisplayWidth * 0.75) * baseCutoutFit * currentTf.scale;
+                const cutoutH = (cutoutDimensions?.height || artboardDisplayHeight * 0.75) * baseCutoutFit * currentTf.scale;
+
+                return (
+                  <div
+                    className="absolute z-10 pointer-events-none flex items-center justify-center"
+                    style={{
+                      left: `${cutoutCenterX}px`,
+                      top: `${cutoutCenterY}px`,
+                      width: `${cutoutW}px`,
+                      height: `${cutoutH}px`,
+                      transform: `translate(-50%, -50%) rotate(${currentTf.rotation}deg) scaleX(${currentTf.flipX ? -1 : 1}) scaleY(${currentTf.flipY ? -1 : 1})`,
                     }}
                   >
-                    {tl.text}
+                    <img
+                      src={job.resultUrl}
+                      alt={job.name}
+                      className="w-full h-full object-contain pointer-events-none select-none"
+                      style={{ filter: combinedFilter, clipPath: cropClipPath }}
+                    />
                   </div>
+                );
+              })()
+            )}
 
-                  {isSelected && (
-                    <button
-                      type="button"
+            {/* 3. DESIGN OVERLAY LAYERS (TEXT & SHAPES / BADGES / STICKERS) */}
+            {!isProcessing && !isCompareMode && !fabricEditMode && (
+              <div className="absolute inset-0 pointer-events-none z-30 overflow-hidden">
+                {/* 1. RENDER ELEMENT LAYERS */}
+                {elementLayers.map((el) => {
+                  const isSelected = selectedLayerId === el.id;
+                  const preset = ELEMENT_PRESETS.find((p) => p.key === el.key);
+
+                  return (
+                    <motion.div
+                      key={el.id}
+                      drag
+                      dragConstraints={artboardRef}
+                      dragMomentum={false}
+                      onDragEnd={(_e, info) => {
+                        const rect = artboardRef.current?.getBoundingClientRect();
+                        if (!rect) return;
+                        const deltaX = (info.offset.x / rect.width) * 100;
+                        const deltaY = (info.offset.y / rect.height) * 100;
+                        onUpdateElementLayerPosition?.(el.id, el.x + deltaX, el.y + deltaY);
+                      }}
                       onClick={(e) => {
                         e.stopPropagation();
-                        onDeleteLayer?.(tl.id);
+                        onSelectLayer?.(el.id);
                       }}
-                      className="absolute -top-3 -right-3 w-5 h-5 rounded-full bg-rose-600 text-white flex items-center justify-center text-[10px] font-bold shadow-lg hover:bg-rose-700 transition"
-                      title="Delete Text"
+                      className={`absolute pointer-events-auto cursor-move select-none p-1 rounded-xl transition-all ${
+                        isSelected ? 'ring-2 ring-[#00FF85] shadow-2xl' : 'hover:ring-1 hover:ring-white/40'
+                      }`}
+                      style={{
+                        left: `${el.x}%`,
+                        top: `${el.y}%`,
+                        transform: `translate(-50%, -50%) rotate(${el.rotation || 0}deg)`,
+                        opacity: el.opacity ?? 1,
+                      }}
                     >
-                      ✕
-                    </button>
-                  )}
-                </motion.div>
-              );
-            })}
+                      {el.type === 'badge' ? (
+                        <div
+                          className="px-4 py-2 rounded-full font-black text-sm border-2 shadow-2xl whitespace-nowrap bg-[#09090D] flex items-center justify-center"
+                          style={{
+                            borderColor: el.color,
+                            color: el.color,
+                            fontSize: `${Math.round(el.size * 0.22)}px`,
+                            boxShadow: `0 0 20px ${el.color}40`,
+                          }}
+                        >
+                          {el.badgeText || el.name}
+                        </div>
+                      ) : preset?.path ? (
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill={el.color}
+                          style={{
+                            width: `${el.size}px`,
+                            height: `${el.size}px`,
+                            filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.5))',
+                          }}
+                        >
+                          <path d={preset.path} />
+                        </svg>
+                      ) : null}
+
+                      {isSelected && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteLayer?.(el.id);
+                          }}
+                          className="absolute -top-3 -right-3 w-5 h-5 rounded-full bg-rose-600 text-white flex items-center justify-center text-[10px] font-bold shadow-lg hover:bg-rose-700 transition"
+                          title="Delete Layer"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </motion.div>
+                  );
+                })}
+
+                {/* 2. RENDER TEXT LAYERS */}
+                {textLayers.map((tl) => {
+                  const isSelected = selectedLayerId === tl.id;
+                  let pillBg = 'transparent';
+                  if (tl.bgPill === 'black') pillBg = 'rgba(9, 9, 13, 0.85)';
+                  if (tl.bgPill === 'mint') pillBg = '#00FF85';
+                  if (tl.bgPill === 'white') pillBg = '#FFFFFF';
+                  if (tl.bgPill === 'crimson') pillBg = '#F43F5E';
+
+                  return (
+                    <motion.div
+                      key={tl.id}
+                      drag
+                      dragConstraints={artboardRef}
+                      dragMomentum={false}
+                      onDragEnd={(_e, info) => {
+                        const rect = artboardRef.current?.getBoundingClientRect();
+                        if (!rect) return;
+                        const deltaX = (info.offset.x / rect.width) * 100;
+                        const deltaY = (info.offset.y / rect.height) * 100;
+                        onUpdateTextLayerPosition?.(tl.id, tl.x + deltaX, tl.y + deltaY);
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectLayer?.(tl.id);
+                      }}
+                      className={`absolute pointer-events-auto cursor-move select-none p-1.5 rounded-xl transition-all ${
+                        isSelected ? 'ring-2 ring-[#00FF85] shadow-2xl' : 'hover:ring-1 hover:ring-white/40'
+                      }`}
+                      style={{
+                        left: `${tl.x}%`,
+                        top: `${tl.y}%`,
+                        transform: 'translate(-50%, -50%)',
+                      }}
+                    >
+                      <div
+                        className="px-3 py-1 rounded-xl whitespace-pre-wrap transition-colors leading-tight"
+                        style={{
+                          fontFamily: tl.fontFamily,
+                          fontSize: `${tl.fontSize}px`,
+                          fontWeight: tl.fontWeight,
+                          color: tl.color,
+                          textAlign: tl.align,
+                          backgroundColor: pillBg,
+                          textShadow: tl.shadow ? '0 4px 14px rgba(0,0,0,0.8)' : undefined,
+                        }}
+                      >
+                        {tl.text}
+                      </div>
+
+                      {isSelected && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteLayer?.(tl.id);
+                          }}
+                          className="absolute -top-3 -right-3 w-5 h-5 rounded-full bg-rose-600 text-white flex items-center justify-center text-[10px] font-bold shadow-lg hover:bg-rose-700 transition"
+                          title="Delete Text"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </motion.div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
-
       </div>
 
       {/* =========================================================
