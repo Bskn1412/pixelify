@@ -1,14 +1,14 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Routes, Route, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import HomePage from './components/HomePage';
+import MobileSidebar from './components/MobileSidebar';
 import BGRemoveWorkspace from './components/BGRemoveWorkspace';
 import UploadArea from './components/UploadArea';
 // ImageComparison and ControlPanel replaced by UpscaleWorkspace
-import UpscaleWorkspace from './components/UpscaleWorkspace';
+import HomePage from './components/HomePage';
 // ProcessingOverlay and StatsBar are no longer used here
 import ErrorMessage from './components/ErrorMessage';
-import HistoryDrawer from './components/HistoryDrawer';
+import UpscaleWorkspace from './components/UpscaleWorkspace';
 
 import UpscaleShowcase from './components/upscaler/UpscaleShowcase';
 import UpscaleShowreel from './components/upscaler/UpscaleShowreel';
@@ -21,8 +21,9 @@ import { BgSampleGallery, BgShowcase, BgPipeline, BgPrecision, BgFaq } from './c
 import Footer from './components/Footer';
 
 import { useONNX } from './hooks/useONNX';
-import { useUpscale } from './hooks/useUpscale';
+import { useUpscale, cancelUpscale } from './hooks/useUpscale';
 import { makeId } from './lib/bgUtils';
+import { buildPresetOptions, getDefaultPreset } from './constants';
 
 import Bgmarquee from './components/bgremove/Bgmarquee';
 
@@ -48,14 +49,13 @@ import type {
   EnhancementOptions,
   ViewTab,
   ThemeMode,
-  HistoryItem,
   BGJob,
   ToastMessage,
   UpscaleItem,
 } from './types';
 import NotFound from './components/NotFound';
 
-const STORAGE_KEY = 'pixelify_upscaler_history_2026';
+const STORAGE_KEY = 'pixelify_upscaler_history_2026'; // legacy, no longer written
 const THEME_KEY = 'pixelify_theme_pref';
 const MAX_FILE_SIZE = 15 * 1024 * 1024;
 
@@ -65,7 +65,7 @@ export default function App() {
 
   const getActiveTab = useCallback((): ViewTab => {
     const path = location.pathname.replace(/^\//, '');
-    if (path === 'upscaler' || path === 'bg_remove' || path === 'history') {
+    if (path === 'upscaler' || path === 'bg_remove') {
       return path as ViewTab;
     }
     return 'home';
@@ -74,7 +74,8 @@ export default function App() {
   const activeTab = getActiveTab();
 
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  // Mobile navigation sidebar (replaces the old bottom nav bar on < md)
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   // Theme state management
   const [theme, setTheme] = useState<ThemeMode>(() => {
@@ -88,21 +89,11 @@ export default function App() {
   // Sync state with URL navigation via React Router
   const navigateTo = useCallback(
     (tab: ViewTab) => {
-      if (tab === 'history') {
-        setIsHistoryOpen(true);
-        return;
-      }
       const targetPath = tab === 'home' ? '/' : `/${tab}`;
       navigate(targetPath);
     },
     [navigate]
   );
-
-  useEffect(() => {
-    if (location.pathname === '/history') {
-      setIsHistoryOpen(true);
-    }
-  }, [location.pathname]);
 
   // Theme effect application
   useEffect(() => {
@@ -125,7 +116,7 @@ export default function App() {
   const [bgJobs, setBgJobs] = useState<BGJob[]>([]);
 
   // Upscaler State Hooks
-  const { ortRef, backend, execEngine, sessionRef, isLoading: modelLoading, initONNX, loadModel } = useONNX();
+  const { ortRef, backend, execEngine, sessionRef, isLoading: modelLoading, modelProgress, initONNX, loadModel } = useONNX();
   const { upscale } = useUpscale({ ortRef, sessionRef });
 
   // LIVE ENGINE STATE — what each tool's pipeline is ACTUALLY running on right now.
@@ -157,17 +148,17 @@ export default function App() {
     hdrLevel: 50,
     brightness: 50,
     contrast: 50,
+    preset: 'Standard',
   };
 
-  // Local Dual History State (Upscale & Cutouts)
-  const [history, setHistory] = useState<HistoryItem[]>(() => {
+  // Legacy local history feature was removed; clear any old stored records.
+  useEffect(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : [];
+      localStorage.removeItem(STORAGE_KEY);
     } catch {
-      return [];
+      /* ignore */
     }
-  });
+  }, []);
 
   const addToast = useCallback((type: 'success' | 'error' | 'info', text: string) => {
     const id = makeId();
@@ -176,18 +167,6 @@ export default function App() {
       setToasts((prev) => prev.filter((item) => item.id !== id));
     }, 4200);
   }, []);
-
-  const addHistoryRecord = useCallback((item: HistoryItem) => {
-    setHistory((prev) => [item, ...prev.filter((i) => i.id !== item.id).slice(0, 24)]);
-  }, []);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-    } catch (e) {
-      console.warn('LocalStorage error:', e);
-    }
-  }, [history]);
 
   useEffect(() => {
     initONNX();
@@ -243,12 +222,26 @@ export default function App() {
 
   /* ----------------------------------------------------------
      HANDLE MODEL CHANGE (Per image)
+     Switching models also switches to that model's default preset
+     so the enhancement sliders always match the selected model.
      ---------------------------------------------------------- */
   const handleItemModelChange = useCallback(
     async (id: string, key: ModelKey) => {
       setItems((prev) =>
         prev.map((i) =>
-          i.id === id ? { ...i, modelKey: key, result: null, error: null } : i
+          i.id === id
+            ? {
+              ...i,
+              modelKey: key,
+              result: null,
+              error: null,
+              options: buildPresetOptions(
+                key,
+                MODELS[key]?.defaultPreset || getDefaultPreset(key),
+                i.options
+              ),
+            }
+            : i
         )
       );
       const ok = await loadModel(key);
@@ -269,11 +262,19 @@ export default function App() {
   }, []);
 
   /* ----------------------------------------------------------
-     RESET SETTINGS (Per image)
+     RESET SETTINGS (Per image) — back to the model's default preset
      ---------------------------------------------------------- */
   const handleResetItemSettings = useCallback((id: string) => {
     setItems((prev) =>
-      prev.map((i) => (i.id === id ? { ...i, options: { ...DEFAULT_OPTIONS } } : i))
+      prev.map((i) => {
+        if (i.id !== id) return i;
+        const preset =
+          MODELS[i.modelKey]?.defaultPreset || getDefaultPreset(i.modelKey);
+        return {
+          ...i,
+          options: buildPresetOptions(i.modelKey, preset, { ...DEFAULT_OPTIONS, preset }),
+        };
+      })
     );
     addToast('info', 'Settings reset to defaults.');
   }, [addToast]);
@@ -306,6 +307,7 @@ export default function App() {
 
       try {
         const res = await upscale(
+          id,
           item.img,
           item.modelKey,
           item.options,
@@ -329,23 +331,6 @@ export default function App() {
           )
         );
 
-        const historyRecord: HistoryItem = {
-          id: makeId(),
-          type: 'upscale',
-          name: item.name,
-          originalWidth: item.width,
-          originalHeight: item.height,
-          upscaledWidth: res.width,
-          upscaledHeight: res.height,
-          scale: item.options.scale,
-          timestamp: Date.now(),
-          thumbnailUrl: item.url,
-          resultUrl: res.dataUrl || item.url,
-          timeMs: res.time,
-          enhancements: res.enhancementsApplied || [],
-        };
-        addHistoryRecord(historyRecord);
-
         // Play pleasant completion chime & send desktop notification
         playSuccessChime();
         sendDesktopNotification(
@@ -358,6 +343,10 @@ export default function App() {
           `✨ ${item.name} upscaled successfully! (${item.options.scale}×, ${(res.time / 1000).toFixed(1)}s)`
         );
       } catch (err: any) {
+        // A user cancel was already handled by handleCancelUpscale (item is idle).
+        if (err?.name === 'CancellationError' || /cancel/i.test(err?.message || '')) {
+          return;
+        }
         setItems((prev) =>
           prev.map((i) =>
             i.id === id
@@ -373,8 +362,29 @@ export default function App() {
         addToast('error', `Failed to upscale ${item.name}: ${err.message || 'Error occurred'}`);
       }
     },
-    [items, modelLoading, upscale, addToast, addHistoryRecord]
+    [items, modelLoading, upscale, addToast]
   );
+
+  /* ----------------------------------------------------------
+     CANCEL UPSCALE (Per image) — aborts the in-flight inference run
+     and returns the item to its idle state.
+     ---------------------------------------------------------- */
+  const handleCancelUpscale = useCallback((id: string) => {
+    cancelUpscale(id);
+    setItems((prev) =>
+      prev.map((i) =>
+        i.id === id
+          ? {
+            ...i,
+            status: 'idle',
+            error: null,
+            progress: { percent: 0, text: '' },
+          }
+          : i
+      )
+    );
+    addToast('info', 'Enhancement cancelled.');
+  }, [cancelUpscale, addToast]);
 
   /* ----------------------------------------------------------
      REMOVE / CLEAR ITEMS
@@ -400,6 +410,26 @@ export default function App() {
     setSelectedId(null);
     setStep('upload');
   }, []);
+
+  /* ----------------------------------------------------------
+     EXIT WORKSPACE (mobile X / desktop close) — back to upload.
+     ---------------------------------------------------------- */
+  const handleExitWorkspace = useCallback(() => {
+    setStep('upload');
+  }, []);
+
+  // Returning to the upload step must land at the TOP of the page
+  // (where the dropzone is). Mobile browsers otherwise restore the
+  // deep scroll position (footer) that was active before the
+  // full-screen workspace opened. Double rAF so it wins over the
+  // browser's own scroll restoration after the view re-mounts.
+  useEffect(() => {
+    if (step === 'upload') {
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => window.scrollTo(0, 0))
+      );
+    }
+  }, [step]);
 
   /* ----------------------------------------------------------
      DOWNLOAD RESULT (Per image)
@@ -473,17 +503,6 @@ export default function App() {
     addToast('success', `${additions.length} image(s) added to Cutout Canvas.`);
   };
 
-  // Escape Listener for History Drawer
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setIsHistoryOpen(false);
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
-
   const activeItem = items.find((i) => i.id === selectedId) || items[0];
   const visibleError = error || activeItem?.error || null;
 
@@ -512,13 +531,30 @@ export default function App() {
         }}
       />
 
-      {/* STICKY GLASSMORPHIC NAVBAR (REQUIRED TASK 1 & 5) */}
+      {/* STICKY GLASSMORPHIC NAVBAR (REQUIRED TASK 1 & 5)
+          On mobile the upscaler workspace owns the whole screen,
+          so the navbar hides there (< lg) and the workspace renders
+          its own top bar with the sidebar menu + cancel buttons. */}
       <Navbar
         activeTab={activeTab}
         onTabChange={navigateTo}
         upscalerEngine={execEngine}
         bgEngine={bgEngine}
-        historyCount={history.length}
+        onOpenMobileSidebar={() => setIsMobileNavOpen(true)}
+        mobileHidden={activeTab === 'upscaler' && step !== 'upload'}
+      />
+
+      {/* MOBILE NAVIGATION SIDEBAR (replaces the old bottom nav on < md) */}
+      <MobileSidebar
+        open={isMobileNavOpen}
+        onClose={() => setIsMobileNavOpen(false)}
+        activeTab={activeTab}
+        onTabChange={(tab) => {
+          setIsMobileNavOpen(false);
+          navigateTo(tab);
+        }}
+        upscalerEngine={execEngine}
+        bgEngine={bgEngine}
       />
 
       {/* MAIN CONTENT AREA */}
@@ -598,12 +634,16 @@ export default function App() {
                     onRemoveId={handleRemoveItem}
                     onAddFile={addUpscaleFile}
                     isLoading={modelLoading}
+                    modelProgress={modelProgress}
                     onModelChange={handleItemModelChange}
                     onOptionsChange={handleItemOptionsChange}
                     onResetSettings={handleResetItemSettings}
                     onUpscale={handleUpscaleItem}
+                    onCancel={handleCancelUpscale}
                     onDownload={handleDownloadItem}
                     onReset={handleClearAll}
+                    onOpenMobileSidebar={() => setIsMobileNavOpen(true)}
+                    onExitWorkspace={handleExitWorkspace}
                   />
                 )}
 
@@ -620,7 +660,6 @@ export default function App() {
                   setJobs={setBgJobs}
                   addToast={addToast}
                   onOpenPicker={() => fileInputRef.current?.click()}
-                  onAddHistoryRecord={addHistoryRecord}
                   onEngineReport={(engine, webgpuAvailable) => {
                     setBgEngine(engine);
                     setBgWebgpuAvailable(webgpuAvailable);
@@ -657,24 +696,6 @@ export default function App() {
 
         </Routes>
       </main>
-
-      {/* HISTORY DRAWER */}
-      {isHistoryOpen && (
-        <HistoryDrawer
-          history={history}
-          onClose={() => setIsHistoryOpen(false)}
-          onClear={() => setHistory([])}
-          onSelect={(item) => {
-            setIsHistoryOpen(false);
-            if (item.type === 'bg_remove') {
-              navigateTo('bg_remove');
-            } else {
-              navigateTo('upscaler');
-            }
-          }}
-        />
-      )}
-
     </div>
   );
 }

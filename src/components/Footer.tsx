@@ -43,9 +43,6 @@ export default function Footer({ onTabChange }: FooterProps) {
               <a href="#birefnet" onClick={(e) => { e.preventDefault(); onTabChange('bg_remove'); }} className="text-muted hover:text-white transition">
                 BiRefNet Neural Cutouts
               </a>
-              <button onClick={() => onTabChange('history')} className="text-left text-muted hover:text-white transition">
-                Local History
-              </button>
               <a href="#webgpu" onClick={(e) => e.preventDefault()} className="text-muted hover:text-white transition">
                 WebGPU Acceleration
               </a>

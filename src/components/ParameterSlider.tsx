@@ -93,16 +93,6 @@ const ParameterSlider: React.FC<ParameterSliderProps> = ({
     }
   };
 
-  const handleNumberChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const newValue = Number(e.target.value);
-
-    if (Number.isNaN(newValue)) return;
-
-    onChange(clamp(newValue));
-  };
-
   return (
     <div
       className={`
@@ -196,36 +186,28 @@ const ParameterSlider: React.FC<ParameterSliderProps> = ({
         />
 
         {/* ==================================================
-            NUMBER
+            VALUE (display only — values are adjusted with the
+            drag bar only, never typed manually)
            ================================================== */}
 
-        <input
-          type="number"
-          min={min}
-          max={max}
-          step={step}
-          value={value}
-          onChange={handleNumberChange}
-          onPointerDown={(e) => e.stopPropagation()}
+        <div
           className="
+            pointer-events-none
             absolute
             left-0
             top-0
             z-20
+            flex
             h-full
-            w-[110px]
-            bg-transparent
+            items-center
             px-4
             text-[16px]
             font-medium
             text-white/75
-            outline-none
-            appearance-none
-            [appearance:textfield]
-            [&::-webkit-inner-spin-button]:appearance-none
-            [&::-webkit-outer-spin-button]:appearance-none
           "
-        />
+        >
+          {value}
+        </div>
 
         {/* ==================================================
             VERTICAL DRAG HANDLE

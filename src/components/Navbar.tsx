@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Menu } from 'lucide-react';
 import type { ViewTab, ThemeMode } from '../types';
 import Icon from './Icon';
 import Logo from './Logo';
@@ -13,10 +14,14 @@ interface NavbarProps {
   /** Live engine reported by the BG remover worker pipeline */
   bgEngine: Engine;
   historyCount?: number;
+  /** Opens the mobile navigation sidebar (hamburger, < md only) */
+  onOpenMobileSidebar?: () => void;
+  /** Hides the navbar on mobile (< lg) — e.g. when the upscaler workspace owns the screen */
+  mobileHidden?: boolean;
 }
 
-/** Small dynamic engine pill used in the settings dropdown */
-function EngineRow({ label, engine }: { label: string; engine: Engine }) {
+/** Small dynamic engine pill used in the settings dropdown & mobile sidebar (exported) */
+export function EngineRow({ label, engine }: { label: string; engine: Engine }) {
   return (
     <div className="flex items-center justify-between text-[11px]">
       <span className="font-semibold text-neutral-400">{label}</span>
@@ -50,6 +55,8 @@ export default function Navbar({
   upscalerEngine,
   bgEngine,
   historyCount = 0,
+  onOpenMobileSidebar,
+  mobileHidden = false,
 }: NavbarProps) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -78,8 +85,37 @@ export default function Navbar({
 
   return (
     <>
-      <header className="sticky top-0 inset-x-0 z-[60] w-full select-none py-3.5 bg-transparent border-none pointer-events-none transition-all duration-300">
+      <header className={`sticky top-0 inset-x-0 z-[60] w-full select-none py-3.5 bg-transparent border-none pointer-events-none transition-all duration-300 ${mobileHidden ? 'max-lg:hidden' : ''}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-8 flex items-center justify-between gap-4 relative">
+
+          {/* MOBILE SIDEBAR MENU BUTTON (< md): opens the navigation sidebar drawer */}
+          <button
+            type="button"
+            onClick={() => onOpenMobileSidebar?.()}
+            aria-label="Open navigation menu"
+            className="pointer-events-auto
+              mr-1
+              h-11
+              w-11
+              shrink-0
+              cursor-pointer
+              flex
+              items-center
+              justify-center
+              rounded-full
+              bg-white/10
+              border
+              border-white/20
+              backdrop-blur-xl
+              text-white
+              shadow-xl
+              transition-all
+              duration-200
+              active:scale-95
+              md:hidden"
+          >
+            <Menu size={20} strokeWidth={2.2} />
+          </button>
 
           {/* LOGO (LEFT SIDE: Frosted Glass Capsule with Blur) */}
           <div
@@ -177,7 +213,7 @@ export default function Navbar({
           <div className="pointer-events-auto relative ml-auto" ref={settingsRef}>
             <button
               onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-xl text-white flex items-center justify-center transition-all shadow-xl active:scale-95"
+              className="hidden sm:flex w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-xl text-white items-center justify-center transition-all shadow-xl active:scale-95"
               title="Settings & Preferences"
               aria-label="Settings and Preferences"
             >
@@ -193,23 +229,6 @@ export default function Navbar({
                   <EngineRow label="BG Remover engine" engine={bgEngine} />
                 </div>
 
-                {/* LOCAL HISTORY */}
-                <button
-                  onClick={() => {
-                    onTabChange('history');
-                    setIsSettingsOpen(false);
-                  }}
-                  className="w-full text-left px-3 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white transition flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-2">
-                    <Icon name="history" size={16} className="text-[#00FF85]" />
-                    <span>History</span>
-                  </div>
-                  <span className="px-2 py-0.5 rounded-full bg-[#00FF85]/20 text-[#00FF85] text-[10px] font-bold font-mono">
-                    {historyCount} items
-                  </span>
-                </button>
-
               </div>
             )}
           </div>
@@ -217,44 +236,6 @@ export default function Navbar({
         </div>
       </header>
 
-      {/* MOBILE FLOATING BOTTOM NAV BAR (STICKY/FIXED, VISIBLE ON < md ONLY) */}
-      <nav
-        aria-label="Mobile Navigation"
-        className="md:hidden pointer-events-auto fixed bottom-5 left-1/2 -translate-x-1/2 z-[60] h-12 bg-[#121218]/90 border border-white/20 rounded-full p-1.5 flex items-center gap-1 backdrop-blur-2xl shadow-[0_12px_40px_rgba(0,0,0,0.75)] max-w-[calc(100vw-24px)] transition-all duration-300"
-      >
-        <button
-          onClick={() => onTabChange('home')}
-          className={`h-full px-3.5 sm:px-4 rounded-full text-xs font-bold transition-all duration-300 flex items-center justify-center whitespace-nowrap active:scale-95 ${
-            activeTab === 'home'
-              ? 'bg-white text-black shadow-md'
-              : 'text-neutral-300 hover:text-white font-medium'
-          }`}
-        >
-          Home
-        </button>
-
-        <button
-          onClick={() => onTabChange('bg_remove')}
-          className={`h-full px-3.5 sm:px-4 rounded-full text-xs font-bold transition-all duration-300 flex items-center justify-center whitespace-nowrap active:scale-95 ${
-            activeTab === 'bg_remove'
-              ? 'bg-white text-black shadow-md'
-              : 'text-neutral-300 hover:text-white font-medium'
-          }`}
-        >
-          BG Remover
-        </button>
-
-        <button
-          onClick={() => onTabChange('upscaler')}
-          className={`h-full px-3.5 sm:px-4 rounded-full text-xs font-bold transition-all duration-300 flex items-center justify-center whitespace-nowrap active:scale-95 ${
-            activeTab === 'upscaler'
-              ? 'bg-white text-black shadow-md'
-              : 'text-neutral-300 hover:text-white font-medium'
-          }`}
-        >
-          AI Upscaler
-        </button>
-      </nav>
     </>
   );
 }

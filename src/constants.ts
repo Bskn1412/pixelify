@@ -1,4 +1,179 @@
-import type { ModelConfig, ModelKey, BackgroundPrompt } from './types';
+import type { EnhancementOptions, ModelConfig, ModelKey, BackgroundPrompt } from './types';
+
+/* ==========================================================================
+   REAL PRESET CONFIGURATIONS
+   Each model's presets map to concrete enhancement values that are applied
+   by the canvas post-processing pipeline (applyCanvasEnhancements).
+   Levels are 0–100 where 50 is the neutral baseline.
+   ========================================================================== */
+
+export interface PresetSettings
+  extends Pick<
+    EnhancementOptions,
+    | 'sharpness'
+    | 'denoise'
+    | 'brightness'
+    | 'contrast'
+  > {
+  faceEnhancement?: number;
+  colorLevel?: number;
+  hdrLevel?: number;
+}
+
+export const PRESET_SETTINGS: Record<ModelKey, Record<string, PresetSettings>> = {
+  clearreality: {
+    Standard: {
+      sharpness: 50,
+      denoise: 50,
+      faceEnhancement: 50,
+      colorLevel: 50,
+      hdrLevel: 50,
+      brightness: 50,
+      contrast: 50,
+    },
+    Fast: {
+      sharpness: 62,
+      denoise: 42,
+      faceEnhancement: 50,
+      colorLevel: 50,
+      hdrLevel: 50,
+      brightness: 50,
+      contrast: 55,
+    },
+    Crisp: {
+      sharpness: 78,
+      denoise: 30,
+      faceEnhancement: 50,
+      colorLevel: 55,
+      hdrLevel: 55,
+      brightness: 52,
+      contrast: 62,
+    },
+    Illustration: {
+      sharpness: 72,
+      denoise: 68,
+      faceEnhancement: 50,
+      colorLevel: 68,
+      hdrLevel: 52,
+      brightness: 54,
+      contrast: 58,
+    },
+  },
+  ultrasharp: {
+    Balanced: {
+      sharpness: 50,
+      denoise: 50,
+      faceEnhancement: 50,
+      colorLevel: 50,
+      hdrLevel: 50,
+      brightness: 50,
+      contrast: 50,
+    },
+    UltraSharp: {
+      sharpness: 88,
+      denoise: 35,
+      faceEnhancement: 50,
+      colorLevel: 55,
+      hdrLevel: 58,
+      brightness: 52,
+      contrast: 66,
+    },
+    Photography: {
+      sharpness: 66,
+      denoise: 45,
+      faceEnhancement: 58,
+      colorLevel: 62,
+      hdrLevel: 62,
+      brightness: 52,
+      contrast: 56,
+    },
+    Landscape: {
+      sharpness: 74,
+      denoise: 40,
+      faceEnhancement: 50,
+      colorLevel: 72,
+      hdrLevel: 70,
+      brightness: 50,
+      contrast: 60,
+    },
+  },
+  realesrgan: {
+    Balanced: {
+      sharpness: 50,
+      denoise: 50,
+      faceEnhancement: 50,
+      colorLevel: 50,
+      hdrLevel: 50,
+      brightness: 50,
+      contrast: 50,
+    },
+    Portrait: {
+      sharpness: 55,
+      denoise: 66,
+      faceEnhancement: 82,
+      colorLevel: 58,
+      hdrLevel: 52,
+      brightness: 56,
+      contrast: 52,
+    },
+    Landscape: {
+      sharpness: 70,
+      denoise: 44,
+      faceEnhancement: 50,
+      colorLevel: 66,
+      hdrLevel: 64,
+      brightness: 50,
+      contrast: 58,
+    },
+    Artwork: {
+      sharpness: 64,
+      denoise: 58,
+      faceEnhancement: 50,
+      colorLevel: 70,
+      hdrLevel: 56,
+      brightness: 52,
+      contrast: 55,
+    },
+  },
+};
+
+/**
+ * Build a full EnhancementOptions object for the given model preset.
+ * `base` keeps unrelated options (scale, booleans) as they are.
+ */
+export function buildPresetOptions(
+  modelKey: ModelKey,
+  preset: string,
+  base: EnhancementOptions
+): EnhancementOptions {
+  const settings =
+    PRESET_SETTINGS[modelKey]?.[preset] || PRESET_SETTINGS[modelKey]?.Standard || {};
+
+  return {
+    ...base,
+    preset,
+    sharpness: settings.sharpness ?? 50,
+    sharpenLevel: settings.sharpness ?? 50,
+    sharpen: true,
+    denoise: settings.denoise ?? 50,
+    removeNoiseLevel: settings.denoise ?? 50,
+    removeNoise: true,
+    faceEnhancement: settings.faceEnhancement ?? 50,
+    faceRestoreLevel: settings.faceEnhancement ?? 50,
+    faceRestore: (settings.faceEnhancement ?? 50) > 50,
+    colorLevel: settings.colorLevel ?? 50,
+    colorEnhance: (settings.colorLevel ?? 50) !== 50,
+    hdrLevel: settings.hdrLevel ?? 50,
+    hdrBoost: (settings.hdrLevel ?? 50) > 50,
+    brightness: settings.brightness ?? 50,
+    contrast: settings.contrast ?? 50,
+  };
+}
+
+/** Preset whose settings are all-neutral (i.e. the "Standard"/"Balanced" one). */
+export function getDefaultPreset(modelKey: ModelKey): string {
+  return modelKey === 'clearreality' ? 'Standard' : 'Balanced';
+}
 
 export const MODELS: Record<ModelKey, ModelConfig> = {
   clearreality: {
@@ -18,6 +193,7 @@ export const MODELS: Record<ModelKey, ModelConfig> = {
     recommendation: 'Best for instant previews, illustrations, portraits, anime, and fast processing on any hardware.',
     maxScale: 8,
     presets: ['Standard', 'Fast', 'Crisp', 'Illustration'],
+    defaultPreset: 'Standard',
     features: {
       faceRestore: true,
       colorEnhance: true,
@@ -41,6 +217,7 @@ export const MODELS: Record<ModelKey, ModelConfig> = {
     recommendation: 'Best for high-end photography, complex scenery, architectural details, and 8K fine-art prints.',
     maxScale: 8,
     presets: ['Balanced', 'UltraSharp', 'Photography', 'Landscape'],
+    defaultPreset: 'Balanced',
     features: {
       faceRestore: true,
       colorEnhance: true,
@@ -64,6 +241,7 @@ export const MODELS: Record<ModelKey, ModelConfig> = {
     recommendation: 'Best for portraits, professional photos, high-res prints, and 8K displays.',
     maxScale: 8,
     presets: ['Balanced', 'Portrait', 'Landscape', 'Artwork'],
+    defaultPreset: 'Balanced',
     features: {
       faceRestore: true,
       colorEnhance: true,

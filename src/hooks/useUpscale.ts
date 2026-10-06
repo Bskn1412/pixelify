@@ -12,6 +12,29 @@ import {
 import { runPass, createSession, loadONNX } from '../utils/upscale';
 import type { ModelKey, UpscaleResult, ProgressState, EnhancementOptions } from '../types';
 
+/* ============================================================
+   CANCELLATION REGISTRY
+   Each in-flight upscale run registers itself under the item id.
+   cancelUpscale(id) flips its flag, so loops between awaited steps
+   bail out with a CancellationError.
+   ============================================================ */
+
+const activeRuns = new Map<string, { cancelled: boolean }>();
+
+export function cancelUpscale(id: string): void {
+  const run = activeRuns.get(id);
+  if (run) {
+    run.cancelled = true;
+  }
+}
+
+class CancellationError extends Error {
+  constructor() {
+    super('Enhancement cancelled.');
+    this.name = 'CancellationError';
+  }
+}
+
 interface UseUpscaleParams {
   ortRef: React.MutableRefObject<any>;
   sessionRef: React.MutableRefObject<any>;
@@ -19,6 +42,7 @@ interface UseUpscaleParams {
 
 interface UseUpscaleReturn {
   upscale: (
+    id: string,
     img: HTMLImageElement,
     modelKey: ModelKey,
     options: EnhancementOptions,
@@ -29,6 +53,7 @@ interface UseUpscaleReturn {
 export function useUpscale({ ortRef, sessionRef }: UseUpscaleParams): UseUpscaleReturn {
   const upscale = useCallback(
     async (
+      id: string,
       img: HTMLImageElement,
       modelKey: ModelKey,
       options: EnhancementOptions,
@@ -45,6 +70,16 @@ export function useUpscale({ ortRef, sessionRef }: UseUpscaleParams): UseUpscale
       }
 
       const start = performance.now();
+      const run = { cancelled: false };
+      activeRuns.set(id, run);
+
+      /** Throw as soon as a cancel was requested for this run. */
+      const checkCancelled = () => {
+        if (run.cancelled) {
+          throw new CancellationError();
+        }
+      };
+
       const enhancementsApplied: string[] = [];
       const faceLevel = (options as any).faceEnhancement ?? (options as any).faceRestoreLevel ?? (options.faceRestore ? 50 : 50);
       const noiseLevel = (options as any).denoise ?? (options as any).removeNoiseLevel ?? (options.removeNoise ? 50 : 50);
@@ -71,6 +106,7 @@ export function useUpscale({ ortRef, sessionRef }: UseUpscaleParams): UseUpscale
 
       onProgress({ percent: 10, text: steps[0], stepIndex: 1, totalSteps: steps.length });
       await new Promise((r) => setTimeout(r, 100));
+      checkCancelled();
 
       let ort = ortRef.current;
       if (!ort) {
@@ -84,13 +120,20 @@ export function useUpscale({ ortRef, sessionRef }: UseUpscaleParams): UseUpscale
 
       // CRITICAL: Guarantee the session matches the selected modelKey!
       if (!session || (session as any).__modelKey !== modelKey) {
-        onProgress({ percent: 15, text: `Loading ${m.name}…`, stepIndex: 1, totalSteps: steps.length });
+        const onLoadProgress = (pct: number) =>
+          onProgress({
+            percent: 12 + Math.round(pct * 0.12),
+            text: `Loading ${m.name}… ${Math.round(pct)}%`,
+            stepIndex: 1,
+            totalSteps: steps.length,
+          });
+        onProgress({ percent: 12, text: `Loading ${m.name}… 0%`, stepIndex: 1, totalSteps: steps.length });
         try {
-          session = await createSession(ort, modelKey);
+          session = await createSession(ort, modelKey, undefined, onLoadProgress);
           sessionRef.current = session;
         } catch (loadErr) {
           console.warn(`Failed to create session for ${modelKey}, trying WASM fallback:`, loadErr);
-          session = await createSession(ort, modelKey, 'wasm');
+          session = await createSession(ort, modelKey, 'wasm', onLoadProgress);
           sessionRef.current = session;
         }
       }
@@ -118,6 +161,7 @@ export function useUpscale({ ortRef, sessionRef }: UseUpscaleParams): UseUpscale
 
           onProgress({ percent: 25, text: steps[1], stepIndex: 2, totalSteps: steps.length });
           await new Promise((r) => setTimeout(r, 80));
+          checkCancelled();
 
           const onSessionUpdated = (newSession: any) => {
             session = newSession;
@@ -127,6 +171,7 @@ export function useUpscale({ ortRef, sessionRef }: UseUpscaleParams): UseUpscale
           if (m.color === 'rgb') {
             let data = extractRGB(fullImg);
             for (let pass = 0; pass < numPasses; pass++) {
+              checkCancelled();
               data = await runPass(
                 ort, 
                 session, 
@@ -154,6 +199,7 @@ export function useUpscale({ ortRef, sessionRef }: UseUpscaleParams): UseUpscale
           } else {
             let { Y, Cb, Cr } = extractYCbCr(fullImg);
             for (let pass = 0; pass < numPasses; pass++) {
+              checkCancelled();
               const passDstW = cw * m.scale;
               const passDstH = ch * m.scale;
               Cb = resizeChannel(Cb, cw, ch, passDstW, passDstH);
@@ -184,6 +230,8 @@ export function useUpscale({ ortRef, sessionRef }: UseUpscaleParams): UseUpscale
             outH = ch;
           }
         } catch (e: any) {
+          // A cancel must never fall back into a full canvas re-render.
+          if (run.cancelled || e?.name === 'CancellationError') throw e;
           console.error('[useUpscale] ONNX INFERENCE ERROR:', e?.message || e, e?.stack);
           const fallback = upscaleWithCanvas(img, scale, options);
           rawRgba = fallback.rgba;
@@ -195,6 +243,7 @@ export function useUpscale({ ortRef, sessionRef }: UseUpscaleParams): UseUpscale
         // High quality local super-sampling
         onProgress({ percent: 50, text: steps[2], stepIndex: 3, totalSteps: steps.length });
         await new Promise((r) => setTimeout(r, 200));
+        checkCancelled();
         const res = upscaleWithCanvas(img, scale, options);
         rawRgba = res.rgba;
         outW = res.width;
@@ -203,6 +252,10 @@ export function useUpscale({ ortRef, sessionRef }: UseUpscaleParams): UseUpscale
 
       onProgress({ percent: 88, text: steps[4], stepIndex: 5, totalSteps: steps.length });
       await new Promise((r) => setTimeout(r, 120));
+      checkCancelled();
+
+      // Unregister before the final non-cancellable encoding step.
+      activeRuns.delete(id);
 
       // Final canvas buffer post-processing & exact target scale fitting
       let finalCanvas = document.createElement('canvas');
@@ -227,6 +280,7 @@ export function useUpscale({ ortRef, sessionRef }: UseUpscaleParams): UseUpscale
       }
 
       applyCanvasEnhancements(finalCanvas, options);
+      checkCancelled();
 
       const finalCtx = finalCanvas.getContext('2d', { willReadFrequently: true })!;
       const finalImgData = finalCtx.getImageData(0, 0, outW, outH);

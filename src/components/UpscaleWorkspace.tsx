@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { MODELS } from "../constants";
+import { MODELS, buildPresetOptions } from "../constants";
 import type {
   ModelKey,
   Step,
@@ -8,7 +8,6 @@ import type {
   UpscaleItem,
 } from "../types";
 import ParameterSlider from "./ParameterSlider";
-import SolvingOrb from "./SolvingOrb";
 import "./solving-orb.css";
 import {
   Sparkles,
@@ -19,6 +18,9 @@ import {
   SlidersHorizontal,
   Volume2,
   VolumeX,
+  Menu,
+  X,
+  Images
 } from "lucide-react";
 import {
   isSoundEnabled,
@@ -27,6 +29,7 @@ import {
   primeAudio,
 } from "../utils/notifications";
 import UpscalerLoader from "./upscaling-loader";
+import ModelLoader from "./upscaler/ModelLoader";
 
 /* ============================================================
    IMAGE CIRCLE ICON (Replacement for header star)
@@ -65,14 +68,23 @@ interface UpscaleWorkspaceProps {
   onAddFile: (file: File) => void;
 
   isLoading: boolean;
+  /** 0–100 real progress of the in-flight neural model load (null when idle). */
+  modelProgress?: number | null;
 
   onModelChange: (id: string, key: ModelKey) => void;
   onOptionsChange: (id: string, options: EnhancementOptions) => void;
   onResetSettings: (id: string) => void;
 
   onUpscale: (id: string) => void;
+  /** Aborts the in-flight enhancement for the active item (Cancel button while processing). */
+  onCancel?: (id: string) => void;
   onDownload: (id: string, format?: "png" | "webp" | "jpeg") => void;
   onReset?: () => void;
+
+  /** MOBILE: opens the navigation sidebar drawer (hamburger icon, top-left) */
+  onOpenMobileSidebar?: () => void;
+  /** MOBILE: close the editor and return to the upscaler home (upload step) */
+  onExitWorkspace?: () => void;
 }
 
 /* ============================================================
@@ -91,19 +103,55 @@ const DEFAULT_ENHANCEMENT_SETTINGS = {
 };
 
 /* ============================================================
-   CUSTOM MODEL DROPDOWN COMPONENT (Requirement 2)
-   Shows model name and below it a concise 1-line description
+   MODEL GLYPH ICONS (image-2 style tile icons)
+   Simple monochrome glyphs rendered inside a rounded tile.
    ============================================================ */
+
+function ModelGlyph({ model, className = "h-4.5 w-4.5" }: { model: ModelKey; className?: string }) {
+  if (model === "clearreality") {
+    /* Crisp diagonal edges */
+    return (
+      <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+        <rect x="3" y="3" width="7" height="7" rx="1.6" />
+        <rect x="14" y="14" width="7" height="7" rx="1.6" />
+        <rect x="12.5" y="8" width="4" height="4" rx="1" opacity="0.5" />
+        <rect x="7.5" y="12" width="4" height="4" rx="1" opacity="0.5" />
+      </svg>
+    );
+  }
+
+  if (model === "ultrasharp") {
+    /* Rising detail bars */
+    return (
+      <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+        <rect x="4" y="13.5" width="3.6" height="6.5" rx="1" opacity="0.55" />
+        <rect x="10.2" y="9" width="3.6" height="11" rx="1" opacity="0.8" />
+        <rect x="16.4" y="4" width="3.6" height="16" rx="1" />
+      </svg>
+    );
+  }
+
+  /* realesrgan — layered restoration stack */
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <rect x="3" y="14" width="7" height="7" rx="1.6" opacity="0.5" />
+      <rect x="8.5" y="8.5" width="7" height="7" rx="1.6" opacity="0.75" />
+      <rect x="14" y="3" width="7" height="7" rx="1.6" />
+    </svg>
+  );
+}
+
+interface ModelDropdownProps {
+  selectedKey: ModelKey;
+  onChange: (key: ModelKey) => void;
+  disabled?: boolean;
+}
 
 function ModelDropdown({
   selectedKey,
   onChange,
   disabled,
-}: {
-  selectedKey: ModelKey;
-  onChange: (key: ModelKey) => void;
-  disabled?: boolean;
-}) {
+}: ModelDropdownProps) {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -120,30 +168,80 @@ function ModelDropdown({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [open]);
 
-  const activeModel = MODELS[selectedKey];
-
-  const MODEL_METADATA: Record<ModelKey, { label: string; desc: string; badge: string }> = {
+  const MODEL_METADATA: Record<
+    ModelKey,
+    { label: string; full: string; desc: string; popular?: boolean }
+  > = {
     clearreality: {
-      label: MODELS.clearreality?.name || "4x-ClearReality V1 (Fast / Clean)",
-      desc: "Ultra-fast neural inference • Crisp edges, de-blurring & illustration clarity",
-      badge: "Fast & Crisp",
+      label: "ClearReality",
+      full: MODELS.clearreality?.name || "ClearReality",
+      desc: "Fastest model, crisp clean edges.",
+      popular: true,
     },
     ultrasharp: {
-      label: MODELS.ultrasharp?.name || "4x-UltraSharp (Extreme Clarity & 8K)",
-      desc: "Deep generative ESRGAN • Extreme micro-textures, photorealism & 8K clarity",
-      badge: "8K UltraSharp",
+      label: "UltraSharp",
+      full: MODELS.ultrasharp?.name || "UltraSharp",
+      desc: "Max detail, up to 8K output.",
     },
     realesrgan: {
-      label: MODELS.realesrgan?.name || "Real-ESRGAN Studio (4× / 8×)",
-      desc: "Deep residual network • Studio portrait restoration, artifact removal & precision",
-      badge: "Studio 8K",
+      label: "Real-ESRGAN",
+      full: MODELS.realesrgan?.name || "Real-ESRGAN",
+      desc: "Natural detail for portraits & photos.",
     },
   };
 
-  const current = MODEL_METADATA[selectedKey] || {
-    label: activeModel?.name || selectedKey,
-    desc: activeModel?.description || "",
-    badge: "AI Model",
+  const renderRow = (key: ModelKey, isSelected: boolean, onClick: () => void) => {
+    const meta = MODEL_METADATA[key];
+
+    return (
+      <button
+        key={key}
+        type="button"
+        role="option"
+        aria-selected={isSelected}
+        onClick={onClick}
+        className={`
+          group flex w-full cursor-pointer items-center gap-3 rounded-xl p-3 text-left transition-colors
+          ${
+            isSelected
+              ? "bg-[#00FF85]/[0.08]"
+              : "hover:bg-white/[0.05]"
+          }
+        `}
+      >
+        {/* ICON TILE */}
+        <div
+          className={`
+            flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition-colors
+            ${
+              isSelected
+                ? "border-[#00FF85]/40 bg-[#00FF85]/15 text-[#00FF85]"
+                : "border-white/10 bg-white/[0.05] text-white/85 group-hover:text-white"
+            }
+          `}
+        >
+          <ModelGlyph model={key} className="h-4 w-4" />
+        </div>
+
+        {/* NAME + SIMPLE 1-LINE DESCRIPTION */}
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-[13px] font-semibold text-white" title={meta.full}>
+            {meta.label}
+          </div>
+          <div className="mt-0.5 truncate text-[11px] text-white/45">
+            {meta.desc}
+          </div>
+        </div>
+
+        {/* RIGHT: POPULAR TAG (top right) + CHECK */}
+        {meta.popular && (
+          <span className="shrink-0 rounded-md bg-[#C7FF00]/15 px-1.5 py-0.5 text-[9.5px] font-bold text-[#C7FF00]">
+            Popular
+          </span>
+        )}
+        {isSelected && <Check className="h-3.5 w-3.5 shrink-0 text-[#00FF85]" />}
+      </button>
+    );
   };
 
   return (
@@ -156,28 +254,43 @@ function ModelDropdown({
         aria-haspopup="listbox"
         aria-expanded={open}
         className={`
-          flex w-full items-center justify-between gap-3 rounded-xl border p-3.5 text-left transition-all
+          flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-all
           ${
             open
-              ? "border-[#00FF85]/60 bg-[#16161c] shadow-[0_0_20px_rgba(0,255,133,0.15)]"
-              : "border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.06]"
+              ? "border-[#00FF85]/50 bg-[#16161c] shadow-[0_0_20px_rgba(0,255,133,0.12)]"
+              : "border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.05]"
           }
           ${disabled ? "opacity-40 cursor-not-allowed pointer-events-none" : "cursor-pointer"}
         `}
       >
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-bold text-white truncate">
-              {current.label}
-            </span>
-            <span className="rounded-full bg-[#00FF85]/15 border border-[#00FF85]/30 px-2 py-0.5 text-[10px] font-bold text-[#00FF85]">
-              {current.badge}
-            </span>
-          </div>
-          <p className="mt-1 text-[11.5px] text-white/55 truncate">
-            {current.desc}
-          </p>
+        {/* ICON TILE */}
+        <div
+          className={`
+            flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border
+            ${
+              selectedKey === "clearreality"
+                ? "border-[#00FF85]/40 bg-[#00FF85]/15 text-[#00FF85]"
+                : "border-white/10 bg-white/[0.05] text-white/85"
+            }
+          `}
+        >
+          <ModelGlyph model={selectedKey} className="h-4 w-4" />
         </div>
+
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-[13px] font-semibold text-white" title={MODEL_METADATA[selectedKey].full}>
+            {MODEL_METADATA[selectedKey].label}
+          </div>
+          <div className="mt-0.5 truncate text-[11px] text-white/45">
+            {MODEL_METADATA[selectedKey].desc}
+          </div>
+        </div>
+
+        {MODEL_METADATA[selectedKey].popular && (
+          <span className="shrink-0 rounded-md bg-[#C7FF00]/15 px-1.5 py-0.5 text-[9.5px] font-bold text-[#C7FF00]">
+            Popular
+          </span>
+        )}
 
         <ChevronDown
           className={`h-4 w-4 shrink-0 text-white/60 transition-transform duration-200 ${
@@ -188,58 +301,16 @@ function ModelDropdown({
 
       {/* Popover Menu */}
       {open && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-2 flex flex-col gap-1.5 rounded-2xl border border-white/15 bg-[#141418] p-2 shadow-2xl backdrop-blur-2xl animate-in fade-in slide-in-from-top-2 duration-150">
-          {(Object.keys(MODELS) as ModelKey[]).map((key) => {
-            const isSelected = key === selectedKey;
-            const meta = MODEL_METADATA[key] || {
-              label: MODELS[key]?.name || key,
-              desc: MODELS[key]?.description || "",
-              badge: "Model",
-            };
-
-            return (
-              <button
-                key={key}
-                type="button"
-                onClick={() => {
-                  onChange(key);
-                  setOpen(false);
-                }}
-                className={`
-                  group flex w-full items-start justify-between gap-3 rounded-xl p-3 text-left transition-all
-                  ${
-                    isSelected
-                      ? "bg-[#00FF85]/10 border border-[#00FF85]/30 text-white"
-                      : "hover:bg-white/[0.06] border border-transparent text-white/80 hover:text-white"
-                  }
-                `}
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-white">
-                      {meta.label}
-                    </span>
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-[9.5px] font-semibold ${
-                        isSelected
-                          ? "bg-[#00FF85] text-black font-bold"
-                          : "bg-white/10 text-white/70"
-                      }`}
-                    >
-                      {meta.badge}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-[11px] leading-relaxed text-white/55 group-hover:text-white/75">
-                    {meta.desc}
-                  </p>
-                </div>
-
-                {isSelected && (
-                  <Check className="h-4 w-4 shrink-0 text-[#00FF85] mt-0.5" />
-                )}
-              </button>
-            );
-          })}
+        <div
+          role="listbox"
+          className="absolute left-0 right-0 top-full z-50 mt-2 flex flex-col gap-0.5 rounded-2xl border border-white/15 bg-[#141418] p-2 shadow-2xl backdrop-blur-2xl animate-in fade-in slide-in-from-top-2 duration-150"
+        >
+          {(Object.keys(MODELS) as ModelKey[]).map((key) =>
+            renderRow(key, key === selectedKey, () => {
+              onChange(key);
+              setOpen(false);
+            })
+          )}
         </div>
       )}
     </div>
@@ -257,12 +328,16 @@ export default function UpscaleWorkspace({
   onRemoveId,
   onAddFile,
   isLoading,
+  modelProgress,
   onModelChange,
   onOptionsChange,
   onResetSettings,
   onUpscale,
+  onCancel,
   onDownload,
   onReset,
+  onOpenMobileSidebar,
+  onExitWorkspace,
 }: UpscaleWorkspaceProps) {
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [soundOn, setSoundOn] = useState(() => isSoundEnabled());
@@ -309,15 +384,521 @@ export default function UpscaleWorkspace({
     });
   };
 
+  /* ----------------------------------------------------------
+     CANCEL PROCESSING → aborts the in-flight upscale run
+     ---------------------------------------------------------- */
+  const handleCancelProcessing = () => {
+    if (isProcessing && onCancel) {
+      onCancel(activeItem.id);
+    }
+  };
+
+  /* ----------------------------------------------------------
+     MOBILE: CANCEL (X) → back to the upscaler home
+     ---------------------------------------------------------- */
+  const handleExitWorkspace = () => {
+    if (onExitWorkspace) {
+      onExitWorkspace();
+    } else {
+      onReset?.();
+    }
+  };
+
+  /* ----------------------------------------------------------
+     SHARED ADVANCED CONTROLS (presets + sliders)
+     Rendered inside the desktop collapsible and — on mobile —
+     inside the scrollable advanced view of the same card.
+     ---------------------------------------------------------- */
+  const advancedControls = (
+    <>
+      {/* Presets — each preset applies real enhancement values. Moving any
+          slider manually clears the active preset selection. */}
+      {model?.presets && (
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-xs font-medium text-white/50">
+              Preset
+            </div>
+            {options.preset && (
+              <span className="rounded-full bg-[#00FF85]/10 border border-[#00FF85]/25 px-2 py-0.5 text-[10px] font-semibold text-[#00FF85]">
+                {options.preset}
+              </span>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {model.presets.map((p: string) => {
+              const active = options.preset === p;
+
+              return (
+                <button
+                  key={p}
+                  type="button"
+                  disabled={busy}
+                  aria-pressed={active}
+                  onClick={() =>
+                    onOptionsChange(
+                      activeItem.id,
+                      buildPresetOptions(modelKey, p, options)
+                    )
+                  }
+                  className={`
+                    rounded-lg
+                    px-3
+                    py-1.5
+                    text-xs
+                    font-medium
+                    transition-all
+                    disabled:opacity-30
+                    cursor-pointer
+                    ${
+                      active
+                        ? "border border-[#00FF85]/50 bg-[#00FF85]/15 text-[#00FF85] font-semibold shadow-[0_0_12px_rgba(0,255,133,0.12)]"
+                        : "border border-white/10 bg-white/[0.03] text-white/80 hover:border-white/20 hover:bg-white/[0.08] hover:text-white"
+                    }
+                  `}
+                >
+                  {p}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Sliders with disabled={busy} and fixed tooltips.
+          Moving a slider clears the active preset (custom tuning). */}
+      <ParameterSlider
+        label="Sharpness"
+        value={options.sharpness ?? options.sharpenLevel ?? 50}
+        min={0}
+        max={100}
+        disabled={busy}
+        onChange={(value) => onOptionsChange(activeItem.id, { ...options, preset: undefined, sharpness: value, sharpenLevel: value, sharpen: true })}
+        info="Controls how strongly fine edges and details are enhanced."
+      />
+
+      <ParameterSlider
+        label="Denoise"
+        value={options.denoise ?? options.removeNoiseLevel ?? 50}
+        min={0}
+        max={100}
+        disabled={busy}
+        onChange={(value) => onOptionsChange(activeItem.id, { ...options, preset: undefined, denoise: value, removeNoiseLevel: value, removeNoise: true })}
+        info="Reduces noise, grain and compression artifacts."
+      />
+
+      {model?.features?.faceRestore && (
+        <ParameterSlider
+          label="Face enhancement"
+          value={options.faceEnhancement ?? options.faceRestoreLevel ?? 50}
+          min={0}
+          max={100}
+          disabled={busy}
+          onChange={(value) => onOptionsChange(activeItem.id, { ...options, preset: undefined, faceEnhancement: value, faceRestoreLevel: value, faceRestore: true } as EnhancementOptions)}
+          info="Controls the strength of facial detail restoration."
+        />
+      )}
+
+      {model?.features?.colorEnhance && (
+        <ParameterSlider
+          label="Color enhancement"
+          value={options.colorLevel ?? 50}
+          min={0}
+          max={100}
+          disabled={busy}
+          onChange={(value) => onOptionsChange(activeItem.id, { ...options, preset: undefined, colorLevel: value, colorEnhance: value !== 50 } as EnhancementOptions)}
+          info="Enhances color richness, vibrancy and overall color balance."
+        />
+      )}
+
+      {model?.features?.hdrBoost && (
+        <ParameterSlider
+          label="HDR"
+          value={options.hdrLevel ?? 50}
+          min={0}
+          max={100}
+          disabled={busy}
+          onChange={(value) => onOptionsChange(activeItem.id, { ...options, preset: undefined, hdrLevel: value, hdrBoost: value !== 50 } as EnhancementOptions)}
+          info="Enhances dynamic range, highlights and shadow details."
+        />
+      )}
+
+      <ParameterSlider
+        label="Brightness"
+        value={options.brightness ?? 50}
+        min={0}
+        max={100}
+        disabled={busy}
+        onChange={(value) => onOptionsChange(activeItem.id, { ...options, preset: undefined, brightness: value } as EnhancementOptions)}
+        info="Adjusts the overall brightness of the image."
+      />
+
+      <ParameterSlider
+        label="Contrast"
+        value={options.contrast ?? 50}
+        min={0}
+        max={100}
+        disabled={busy}
+        onChange={(value) => onOptionsChange(activeItem.id, { ...options, preset: undefined, contrast: value } as EnhancementOptions)}
+        info="Controls the difference between light and dark areas."
+      />
+    </>
+  );
+
+  /* ----------------------------------------------------------
+     MOBILE: ADVANCED SETTINGS TOGGLE ROW (label left, icon right
+     — matches the reference design). Toggles between the basic
+     controls (Model / Scale factor) and the advanced sliders.
+     ---------------------------------------------------------- */
+  const advancedToggleRow = (
+    <button
+      type="button"
+      onClick={() => setAdvancedOpen((v) => !v)}
+      disabled={busy}
+      aria-expanded={advancedOpen}
+      className={`
+        flex
+        w-full
+        items-center
+        justify-between
+        rounded-xl
+        border
+        p-3.5
+        text-left
+        text-sm
+        font-semibold
+        transition-colors
+        cursor-pointer
+        disabled:opacity-40
+        ${
+          advancedOpen
+            ? "border-[#00FF85]/40 bg-[#00FF85]/10 text-white"
+            : "border-white/[0.08] bg-white/[0.02] text-white/90 hover:bg-white/[0.05]"
+        }
+      `}
+    >
+      <span>Advanced Settings</span>
+
+      <SlidersHorizontal
+        className={`h-4 w-4 ${advancedOpen ? "text-[#00FF85]" : "text-white/60"}`}
+      />
+    </button>
+  );
+
+  /* ----------------------------------------------------------
+     SHARED PRIMARY ACTION BUTTON — identical on mobile and desktop
+     (idle → "Upscale {scale}x" · completed → "Download Result").
+     While processing, the same row gains a Cancel button next to
+     the disabled Enhancing… button.
+     ---------------------------------------------------------- */
+  const actionArea = (
+    <div className="shrink-0">
+      {hasResult ? (
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => onDownload(activeItem.id, "png")}
+            className="
+              flex flex-1 cursor-pointer items-center justify-center gap-2
+              rounded-xl bg-[#00FF85] px-4 py-3 text-sm font-bold text-black
+              shadow-[0_10px_30px_rgba(0,255,133,0.25)]
+              transition-all duration-200 hover:bg-[#00E599] active:scale-[0.98]
+            "
+          >
+            <Download className="h-4 w-4" />
+            <span>Download</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onUpscale(activeItem.id)}
+            disabled={busy}
+            title="Run the enhancement again"
+            className="
+              flex cursor-pointer items-center justify-center gap-2 rounded-xl
+              border border-white/15 bg-white/[0.06] px-4 py-3 text-sm
+              font-semibold text-white transition-all duration-200
+              hover:bg-white/[0.12] active:scale-[0.98] disabled:opacity-30
+            "
+          >
+            <RotateCcw className="h-4 w-4" />
+            <span>Re-enhance</span>
+          </button>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => onUpscale(activeItem.id)}
+            disabled={busy}
+            className="
+              flex flex-1 cursor-pointer items-center justify-center gap-2
+              rounded-xl bg-[#00FF85] px-5 py-3 text-sm font-bold text-black
+              shadow-[0_10px_30px_rgba(0,255,133,0.25)]
+              transition-all duration-200 hover:bg-[#00E599]
+              active:scale-[0.98] disabled:cursor-wait disabled:opacity-40
+            "
+          >
+            <ImageCircleIcon className="h-5 w-5 text-black" />
+            <span>{busy ? "Enhancing…" : `Upscale ${options.scale}x`}</span>
+          </button>
+
+          {isProcessing && (
+            <button
+              type="button"
+              onClick={handleCancelProcessing}
+              title="Cancel the current enhancement"
+              className="
+                flex cursor-pointer items-center justify-center gap-1.5 rounded-xl
+                border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm
+                font-semibold text-red-300 transition-all duration-200
+                hover:bg-red-500/20 hover:text-red-200 active:scale-[0.98]
+              "
+            >
+              <X className="h-4 w-4" />
+              <span>Cancel</span>
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+
   return (
-    <div className="flex flex-col lg:flex-row w-full gap-6 items-start">
+    <>
+      {/* ========================================================
+          MOBILE LAYOUT (< lg): full-screen fixed view — image on
+          top (fixed height), adjustment card below (fills the rest).
+          No page scrolling; only the advanced sliders scroll inside
+          the card.
+         ======================================================== */}
+      <div className="lg:hidden fixed inset-0 z-40 flex w-full flex-col overflow-hidden bg-[#0a0a0c]">
+        {/* TOP BAR: sidebar menu (left) · cancel (right) */}
+        <div className="flex h-14 w-full shrink-0 items-center justify-between px-3">
+          {/* SIDEBAR MENU ICON (replaces the "Upscale" heading on mobile) */}
+          <button
+            type="button"
+            onClick={onOpenMobileSidebar}
+            aria-label="Open navigation menu"
+            className="
+              flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center
+              rounded-full border border-white/15 bg-white/[0.06] text-white
+              transition-all active:scale-95
+            "
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+
+          <div className="flex items-center gap-2">
+            {/* CANCEL → back to the upscaler home */}
+            <button
+              type="button"
+              onClick={handleExitWorkspace}
+              title="Back to upscaler home"
+              aria-label="Close and return to upscaler home"
+              className="
+                flex h-10 w-10 cursor-pointer items-center justify-center rounded-full
+                border border-white/15 bg-white/[0.06] text-white
+                transition-all active:scale-95 hover:bg-white/[0.12]
+              "
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* IMAGE SHOWCASE — FIXED HEIGHT */}
+        <div className="w-full shrink-0 px-3">
+          <div className="relative h-[40vh] max-h-[480px] min-h-[210px] w-full overflow-hidden rounded-2xl border border-white/[0.08] bg-[#070709] shadow-2xl isolate">
+            {/* Subtle canvas grid pattern */}
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:20px_20px] opacity-40" />
+
+            {hasResult && resultUrl ? (
+              <BeforeAfterSlider before={imageUrl} after={resultUrl} />
+            ) : (
+              <div className="relative flex h-full w-full items-center justify-center">
+                <img
+                  src={imageUrl}
+                  alt={activeItem.name || "Uploaded preview"}
+                  className="
+                    block
+                    h-full
+                    w-full
+                    object-contain
+                    select-none
+                  "
+                  draggable={false}
+                />
+              </div>
+            )}
+
+            {/* SOLVING ORB PROCESSING OVERLAY */}
+            {isProcessing && (
+              <div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center overflow-hidden bg-black/45 backdrop-blur-[3px]">
+                <div className="relative z-20 flex flex-col items-center gap-3 px-8 py-6 text-center">
+                  <UpscalerLoader />
+
+                  {/* LIVE PERCENTAGE */}
+                  <div className="font-mono text-3xl font-black tabular-nums tracking-tight text-white">
+                    {Math.min(100, Math.max(0, Math.round(activeItem.progress?.percent ?? 0)))}
+                    <span className="text-lg font-bold text-[#00FF85]">%</span>
+                  </div>
+
+                  <div className="max-w-[240px] truncate text-sm font-bold tracking-wide text-white">
+                    Enhancing {activeItem.name}
+                  </div>
+
+                  <div className="flex items-center gap-2 rounded-full border border-[#00FF85]/30 bg-[#00FF85]/10 px-3 py-1 text-[9px] font-semibold text-[#00FF85]">
+                    <span className="h-1.5 w-1.5 animate-ping rounded-full bg-[#00FF85]" />
+                    <span>Neural Super-Resolution Active</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* MODEL LOADING OVERLAY — shown while the neural model downloads/compiles */}
+            {isLoading && !isProcessing && (
+              <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-4 overflow-hidden bg-black/55 backdrop-blur-[3px]">
+                <div className="flex w-[70%] max-w-[380px] justify-center">
+                  <ModelLoader progress={modelProgress} />
+                </div>
+                <div className="text-sm font-bold tracking-wide text-white">
+                  Loading AI model...
+                </div>
+                <div className="max-w-[240px] text-center text-[11px] text-white/50">
+                  The neural model downloads once, then runs from your browser cache.
+                </div>
+              </div>
+            )}
+
+          </div>
+        </div>
+
+        {/* ADJUSTMENTS CARD — fills the remaining height, no page scrolling */}
+        <div className="flex w-full min-h-0 flex-1 flex-col px-3 pb-3 pt-3">
+          <div className="flex h-full min-h-0 flex-col rounded-2xl border border-white/[0.08] bg-[#121216] p-4 shadow-2xl">
+            {/* INLINE ERROR */}
+            {activeItem.status === "error" && activeItem.error && (
+              <div className="mb-3 shrink-0 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-[11px] font-medium text-red-300">
+                {activeItem.error}
+              </div>
+            )}
+
+            {!advancedOpen ? (
+              /* ---------- BASIC: Model + Scale factor ---------- */
+              <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+                {/* MODEL */}
+                <div className="shrink-0">
+                  <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-white/50">
+                    Model
+                  </div>
+
+                  <ModelDropdown
+                    selectedKey={modelKey}
+                    onChange={(key) => onModelChange(activeItem.id, key)}
+                    disabled={busy}
+                  />
+                </div>
+
+                {/* SCALE FACTOR */}
+                <div className="mt-4 shrink-0">
+                  <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-white/50">
+                    Scale factor
+                  </div>
+
+                  <div className="flex rounded-2xl border border-white/10 bg-white/[0.03] p-1.5">
+                    {[2, 4, 8].map((s) => {
+                      if (s === 8 && model?.maxScale && model.maxScale < 8) {
+                        return null;
+                      }
+
+                      const active = options.scale === (s as ScaleFactor);
+
+                      return (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={() => selectScale(s as ScaleFactor)}
+                          disabled={busy}
+                          className={`
+                            flex-1
+                            rounded-xl
+                            py-2.5
+                            text-sm
+                            font-bold
+                            transition-all
+                            ${
+                              active
+                                ? "bg-white text-black shadow-lg"
+                                : "text-white/60 hover:text-white"
+                            }
+                            disabled:opacity-30
+                          `}
+                        >
+                          {s}x
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* ADVANCED SETTINGS + ACTION — pinned to the bottom of the card */}
+                <div className="mt-auto shrink-0 pt-4">
+                  {advancedToggleRow}
+                  <div className="pt-3" />
+                  {actionArea}
+                </div>
+              </div>
+            ) : (
+              /* ---------- ADVANCED: sliders replace the basic controls (scrollable) ---------- */
+              <>
+                {/* HEADER ROW: label + Reset (matches the desktop panel header) */}
+                <div className="flex shrink-0 items-center justify-between pb-2">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-white/50">
+                    Advanced
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={resetEnhancementSettings}
+                    disabled={busy}
+                    title="Reset enhancement controls to defaults"
+                    className="
+                      flex cursor-pointer items-center gap-1.5 rounded-lg border
+                      border-white/10 bg-white/[0.03] px-2.5 py-1.5 text-xs
+                      font-medium text-white/60 transition-colors
+                      hover:bg-white/[0.06] hover:text-white disabled:opacity-30
+                    "
+                  >
+                    <RotateCcw className="h-3.5 w-3.5" />
+                    <span>Reset</span>
+                  </button>
+                </div>
+
+                <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
+                  {advancedControls}
+                </div>
+
+                <div className="shrink-0 pt-3">
+                  {advancedToggleRow}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ========================================================
+          DESKTOP LAYOUT (lg+): unchanged two-column workspace
+         ======================================================== */}
+      <div className="hidden lg:flex lg:flex-row w-full gap-6 items-start">
       {/* ======================================================
           LEFT SECTION: IMAGE CANVAS + INDIVIDUAL ADD/THUMB STRIP BELOW (Req 5 & 6)
          ====================================================== */}
       <div className="flex-1 min-w-0 flex flex-col gap-4 w-full">
         
         {/* 5. IMAGE SHOWCASE DIV (Big, properly fits uploaded image in view) */}
-        <div className="relative w-full h-[540px] lg:h-[690px] max-h-[80vh] rounded-2xl border border-white/[0.08] bg-[#070709] flex items-center justify-center overflow-hidden p-3 sm:p-6 shadow-2xl isolate">
+        <div className="relative w-full h-[620px] lg:h-[760px] max-h-[82vh] rounded-2xl border border-white/[0.08] bg-[#070709] flex items-center justify-center overflow-hidden p-3 sm:p-6 shadow-2xl isolate">
           {/* Subtle canvas grid pattern */}
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:20px_20px] opacity-40" />
 
@@ -375,6 +956,21 @@ export default function UpscaleWorkspace({
               </div>
             </div>
           )}
+
+          {/* MODEL LOADING OVERLAY — shown while the neural model downloads/compiles */}
+          {isLoading && !isProcessing && (
+            <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-4 overflow-hidden bg-black/55 backdrop-blur-[3px]">
+              <div className="flex w-[70%] max-w-[380px] justify-center">
+                <ModelLoader progress={modelProgress} />
+              </div>
+              <div className="text-sm font-bold tracking-wide text-white">
+                Loading AI model...
+              </div>
+              <div className="max-w-[260px] text-center text-[11px] text-white/50">
+                The neural model downloads once, then runs from your browser cache.
+              </div>
+            </div>
+          )}
         </div>
 
         {/* 6. INDIVIDUAL '+ ADD' SECTION (Stays still & in middle of image below section) */}
@@ -416,8 +1012,8 @@ export default function UpscaleWorkspace({
         {/* HEADER (With image-circle.svg icon to the left of Upscale) */}
         <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#00FF85]/10 text-[#00FF85]">
-              <ImageCircleIcon className="h-5 w-5 text-[#00FF85]" />
+            <div className="flex h-8 w-8 items-center justify-center">
+              <Images className="h-7 w-7 text-[#00FF85]" />
             </div>
             <div>
               <div className="text-base font-bold text-white tracking-wide">
@@ -588,209 +1184,18 @@ export default function UpscaleWorkspace({
 
           {advancedOpen && (
             <div className={`mt-4 space-y-5 rounded-xl border border-white/[0.06] bg-black/20 p-4 transition-opacity ${busy ? "opacity-50 pointer-events-none" : ""}`}>
-              {/* Presets */}
-              {model?.presets && (
-                <div>
-                  <div className="text-xs font-medium text-white/50 mb-2">
-                    Preset
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {model.presets.map((p: string) => (
-                      <button
-                        key={p}
-                        type="button"
-                        disabled={busy}
-                        onClick={() => onOptionsChange(activeItem.id, { ...options, preset: p })}
-                        className="
-                          rounded-lg
-                          border border-white/10
-                          bg-white/[0.03]
-                          px-3
-                          py-1.5
-                          text-xs
-                          font-medium
-                          text-white/80
-                          transition-colors
-                          hover:border-white/20
-                          hover:bg-white/[0.08]
-                          hover:text-white
-                          disabled:opacity-30
-                        "
-                      >
-                        {p}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Sliders with disabled={busy} and fixed tooltips */}
-              <ParameterSlider
-                label="Sharpness"
-                value={options.sharpness ?? options.sharpenLevel ?? 50}
-                min={0}
-                max={100}
-                disabled={busy}
-                onChange={(value) => onOptionsChange(activeItem.id, { ...options, sharpness: value, sharpenLevel: value, sharpen: true })}
-                info="Controls how strongly fine edges and details are enhanced."
-              />
-
-              <ParameterSlider
-                label="Denoise"
-                value={options.denoise ?? options.removeNoiseLevel ?? 50}
-                min={0}
-                max={100}
-                disabled={busy}
-                onChange={(value) => onOptionsChange(activeItem.id, { ...options, denoise: value, removeNoiseLevel: value, removeNoise: true })}
-                info="Reduces noise, grain and compression artifacts."
-              />
-
-              {model?.features?.faceRestore && (
-                <ParameterSlider
-                  label="Face enhancement"
-                  value={options.faceEnhancement ?? options.faceRestoreLevel ?? 50}
-                  min={0}
-                  max={100}
-                  disabled={busy}
-                  onChange={(value) => onOptionsChange(activeItem.id, { ...options, faceEnhancement: value, faceRestoreLevel: value, faceRestore: true } as EnhancementOptions)}
-                  info="Controls the strength of facial detail restoration."
-                />
-              )}
-
-              {model?.features?.colorEnhance && (
-                <ParameterSlider
-                  label="Color enhancement"
-                  value={options.colorLevel ?? 50}
-                  min={0}
-                  max={100}
-                  disabled={busy}
-                  onChange={(value) => onOptionsChange(activeItem.id, { ...options, colorLevel: value, colorEnhance: value !== 50 } as EnhancementOptions)}
-                  info="Enhances color richness, vibrancy and overall color balance."
-                />
-              )}
-
-              {model?.features?.hdrBoost && (
-                <ParameterSlider
-                  label="HDR"
-                  value={options.hdrLevel ?? 50}
-                  min={0}
-                  max={100}
-                  disabled={busy}
-                  onChange={(value) => onOptionsChange(activeItem.id, { ...options, hdrLevel: value, hdrBoost: value !== 50 } as EnhancementOptions)}
-                  info="Enhances dynamic range, highlights and shadow details."
-                />
-              )}
-
-              <ParameterSlider
-                label="Brightness"
-                value={options.brightness ?? 50}
-                min={0}
-                max={100}
-                disabled={busy}
-                onChange={(value) => onOptionsChange(activeItem.id, { ...options, brightness: value } as EnhancementOptions)}
-                info="Adjusts the overall brightness of the image."
-              />
-
-              <ParameterSlider
-                label="Contrast"
-                value={options.contrast ?? 50}
-                min={0}
-                max={100}
-                disabled={busy}
-                onChange={(value) => onOptionsChange(activeItem.id, { ...options, contrast: value } as EnhancementOptions)}
-                info="Controls the difference between light and dark areas."
-              />
+              {advancedControls}
             </div>
           )}
         </div>
 
         {/* 3. ACTIONS (Upscale & Download Buttons with brand mint color) */}
         <div className="mt-auto pt-4 border-t border-white/[0.08]">
-          {hasResult ? (
-            <div className="flex gap-2.5">
-              <button
-                type="button"
-                onClick={() => onDownload(activeItem.id, "png")}
-                className="
-                  flex-1
-                  flex
-                  items-center
-                  justify-center
-                  gap-2
-                  rounded-xl
-                  bg-[#00FF85]
-                  px-5
-                  py-3.5
-                  font-bold
-                  text-black
-                  text-sm
-                  transition-all
-                  duration-200
-                  hover:bg-[#00E599]
-                  hover:shadow-[0_0_28px_rgba(0,255,133,0.45)]
-                  active:scale-[0.98]
-                "
-              >
-                <Download className="h-4 w-4" />
-                <span>Download Result</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => onUpscale(activeItem.id)}
-                disabled={busy}
-                className="
-                  rounded-xl
-                  border
-                  border-white/10
-                  bg-white/[0.06]
-                  px-4
-                  py-3.5
-                  text-sm
-                  font-medium
-                  text-white
-                  transition-colors
-                  hover:bg-white/[0.12]
-                  disabled:opacity-30
-                "
-              >
-                Re-enhance
-              </button>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => onUpscale(activeItem.id)}
-              disabled={busy}
-              className="
-                w-full
-                flex
-                items-center
-                justify-center
-                gap-2
-                rounded-xl
-                bg-[#00FF85]
-                px-5
-                py-3.5
-                font-bold
-                text-black
-                text-sm
-                transition-all
-                duration-200
-                hover:bg-[#00E599]
-                hover:shadow-[0_0_28px_rgba(0,255,133,0.45)]
-                active:scale-[0.98]
-                disabled:cursor-wait
-                disabled:opacity-40
-              "
-            >
-              <ImageCircleIcon className="h-4 w-4" />
-              <span>{busy ? `Enhancing ${activeItem.name}…` : `Upscale ✦ ${options.scale}x`}</span>
-            </button>
-          )}
+          {actionArea}
         </div>
       </aside>
-    </div>
+      </div>
+    </>
   );
 }
 
@@ -813,10 +1218,7 @@ function BeforeAfterSlider({
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [pos, setPos] = useState(50);
-  const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
   const draggingRef = useRef(false);
-  const panStartRef = useRef<{ startX: number; startY: number; initPanX: number; initPanY: number } | null>(null);
 
   /* ----------------------------------------------------------
      Update slider position
@@ -836,22 +1238,12 @@ function BeforeAfterSlider({
      ---------------------------------------------------------- */
   useEffect(() => {
     const handlePointerMove = (e: PointerEvent) => {
-      if (panStartRef.current) {
-        const dx = e.clientX - panStartRef.current.startX;
-        const dy = e.clientY - panStartRef.current.startY;
-        setPan({
-          x: panStartRef.current.initPanX + dx,
-          y: panStartRef.current.initPanY + dy,
-        });
-        return;
-      }
       if (!draggingRef.current) return;
       updatePosition(e.clientX);
     };
 
     const handlePointerUp = () => {
       draggingRef.current = false;
-      panStartRef.current = null;
     };
 
     window.addEventListener("pointermove", handlePointerMove);
@@ -864,22 +1256,12 @@ function BeforeAfterSlider({
   });
 
   /* ----------------------------------------------------------
-     Start dragging / panning
+     Start dragging
      ---------------------------------------------------------- */
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (e.shiftKey || e.button === 1 || e.button === 2) {
-      panStartRef.current = { startX: e.clientX, startY: e.clientY, initPanX: pan.x, initPanY: pan.y };
-      return;
-    }
     e.preventDefault();
     draggingRef.current = true;
     updatePosition(e.clientX);
-  };
-
-  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    const delta = e.deltaY < 0 ? 0.3 : -0.3;
-    setZoom((z) => Math.min(4, Math.max(1, +(z + delta).toFixed(1))));
   };
 
   /* ----------------------------------------------------------
@@ -911,8 +1293,7 @@ function BeforeAfterSlider({
     <div
       ref={containerRef}
       onPointerDown={handlePointerDown}
-      onWheel={handleWheel}
-      className={`
+      className="
         relative
         h-full
         w-full
@@ -920,19 +1301,10 @@ function BeforeAfterSlider({
         rounded-xl
         touch-none
         select-none
-        ${zoom > 1 ? "cursor-grab active:cursor-grabbing" : "cursor-ew-resize"}
-      `}
+        cursor-ew-resize
+      "
     >
-      {/* =====================================================
-          ZOOMABLE WRAPPER
-         ===================================================== */}
-      <div
-        className="relative h-full w-full flex items-center justify-center transition-transform duration-100 ease-out"
-        style={{
-          transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
-          transformOrigin: "center center",
-        }}
-      >
+      <div className="relative h-full w-full flex items-center justify-center">
         {/* NEW / UPSCALED IMAGE */}
         <img
           src={after}
@@ -981,43 +1353,6 @@ function BeforeAfterSlider({
       {/* ENHANCED LABEL */}
       <div className="pointer-events-none absolute right-3 top-3 z-30 rounded-md bg-black/60 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
         Enhanced
-      </div>
-
-      {/* INTERACTIVE ZOOM CONTROLS (Fit, 2x, 4x) */}
-      <div
-        className="absolute bottom-3 right-3 z-30 flex items-center gap-1 rounded-xl border border-white/15 bg-black/75 p-1.5 backdrop-blur-md shadow-2xl"
-        onPointerDown={(e) => e.stopPropagation()}
-      >
-        <button
-          type="button"
-          onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }}
-          className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
-            zoom === 1 ? "bg-white/20 text-white shadow-sm" : "text-white/60 hover:text-white"
-          }`}
-          title="Fit to view"
-        >
-          Fit
-        </button>
-        <button
-          type="button"
-          onClick={() => { setZoom(2); }}
-          className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
-            zoom === 2 ? "bg-[#00FF85] text-black font-bold shadow-sm" : "text-white/60 hover:text-white"
-          }`}
-          title="2× Zoom (Inspect edges)"
-        >
-          2× Zoom
-        </button>
-        <button
-          type="button"
-          onClick={() => { setZoom(4); }}
-          className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
-            zoom === 4 ? "bg-[#00FF85] text-black font-bold shadow-sm" : "text-white/60 hover:text-white"
-          }`}
-          title="4× Zoom (Pixel-level detail)"
-        >
-          4× Zoom
-        </button>
       </div>
 
       {/* =====================================================
@@ -1218,7 +1553,7 @@ function UploadStrip({
         className="hidden"
       />
 
-      <div className="flex items-center justify-center gap-3 px-4 py-1.5 max-w-full overflow-x-auto rounded-2xl border border-white/[0.08] bg-[#0c0c10]/70 backdrop-blur-xl shadow-lg">
+      <div className="flex items-center justify-center gap-3 px-4 py-1.5 max-w-full overflow-x-auto rounded-2xl bg-[#0c0c10]/70 backdrop-blur-xl shadow-lg">
         {/* ==================================================
             ADD BUTTON - Stays still in the middle / anchor
            ================================================== */}

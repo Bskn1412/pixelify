@@ -6,8 +6,7 @@ import UploadArea from './UploadArea';
 import BGComparator, { ImageAdjustments, ImageEffects } from './BGComparator';
 import type { FabricEditMode, FabricCropRatio } from './bgremove/FabricImageEditor';
 import { makeId, downloadName } from '../lib/bgUtils';
-import { writeBGHistory } from '../lib/bgDb';
-import type { BGJob, HistoryItem } from '../types';
+import type { BGJob } from '../types';
 import {
   TextLayer,
   ElementLayer,
@@ -23,7 +22,6 @@ interface BGRemoveWorkspaceProps {
   setJobs: React.Dispatch<React.SetStateAction<BGJob[]>>;
   addToast: (type: 'success' | 'error' | 'info', text: string) => void;
   onOpenPicker: () => void;
-  onAddHistoryRecord?: (item: HistoryItem) => void;
   onFileAdd?: (files: FileList | File[]) => void;
   /** Live engine reported by the processing worker ('wasm' | 'webgpu') */
   onEngineReport?: (engine: 'wasm' | 'webgpu', webgpuAvailable: boolean) => void;
@@ -76,7 +74,6 @@ export default function BGRemoveWorkspace({
   setJobs,
   addToast,
   onOpenPicker,
-  onAddHistoryRecord,
   onFileAdd,
   onEngineReport,
 }: BGRemoveWorkspaceProps) {
@@ -309,27 +306,6 @@ export default function BGRemoveWorkspace({
         elapsedMs,
       });
 
-      await writeBGHistory({
-        id: job.id,
-        name: job.name,
-        original: job.file,
-        result: blob,
-        elapsedMs,
-        updatedAt: Date.now(),
-      });
-
-      if (onAddHistoryRecord) {
-        onAddHistoryRecord({
-          id: job.id,
-          type: 'bg_remove',
-          name: job.name,
-          timestamp: Date.now(),
-          thumbnailUrl: url,
-          resultUrl: url,
-          timeMs: elapsedMs,
-        });
-      }
-
       addToast('success', `${job.name} background removed!`);
     } catch (err: any) {
       console.error('processJob failed:', err);
@@ -369,15 +345,6 @@ export default function BGRemoveWorkspace({
     recordEditorEdit();
     const oldUrl = selected.resultUrl;
     updateJob(selected.id, { resultBlob: newBlob, resultUrl: newUrl });
-
-    await writeBGHistory({
-      id: selected.id,
-      name: selected.name,
-      original: selected.file,
-      result: newBlob,
-      elapsedMs: selected.elapsedMs,
-      updatedAt: Date.now(),
-    });
 
     if (oldUrl && oldUrl !== selected.sourceUrl) {
       URL.revokeObjectURL(oldUrl);

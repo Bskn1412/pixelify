@@ -44,7 +44,64 @@ export async function loadONNX(): Promise<OrtModule> {
   return ort;
 }
 
-async function fetchModelWithCache(path: string): Promise<Uint8Array> {
+/** Reports model load progress 0–100 (90 = downloaded, 100 = session ready). */
+export type ModelLoadProgress = (pct: number) => void;
+
+/** Parses size hints like "1.9MB" / "67MB" from MODELS[].size into bytes. */
+function parseSizeToBytes(size: string): number {
+  const match = /([\d.]+)\s*(KB|MB|GB)/i.exec(size || '');
+  if (!match) return 0;
+  const value = parseFloat(match[1]);
+  const unit = match[2].toUpperCase();
+  const mult = unit === 'GB' ? 1024 ** 3 : unit === 'MB' ? 1024 ** 2 : 1024;
+  return Math.round(value * mult);
+}
+
+/** Streams the response body so the caller can show real download %. */
+async function readWithProgress(
+  res: Response,
+  onProgress?: ModelLoadProgress,
+  expectedBytes = 0
+): Promise<Uint8Array<ArrayBuffer>> {
+  const totalHeader = Number(res.headers.get('content-length') || 0);
+  const total = totalHeader > 0 ? totalHeader : expectedBytes;
+
+  // No stream or no size hint at all — fall back to a plain buffered read.
+  if (!res.body || total <= 0) {
+    const data = new Uint8Array(await res.arrayBuffer());
+    onProgress?.(100);
+    return data;
+  }
+
+  const reader = res.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let received = 0;
+
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    if (value && value.byteLength > 0) {
+      chunks.push(value);
+      received += value.byteLength;
+      onProgress?.(Math.min(99, (received / total) * 100));
+    }
+  }
+
+  const merged = new Uint8Array(received);
+  let offset = 0;
+  for (const chunk of chunks) {
+    merged.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  onProgress?.(100);
+  return merged;
+}
+
+async function fetchModelWithCache(
+  path: string,
+  onProgress?: ModelLoadProgress,
+  expectedBytes = 0
+): Promise<Uint8Array> {
   try {
     const cache = await caches.open('onnx-models');
     const cached = await cache.match(path);
@@ -52,6 +109,7 @@ async function fetchModelWithCache(path: string): Promise<Uint8Array> {
       const buf = new Uint8Array(await cached.arrayBuffer());
       // Valid ONNX models in our app are at least 1.5MB. If a 404 or corrupted stub was cached, invalidate it!
       if (buf.byteLength > 100000) {
+        onProgress?.(100);
         return buf;
       }
       await cache.delete(path);
@@ -60,7 +118,7 @@ async function fetchModelWithCache(path: string): Promise<Uint8Array> {
     if (!res.ok) {
       throw new Error(`Failed to load model file ${path}: HTTP ${res.status}`);
     }
-    const data = new Uint8Array(await res.arrayBuffer());
+    const data = await readWithProgress(res, onProgress, expectedBytes);
     if (data.byteLength > 100000) {
       cache.put(path, new Response(data));
     }
@@ -71,17 +129,27 @@ async function fetchModelWithCache(path: string): Promise<Uint8Array> {
     if (!res.ok) {
       throw new Error(`Failed to load model file ${path}: HTTP ${res.status}`);
     }
-    return new Uint8Array(await res.arrayBuffer());
+    return await readWithProgress(res, onProgress, expectedBytes);
   }
 }
 
 export async function createSession(
   ort: OrtModule, 
   modelKey: ModelKey, 
-  forceEngine?: 'wasm' | 'webgpu'
+  forceEngine?: 'wasm' | 'webgpu',
+  onProgress?: ModelLoadProgress
 ): Promise<InferenceSession> {
   const m = MODELS[modelKey];
-  const data = await fetchModelWithCache(m.file);
+
+  // Downloading maps to 0–90; the remaining 10% is the session-compile step.
+  const downloadProgress: ModelLoadProgress = (pct) =>
+    onProgress?.(Math.min(90, Math.max(0, pct * 0.9)));
+
+  const data = await fetchModelWithCache(
+    m.file,
+    downloadProgress,
+    parseSizeToBytes(m.size)
+  );
 
   // ClearReality uses DepthToSpace / PixelShuffle. In ORT Web 1.19.2+, WebGPU JSEP kernel for DepthToSpace
   // has a known dimension mismatch bug with 4D output tensors [1, 512, 512, 3].
@@ -90,6 +158,7 @@ export async function createSession(
 
   if (targetEngine === 'wasm') {
     const session = await ort.InferenceSession.create(data, { executionProviders: ['wasm'] });
+    onProgress?.(100);
     (session as any).__engine = 'wasm';
     (session as any).__modelKey = modelKey;
     return session;
@@ -107,6 +176,7 @@ export async function createSession(
   if (adapterOk) {
     try {
       const session = await ort.InferenceSession.create(data, { executionProviders: ['webgpu'] });
+      onProgress?.(100);
       (session as any).__engine = 'webgpu';
       (session as any).__modelKey = modelKey;
       return session;
@@ -116,6 +186,7 @@ export async function createSession(
   }
 
   const session = await ort.InferenceSession.create(data, { executionProviders: ['wasm'] });
+  onProgress?.(100);
   (session as any).__engine = 'wasm';
   (session as any).__modelKey = modelKey;
   return session;

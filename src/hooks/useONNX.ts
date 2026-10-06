@@ -10,6 +10,8 @@ interface UseONNXReturn {
   execEngine: 'wasm' | 'webgpu' | null;
   sessionRef: React.MutableRefObject<any>;
   isLoading: boolean;
+  /** 0–100 real progress of the in-flight model load; null when idle. */
+  modelProgress: number | null;
   initONNX: () => Promise<void>;
   loadModel: (key: ModelKey) => Promise<boolean>;
 }
@@ -20,6 +22,7 @@ export function useONNX(): UseONNXReturn {
   const [backend, setBackend] = useState<Backend | null>(null);
   const [execEngine, setExecEngine] = useState<'wasm' | 'webgpu' | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [modelProgress, setModelProgress] = useState<number | null>(null);
 
   const initONNX = useCallback(async () => {
     if (ortRef.current) return;
@@ -39,8 +42,9 @@ export function useONNX(): UseONNXReturn {
       await initONNX();
     }
     setIsLoading(true);
+    setModelProgress(0);
     try {
-      const session = await createSession(ortRef.current, key);
+      const session = await createSession(ortRef.current, key, undefined, setModelProgress);
       sessionRef.current = session;
       // Truthful engine read: createSession tags the session with the EP that
       // actually won (webgpu first, wasm fallback). handler EPs as backup.
@@ -57,8 +61,9 @@ export function useONNX(): UseONNXReturn {
       return false;
     } finally {
       setIsLoading(false);
+      setModelProgress(null);
     }
   }, [initONNX]);
 
-  return { ortRef, backend, execEngine, sessionRef, isLoading, initONNX, loadModel };
+  return { ortRef, backend, execEngine, sessionRef, isLoading, modelProgress, initONNX, loadModel };
 }

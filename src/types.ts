@@ -2,7 +2,7 @@ export type Step = 'upload' | 'config' | 'processing' | 'result';
 export type Backend = 'webgpu' | 'wasm';
 export type ModelKey = 'clearreality' | 'ultrasharp' | 'realesrgan';
 export type ScaleFactor = 2 | 4 | 8;
-export type ViewTab = 'home' | 'upscaler' | 'bg_remove' | 'history' | 'prompts' | 'batch';
+export type ViewTab = 'home' | 'upscaler' | 'bg_remove' | 'prompts' | 'batch';
 export type ThemeMode = 'dark' | 'light' | 'system';
 export type CompareMode = 'slider' | 'sideBySide' | 'zoomLens';
 
@@ -30,6 +30,8 @@ export interface ModelConfig {
   recommendation: string;
   maxScale?: number;
   presets?: string[];
+  /** Preset applied by default for this model (must exist in `presets`). */
+  defaultPreset?: string;
   features?: ModelFeatures;
 }
 
@@ -105,22 +107,6 @@ export interface ProgressState {
   totalSteps?: number;
 }
 
-export interface HistoryItem {
-  id: string;
-  type?: 'upscale' | 'bg_remove';
-  name: string;
-  originalWidth?: number;
-  originalHeight?: number;
-  upscaledWidth?: number;
-  upscaledHeight?: number;
-  scale?: ScaleFactor;
-  timestamp: number;
-  thumbnailUrl: string;
-  resultUrl: string;
-  timeMs: number;
-  enhancements?: string[];
-}
-
 export interface BatchItem {
   id: string;
   file: File;
@@ -154,15 +140,6 @@ export interface BGJob {
   progress: number;
   message: string;
   elapsedMs?: number;
-}
-
-export interface BGHistoryRecord {
-  id: string;
-  name: string;
-  original: File;
-  result: Blob;
-  elapsedMs?: number;
-  updatedAt: number;
 }
 
 export interface ToastMessage {

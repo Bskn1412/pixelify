@@ -52,6 +52,7 @@ export default {
         'pulse-glow': 'pulseGlow 2.5s ease-in-out infinite',
         'shimmer': 'shimmer 2s infinite linear',
         'scanline': 'scanline 3s linear infinite',
+        'slide-in-left': 'slideInLeft 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards',
       },
       keyframes: {
         fadeIn: {
@@ -87,7 +88,11 @@ export default {
         scanline: {
           '0%': { transform: 'translateY(-100%)' },
           '100%': { transform: 'translateY(1000%)' },
-        }
+        },
+        slideInLeft: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(0)' },
+        },
       },
     },
   },

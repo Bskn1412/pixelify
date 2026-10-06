@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Icon from './Icon';
-import { writeBGHistory } from '../lib/bgDb';
 import type { BGJob } from '../types';
 
 interface CanvasEditorProps {
@@ -131,17 +130,9 @@ export default function CanvasEditor({ job, updateJob, toast, onHistoryChange }:
       const url = URL.createObjectURL(blob);
       const oldUrl = job.resultUrl;
       updateJob(job.id, { resultBlob: blob, resultUrl: url });
-      await writeBGHistory({
-        id: job.id,
-        name: job.name,
-        original: job.file,
-        result: blob,
-        elapsedMs: job.elapsedMs,
-        updatedAt: Date.now(),
-      });
       if (oldUrl) URL.revokeObjectURL(oldUrl);
       setDirty(false);
-      toast('success', 'Edits saved to your local history.');
+      toast('success', 'Edits saved.');
     }, 'image/png');
   }
 
