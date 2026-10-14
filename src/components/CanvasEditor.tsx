@@ -203,7 +203,7 @@ export default function CanvasEditor({ job, updateJob, toast, onHistoryChange }:
           </div>
         </div>
 
-        <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-[radial-gradient(#333_1px,transparent_1px)] [background-size:16px_16px] bg-neutral-950 flex items-center justify-center p-4 min-h-[360px]">
+        <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-neutral-950 flex items-center justify-center p-4 min-h-[360px]">
           <canvas
             ref={canvasRef}
             className="cursor-crosshair max-w-full max-h-[600px] rounded-xl shadow-2xl object-contain"

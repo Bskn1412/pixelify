@@ -64,6 +64,166 @@ export interface FabricImageEditorProps {
 
 const STAGE_MAX_WIDTH = 760;
 const STAGE_MAX_HEIGHT = 500;
+const STAGE_PADDING = 56;
+
+// Preload the rotate icon from public/rotate.svg
+const rotateIcon = new Image();
+rotateIcon.src = '/rotate.svg';
+
+function drawRoundRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number
+) {
+  if (typeof ctx.roundRect === 'function') {
+    ctx.roundRect(x, y, w, h, r);
+  } else {
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+  }
+}
+
+// 1. Diagonal corners: rounded circle handles with green stroke and clean shadow
+function renderCircleCorner(
+  this: any,
+  ctx: CanvasRenderingContext2D,
+  left: number,
+  top: number,
+  _styleOverride: any,
+  _fabricObject: any
+) {
+  const size = 14;
+  ctx.save();
+  ctx.translate(left, top);
+  ctx.beginPath();
+  ctx.arc(0, 0, size / 2, 0, Math.PI * 2);
+  ctx.fillStyle = '#ffffff';
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.28)';
+  ctx.shadowBlur = 5;
+  ctx.shadowOffsetY = 1;
+  ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = '#00C86A';
+  ctx.stroke();
+  ctx.restore();
+}
+
+// 2. Middle top & bottom: small horizontal rectangular box
+function renderHorizontalRectControl(
+  this: any,
+  ctx: CanvasRenderingContext2D,
+  left: number,
+  top: number,
+  _styleOverride: any,
+  fabricObject: any
+) {
+  const w = 18;
+  const h = 7;
+  const radius = 3;
+  ctx.save();
+  ctx.translate(left, top);
+  const angleRad = ((fabricObject?.angle || 0) * Math.PI) / 180;
+  ctx.rotate(angleRad);
+  ctx.beginPath();
+  drawRoundRect(ctx, -w / 2, -h / 2, w, h, radius);
+  ctx.fillStyle = '#ffffff';
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.28)';
+  ctx.shadowBlur = 5;
+  ctx.shadowOffsetY = 1;
+  ctx.fill();
+  ctx.lineWidth = 1.8;
+  ctx.strokeStyle = '#00C86A';
+  ctx.stroke();
+  ctx.restore();
+}
+
+// 3. Middle left & right: small vertical rectangular box
+function renderVerticalRectControl(
+  this: any,
+  ctx: CanvasRenderingContext2D,
+  left: number,
+  top: number,
+  _styleOverride: any,
+  fabricObject: any
+) {
+  const w = 7;
+  const h = 18;
+  const radius = 3;
+  ctx.save();
+  ctx.translate(left, top);
+  const angleRad = ((fabricObject?.angle || 0) * Math.PI) / 180;
+  ctx.rotate(angleRad);
+  ctx.beginPath();
+  drawRoundRect(ctx, -w / 2, -h / 2, w, h, radius);
+  ctx.fillStyle = '#ffffff';
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.28)';
+  ctx.shadowBlur = 5;
+  ctx.shadowOffsetY = 1;
+  ctx.fill();
+  ctx.lineWidth = 1.8;
+  ctx.strokeStyle = '#00C86A';
+  ctx.stroke();
+  ctx.restore();
+}
+
+// 4. Top side rotation handle: circular button with rotate.svg icon from public
+function renderRotateControl(
+  this: any,
+  ctx: CanvasRenderingContext2D,
+  left: number,
+  top: number,
+  _styleOverride: any,
+  fabricObject: any
+) {
+  const buttonRadius = 14;
+  ctx.save();
+  ctx.translate(left, top);
+
+  // Rotate local coordinate system to align with object angle
+  const angleRad = ((fabricObject?.angle || 0) * Math.PI) / 180;
+  ctx.rotate(angleRad);
+
+  // Subtle connector stem down to the top edge of the selection box
+  ctx.beginPath();
+  ctx.moveTo(0, buttonRadius);
+  ctx.lineTo(0, 28);
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = '#00C86A';
+  ctx.stroke();
+
+  // Outer button circle
+  ctx.beginPath();
+  ctx.arc(0, 0, buttonRadius, 0, Math.PI * 2);
+  ctx.fillStyle = '#0f172a';
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+  ctx.shadowBlur = 7;
+  ctx.shadowOffsetY = 2;
+  ctx.fill();
+
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = '#00C86A';
+  ctx.stroke();
+
+  // Draw rotate icon inside
+  if (rotateIcon.complete && rotateIcon.naturalWidth > 0) {
+    const iconSize = 16;
+    ctx.drawImage(rotateIcon, -iconSize / 2, -iconSize / 2, iconSize, iconSize);
+  } else {
+    ctx.beginPath();
+    ctx.arc(0, 0, 5, 0.3 * Math.PI, 1.8 * Math.PI);
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = '#ffffff';
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
 
 const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorProps>(function FabricImageEditor({
   imageUrl,
@@ -104,13 +264,17 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
   const [internalCropZoom, setInternalCropZoom] = useState(100);
-  const cropZoom = controlledCropZoom ?? internalCropZoom;
   const [guides, setGuides] = useState({ x: false, y: false });
   const [internalCropTarget, setInternalCropTarget] = useState<'frame' | 'image'>('frame');
   const cropTarget = controlledCropTarget ?? internalCropTarget;
   const cropTargetRef = useRef<'frame' | 'image'>('frame');
   const cropPanRef = useRef<{ x: number; y: number } | null>(null);
   const baseScaleRef = useRef(1);
+  const initialTransformRef = useRef<SubjectTransform>(subjectTransform || DEFAULT_SUBJECT_TRANSFORM);
+
+  useEffect(() => {
+    initialTransformRef.current = subjectTransform || DEFAULT_SUBJECT_TRANSFORM;
+  }, [subjectTransform]);
 
   useEffect(() => {
     ratioRef.current = cropRatio;
@@ -136,6 +300,9 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
       backgroundColor: 'transparent',
     });
     fabricRef.current = fabric;
+    rotateIcon.onload = () => {
+      if (!disposed) fabric.requestRenderAll();
+    };
 
     const width = Math.max(1, Math.round(artboardWidth || STAGE_MAX_WIDTH));
     const height = Math.max(1, Math.round(artboardHeight || STAGE_MAX_HEIGHT));
@@ -144,7 +311,9 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
       height: Math.max(1, Math.round(naturalArtboardHeight || height)),
     };
 
-    fabric.setDimensions({ width, height });
+    const canvasWidth = width + STAGE_PADDING * 2;
+    const canvasHeight = height + STAGE_PADDING * 2;
+    fabric.setDimensions({ width: canvasWidth, height: canvasHeight });
     fabric.set({ selection: false });
 
     FabricImage.fromURL(imageUrl, { crossOrigin: 'anonymous' }).then((image) => {
@@ -156,8 +325,11 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
       const cutoutWidth = image.width || 1;
       const cutoutHeight = image.height || 1;
       const fitFactor = hasCustomBg ? 0.75 : 1.0;
-      const fit = Math.min((width * fitFactor) / cutoutWidth, (height * fitFactor) / cutoutHeight, 1);
+      const fit = Math.min((width * fitFactor) / cutoutWidth, (height * fitFactor) / cutoutHeight);
       baseScaleRef.current = fit;
+
+      const canvasCenterX = STAGE_PADDING + width / 2;
+      const canvasCenterY = STAGE_PADDING + height / 2;
 
       const tf = subjectTransform || DEFAULT_SUBJECT_TRANSFORM;
       const initialX = tf.relX * width;
@@ -168,8 +340,8 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
       image.set({
         originX: 'center',
         originY: 'center',
-        left: width / 2 + initialX,
-        top: height / 2 + initialY,
+        left: canvasCenterX + initialX,
+        top: canvasCenterY + initialY,
         scaleX: currentScale,
         scaleY: currentScale,
         angle: initialAngle,
@@ -179,18 +351,48 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
         snapAngle: 45,
         snapThreshold: 6,
         cornerStyle: 'circle',
-        cornerColor: '#00C86A',
-        cornerStrokeColor: '#ffffff',
+        cornerColor: '#ffffff',
+        cornerStrokeColor: '#00C86A',
         transparentCorners: false,
         cornerSize: 14,
         touchCornerSize: 28,
         borderColor: '#00C86A',
-        borderDashArray: [5, 4],
-        padding: 8,
+        borderScaleFactor: 2,
+        borderDashArray: undefined,
+        padding: 0,
         objectCaching: false,
       });
-      image.controls.mtr.offsetY = -30;
+
+      // Diagonal corners: rounded circles
+      image.controls.tl.render = renderCircleCorner;
+      image.controls.tr.render = renderCircleCorner;
+      image.controls.bl.render = renderCircleCorner;
+      image.controls.br.render = renderCircleCorner;
+
+      // Other edges: small rectangular boxes
+      image.controls.ml.render = renderVerticalRectControl;
+      image.controls.mr.render = renderVerticalRectControl;
+      image.controls.mt.render = renderHorizontalRectControl;
+      image.controls.mb.render = renderHorizontalRectControl;
+
+      // Top rotate handle: rotate.svg icon from public
+      image.controls.mtr.render = renderRotateControl;
+      image.controls.mtr.offsetY = -28;
       image.controls.mtr.actionHandler = controlsUtils.rotationWithSnapping;
+
+      // Restrict cutout image pixels to chessboard artboard canvas (with matching rounded corners)
+      // Controls (selection borders, corner circles, rects, rotation handle) remain visible and active in STAGE_PADDING
+      const artboardClip = new Rect({
+        left: STAGE_PADDING,
+        top: STAGE_PADDING,
+        width,
+        height,
+        rx: 16,
+        ry: 16,
+        absolutePositioned: true,
+      });
+      image.clipPath = artboardClip;
+
       fabric.add(image);
       imageRef.current = image;
 
@@ -201,24 +403,27 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
         evented: false,
         excludeFromExport: true,
       };
-      const verticalGuide = new Line([width / 2, 0, width / 2, height], { ...guideOptions, visible: false });
-      const horizontalGuide = new Line([0, height / 2, width, height / 2], { ...guideOptions, visible: false });
+      const verticalGuide = new Line([canvasCenterX, STAGE_PADDING, canvasCenterX, STAGE_PADDING + height], { ...guideOptions, visible: false });
+      const horizontalGuide = new Line([STAGE_PADDING, canvasCenterY, STAGE_PADDING + width, canvasCenterY], { ...guideOptions, visible: false });
       fabric.add(verticalGuide, horizontalGuide);
       verticalGuideRef.current = verticalGuide;
       horizontalGuideRef.current = horizontalGuide;
 
       if (mode === 'crop') {
         createCropFrame(fabric, width, height, ratioRef.current);
-        fabric.on('mouse:down', ({ e }) => {
+        fabric.on('mouse:down', (opt: any) => {
           if (cropTargetRef.current !== 'image') return;
-          const pointer = fabric.getPointer(e);
+          const pointer = opt.scenePoint || (typeof (fabric as any).getScenePoint === 'function' ? (fabric as any).getScenePoint(opt.e) : opt.e);
           cropPanRef.current = { x: pointer.x, y: pointer.y };
         });
-        fabric.on('mouse:move', ({ e }) => {
+        fabric.on('mouse:move', (opt: any) => {
           if (cropTargetRef.current !== 'image' || !cropPanRef.current || !imageRef.current) return;
-          const pointer = fabric.getPointer(e);
+          const pointer = opt.scenePoint || (typeof (fabric as any).getScenePoint === 'function' ? (fabric as any).getScenePoint(opt.e) : opt.e);
           const currentImg = imageRef.current;
-          currentImg.set({ left: (currentImg.left || 0) + pointer.x - cropPanRef.current.x, top: (currentImg.top || 0) + pointer.y - cropPanRef.current.y });
+          currentImg.set({
+            left: (currentImg.left || 0) + pointer.x - cropPanRef.current.x,
+            top: (currentImg.top || 0) + pointer.y - cropPanRef.current.y
+          });
           currentImg.setCoords();
           cropPanRef.current = { x: pointer.x, y: pointer.y };
           fabric.requestRenderAll();
@@ -241,28 +446,50 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
         const center = activeImage.getCenterPoint();
         const rect = activeImage.getBoundingRect();
         const epsilon = 7;
+        const artboardLeft = STAGE_PADDING;
+        const artboardTop = STAGE_PADDING;
+        const artboardRight = STAGE_PADDING + width;
+        const artboardBottom = STAGE_PADDING + height;
+
         const xSnaps = [
-          { delta: width / 2 - center.x, active: Math.abs(width / 2 - center.x) <= epsilon },
-          { delta: -rect.left, active: Math.abs(rect.left) <= epsilon },
-          { delta: width - (rect.left + rect.width), active: Math.abs(width - (rect.left + rect.width)) <= epsilon },
+          { delta: canvasCenterX - center.x, active: Math.abs(canvasCenterX - center.x) <= epsilon },
+          { delta: artboardLeft - rect.left, active: Math.abs(artboardLeft - rect.left) <= epsilon },
+          { delta: artboardRight - (rect.left + rect.width), active: Math.abs(artboardRight - (rect.left + rect.width)) <= epsilon },
         ].filter((snap) => snap.active).sort((a, b) => Math.abs(a.delta) - Math.abs(b.delta));
         const ySnaps = [
-          { delta: height / 2 - center.y, active: Math.abs(height / 2 - center.y) <= epsilon },
-          { delta: -rect.top, active: Math.abs(rect.top) <= epsilon },
-          { delta: height - (rect.top + rect.height), active: Math.abs(height - (rect.top + rect.height)) <= epsilon },
+          { delta: canvasCenterY - center.y, active: Math.abs(canvasCenterY - center.y) <= epsilon },
+          { delta: artboardTop - rect.top, active: Math.abs(artboardTop - rect.top) <= epsilon },
+          { delta: artboardBottom - (rect.top + rect.height), active: Math.abs(artboardBottom - (rect.top + rect.height)) <= epsilon },
         ].filter((snap) => snap.active).sort((a, b) => Math.abs(a.delta) - Math.abs(b.delta));
         const deltaX = xSnaps[0]?.delta || 0;
         const deltaY = ySnaps[0]?.delta || 0;
-        activeImage.set({ left: (activeImage.left || 0) + deltaX, top: (activeImage.top || 0) + deltaY });
+        let finalLeft = (activeImage.left || 0) + deltaX;
+        let finalTop = (activeImage.top || 0) + deltaY;
+
+        // Prevent image from completely overpassing the artboard boundaries
+        const minMargin = 30;
+        const curBounds = activeImage.getBoundingRect();
+        if (curBounds.left + curBounds.width < artboardLeft + minMargin) {
+          finalLeft += (artboardLeft + minMargin) - (curBounds.left + curBounds.width);
+        } else if (curBounds.left > artboardRight - minMargin) {
+          finalLeft -= curBounds.left - (artboardRight - minMargin);
+        }
+        if (curBounds.top + curBounds.height < artboardTop + minMargin) {
+          finalTop += (artboardTop + minMargin) - (curBounds.top + curBounds.height);
+        } else if (curBounds.top > artboardBottom - minMargin) {
+          finalTop -= curBounds.top - (artboardBottom - minMargin);
+        }
+
+        activeImage.set({ left: finalLeft, top: finalTop });
         activeImage.setCoords();
         const showX = xSnaps.length > 0;
         const showY = ySnaps.length > 0;
         const snappedBounds = activeImage.getBoundingRect();
         const snappedCenter = activeImage.getCenterPoint();
-        const xGuide = Math.abs(snappedCenter.x - width / 2) <= epsilon ? width / 2 : Math.abs(snappedBounds.left) <= epsilon ? 0 : width;
-        const yGuide = Math.abs(snappedCenter.y - height / 2) <= epsilon ? height / 2 : Math.abs(snappedBounds.top) <= epsilon ? 0 : height;
-        verticalGuideRef.current?.set({ x1: xGuide, x2: xGuide, visible: showX });
-        horizontalGuideRef.current?.set({ y1: yGuide, y2: yGuide, visible: showY });
+        const xGuide = Math.abs(snappedCenter.x - canvasCenterX) <= epsilon ? canvasCenterX : Math.abs(snappedBounds.left - artboardLeft) <= epsilon ? artboardLeft : artboardRight;
+        const yGuide = Math.abs(snappedCenter.y - canvasCenterY) <= epsilon ? canvasCenterY : Math.abs(snappedBounds.top - artboardTop) <= epsilon ? artboardTop : artboardBottom;
+        verticalGuideRef.current?.set({ x1: xGuide, x2: xGuide, y1: artboardTop, y2: artboardBottom, visible: showX });
+        horizontalGuideRef.current?.set({ y1: yGuide, y2: yGuide, x1: artboardLeft, x2: artboardRight, visible: showY });
         setGuides({ x: showX, y: showY });
         fabric.requestRenderAll();
       };
@@ -321,9 +548,11 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
   useEffect(() => {
     const fabric = fabricRef.current;
     if (!fabric || !ready || mode !== 'crop') return;
-    createCropFrame(fabric, fabric.getWidth(), fabric.getHeight(), cropRatio);
+    const width = Math.max(1, Math.round(artboardWidth || STAGE_MAX_WIDTH));
+    const height = Math.max(1, Math.round(artboardHeight || STAGE_MAX_HEIGHT));
+    createCropFrame(fabric, width, height, cropRatio);
     if (cropTarget === 'image') selectCropImage();
-  }, [cropRatio, mode, ready]);
+  }, [cropRatio, mode, ready, artboardWidth, artboardHeight]);
 
   // Synchronize rotation prop
   useEffect(() => {
@@ -369,21 +598,24 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
     }
 
     const crop = new Rect({
-      left: (width - frameWidth) / 2,
-      top: (height - frameHeight) / 2,
+      left: STAGE_PADDING + (width - frameWidth) / 2,
+      top: STAGE_PADDING + (height - frameHeight) / 2,
       width: frameWidth,
       height: frameHeight,
       fill: 'transparent',
-      stroke: '#ffffff',
-      strokeWidth: 1.5,
-      strokeDashArray: [7, 5],
-      cornerStyle: 'rect',
-      cornerColor: '#00C86A',
-      cornerStrokeColor: '#ffffff',
+      stroke: '#00C86A',
+      strokeWidth: 2,
+      strokeUniform: true,
+      hasBorders: false,
+      cornerStyle: 'circle',
+      cornerColor: '#ffffff',
+      cornerStrokeColor: '#00C86A',
       transparentCorners: false,
-      cornerSize: 12,
+      cornerSize: 14,
       touchCornerSize: 28,
       borderColor: '#00C86A',
+      borderScaleFactor: 2,
+      borderDashArray: undefined,
       padding: 0,
       lockRotation: true,
       lockUniScaling: ratio !== 'free',
@@ -401,6 +633,18 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
     crop.controls.mt.actionHandler = controlsUtils.wrapWithFixedAnchor(horizontalEdgeHandler);
     crop.controls.mb.actionHandler = controlsUtils.wrapWithFixedAnchor(horizontalEdgeHandler);
 
+    // Diagonal corners: rounded circles
+    crop.controls.tl.render = renderCircleCorner;
+    crop.controls.tr.render = renderCircleCorner;
+    crop.controls.bl.render = renderCircleCorner;
+    crop.controls.br.render = renderCircleCorner;
+
+    // Other edges: small rectangular boxes
+    crop.controls.ml.render = renderVerticalRectControl;
+    crop.controls.mr.render = renderVerticalRectControl;
+    crop.controls.mt.render = renderHorizontalRectControl;
+    crop.controls.mb.render = renderHorizontalRectControl;
+
     fabric.add(crop);
     cropRef.current = crop;
 
@@ -413,13 +657,46 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
     };
     cropMasksRef.current = Array.from({ length: 4 }, () => new Rect({ ...maskOptions, width: 0, height: 0 }));
     cropMasksRef.current.forEach((mask) => fabric.add(mask));
+
+    const clampCropBounds = () => {
+      crop.setCoords();
+      let scaledW = crop.getScaledWidth();
+      let scaledH = crop.getScaledHeight();
+
+      // Clamp dimensions to artboard size
+      if (scaledW > width) {
+        crop.scaleX = width / crop.width;
+        scaledW = width;
+      }
+      if (scaledH > height) {
+        crop.scaleY = height / crop.height;
+        scaledH = height;
+      }
+
+      // Clamp position within [STAGE_PADDING, STAGE_PADDING + width - scaledW] and [STAGE_PADDING, STAGE_PADDING + height - scaledH]
+      let newLeft = crop.left || STAGE_PADDING;
+      let newTop = crop.top || STAGE_PADDING;
+      if (newLeft < STAGE_PADDING) newLeft = STAGE_PADDING;
+      if (newTop < STAGE_PADDING) newTop = STAGE_PADDING;
+      if (newLeft + scaledW > STAGE_PADDING + width) newLeft = Math.max(STAGE_PADDING, STAGE_PADDING + width - scaledW);
+      if (newTop + scaledH > STAGE_PADDING + height) newTop = Math.max(STAGE_PADDING, STAGE_PADDING + height - scaledH);
+
+      crop.set({ left: newLeft, top: newTop });
+      crop.setCoords();
+    };
+
     const updateCropMasks = () => {
+      clampCropBounds();
       const bounds = crop.getBoundingRect();
+      const artboardLeft = STAGE_PADDING;
+      const artboardTop = STAGE_PADDING;
+      const artboardRight = STAGE_PADDING + width;
+      const artboardBottom = STAGE_PADDING + height;
       const maskRects = [
-        { left: 0, top: 0, width, height: Math.max(0, bounds.top) },
-        { left: 0, top: bounds.top + bounds.height, width, height: Math.max(0, height - bounds.top - bounds.height) },
-        { left: 0, top: bounds.top, width: Math.max(0, bounds.left), height: bounds.height },
-        { left: bounds.left + bounds.width, top: bounds.top, width: Math.max(0, width - bounds.left - bounds.width), height: bounds.height },
+        { left: artboardLeft, top: artboardTop, width, height: Math.max(0, bounds.top - artboardTop) },
+        { left: artboardLeft, top: bounds.top + bounds.height, width, height: Math.max(0, artboardBottom - (bounds.top + bounds.height)) },
+        { left: artboardLeft, top: bounds.top, width: Math.max(0, bounds.left - artboardLeft), height: bounds.height },
+        { left: bounds.left + bounds.width, top: bounds.top, width: Math.max(0, artboardRight - (bounds.left + bounds.width)), height: bounds.height },
       ];
       cropMasksRef.current.forEach((mask, index) => {
         mask.set(maskRects[index]);
@@ -446,7 +723,19 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
     const image = imageRef.current;
     if (!fabric || !image) return;
     cropRef.current?.set({ selectable: false, evented: false });
-    image.set({ selectable: false, evented: false, hasControls: false, lockScalingX: true, lockScalingY: true });
+    // Less visible, reduced opacity border when moving image
+    image.set({
+      selectable: false,
+      evented: false,
+      hasControls: false,
+      hasBorders: true,
+      borderColor: 'rgba(0, 200, 106, 0.35)',
+      borderScaleFactor: 1,
+      borderDashArray: [4, 4],
+      padding: 0,
+      lockScalingX: true,
+      lockScalingY: true,
+    });
     cropMasksRef.current.forEach((mask) => mask.set({ evented: false }));
     fabric.setActiveObject(image);
     setInternalCropTarget('image');
@@ -460,8 +749,16 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
     const frame = cropRef.current;
     const image = imageRef.current;
     if (!fabric || !frame || !image) return;
-    image.set({ selectable: false, evented: false, hasControls: false });
-    frame.set({ selectable: true, evented: true });
+    image.set({
+      selectable: false,
+      evented: false,
+      hasControls: false,
+      hasBorders: false,
+      borderColor: '#00C86A',
+      borderScaleFactor: 2,
+      borderDashArray: undefined,
+    });
+    frame.set({ selectable: true, evented: true, hasBorders: false, hasControls: true });
     cropMasksRef.current.forEach((mask) => mask.set({ selectable: false, evented: false }));
     cropMasksRef.current.forEach((mask) => fabric.sendObjectToBack(mask));
     fabric.sendObjectToBack(image);
@@ -483,6 +780,10 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
     const image = imageRef.current;
     const fabric = fabricRef.current;
     if (!image || !fabric) return;
+    const width = Math.max(1, Math.round(artboardWidth || STAGE_MAX_WIDTH));
+    const height = Math.max(1, Math.round(artboardHeight || STAGE_MAX_HEIGHT));
+    const canvasCenterX = STAGE_PADDING + width / 2;
+    const canvasCenterY = STAGE_PADDING + height / 2;
     const baseScale = baseScaleRef.current || 1;
     const targetScale = baseScale * (zoom / 100);
     const prevScale = image.scaleX || baseScale;
@@ -490,7 +791,7 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
     const cropBounds = cropRef.current?.getBoundingRect();
     const anchor = cropBounds
       ? { x: cropBounds.left + cropBounds.width / 2, y: cropBounds.top + cropBounds.height / 2 }
-      : { x: fabric.getWidth() / 2, y: fabric.getHeight() / 2 };
+      : { x: canvasCenterX, y: canvasCenterY };
 
     image.set({
       left: anchor.x + ((image.left || 0) - anchor.x) * scaleRatio,
@@ -511,9 +812,16 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
     setBusy(true);
 
     try {
+      const width = Math.max(1, Math.round(artboardWidth || STAGE_MAX_WIDTH));
+      const height = Math.max(1, Math.round(artboardHeight || STAGE_MAX_HEIGHT));
+      const canvasCenterX = STAGE_PADDING + width / 2;
+      const canvasCenterY = STAGE_PADDING + height / 2;
+
       if (mode === 'crop' && cropRef.current) {
         const bounds = cropRef.current.getBoundingRect();
-        const multiplier = naturalSizeRef.current.width / fabric.getWidth();
+        const multiplier = naturalSizeRef.current.width / width;
+        const prevClip = image.clipPath;
+        image.clipPath = undefined;
         const output = fabric.toCanvasElement(multiplier, {
           left: bounds.left,
           top: bounds.top,
@@ -521,6 +829,7 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
           height: bounds.height,
           filter: (object) => object === image,
         });
+        image.clipPath = prevClip;
         fabric.setActiveObject(cropRef.current);
         fabric.requestRenderAll();
 
@@ -529,13 +838,11 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
         });
         onApply(blob);
       } else {
-        const cWidth = fabric.getWidth();
-        const cHeight = fabric.getHeight();
         const currentFit = baseScaleRef.current || 1;
         const currentScaleX = Math.abs(image.scaleX || currentFit);
         const newTransform: SubjectTransform = {
-          relX: Number((((image.left || 0) - cWidth / 2) / cWidth).toFixed(4)),
-          relY: Number((((image.top || 0) - cHeight / 2) / cHeight).toFixed(4)),
+          relX: Number((((image.left || 0) - canvasCenterX) / width).toFixed(4)),
+          relY: Number((((image.top || 0) - canvasCenterY) / height).toFixed(4)),
           scale: Number((currentScaleX / currentFit).toFixed(3)),
           rotation: Math.round(image.angle || 0),
           flipX: !!image.flipX,
@@ -545,8 +852,17 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
         if (onApplyTransform) {
           onApplyTransform(newTransform);
         } else {
-          const { width } = naturalSizeRef.current;
-          const output = fabric.toCanvasElement(width / fabric.getWidth(), { filter: (object) => object === image });
+          const { width: naturalW } = naturalSizeRef.current;
+          const prevClip = image.clipPath;
+          image.clipPath = undefined;
+          const output = fabric.toCanvasElement(naturalW / width, {
+            left: STAGE_PADDING,
+            top: STAGE_PADDING,
+            width,
+            height,
+            filter: (object) => object === image,
+          });
+          image.clipPath = prevClip;
           cropMasksRef.current = [];
           const blob = await new Promise<Blob>((resolve, reject) => {
             output.toBlob((value) => value ? resolve(value) : reject(new Error('Could not render image edit')), 'image/png');
@@ -574,12 +890,14 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
     const fabric = fabricRef.current;
     const image = imageRef.current;
     if (!fabric || !image) return;
-    const cWidth = fabric.getWidth();
-    const cHeight = fabric.getHeight();
+    const width = Math.max(1, Math.round(artboardWidth || STAGE_MAX_WIDTH));
+    const height = Math.max(1, Math.round(artboardHeight || STAGE_MAX_HEIGHT));
+    const canvasCenterX = STAGE_PADDING + width / 2;
+    const canvasCenterY = STAGE_PADDING + height / 2;
     const fit = baseScaleRef.current || 1;
     image.set({
-      left: cWidth / 2,
-      top: cHeight / 2,
+      left: canvasCenterX,
+      top: canvasCenterY,
       scaleX: fit,
       scaleY: fit,
       angle: 0,
@@ -592,12 +910,43 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
     onApplyTransform?.(DEFAULT_SUBJECT_TRANSFORM);
   }
 
+  function restoreInitialTransform() {
+    const fabric = fabricRef.current;
+    const image = imageRef.current;
+    if (!fabric || !image) return;
+    const width = Math.max(1, Math.round(artboardWidth || STAGE_MAX_WIDTH));
+    const height = Math.max(1, Math.round(artboardHeight || STAGE_MAX_HEIGHT));
+    const canvasCenterX = STAGE_PADDING + width / 2;
+    const canvasCenterY = STAGE_PADDING + height / 2;
+    const fit = baseScaleRef.current || 1;
+    const tf = initialTransformRef.current || DEFAULT_SUBJECT_TRANSFORM;
+    const initialX = tf.relX * width;
+    const initialY = tf.relY * height;
+    const currentScale = fit * tf.scale;
+    const initialAngle = tf.rotation || initialRotation || rotation;
+    image.set({
+      left: canvasCenterX + initialX,
+      top: canvasCenterY + initialY,
+      scaleX: currentScale,
+      scaleY: currentScale,
+      angle: initialAngle,
+      flipX: tf.flipX,
+      flipY: tf.flipY,
+    });
+    image.setCoords();
+    fabric.requestRenderAll();
+    onRotationChange?.(initialAngle);
+  }
+
   useImperativeHandle(ref, () => ({
     flipX: () => flip('x'),
     flipY: () => flip('y'),
     resetTransform: () => resetTransform(),
     apply: () => apply(),
-    cancel: () => onCancelRef.current(),
+    cancel: () => {
+      restoreInitialTransform();
+      onCancelRef.current?.();
+    },
     selectCropFrame: () => selectCropFrame(),
     selectCropImage: () => selectCropImage(),
     setCropZoom: (z: number) => applyCropZoom(z),
@@ -612,12 +961,14 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
       const img = imageRef.current;
       const fab = fabricRef.current;
       if (!img || !fab) return null;
-      const cWidth = fab.getWidth();
-      const cHeight = fab.getHeight();
+      const width = Math.max(1, Math.round(artboardWidth || STAGE_MAX_WIDTH));
+      const height = Math.max(1, Math.round(artboardHeight || STAGE_MAX_HEIGHT));
+      const canvasCenterX = STAGE_PADDING + width / 2;
+      const canvasCenterY = STAGE_PADDING + height / 2;
       const fit = baseScaleRef.current || 1;
       return {
-        relX: Number((((img.left || 0) - cWidth / 2) / cWidth).toFixed(4)),
-        relY: Number((((img.top || 0) - cHeight / 2) / cHeight).toFixed(4)),
+        relX: Number((((img.left || 0) - canvasCenterX) / width).toFixed(4)),
+        relY: Number((((img.top || 0) - canvasCenterY) / height).toFixed(4)),
         scale: Number((Math.abs(img.scaleX || fit) / fit).toFixed(3)),
         rotation: Math.round(img.angle || 0),
         flipX: !!img.flipX,
@@ -626,11 +977,21 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
     },
   }), []);
 
-  const canvasWidth = fabricRef.current?.getWidth() || Math.round(artboardWidth || STAGE_MAX_WIDTH);
-  const canvasHeight = fabricRef.current?.getHeight() || Math.round(artboardHeight || STAGE_MAX_HEIGHT);
+  const width = Math.max(1, Math.round(artboardWidth || STAGE_MAX_WIDTH));
+  const height = Math.max(1, Math.round(artboardHeight || STAGE_MAX_HEIGHT));
+  const canvasWidth = width + STAGE_PADDING * 2;
+  const canvasHeight = height + STAGE_PADDING * 2;
 
   return (
-    <div className="relative flex h-full w-full items-center justify-center overflow-hidden select-none">
+    <div
+      className="absolute flex items-center justify-center overflow-visible select-none pointer-events-auto"
+      style={{
+        width: `${canvasWidth}px`,
+        height: `${canvasHeight}px`,
+        left: `-${STAGE_PADDING}px`,
+        top: `-${STAGE_PADDING}px`,
+      }}
+    >
       <canvas
         ref={canvasElementRef}
         className="touch-none"
@@ -638,7 +999,10 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
         aria-label={mode === 'crop' ? 'Crop image with Fabric controls' : 'Transform image with Fabric controls'}
       />
       {mode === 'transform' && ready && (guides.x || guides.y) && (
-        <span className="pointer-events-none absolute right-3 top-3 z-10 rounded bg-black/70 px-2 py-1 text-[10px] font-bold text-[#00FF85]">
+        <span
+          className="pointer-events-none absolute z-20 rounded bg-black/70 px-2 py-1 text-[10px] font-bold text-[#00FF85]"
+          style={{ right: `${STAGE_PADDING + 12}px`, top: `${STAGE_PADDING + 12}px` }}
+        >
           Aligned
         </span>
       )}

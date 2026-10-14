@@ -10,12 +10,14 @@ import './bgremove-sections.css';
    Sample images are placeholders — swap at the top.
    ============================================================ */
 
-const IMG_S1 = '/samples/s1.png';
-const IMG_S2 = '/samples/s2.png';
-const IMG_S3 = '/samples/s3.png';
+const IMG_S1 = '/bgremove/samples/s1.png';
+const IMG_S2 = '/bgremove/samples/s2.png';
+const IMG_S3 = '/bgremove/samples/s3.png';
 const IMG_PAIR_BEFORE = '/gta6.jpg';   // real before shot
 const IMG_PAIR_AFTER = '/gta6.png';    // real transparent cutout
-const IMG_CUTOUT_STANDALONE = '/ada-cutout.jpg';
+const IMG_CUTOUT_STANDALONE = '/bgremove/watch.png';
+const IMG_CUTOUT_STANDALONE2 = '/bgremove/black-widow.png';
+const IMG_CUTOUT_STANDALONE3 = '/bgremove/roronova.png';
 
 /* reveal-on-scroll (adds .pb-in once) */
 function useReveal<T extends HTMLElement>() {
@@ -63,26 +65,24 @@ export const BgShowcase: React.FC = () => {
             The background
             <br />
             is <em>gone</em>.<br />
-            The <span className="grn">subject</span> stays.
+            The subject <span className="grn">stays.</span>
           </h2>
           <p className="bgr-lede pb-reveal" style={{ '--rv-i': '0.12s' } as React.CSSProperties}>
-            A bilateral-reference segmentation network runs on your GPU, inside this tab.
-            Drop a frame and the cutout is done before a cloud service would have finished uploading.
-          </p>
+            Powered by a high-precision segmentation network running on your local GPU. Drop a frame and the cutout is done before a cloud service would have finished uploading.          </p>
         </div>
 
         <div className="bgr-shots">
           <figure className="bgr-shot pb-reveal" style={{ '--rot': '-4deg', left: '0%', top: '8%', '--rv-i': '0.15s', zIndex: 2 } as React.CSSProperties}>
-            <img src={IMG_CUTOUT_STANDALONE} alt="Portrait cutout" loading="lazy" draggable={false} />
-            <figcaption>Cutout · 01</figcaption>
+            <img src={IMG_CUTOUT_STANDALONE} alt="Product cutout" loading="lazy" draggable={false} />
+            <figcaption>Product · 01</figcaption>
           </figure>
           <figure className="bgr-shot pb-reveal" style={{ '--rot': '2.5deg', left: '30%', top: '0%', '--rv-i': '0.24s', zIndex: 3 } as React.CSSProperties}>
-            <img src={IMG_S2} alt="Studio subject" loading="lazy" draggable={false} />
-            <figcaption>Studio · 02</figcaption>
+            <img src={IMG_CUTOUT_STANDALONE2} alt="Portrait cutout" loading="lazy" draggable={false} />
+            <figcaption>Portrait · 02</figcaption>
           </figure>
           <figure className="bgr-shot pb-reveal" style={{ '--rot': '5deg', left: '58%', top: '16%', '--rv-i': '0.33s', zIndex: 1 } as React.CSSProperties}>
-            <img src={IMG_S3} alt="Product cutout" loading="lazy" draggable={false} />
-            <figcaption>Product · 03</figcaption>
+            <img src={IMG_CUTOUT_STANDALONE3} alt="Studio cutout" loading="lazy" draggable={false} />
+            <figcaption>Studio · 03</figcaption>
           </figure>
         </div>
       </div>
@@ -90,89 +90,6 @@ export const BgShowcase: React.FC = () => {
   );
 };
 
-/* ============================================================
-   2 — SAMPLES : index list + cursor-follow preview
-   ============================================================ */
-export interface SampleDef {
-  src: string;
-  name: string;
-  tag: string;
-}
-
-const SAMPLES: SampleDef[] = [
-  { src: IMG_S1, name: 'Street Portrait', tag: 'Portrait' },
-  { src: IMG_S2, name: 'Studio Subject', tag: 'Studio' },
-  { src: IMG_S3, name: 'Product Shot', tag: 'Product' },
-];
-
-export const BgSampleGallery: React.FC<{ onLoadSample: (src: string, name: string) => void }> = ({ onLoadSample }) => {
-  const ref = useReveal<HTMLElement>();
-  const previewRef = useRef<HTMLDivElement>(null);
-  const previewImgRef = useRef<HTMLImageElement>(null);
-
-  const showPreview = useCallback((src: string, x: number, y: number) => {
-    const el = previewRef.current;
-    if (!el) return;
-    if (previewImgRef.current) previewImgRef.current.src = src;
-    el.style.transform = `translate(${x - 125}px, ${y - 300}px)`;
-    el.classList.add('is-on');
-  }, []);
-
-  const hidePreview = useCallback(() => {
-    previewRef.current?.classList.remove('is-on');
-  }, []);
-
-  /* keep the preview honest when the page scrolls under a stationary cursor */
-  useEffect(() => {
-    window.addEventListener('scroll', hidePreview, { passive: true });
-    return () => window.removeEventListener('scroll', hidePreview);
-  }, [hidePreview]);
-
-  return (
-    <section className="bgr-section" ref={ref}>
-      <PlusMark style={{ top: '10%', right: '4%' }} />
-
-      <div className="bgr-samples-head">
-        <div>
-          <span className="bgr-eyebrow pb-reveal">Try it live</span>
-          <h2 className="bgr-display pb-reveal" style={{ '--rv-i': '0.06s' } as React.CSSProperties}>
-            Pick a frame.
-            <br />
-            <em>Watch it split.</em>
-          </h2>
-        </div>
-        <p className="bgr-lede pb-reveal" style={{ '--rv-i': '0.12s', maxWidth: 380 } as React.CSSProperties}>
-          Each row runs the same network you'll use on your own files — click and the
-          cutout starts instantly on the canvas below.
-        </p>
-      </div>
-
-      <div className="bgr-index" onMouseLeave={hidePreview}>
-        {SAMPLES.map((s, i) => (
-          <button
-            key={s.name}
-            type="button"
-            className="bgr-row pb-reveal"
-            style={{ '--rv-i': `${0.1 + i * 0.07}s` } as React.CSSProperties}
-            onClick={() => { hidePreview(); onLoadSample(s.src, s.name); }}
-            onMouseMove={(e) => showPreview(s.src, e.clientX, e.clientY)}
-          >
-            <span className="bgr-ghost">{String(i + 1).padStart(2, '0')}</span>
-            <span className="bgr-row-name">{s.name}</span>
-            <img className="bgr-row-thumb" src={s.src} alt="" loading="lazy" draggable={false} />
-            <span className="bgr-row-tag">{s.tag}</span>
-            <span className="bgr-row-go"><ArrowRight size={15} strokeWidth={2.4} /></span>
-          </button>
-        ))}
-      </div>
-
-      {/* cursor-follow preview */}
-      <div className="bgr-preview" ref={previewRef} aria-hidden="true">
-        <img ref={previewImgRef} alt="" draggable={false} />
-      </div>
-    </section>
-  );
-};
 
 /* ============================================================
    3 — PIPELINE : sticky crosshair + ghost-number steps
@@ -199,7 +116,7 @@ export const BgPipeline: React.FC = () => {
           <h2 className="bgr-display pb-reveal" style={{ '--rv-i': '0.06s' } as React.CSSProperties}>
             Three moves.
             <br />
-            <em>Zero uploads.</em>
+            <em>Absolute privacy.</em>
           </h2>
           <p className="bgr-lede pb-reveal" style={{ '--rv-i': '0.12s' } as React.CSSProperties}>
             From drag-and-drop to finished cutout without a single byte leaving the machine.
@@ -216,7 +133,7 @@ export const BgPipeline: React.FC = () => {
             <div>
               <span className="bgr-step-k">Drop</span>
               <h3>Land the image</h3>
-              <p>PNG, JPG or WebP up to 15 MB — drag it in, paste with Ctrl+V, or pick a file. Processing starts the moment it arrives.</p>
+              <p>PNG, JPG or WebP up to 20 MB by dragging it in, pasting with Ctrl+V, or pick a file. Processing begins the moment it arrives.</p>
             </div>
           </article>
 
@@ -225,7 +142,7 @@ export const BgPipeline: React.FC = () => {
             <div>
               <span className="bgr-step-k">Segment</span>
               <h3>Neural separation</h3>
-              <p>BiRefNet isolates the subject on your hardware — WebGPU when available, WebAssembly everywhere else. Hair, fur and glass edges included.</p>
+              <p>BiRefNet runs directly on your hardware, leveraging WebGPU when available and WebAssembly everywhere else. Hair, fur and glass edges included.</p>
             </div>
           </article>
 
@@ -234,7 +151,7 @@ export const BgPipeline: React.FC = () => {
             <div>
               <span className="bgr-step-k">Ship</span>
               <h3>Refine & export</h3>
-              <p>Brush edges back, swap the background, add a shadow — then save a transparent PNG, WebP or JPG in one click.</p>
+              <p>Brush edges back, swap backgrounds, and add shadows. Then, save as a transparent PNG, WebP, or JPG in a single click.</p>
             </div>
           </article>
         </div>
@@ -263,7 +180,7 @@ const Lens: React.FC<{ before: string; after: string }> = ({ before, after }) =>
     if (!el) return;
     const r = el.getBoundingClientRect();
     if (!r.width) return;
-    setCut(Math.min(96, Math.max(4, ((clientX - r.left) / r.width) * 100)));
+    setCut(Math.min(100, Math.max(0, ((clientX - r.left) / r.width) * 100)));
   }, []);
 
   return (
@@ -275,7 +192,7 @@ const Lens: React.FC<{ before: string; after: string }> = ({ before, after }) =>
         style={{ '--bgr-ar': ar } as React.CSSProperties}
         onPointerDown={(e) => {
           dragging.current = true;
-          (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+          (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
           move(e.clientX);
         }}
         onPointerMove={(e) => dragging.current && move(e.clientX)}
@@ -317,8 +234,7 @@ export const BgPrecision: React.FC = () => {
             <em>Judge yourself.</em>
           </h2>
           <p className="bgr-lede pb-reveal" style={{ '--rv-i': '0.12s', fontSize: 13.5 } as React.CSSProperties}>
-            Drag the blade across the frame — the left side is the untouched shot, the right
-            is the isolated subject. The export keeps exactly what you approve here.
+            Drag the slider across the frame, the left side shows the original shot, the right shows the isolated subject. Your export keeps exactly what you see here.
           </p>
 
           <div className="bgr-stats">
@@ -345,6 +261,91 @@ export const BgPrecision: React.FC = () => {
   );
 };
 
+
+/* ============================================================
+   2 — SAMPLES : index list + cursor-follow preview
+   ============================================================ */
+export interface SampleDef {
+  src: string;
+  name: string;
+  tag: string;
+}
+
+const SAMPLES: SampleDef[] = [
+  { src: IMG_S1, name: 'Street Portrait', tag: 'Portrait' },
+  { src: IMG_S2, name: 'Studio Subject', tag: 'Studio' },
+  { src: IMG_S3, name: 'Wildlife Shot', tag: 'Wildlife' },
+];
+
+export const BgSampleGallery: React.FC<{ onLoadSample: (src: string, name: string) => void }> = ({ onLoadSample }) => {
+  const ref = useReveal<HTMLElement>();
+  const previewRef = useRef<HTMLDivElement>(null);
+  const previewImgRef = useRef<HTMLImageElement>(null);
+
+  const showPreview = useCallback((src: string, x: number, y: number) => {
+    const el = previewRef.current;
+    if (!el) return;
+    if (previewImgRef.current) previewImgRef.current.src = src;
+    el.style.transform = `translate(${x - 125}px, ${y - 300}px)`;
+    el.classList.add('is-on');
+  }, []);
+
+  const hidePreview = useCallback(() => {
+    previewRef.current?.classList.remove('is-on');
+  }, []);
+
+  /* keep the preview honest when the page scrolls under a stationary cursor */
+  useEffect(() => {
+    window.addEventListener('scroll', hidePreview, { passive: true });
+    return () => window.removeEventListener('scroll', hidePreview);
+  }, [hidePreview]);
+
+  return (
+    <section className="bgr-section" ref={ref}>
+      <PlusMark style={{ top: '10%', right: '4%' }} />
+
+      <div className="bgr-samples-head">
+        <div>
+          <span className="bgr-eyebrow pb-reveal">Try it live</span>
+          <h2 className="bgr-display pb-reveal" style={{ '--rv-i': '0.06s' } as React.CSSProperties}>
+            Pick a frame.
+            <br />
+            <em>Watch it split.</em>
+          </h2>
+        </div>
+        <p className="bgr-lede pb-reveal" style={{ '--rv-i': '0.12s', maxWidth: 380 } as React.CSSProperties}>
+          Each row runs the exact network you'll use on your own files. Click an option below to start the cutout instantly on the canvas.
+        </p>
+      </div>
+
+      <div className="bgr-index" onMouseLeave={hidePreview}>
+        {SAMPLES.map((s, i) => (
+          <button
+            key={s.name}
+            type="button"
+            className="bgr-row pb-reveal"
+            style={{ '--rv-i': `${0.1 + i * 0.07}s` } as React.CSSProperties}
+            onClick={() => { hidePreview(); onLoadSample(s.src, s.name); }}
+            onMouseMove={(e) => showPreview(s.src, e.clientX, e.clientY)}
+          >
+            <span className="bgr-ghost">{String(i + 1).padStart(2, '0')}</span>
+            <span className="bgr-row-name">{s.name}</span>
+            <img className="bgr-row-thumb" src={s.src} alt="" loading="lazy" draggable={false} />
+            <span className="bgr-row-tag">{s.tag}</span>
+            <span className="bgr-row-go"><ArrowRight size={15} strokeWidth={2.4} /></span>
+          </button>
+        ))}
+      </div>
+
+      {/* cursor-follow preview */}
+      <div className="bgr-preview" ref={previewRef} aria-hidden="true">
+        <img ref={previewImgRef} alt="" draggable={false} />
+      </div>
+    </section>
+  );
+};
+
+
 /* ============================================================
    5 — FAQ : identical design system to the upscaler FAQ
    (reuses the globally-bundled uc-faq classes)
@@ -360,7 +361,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'Which formats can I use and export?',
-    a: 'Upload PNG, JPG, and WebP up to 15 MB. Export as transparent PNG for cutouts, WebP for the web with alpha kept, or JPG flattened onto a solid background.',
+    a: 'Upload PNG, JPG, and WebP up to 20 MB. Export as transparent PNG for cutouts, WebP for the web with alpha kept, or JPG flattened onto a solid background.',
   },
   {
     q: 'Can I replace the removed background?',
@@ -440,4 +441,4 @@ export const BgFaq: React.FC = () => {
   );
 };
 
-export default { BgSampleGallery, BgShowcase, BgPipeline, BgPrecision, BgFaq };
+export default { BgShowcase, BgPipeline, BgPrecision, BgSampleGallery, BgFaq };

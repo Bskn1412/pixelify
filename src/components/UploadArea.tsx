@@ -14,6 +14,7 @@ interface UploadAreaProps {
   // Image used for the visual demo shown before upload.
   // Example: "/images/upscale-demo.jpg"
   previewImage?: string;
+  maxSizeMB?: number;
 }
 
 function formatSize(bytes: number): string {
@@ -33,6 +34,7 @@ export default function UploadArea({
   beforeImage,
   afterImage,
   previewImage = "/spiderman3.jpeg",
+  maxSizeMB = 15,
 }: UploadAreaProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -575,7 +577,7 @@ export default function UploadArea({
                 text-white/20
               "
             >
-              PNG, JPEG, WEBP · up to 25MB · Ctrl + V to paste
+              PNG, JPEG, WEBP · up to {maxSizeMB}MB · Ctrl + V to paste
             </p>
           )}
         </div>

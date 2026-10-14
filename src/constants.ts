@@ -402,7 +402,7 @@ export const BG_HOW_IT_WORKS = [
   {
     num: '01',
     title: 'Upload Your Image',
-    desc: 'Drag & drop a PNG, JPG, or WebP photo up to 15 MB, paste it with Ctrl+V, or click a sample image to try it instantly.',
+    desc: 'Drag & drop a PNG, JPG, or WebP photo up to 20 MB, paste it with Ctrl+V, or click a sample image to try it instantly.',
     icon: '📥'
   },
   {
@@ -430,7 +430,7 @@ export const BG_FAQS = [
   },
   {
     q: 'Which image formats are supported?',
-    a: 'You can upload PNG, JPG, and WebP images up to 15 MB. Results export as transparent PNG (recommended for cutouts), WebP for the web, or JPG with a solid background.'
+    a: 'You can upload PNG, JPG, and WebP images up to 20 MB. Results export as transparent PNG (recommended for cutouts), WebP for the web, or JPG with a solid background.'
   },
   {
     q: 'Can I replace the background with another photo or color?',

@@ -20,7 +20,9 @@ import {
   VolumeX,
   Menu,
   X,
-  Images
+  Images,
+  ZoomIn,
+  ZoomOut,
 } from "lucide-react";
 import {
   isSoundEnabled,
@@ -173,19 +175,19 @@ function ModelDropdown({
     { label: string; full: string; desc: string; popular?: boolean }
   > = {
     clearreality: {
-      label: "ClearReality",
-      full: MODELS.clearreality?.name || "ClearReality",
+      label: "vitality",
+      full: MODELS.clearreality?.name || "Vitality",
       desc: "Fastest model, crisp clean edges.",
       popular: true,
     },
     ultrasharp: {
-      label: "UltraSharp",
-      full: MODELS.ultrasharp?.name || "UltraSharp",
+      label: "Pixel-Dance",
+      full: MODELS.ultrasharp?.name || "Pixel-Dance",
       desc: "Max detail, up to 8K output.",
     },
     realesrgan: {
-      label: "Real-ESRGAN",
-      full: MODELS.realesrgan?.name || "Real-ESRGAN",
+      label: "Alpha-Satoru",
+      full: MODELS.realesrgan?.name || "Alpha-Satoru",
       desc: "Natural detail for portraits & photos.",
     },
   };
@@ -354,6 +356,152 @@ export default function UpscaleWorkspace({
 
   const activeItem = items.find((i) => i.id === selectedId) || items[0];
   if (!activeItem) return null;
+
+  // Viewport Zoom & Pan state
+  const [viewportZoom, setViewportZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
+  const isPanningRef = useRef(false);
+  const startPanRef = useRef({ x: 0, y: 0 });
+
+  // Reset zoom & pan when active item changes
+  useEffect(() => {
+    setViewportZoom(1);
+    setPan({ x: 0, y: 0 });
+  }, [activeItem?.id]);
+
+  // Reset pan if zoom drops back to 1
+  useEffect(() => {
+    if (viewportZoom <= 1) {
+      setPan({ x: 0, y: 0 });
+    }
+  }, [viewportZoom]);
+
+  const handleStagePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (viewportZoom <= 1) return;
+    if (e.button !== 0 && e.button !== 1) return;
+    isPanningRef.current = true;
+    setIsPanning(true);
+    startPanRef.current = {
+      x: e.clientX - pan.x,
+      y: e.clientY - pan.y,
+    };
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleStagePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isPanningRef.current) return;
+    setPan({
+      x: e.clientX - startPanRef.current.x,
+      y: e.clientY - startPanRef.current.y,
+    });
+  };
+
+  const handleStagePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (isPanningRef.current) {
+      isPanningRef.current = false;
+      setIsPanning(false);
+      try {
+        (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+      } catch {
+        // ignore
+      }
+    }
+  };
+
+  const handleStageWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      const delta = e.deltaY < 0 ? 0.25 : -0.25;
+      setViewportZoom((z) =>
+        Math.min(3, Math.max(0.5, Math.round((z + delta) * 100) / 100))
+      );
+    } else if (viewportZoom > 1) {
+      setPan((p) => ({
+        x: p.x - e.deltaX,
+        y: p.y - e.deltaY,
+      }));
+    }
+  };
+
+  // Stage header bar matching BGRemoveWorkspace style
+  const stageHeaderBar = (
+    <div className="flex w-full flex-wrap items-center justify-between gap-3 px-2 py-1.5">
+      <div className="flex items-center gap-2 min-w-0">
+        <span className="text-xs font-mono px-3 py-1.5 rounded-full bg-slate-200/80 dark:bg-white/10 text-slate-800 dark:text-neutral-200 border border-slate-300/60 dark:border-white/10 font-bold truncate max-w-xs">
+          📁 {activeItem?.name || "Untitled Image"}
+        </span>
+        {activeItem.status === "completed" && !!activeItem.result && (
+          <span className="text-[11px] font-mono px-2.5 py-1 rounded-full bg-[#00FF85]/15 text-[#00FF85] border border-[#00FF85]/30 font-bold shrink-0">
+            ✓ Enhanced {activeItem?.options?.scale ? `${activeItem.options.scale}x` : ""}
+          </span>
+        )}
+        {activeItem.status === "processing" && (
+          <span className="text-[11px] font-mono px-2.5 py-1 rounded-full bg-cyan-400/15 text-cyan-400 border border-cyan-400/30 font-bold shrink-0 animate-pulse">
+            ⚡ Enhancing...
+          </span>
+        )}
+      </div>
+
+      <div className="flex items-center gap-1 rounded-full border border-white/10 bg-[#111319]/90 p-1 text-white shadow-lg backdrop-blur-xl shrink-0">
+        <button
+          type="button"
+          onClick={() =>
+            setViewportZoom((zoom) =>
+              Math.max(0.5, Math.round((zoom - 0.25) * 100) / 100)
+            )
+          }
+          aria-label="Zoom out"
+          title="Zoom out"
+          className="flex h-8 w-8 items-center justify-center rounded-full transition hover:bg-white/10 cursor-pointer"
+        >
+          <ZoomOut className="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setViewportZoom(1);
+            setPan({ x: 0, y: 0 });
+          }}
+          aria-label="Reset zoom"
+          title="Reset zoom"
+          className="min-w-12 rounded-full px-2 py-1.5 text-xs font-bold tabular-nums transition hover:bg-white/10 cursor-pointer text-center"
+        >
+          {Math.round(viewportZoom * 100)}%
+        </button>
+        <button
+          type="button"
+          onClick={() =>
+            setViewportZoom((zoom) =>
+              Math.min(3, Math.round((zoom + 0.25) * 100) / 100)
+            )
+          }
+          aria-label="Zoom in"
+          title="Zoom in"
+          className="flex h-8 w-8 items-center justify-center rounded-full transition hover:bg-white/10 cursor-pointer"
+        >
+          <ZoomIn className="h-4 w-4" />
+        </button>
+        <span className="mx-0.5 h-5 w-px bg-white/15" />
+        <button
+          type="button"
+          onClick={() => {
+            setViewportZoom(1);
+            setPan({ x: 0, y: 0 });
+          }}
+          aria-label="Reset zoom"
+          title="Reset zoom"
+          className="flex h-8 w-8 items-center justify-center rounded-full transition hover:bg-white/10 cursor-pointer"
+        >
+          <RotateCcw className="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+  );
 
   const isProcessing = activeItem.status === "processing";
   const hasResult = activeItem.status === "completed" && !!activeItem.result;
@@ -707,30 +855,57 @@ export default function UpscaleWorkspace({
           </div>
         </div>
 
+        {/* STAGE HEADER BAR */}
+        <div className="w-full shrink-0 px-3 pb-2">
+          {stageHeaderBar}
+        </div>
+
         {/* IMAGE SHOWCASE — FIXED HEIGHT */}
         <div className="w-full shrink-0 px-3">
-          <div className="relative h-[40vh] max-h-[480px] min-h-[210px] w-full overflow-hidden rounded-2xl border border-white/[0.08] bg-[#070709] shadow-2xl isolate">
-            {/* Subtle canvas grid pattern */}
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:20px_20px] opacity-40" />
+          <div
+            onPointerDown={handleStagePointerDown}
+            onPointerMove={handleStagePointerMove}
+            onPointerUp={handleStagePointerUp}
+            onPointerCancel={handleStagePointerUp}
+            onWheel={handleStageWheel}
+            className={`relative h-[40vh] max-h-[480px] min-h-[210px] w-full overflow-hidden rounded-2xl border border-white/[0.08] bg-[#070709] shadow-2xl isolate select-none ${
+              viewportZoom > 1 ? (isPanning ? 'cursor-grabbing' : 'cursor-grab') : ''
+            }`}
+          >
+            {/* Authentic stage canvas */}
 
-            {hasResult && resultUrl ? (
-              <BeforeAfterSlider before={imageUrl} after={resultUrl} />
-            ) : (
-              <div className="relative flex h-full w-full items-center justify-center">
-                <img
-                  src={imageUrl}
-                  alt={activeItem.name || "Uploaded preview"}
-                  className="
-                    block
-                    h-full
-                    w-full
-                    object-contain
-                    select-none
-                  "
-                  draggable={false}
+            <div
+              className={`relative flex h-full w-full items-center justify-center origin-center ${
+                isPanning ? 'transition-none' : 'transition-transform duration-150'
+              }`}
+              style={{
+                transform: `translate(${pan.x}px, ${pan.y}px) scale(${viewportZoom})`,
+              }}
+            >
+              {hasResult && resultUrl ? (
+                <BeforeAfterSlider
+                  before={imageUrl}
+                  after={resultUrl}
+                  isZoomed={viewportZoom > 1}
+                  onStartPan={handleStagePointerDown}
                 />
-              </div>
-            )}
+              ) : (
+                <div className="relative flex h-full w-full items-center justify-center pointer-events-none">
+                  <img
+                    src={imageUrl}
+                    alt={activeItem.name || "Uploaded preview"}
+                    className="
+                      block
+                      h-full
+                      w-full
+                      object-contain
+                      select-none
+                    "
+                    draggable={false}
+                  />
+                </div>
+              )}
+            </div>
 
             {/* SOLVING ORB PROCESSING OVERLAY */}
             {isProcessing && (
@@ -896,30 +1071,54 @@ export default function UpscaleWorkspace({
           LEFT SECTION: IMAGE CANVAS + INDIVIDUAL ADD/THUMB STRIP BELOW (Req 5 & 6)
          ====================================================== */}
       <div className="flex-1 min-w-0 flex flex-col gap-4 w-full">
-        
-        {/* 5. IMAGE SHOWCASE DIV (Big, properly fits uploaded image in view) */}
-        <div className="relative w-full h-[620px] lg:h-[760px] max-h-[82vh] rounded-2xl border border-white/[0.08] bg-[#070709] flex items-center justify-center overflow-hidden p-3 sm:p-6 shadow-2xl isolate">
-          {/* Subtle canvas grid pattern */}
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:20px_20px] opacity-40" />
+        {/* STAGE HEADER BAR */}
+        {stageHeaderBar}
 
-          {hasResult && resultUrl ? (
-            <BeforeAfterSlider before={imageUrl} after={resultUrl} />
-          ) : (
-            <div className="relative flex h-full w-full items-center justify-center">
-              <img
-                src={imageUrl}
-                alt={activeItem.name || "Uploaded preview"}
-                className="
-                  block
-                  h-full
-                  w-full
-                  object-contain
-                  select-none
-                "
-                draggable={false}
+        {/* 5. IMAGE SHOWCASE DIV (Big, properly fits uploaded image in view) */}
+        <div
+          onPointerDown={handleStagePointerDown}
+          onPointerMove={handleStagePointerMove}
+          onPointerUp={handleStagePointerUp}
+          onPointerCancel={handleStagePointerUp}
+          onWheel={handleStageWheel}
+          className={`relative w-full h-[620px] lg:h-[760px] max-h-[82vh] rounded-2xl border border-white/[0.08] bg-[#070709] flex items-center justify-center overflow-hidden p-3 sm:p-6 shadow-2xl isolate select-none ${
+            viewportZoom > 1 ? (isPanning ? 'cursor-grabbing' : 'cursor-grab') : ''
+          }`}
+        >
+          {/* Authentic stage canvas */}
+
+          <div
+            className={`relative flex h-full w-full items-center justify-center origin-center ${
+              isPanning ? 'transition-none' : 'transition-transform duration-150'
+            }`}
+            style={{
+              transform: `translate(${pan.x}px, ${pan.y}px) scale(${viewportZoom})`,
+            }}
+          >
+            {hasResult && resultUrl ? (
+              <BeforeAfterSlider
+                before={imageUrl}
+                after={resultUrl}
+                isZoomed={viewportZoom > 1}
+                onStartPan={handleStagePointerDown}
               />
-            </div>
-          )}
+            ) : (
+              <div className="relative flex h-full w-full items-center justify-center pointer-events-none">
+                <img
+                  src={imageUrl}
+                  alt={activeItem.name || "Uploaded preview"}
+                  className="
+                    block
+                    h-full
+                    w-full
+                    object-contain
+                    select-none
+                  "
+                  draggable={false}
+                />
+              </div>
+            )}
+          </div>
 
           {/* SOLVING ORB PROCESSING OVERLAY — progress ring + solving orb + % (no tiles/steps) */}
           {isProcessing && (
@@ -1212,9 +1411,13 @@ export default function UpscaleWorkspace({
 function BeforeAfterSlider({
   before,
   after,
+  isZoomed = false,
+  onStartPan,
 }: {
   before: string;
   after: string;
+  isZoomed?: boolean;
+  onStartPan?: (e: React.PointerEvent<HTMLDivElement>) => void;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [pos, setPos] = useState(50);
@@ -1259,6 +1462,19 @@ function BeforeAfterSlider({
      Start dragging
      ---------------------------------------------------------- */
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    const container = containerRef.current;
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const dividerX = (pos / 100) * rect.width;
+    const dist = Math.abs(clickX - dividerX);
+
+    // If zoomed and not clicking near the divider/handle, delegate to panning
+    if (isZoomed && dist > 40) {
+      onStartPan?.(e);
+      return;
+    }
+
     e.preventDefault();
     draggingRef.current = true;
     updatePosition(e.clientX);
@@ -1293,7 +1509,7 @@ function BeforeAfterSlider({
     <div
       ref={containerRef}
       onPointerDown={handlePointerDown}
-      className="
+      className={`
         relative
         h-full
         w-full
@@ -1301,8 +1517,8 @@ function BeforeAfterSlider({
         rounded-xl
         touch-none
         select-none
-        cursor-ew-resize
-      "
+        ${isZoomed ? "cursor-default" : "cursor-ew-resize"}
+      `}
     >
       <div className="relative h-full w-full flex items-center justify-center">
         {/* NEW / UPSCALED IMAGE */}
@@ -1331,8 +1547,27 @@ function BeforeAfterSlider({
             left: `${pos}%`,
           }}
         >
+          {/* HIT AREA FOR SLIDER DRAGGING WHEN ZOOMED */}
+          <div
+            className="absolute inset-y-0 -left-6 -right-6 pointer-events-auto cursor-ew-resize"
+            onPointerDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              draggingRef.current = true;
+              updatePosition(e.clientX);
+            }}
+          />
+
           {/* HANDLE */}
-          <div className="absolute left-1/2 top-1/2 flex h-[48px] w-[48px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-[14px] bg-white shadow-[0_8px_30px_rgba(0,0,0,.4)] pointer-events-auto cursor-ew-resize">
+          <div
+            className="absolute left-1/2 top-1/2 flex h-[48px] w-[48px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-[14px] bg-white shadow-[0_8px_30px_rgba(0,0,0,.4)] pointer-events-auto cursor-ew-resize"
+            onPointerDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              draggingRef.current = true;
+              updatePosition(e.clientX);
+            }}
+          >
             <div className="flex items-center gap-[5px] text-black">
               <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
                 <path d="M6 1L1 6L6 11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -1624,7 +1859,7 @@ function UploadStrip({
                   >
                     <img
                       src={item.url}
-                      className="h-full w-full object-cover select-none bg-[repeating-conic-gradient(#1a1a20_0%_25%,#121216_0%_50%)] [background-size:12px_12px]"
+                      className="h-full w-full object-cover select-none bg-[#13141b]"
                       alt={item.name}
                       draggable={false}
                     />

@@ -1,3 +1,4 @@
+// utils/upscale.ts
 import { MODELS } from '../constants';
 import type { ModelKey } from '../types';
 
@@ -100,7 +101,8 @@ async function readWithProgress(
 async function fetchModelWithCache(
   path: string,
   onProgress?: ModelLoadProgress,
-  expectedBytes = 0
+  expectedBytes = 0,
+  signal?: AbortSignal
 ): Promise<Uint8Array> {
   try {
     const cache = await caches.open('onnx-models');
@@ -114,18 +116,19 @@ async function fetchModelWithCache(
       }
       await cache.delete(path);
     }
-    const res = await fetch(path);
+    const res = await fetch(path, { signal });
     if (!res.ok) {
       throw new Error(`Failed to load model file ${path}: HTTP ${res.status}`);
     }
     const data = await readWithProgress(res, onProgress, expectedBytes);
     if (data.byteLength > 100000) {
-      cache.put(path, new Response(data));
+      await cache.put(path, new Response(data));
     }
     return data;
   } catch (err) {
+    if (signal?.aborted) throw err;
     // Direct network fallback if Cache API fails or throws
-    const res = await fetch(path);
+    const res = await fetch(path, { signal });
     if (!res.ok) {
       throw new Error(`Failed to load model file ${path}: HTTP ${res.status}`);
     }
@@ -137,7 +140,8 @@ export async function createSession(
   ort: OrtModule, 
   modelKey: ModelKey, 
   forceEngine?: 'wasm' | 'webgpu',
-  onProgress?: ModelLoadProgress
+  onProgress?: ModelLoadProgress,
+  signal?: AbortSignal
 ): Promise<InferenceSession> {
   const m = MODELS[modelKey];
 
@@ -148,7 +152,8 @@ export async function createSession(
   const data = await fetchModelWithCache(
     m.file,
     downloadProgress,
-    parseSizeToBytes(m.size)
+    parseSizeToBytes(m.size),
+    signal
   );
 
   // ClearReality uses DepthToSpace / PixelShuffle. In ORT Web 1.19.2+, WebGPU JSEP kernel for DepthToSpace
