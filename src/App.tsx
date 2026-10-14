@@ -54,6 +54,12 @@ import type {
   UpscaleItem,
 } from './types';
 import NotFound from './components/NotFound';
+import BlogList from './components/blogs/BlogList';
+import BlogPost from './components/blogs/BlogPost';
+import AboutPage from './components/pages/AboutPage';
+import ProductsPage from './components/pages/ProductsPage';
+import PrivacyPage from './components/pages/PrivacyPage';
+import TermsPage from './components/pages/TermsPage';
 
 const STORAGE_KEY = 'pixelify_upscaler_history_2026'; // legacy, no longer written
 const THEME_KEY = 'pixelify_theme_pref';
@@ -67,6 +73,9 @@ export default function App() {
     const path = location.pathname.replace(/^\//, '');
     if (path === 'upscaler' || path === 'bg_remove') {
       return path as ViewTab;
+    }
+    if (path === 'blogs' || path.startsWith('blogs/')) {
+      return 'blogs' as ViewTab;
     }
     return 'home';
   }, [location.pathname]);
@@ -596,7 +605,37 @@ export default function App() {
           />
 
 
-          {/* ROUTE 2: AI UPSCALER STUDIO (/upscaler) */}
+          {/* ROUTE 1 (alt): BLOG LIST (/blogs) */}
+          <Route
+            path="/blogs"
+            element={
+              <BlogList onTabChange={navigateTo} />
+            }
+          />
+
+          {/* ROUTE 2 (alt): BLOG ARTICLE (/blogs/:slug = English) */}
+          <Route
+            path="/blogs/:slug"
+            element={
+              <BlogPost onTabChange={navigateTo} />
+            }
+          />
+
+          {/* ROUTE 2 (b): TRANSLATED ARTICLE (/blogs/fr/:slug, /blogs/zh/:slug, …) */}
+          <Route
+            path="/blogs/:lang/:slug"
+            element={
+              <BlogPost onTabChange={navigateTo} />
+            }
+          />
+
+          {/* STATIC PAGES: ABOUT / PRODUCTS / PRIVACY / TERMS */}
+          <Route path="/about" element={<AboutPage onTabChange={navigateTo} />} />
+          <Route path="/products" element={<ProductsPage onTabChange={navigateTo} />} />
+          <Route path="/privacy" element={<PrivacyPage onTabChange={navigateTo} />} />
+          <Route path="/terms" element={<TermsPage onTabChange={navigateTo} />} />
+
+          {/* ROUTE 3: AI UPSCALER STUDIO (/upscaler) */}
           <Route
             path="/upscaler"
             element={

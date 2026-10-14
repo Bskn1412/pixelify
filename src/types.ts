@@ -2,7 +2,7 @@ export type Step = 'upload' | 'config' | 'processing' | 'result';
 export type Backend = 'webgpu' | 'wasm';
 export type ModelKey = 'clearreality' | 'ultrasharp' | 'realesrgan';
 export type ScaleFactor = 2 | 4 | 8;
-export type ViewTab = 'home' | 'upscaler' | 'bg_remove' | 'prompts' | 'batch';
+export type ViewTab = 'home' | 'upscaler' | 'bg_remove' | 'blogs' | 'prompts' | 'batch';
 export type ThemeMode = 'dark' | 'light' | 'system';
 export type CompareMode = 'slider' | 'sideBySide' | 'zoomLens';
 

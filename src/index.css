@@ -90,6 +90,28 @@ html.light .bg-white\/10:hover {
     background-color: rgba(15, 23, 42, 0.08) !important;
 }
 
+/* ==========================================================
+   BLOG — editorial serif typeface (Medium-style article body)
+   ========================================================== */
+.blog-serif,
+.blog-serif p,
+.blog-serif li,
+.blog-serif figcaption {
+    font-family: Georgia, 'Times New Roman', serif;
+    letter-spacing: -0.003em;
+}
+
+.blog-serif strong,
+.blog-serif b {
+    color: #FFFFFF;
+    font-weight: 700;
+}
+
+.blog-serif em,
+.blog-serif i {
+    font-style: italic;
+}
+
 /* Custom Grid Pattern Background */
 .bg-grid-pattern {
     background-size: 32px 32px;
@@ -472,7 +494,7 @@ html.light .gradient-text {
     align-items: center;
     justify-content: space-between;
 
-    padding: 0 16px;
+    gap: 3rem;
 
     overflow: visible;
 }
@@ -482,7 +504,6 @@ html.light .gradient-text {
     flex-direction: column;
     align-items: center;
     width: 100%;
-    margin-top: 0;
 }
 
 
@@ -516,7 +537,6 @@ html.light .gradient-text {
 
     text-align: center;
 
-    margin-top: 68px;
 }
 
 
@@ -1017,7 +1037,7 @@ html.light .gradient-text {
    HERO SCROLL DOWN BUTTON
    ========================================================================== */
 
-.pixelify-hero .hero-scroll-wrap {
+.hero-scroll-wrap {
     position: relative;
     z-index: 2;
     display: flex;
@@ -1186,6 +1206,14 @@ html.light .gradient-text {
         max-width: none;
 
         justify-content: center;
+    }
+
+    /* The base rule pins the scroll cue to the bottom via margin-top:auto,
+       which collapses the centered content against the top of the hero and
+       leaves a ~330px hole in the middle on phones. Give it a fixed gap so
+       justify-content:center actually centers the headline + CTA block. */
+    .pixelify-hero .hero-scroll-wrap {
+        margin-top: clamp(20px, 4vh, 40px);
     }
 
     .pixelify-hero .headline {
@@ -1375,8 +1403,8 @@ html.light .gradient-text {
     position: relative;
 
     width: 100%;
-    height: 85vh;
-    min-height: 520px;
+    height: 78vh;
+    min-height: 480px;
 
     overflow: hidden;
 
@@ -1447,6 +1475,17 @@ html.light .gradient-text {
 
 .cf-word.pixelify-italic {
     font-style: italic;
+}
+
+/* Shorter frame on phones: the word composition is wide, so a tall frame
+   leaves large empty bands above and below the animated text. */
+@media (max-width: 768px) {
+    [data-composition-id="caption-camera-follow"],
+    .cf-root,
+    .pixelify-story {
+        height: 58vh;
+        min-height: 400px;
+    }
 }
 
 #cf-vignette,

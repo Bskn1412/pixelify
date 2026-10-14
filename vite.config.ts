@@ -4,6 +4,9 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   base: './',
+  optimizeDeps: {
+    exclude: ['@huggingface/transformers'],
+  },
   server: {
     port: 3000,
     headers: {

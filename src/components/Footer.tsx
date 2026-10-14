@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import type { ViewTab } from '../types';
 import Icon from './Icon';
 import Logo from './Logo';
@@ -59,9 +60,12 @@ export default function Footer({ onTabChange }: FooterProps) {
               <a href="#benchmarks" onClick={(e) => e.preventDefault()} className="text-muted hover:text-white transition">
                 WebGPU Benchmarks
               </a>
-              <a href="#privacy" onClick={(e) => e.preventDefault()} className="text-muted hover:text-white transition">
+              <button onClick={() => onTabChange('blogs')} className="text-left text-muted hover:text-white transition">
+                Blog & Guides
+              </button>
+              <Link to="/privacy" className="text-muted hover:text-white transition">
                 100% Privacy Guarantee
-              </a>
+              </Link>
               <a href="https://github.com" target="_blank" rel="noreferrer" className="text-muted hover:text-white transition">
                 GitHub Repository
               </a>
@@ -87,18 +91,21 @@ export default function Footer({ onTabChange }: FooterProps) {
           </div>
 
           <div className="flex flex-wrap items-center justify-center sm:justify-end gap-x-5 gap-y-2 font-medium">
-            <a href="#about" onClick={(e) => e.preventDefault()} className="hover:text-white transition">
+            <Link to="/about" className="hover:text-white transition">
               About Pixelify
-            </a>
-            <a href="#products" onClick={(e) => e.preventDefault()} className="hover:text-white transition">
+            </Link>
+            <Link to="/products" className="hover:text-white transition">
               Pixelify Products
-            </a>
-            <a href="#privacy" onClick={(e) => e.preventDefault()} className="hover:text-white transition">
+            </Link>
+            <button onClick={() => onTabChange('blogs')} className="hover:text-white transition cursor-pointer">
+              Blogs
+            </button>
+            <Link to="/privacy" className="hover:text-white transition">
               Privacy Policy
-            </a>
-            <a href="#terms" onClick={(e) => e.preventDefault()} className="hover:text-white transition">
+            </Link>
+            <Link to="/terms" className="hover:text-white transition">
               Terms of Service
-            </a>
+            </Link>
           </div>
         </div>
 
