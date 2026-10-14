@@ -321,14 +321,23 @@
   border: 1px solid rgba(255, 255, 255, 0.14);
   /* frame follows the image's true aspect ratio (set from JS) and is
      height-capped — the full subject is always visible, never cropped */
-  width: min(680px, calc(540px * var(--bgr-ar, 0.75)));
+  width: min(800px, calc(650px * var(--bgr-ar, 0.75)));
   max-width: calc(100vw - 72px);
   aspect-ratio: var(--bgr-ar, 0.75);
   background: #0b0d0b;
   cursor: ew-resize;
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
-.bgr-lens img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.bgr-lens img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
 .bgr-lens-before { position: absolute; inset: 0; }
 .bgr-lens-handle {
   position: absolute;
@@ -336,6 +345,8 @@
   width: 2px;
   background: #00ff85;
   box-shadow: 0 0 18px rgba(0, 255, 133, 0.65);
+  transform: translateX(-1px);
+  pointer-events: none;
 }
 .bgr-lens-knob {
   position: absolute;
@@ -363,6 +374,9 @@
   border: 1px solid rgba(255, 255, 255, 0.16);
   color: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 .bgr-lens-tag.is-before { left: 12px; }
 .bgr-lens-tag.is-after { right: 12px; color: #050507; background: #00ff85; border-color: #00ff85; }
@@ -381,6 +395,9 @@
   border: 1px solid rgba(255, 255, 255, 0.14);
   padding: 5px 10px;
   border-radius: 4px;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 .bgr-lens-rec::before {
   content: "";

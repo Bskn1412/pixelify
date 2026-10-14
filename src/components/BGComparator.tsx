@@ -87,7 +87,7 @@ export default function BGComparator({
   activeTab = 'cutout',
   cutoutTool = 'move',
   brushSize = 40,
-  backgroundStyle = 'bg-[radial-gradient(#ddd_1px,transparent_1px)] [background-size:16px_16px] bg-slate-100 dark:bg-[radial-gradient(#333_1px,transparent_1px)] dark:bg-neutral-950',
+  backgroundStyle = 'bg-slate-100 dark:bg-neutral-950',
   customBgColor,
   customBgImage,
   subjectBgBlur = 0,
@@ -134,6 +134,151 @@ export default function BGComparator({
   const [isDragging, setIsDragging] = useState(false);
   const [subjectPos, setSubjectPos] = useState({ x: 0, y: 0 });
   const [resultAspectRatio, setResultAspectRatio] = useState<number | null>(null);
+
+  // Viewport Zoom & Pan state (applies to artboard across all modes)
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
+  const isPanningRef = useRef(false);
+  const startPanRef = useRef({ x: 0, y: 0 });
+  const hasPannedRef = useRef(false);
+  const [isSpaceHeld, setIsSpaceHeld] = useState(false);
+  const isSpaceHeldRef = useRef(false);
+
+  // Cutout section check - spacebar move/pan is strictly enabled only in cutout section
+  const isCutoutSection = activeTab === 'cutout' && !fabricEditMode && !isCompareMode;
+  const isCutoutSectionRef = useRef(isCutoutSection);
+  isCutoutSectionRef.current = isCutoutSection;
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'Space') {
+        // Spacebar move is only active in the cutout section; disabled automatically in all other sections
+        if (!isCutoutSectionRef.current) {
+          return;
+        }
+        const target = e.target as HTMLElement;
+        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+          return;
+        }
+        e.preventDefault();
+        if (!isSpaceHeldRef.current) {
+          isSpaceHeldRef.current = true;
+          setIsSpaceHeld(true);
+        }
+      }
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.code === 'Space') {
+        isSpaceHeldRef.current = false;
+        setIsSpaceHeld(false);
+      }
+    };
+
+    const handleBlur = () => {
+      isSpaceHeldRef.current = false;
+      setIsSpaceHeld(false);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('blur', handleBlur);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('blur', handleBlur);
+    };
+  }, []);
+
+  // Automatically disable Space-held move & active panning when navigating to other sections
+  useEffect(() => {
+    if (!isCutoutSection) {
+      isSpaceHeldRef.current = false;
+      setIsSpaceHeld(false);
+      if (isPanningRef.current) {
+        isPanningRef.current = false;
+        setIsPanning(false);
+      }
+      if (viewportZoom <= 1) {
+        setPan({ x: 0, y: 0 });
+      }
+    }
+  }, [isCutoutSection, viewportZoom]);
+
+  // Reset pan when zoom resets to 1 or job changes
+  useEffect(() => {
+    if (viewportZoom <= 1) {
+      setPan({ x: 0, y: 0 });
+    }
+  }, [viewportZoom]);
+
+  useEffect(() => {
+    setPan({ x: 0, y: 0 });
+  }, [job?.id]);
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    const isMiddleClick = e.button === 1;
+    const isLeftClick = e.button === 0;
+
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'INPUT' || target.tagName === 'BUTTON') return;
+    if (selectedLayerId && !isMiddleClick) return;
+
+    // Moving with space or the move tool is strictly enabled only in the cutout section
+    const isCutoutMoveActive = isCutoutSection && (isSpaceHeldRef.current || cutoutTool === 'move');
+    const canPan = isCutoutMoveActive || isMiddleClick || viewportZoom > 1;
+
+    if (canPan && (isLeftClick || isMiddleClick)) {
+      isPanningRef.current = true;
+      hasPannedRef.current = false;
+      setIsPanning(true);
+      startPanRef.current = {
+        x: e.clientX - pan.x,
+        y: e.clientY - pan.y,
+      };
+      try {
+        (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+      } catch {
+        // ignore
+      }
+    }
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isPanningRef.current) return;
+    hasPannedRef.current = true;
+    setPan({
+      x: e.clientX - startPanRef.current.x,
+      y: e.clientY - startPanRef.current.y,
+    });
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (isPanningRef.current) {
+      isPanningRef.current = false;
+      setIsPanning(false);
+      try {
+        (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+      } catch {
+        // ignore
+      }
+    }
+  };
+
+  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      const delta = e.deltaY < 0 ? 0.25 : -0.25;
+      const nextZoom = Math.min(3, Math.max(0.5, Math.round((viewportZoom + delta) * 100) / 100));
+      onViewportZoomChange?.(nextZoom);
+    } else if (!isCutoutSection && !isPaintingRef.current && viewportZoom > 1) {
+      setPan((p) => ({
+        x: p.x - e.deltaX,
+        y: p.y - e.deltaY,
+      }));
+    }
+  };
 
   // Measure stage container dimensions to fit artboard cleanly
   const [containerSize, setContainerSize] = useState({ width: 800, height: 540 });
@@ -223,15 +368,18 @@ export default function BGComparator({
   }, [job?.id]);
 
   const isProcessing = job.status === 'loading' || job.status === 'processing';
-  const isBrushMode = activeTab === 'cutout' && (cutoutTool === 'erase' || cutoutTool === 'restore') && !!job.resultUrl && !isProcessing && !isCompareMode;
+  const isCutoutActive = activeTab === 'cutout' && !fabricEditMode && !!job.resultUrl && !isProcessing;
+  const isBrushMode = isCutoutActive && !isCompareMode && (cutoutTool === 'erase' || cutoutTool === 'restore');
   const isCropMode = fabricEditMode === 'crop';
-  const isMoveMode = activeTab === 'cutout' && cutoutTool === 'move' && !fabricEditMode && !!job.resultUrl && !isProcessing && !isCompareMode;
+  const isMoveMode = isCutoutActive && cutoutTool === 'move';
 
   // -------------------------------------------------------------
   // INTERACTIVE BRUSH CANVAS (SINGLE IMAGE STAGE FOR CUTOUT REFINEMENT)
   // -------------------------------------------------------------
   const brushCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const baseImgCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const lastDrawnCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const lastInternalStrokeUrlRef = useRef<string | null>(null);
   const isPaintingRef = useRef(false);
   const [brushCursor, setBrushCursor] = useState<{ visible: boolean; x: number; y: number }>({
     visible: false,
@@ -248,38 +396,56 @@ export default function BGComparator({
 
   // Sync cutout image to brush canvas when image loads or changes
   useEffect(() => {
-    if (!job?.resultUrl || !brushCanvasRef.current) return;
+    const canvas = brushCanvasRef.current;
+    if (!job?.resultUrl || !canvas) return;
+    const resultUrl = job.resultUrl;
+
+    // Only skip redraw if THIS exact canvas element already has the pixels from our own stroke
+    if (lastDrawnCanvasRef.current === canvas && resultUrl === lastInternalStrokeUrlRef.current) {
+      return;
+    }
     let cancelled = false;
 
     const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => {
+    if (resultUrl.startsWith('http') && !resultUrl.startsWith('blob:')) {
+      img.crossOrigin = 'anonymous';
+    }
+
+    const drawToCanvas = (loadedImg: HTMLImageElement) => {
       if (cancelled) return;
-      const canvas = brushCanvasRef.current;
-      if (!canvas) return;
+      const c = brushCanvasRef.current;
+      if (!c) return;
 
-      const maxDim = 900;
-      const s = Math.min(1, maxDim / Math.max(img.width, img.height));
-      canvas.width = Math.round(img.width * s);
-      canvas.height = Math.round(img.height * s);
+      const maxDim = 2048;
+      const s = Math.min(1, maxDim / Math.max(loadedImg.width, loadedImg.height));
+      c.width = Math.round(loadedImg.width * s);
+      c.height = Math.round(loadedImg.height * s);
 
-      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      const ctx = c.getContext('2d', { willReadFrequently: true });
       if (!ctx) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.clearRect(0, 0, c.width, c.height);
+      ctx.drawImage(loadedImg, 0, 0, c.width, c.height);
 
-      // Reset history stacks on new image
-      setUndoStack([]);
-      setRedoStack([]);
+      lastDrawnCanvasRef.current = c;
+
+      // Reset history stacks only when switching to a completely new source image
+      if (resultUrl !== lastInternalStrokeUrlRef.current) {
+        setUndoStack([]);
+        setRedoStack([]);
+      }
 
       // Load original image to base canvas for restore brush
       const orig = new Image();
-      orig.crossOrigin = 'anonymous';
+      if (job.sourceUrl.startsWith('http') && !job.sourceUrl.startsWith('blob:')) {
+        orig.crossOrigin = 'anonymous';
+      }
       orig.onload = () => {
         if (cancelled) return;
         const base = document.createElement('canvas');
-        base.width = canvas.width;
-        base.height = canvas.height;
+        base.width = c.width;
+        base.height = c.height;
         const bCtx = base.getContext('2d');
         if (bCtx) {
           bCtx.drawImage(orig, 0, 0, base.width, base.height);
@@ -288,12 +454,21 @@ export default function BGComparator({
       };
       orig.src = job.sourceUrl;
     };
-    img.src = job.resultUrl;
+
+    img.onload = () => drawToCanvas(img);
+    img.onerror = () => {
+      if (img.crossOrigin) {
+        const fallback = new Image();
+        fallback.onload = () => drawToCanvas(fallback);
+        fallback.src = resultUrl;
+      }
+    };
+    img.src = resultUrl;
 
     return () => {
       cancelled = true;
     };
-  }, [job?.id, job?.resultUrl, job?.sourceUrl, isBrushMode]);
+  }, [job?.id, job?.resultUrl, job?.sourceUrl, isCutoutActive]);
 
   // Handle Undo trigger
   const prevUndoTrigger = useRef(undoTrigger);
@@ -312,6 +487,7 @@ export default function BGComparator({
         canvas.toBlob((blob) => {
           if (blob && onBrushStroke) {
             const url = URL.createObjectURL(blob);
+            lastInternalStrokeUrlRef.current = url;
             onBrushStroke(blob, url);
           }
         }, 'image/png');
@@ -336,6 +512,7 @@ export default function BGComparator({
         canvas.toBlob((blob) => {
           if (blob && onBrushStroke) {
             const url = URL.createObjectURL(blob);
+            lastInternalStrokeUrlRef.current = url;
             onBrushStroke(blob, url);
           }
         }, 'image/png');
@@ -343,7 +520,7 @@ export default function BGComparator({
     }
   }, [redoTrigger, redoStack, onBrushStroke]);
 
-  // Paint onto brush canvas
+  // Paint onto brush canvas with transform and rotation awareness
   const paintBrush = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
       const canvas = brushCanvasRef.current;
@@ -351,14 +528,40 @@ export default function BGComparator({
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
+      const currentTf = subjectTransform || DEFAULT_SUBJECT_TRANSFORM;
+      const fitFactor = customBgImage ? 0.75 : 1.0;
+      const baseCutoutFit = cutoutDimensions
+        ? Math.min(
+          (artboardDisplayWidth * fitFactor) / cutoutDimensions.width,
+          (artboardDisplayHeight * fitFactor) / cutoutDimensions.height
+        )
+        : 1;
+      const cutoutW = (cutoutDimensions ? cutoutDimensions.width * baseCutoutFit : artboardDisplayWidth * fitFactor) * currentTf.scale;
+      const cutoutH = (cutoutDimensions ? cutoutDimensions.height * baseCutoutFit : artboardDisplayHeight * fitFactor) * currentTf.scale;
+
       const rect = canvas.getBoundingClientRect();
-      const x = (e.clientX - rect.left) * (canvas.width / rect.width);
-      const y = (e.clientY - rect.top) * (canvas.height / rect.height);
-      const radius = (brushSize * (canvas.width / rect.width)) / 2;
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      const dx = e.clientX - centerX;
+      const dy = e.clientY - centerY;
+      const angleRad = (-(currentTf.rotation || 0) * Math.PI) / 180;
+      const unrotX = dx * Math.cos(angleRad) - dy * Math.sin(angleRad);
+      const unrotY = dx * Math.sin(angleRad) + dy * Math.cos(angleRad);
+      const flipXMult = currentTf.flipX ? -1 : 1;
+      const flipYMult = currentTf.flipY ? -1 : 1;
+      const localX = unrotX * flipXMult;
+      const localY = unrotY * flipYMult;
+
+      const displayedW = (cutoutW || 1) * viewportZoom;
+      const displayedH = (cutoutH || 1) * viewportZoom;
+      const x = (localX / displayedW + 0.5) * canvas.width;
+      const y = (localY / displayedH + 0.5) * canvas.height;
+      const radius = (brushSize / 2) * (canvas.width / displayedW);
 
       ctx.save();
       ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.arc(x, y, Math.max(1, radius), 0, Math.PI * 2);
       ctx.clip();
 
       if (cutoutTool === 'erase') {
@@ -369,13 +572,45 @@ export default function BGComparator({
       }
       ctx.restore();
     },
-    [brushSize, cutoutTool]
+    [
+      brushSize,
+      cutoutTool,
+      subjectTransform,
+      customBgImage,
+      cutoutDimensions,
+      artboardDisplayWidth,
+      artboardDisplayHeight,
+      viewportZoom,
+    ]
   );
 
   const startBrush = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    e.currentTarget.setPointerCapture(e.pointerId);
+    if (isCompareMode) return;
+    if (isSpaceHeldRef.current || e.button === 1 || cutoutTool === 'move') {
+      isPanningRef.current = true;
+      hasPannedRef.current = false;
+      setIsPanning(true);
+      startPanRef.current = {
+        x: e.clientX - pan.x,
+        y: e.clientY - pan.y,
+      };
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {
+        // ignore
+      }
+      return;
+    }
+
+    if (e.button !== 0) return;
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // ignore
+    }
     isPaintingRef.current = true;
-    setBrushCursor({ visible: true, x: e.clientX, y: e.clientY });
+    const shouldShow = !isSpaceHeld;
+    setBrushCursor({ visible: shouldShow, x: e.clientX, y: e.clientY });
 
     // Save snapshot before stroke
     const canvas = brushCanvasRef.current;
@@ -391,15 +626,43 @@ export default function BGComparator({
   };
 
   const moveBrush = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    setBrushCursor({ visible: true, x: e.clientX, y: e.clientY });
+    if (isCompareMode) return;
+    if (isPanningRef.current) {
+      hasPannedRef.current = true;
+      setPan({
+        x: e.clientX - startPanRef.current.x,
+        y: e.clientY - startPanRef.current.y,
+      });
+      return;
+    }
+
+    const shouldShow = !isSpaceHeld && cutoutTool !== 'move';
+    setBrushCursor({ visible: shouldShow, x: e.clientX, y: e.clientY });
+
     if (isPaintingRef.current) {
       paintBrush(e);
     }
   };
 
-  const endBrush = () => {
+  const endBrush = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (isPanningRef.current) {
+      isPanningRef.current = false;
+      setIsPanning(false);
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      } catch {
+        // ignore
+      }
+      return;
+    }
+
     if (!isPaintingRef.current) return;
     isPaintingRef.current = false;
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {
+      // ignore
+    }
 
     const canvas = brushCanvasRef.current;
     if (!canvas || !onBrushStroke) return;
@@ -407,6 +670,7 @@ export default function BGComparator({
     canvas.toBlob((blob) => {
       if (!blob) return;
       const url = URL.createObjectURL(blob);
+      lastInternalStrokeUrlRef.current = url;
       onBrushStroke(blob, url);
     }, 'image/png');
   };
@@ -421,8 +685,8 @@ export default function BGComparator({
   const shadowOffsetY = effects.shadowOffsetY ?? 15;
   const shadowCSS = effects.shadow
     ? `drop-shadow(0 ${shadowOffsetY}px ${effects.shadowBlur}px ${shadowCol}${Math.round(shadowAlpha * 255)
-        .toString(16)
-        .padStart(2, '0')})`
+      .toString(16)
+      .padStart(2, '0')})`
     : 'drop-shadow(0 15px 30px rgba(0, 0, 0, 0.2))';
 
   const strokeCSS = effects.stroke
@@ -449,11 +713,20 @@ export default function BGComparator({
          ========================================================= */}
       <div
         ref={containerRef}
-        onClick={() => onSelectLayer?.(null)}
-        className="relative h-[460px] w-full rounded-3xl overflow-hidden border border-white/[0.08] shadow-2xl flex items-center justify-center p-4 sm:h-[540px] sm:p-6 lg:h-[640px] transition-all duration-300 isolate bg-[#0d0f17] select-none"
+        onClick={() => {
+          if (!hasPannedRef.current) onSelectLayer?.(null);
+        }}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        onWheel={handleWheel}
+        className={`relative h-[460px] w-full rounded-3xl overflow-hidden border border-white/[0.08] shadow-2xl flex items-center justify-center p-4 sm:h-[540px] sm:p-6 lg:h-[640px] transition-all duration-300 isolate bg-[#0d0f17] select-none ${(isCutoutSection && (isSpaceHeld || cutoutTool === 'move')) || viewportZoom > 1
+            ? isPanning ? 'cursor-grabbing' : 'cursor-grab'
+            : ''
+          }`}
       >
-        {/* Subtle stage matte grid pattern */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:24px_24px] opacity-40" />
+        {/* Clean, authentic stage canvas without artificial dot or pixel overlays */}
 
         {/* =========================================================
             STAGE FLOATING STATUS & CONTROLS PILL
@@ -461,11 +734,21 @@ export default function BGComparator({
         <div className="absolute top-4 left-4 right-4 z-40 flex items-center justify-between pointer-events-none">
           {/* Active Mode Pill Indicator */}
           <div className="pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-xl border border-white/10 text-xs font-semibold text-white shadow-lg">
-            {isBrushMode ? (
-              <span className="flex items-center gap-1.5 text-rose-400">
-                <span className="h-2 w-2 rounded-full bg-rose-500 animate-pulse" />
-                {cutoutTool === 'erase' ? '✂️ Erase Brush Active' : '✦ Restore Brush Active'}
+            {isCutoutSection && isSpaceHeld ? (
+              <span className="flex items-center gap-1.5 text-blue-400">
+                <span>✋</span> Pan Mode (Space held)
               </span>
+            ) : isCutoutActive ? (
+              cutoutTool === 'move' ? (
+                <span className="flex items-center gap-1.5 text-blue-400">
+                  <span>✋</span> Cutout Move / Pan Active
+                </span>
+              ) : (
+                <span className="flex items-center gap-1.5 text-rose-400">
+                  <span className="h-2 w-2 rounded-full bg-rose-500 animate-pulse" />
+                  {cutoutTool === 'erase' ? '✂️ Erase Brush Active' : '✦ Restore Brush Active'}
+                </span>
+              )
             ) : isCompareMode ? (
               <span className="flex items-center gap-1.5 text-blue-400">
                 <span>[|]</span> Split Compare Active
@@ -549,22 +832,26 @@ export default function BGComparator({
              ========================================================= */
           <div
             ref={artboardRef}
-            className="relative overflow-hidden rounded-2xl shadow-2xl border border-white/10 select-none flex items-center justify-center transition-all duration-200"
+            className={`relative rounded-2xl shadow-2xl border border-white/10 select-none flex items-center justify-center origin-center overflow-visible ${isPanning ? 'transition-none' : 'transition-transform duration-150'
+              }`}
             style={{
               width: `${artboardDisplayWidth}px`,
               height: `${artboardDisplayHeight}px`,
+              transform: `translate(${pan.x}px, ${pan.y}px) scale(${viewportZoom})`,
+              transformOrigin: 'center center',
             }}
           >
             {/* 1. ARTBOARD BACKGROUND LAYER */}
-            <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
+            <div className="absolute inset-0 w-full h-full overflow-hidden rounded-2xl pointer-events-none z-0">
               {customBgImage ? (
                 <>
                   <img
                     src={customBgImage}
                     alt="Custom Background"
-                    className="w-full h-full object-cover transition-all"
+                    className="w-full h-full object-cover transition-all select-none"
                     style={{
                       filter: bgBlur > 0 ? `blur(${bgBlur}px)` : undefined,
+                      imageRendering: 'auto',
                     }}
                   />
                   {bgDarken > 0 && (
@@ -580,8 +867,8 @@ export default function BGComparator({
                 <div className={`w-full h-full ${backgroundStyle}`} />
               )}
 
-              {subjectBgBlur > 0 && !fabricEditMode && (
-                <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+              {subjectBgBlur > 0 && (
+                <div className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-2xl">
                   <img
                     src={job.sourceUrl}
                     alt="Blurred original background"
@@ -593,10 +880,10 @@ export default function BGComparator({
             </div>
 
             {/* 2. FOREGROUND CONTENT: FABRIC EDITOR OR SPLIT/BRUSH/CUTOUT DISPLAY */}
-            {(fabricEditMode || activeTab === 'adjust') && !isProcessing && job.resultUrl ? (
-              <div className="relative z-10 flex h-full w-full items-center justify-center overflow-hidden">
+            {fabricEditMode && !isProcessing && job.resultUrl ? (
+              <div className="relative z-10 flex h-full w-full items-center justify-center overflow-visible">
                 <FabricImageEditor
-                  key={`${job.id}-${fabricEditMode || 'transform'}`}
+                  key={`${job.id}-${fabricEditMode}`}
                   ref={fabricEditorRef}
                   imageUrl={job.resultUrl}
                   artboardWidth={artboardDisplayWidth}
@@ -625,9 +912,105 @@ export default function BGComparator({
                   onCancel={() => onFabricEditCancel?.()}
                 />
               </div>
-            ) : isCompareMode ? (
-              /* BEFORE / AFTER SPLIT COMPARISON SLIDER */
-              <div className="relative w-full h-full flex items-center justify-center overflow-hidden z-10">
+            ) : isCutoutActive ? (
+              /* INTERACTIVE CUTOUT BRUSH / PAN CANVAS (PERSISTED ACROSS MOVE, ERASE, RESTORE) */
+              (() => {
+                const currentTf = subjectTransform || DEFAULT_SUBJECT_TRANSFORM;
+                const cutoutCenterX = artboardDisplayWidth / 2 + currentTf.relX * artboardDisplayWidth;
+                const cutoutCenterY = artboardDisplayHeight / 2 + currentTf.relY * artboardDisplayHeight;
+                const fitFactor = customBgImage ? 0.75 : 1.0;
+                const baseCutoutFit = cutoutDimensions
+                  ? Math.min(
+                    (artboardDisplayWidth * fitFactor) / cutoutDimensions.width,
+                    (artboardDisplayHeight * fitFactor) / cutoutDimensions.height
+                  )
+                  : 1;
+                const cutoutW = (cutoutDimensions ? cutoutDimensions.width * baseCutoutFit : artboardDisplayWidth * fitFactor) * currentTf.scale;
+                const cutoutH = (cutoutDimensions ? cutoutDimensions.height * baseCutoutFit : artboardDisplayHeight * fitFactor) * currentTf.scale;
+
+                return (
+                  <div
+                    className="absolute inset-0 w-full h-full overflow-hidden rounded-2xl pointer-events-none z-10 flex items-center justify-center"
+                    style={{ visibility: isCompareMode ? 'hidden' : 'visible' }}
+                  >
+                    <canvas
+                      ref={brushCanvasRef}
+                      className={`pointer-events-auto rounded-xl shadow-2xl touch-none ${isSpaceHeld || cutoutTool === 'move'
+                          ? isPanning ? 'cursor-grabbing' : 'cursor-grab'
+                          : 'cursor-crosshair'
+                        }`}
+                      style={{
+                        position: 'absolute',
+                        left: `${cutoutCenterX}px`,
+                        top: `${cutoutCenterY}px`,
+                        width: `${cutoutW}px`,
+                        height: `${cutoutH}px`,
+                        transform: `translate(-50%, -50%) rotate(${currentTf.rotation}deg) scaleX(${currentTf.flipX ? -1 : 1}) scaleY(${currentTf.flipY ? -1 : 1})`,
+                        filter: combinedFilter,
+                      }}
+                      onPointerDown={startBrush}
+                      onPointerEnter={(e) => {
+                        const shouldShow = !isSpaceHeld && !isCompareMode && cutoutTool !== 'move';
+                        setBrushCursor({ visible: shouldShow, x: e.clientX, y: e.clientY });
+                      }}
+                      onPointerMove={moveBrush}
+                      onPointerUp={endBrush}
+                      onPointerCancel={endBrush}
+                      onPointerLeave={() => {
+                        if (!isPaintingRef.current && !isPanningRef.current) {
+                          setBrushCursor((v) => ({ ...v, visible: false }));
+                        }
+                      }}
+                    />
+                  </div>
+                );
+              })()
+            ) : (
+              /* CUTOUT DISPLAY (RESTRICTED CLEANLY TO CHESSBOARD ARTBOARD CANVAS) */
+              (() => {
+                const currentTf = subjectTransform || DEFAULT_SUBJECT_TRANSFORM;
+                const cutoutCenterX = artboardDisplayWidth / 2 + currentTf.relX * artboardDisplayWidth;
+                const cutoutCenterY = artboardDisplayHeight / 2 + currentTf.relY * artboardDisplayHeight;
+                const fitFactor = customBgImage ? 0.75 : 1.0;
+                const baseCutoutFit = cutoutDimensions
+                  ? Math.min(
+                    (artboardDisplayWidth * fitFactor) / cutoutDimensions.width,
+                    (artboardDisplayHeight * fitFactor) / cutoutDimensions.height
+                  )
+                  : 1;
+                const cutoutW = (cutoutDimensions ? cutoutDimensions.width * baseCutoutFit : artboardDisplayWidth * fitFactor) * currentTf.scale;
+                const cutoutH = (cutoutDimensions ? cutoutDimensions.height * baseCutoutFit : artboardDisplayHeight * fitFactor) * currentTf.scale;
+
+                return (
+                  <div
+                    className="absolute inset-0 w-full h-full overflow-hidden rounded-2xl pointer-events-none z-10 flex items-center justify-center"
+                    style={{ visibility: isCompareMode ? 'hidden' : 'visible' }}
+                  >
+                    <div
+                      className="absolute pointer-events-none flex items-center justify-center"
+                      style={{
+                        left: `${cutoutCenterX}px`,
+                        top: `${cutoutCenterY}px`,
+                        width: `${cutoutW}px`,
+                        height: `${cutoutH}px`,
+                        transform: `translate(-50%, -50%) rotate(${currentTf.rotation}deg) scaleX(${currentTf.flipX ? -1 : 1}) scaleY(${currentTf.flipY ? -1 : 1})`,
+                      }}
+                    >
+                      <img
+                        src={job.resultUrl}
+                        alt={job.name}
+                        className="w-full h-full object-contain pointer-events-none select-none"
+                        style={{ filter: combinedFilter, clipPath: cropClipPath, imageRendering: 'auto' }}
+                      />
+                    </div>
+                  </div>
+                );
+              })()
+            )}
+
+            {/* BEFORE / AFTER SPLIT COMPARISON SLIDER (OVERLAY) */}
+            {isCompareMode && (
+              <div className="absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden z-20">
                 <img
                   src={job.resultUrl}
                   alt="Result cutout"
@@ -665,66 +1048,6 @@ export default function BGComparator({
                   className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-30"
                 />
               </div>
-            ) : isBrushMode ? (
-              /* INTERACTIVE ERASER / RESTORE BRUSH CANVAS */
-              <div className="relative flex items-center justify-center w-full h-full z-10 overflow-hidden">
-                <canvas
-                  ref={brushCanvasRef}
-                  className="cursor-crosshair max-w-full max-h-full object-contain rounded-xl shadow-2xl touch-none"
-                  style={{
-                    transform: `scale(${viewportZoom}) rotate(${rotation}deg) translate(${subjectPos.x}px, ${subjectPos.y}px)`,
-                    filter: combinedFilter,
-                  }}
-                  onPointerDown={startBrush}
-                  onPointerEnter={(e) => setBrushCursor({ visible: true, x: e.clientX, y: e.clientY })}
-                  onPointerMove={moveBrush}
-                  onPointerUp={endBrush}
-                  onPointerCancel={endBrush}
-                  onPointerLeave={() => {
-                    if (!isPaintingRef.current) setBrushCursor((v) => ({ ...v, visible: false }));
-                  }}
-                />
-              </div>
-            ) : (
-              /* CUTOUT DISPLAY (POSITIONED AT TRANSFORM COORDINATES INSIDE ARTBOARD) */
-              (() => {
-                const currentTf = subjectTransform || DEFAULT_SUBJECT_TRANSFORM;
-                const cutoutCenterX = artboardDisplayWidth / 2 + currentTf.relX * artboardDisplayWidth;
-                const cutoutCenterY = artboardDisplayHeight / 2 + currentTf.relY * artboardDisplayHeight;
-                const baseCutoutFit = customBgImage
-                  ? Math.min(
-                      (artboardDisplayWidth * 0.75) / (cutoutDimensions?.width || 1),
-                      (artboardDisplayHeight * 0.75) / (cutoutDimensions?.height || 1),
-                      1
-                    )
-                  : Math.min(
-                      artboardDisplayWidth / (cutoutDimensions?.width || 1),
-                      artboardDisplayHeight / (cutoutDimensions?.height || 1),
-                      1
-                    );
-                const cutoutW = (cutoutDimensions?.width || artboardDisplayWidth * 0.75) * baseCutoutFit * currentTf.scale;
-                const cutoutH = (cutoutDimensions?.height || artboardDisplayHeight * 0.75) * baseCutoutFit * currentTf.scale;
-
-                return (
-                  <div
-                    className="absolute z-10 pointer-events-none flex items-center justify-center"
-                    style={{
-                      left: `${cutoutCenterX}px`,
-                      top: `${cutoutCenterY}px`,
-                      width: `${cutoutW}px`,
-                      height: `${cutoutH}px`,
-                      transform: `translate(-50%, -50%) rotate(${currentTf.rotation}deg) scaleX(${currentTf.flipX ? -1 : 1}) scaleY(${currentTf.flipY ? -1 : 1})`,
-                    }}
-                  >
-                    <img
-                      src={job.resultUrl}
-                      alt={job.name}
-                      className="w-full h-full object-contain pointer-events-none select-none"
-                      style={{ filter: combinedFilter, clipPath: cropClipPath }}
-                    />
-                  </div>
-                );
-              })()
             )}
 
             {/* 3. DESIGN OVERLAY LAYERS (TEXT & SHAPES / BADGES / STICKERS) */}
@@ -752,9 +1075,8 @@ export default function BGComparator({
                         e.stopPropagation();
                         onSelectLayer?.(el.id);
                       }}
-                      className={`absolute pointer-events-auto cursor-move select-none p-1 rounded-xl transition-all ${
-                        isSelected ? 'ring-2 ring-[#00FF85] shadow-2xl' : 'hover:ring-1 hover:ring-white/40'
-                      }`}
+                      className={`absolute pointer-events-auto cursor-move select-none p-1 rounded-xl transition-all ${isSelected ? 'ring-2 ring-[#00FF85] shadow-2xl' : 'hover:ring-1 hover:ring-white/40'
+                        }`}
                       style={{
                         left: `${el.x}%`,
                         top: `${el.y}%`,
@@ -831,9 +1153,8 @@ export default function BGComparator({
                         e.stopPropagation();
                         onSelectLayer?.(tl.id);
                       }}
-                      className={`absolute pointer-events-auto cursor-move select-none p-1.5 rounded-xl transition-all ${
-                        isSelected ? 'ring-2 ring-[#00FF85] shadow-2xl' : 'hover:ring-1 hover:ring-white/40'
-                      }`}
+                      className={`absolute pointer-events-auto cursor-move select-none p-1.5 rounded-xl transition-all ${isSelected ? 'ring-2 ring-[#00FF85] shadow-2xl' : 'hover:ring-1 hover:ring-white/40'
+                        }`}
                       style={{
                         left: `${tl.x}%`,
                         top: `${tl.y}%`,
@@ -880,16 +1201,15 @@ export default function BGComparator({
       {/* =========================================================
           BRUSH CURSOR INDICATOR (PORTAL / FIXED)
          ========================================================= */}
-      {isBrushMode && brushCursor.visible && (
+      {isCutoutActive && !isCompareMode && brushCursor.visible && !isPanning && !isSpaceHeld && cutoutTool !== 'move' && (
         <span
-          className={`fixed pointer-events-none rounded-full border-2 transform -translate-x-1/2 -translate-y-1/2 transition-opacity z-50 ${
-            cutoutTool === 'erase'
+          className={`fixed pointer-events-none rounded-full border-2 transform -translate-x-1/2 -translate-y-1/2 transition-opacity z-50 ${cutoutTool === 'erase'
               ? 'border-rose-400 bg-rose-500/20 shadow-[0_0_12px_rgba(244,63,94,0.5)]'
               : 'border-[#00FF85] bg-[#00FF85]/20 shadow-[0_0_12px_rgba(0,255,133,0.5)]'
-          }`}
+            }`}
           style={{
-            width: brushSize * scale,
-            height: brushSize * scale,
+            width: brushSize,
+            height: brushSize,
             left: brushCursor.x,
             top: brushCursor.y,
           }}

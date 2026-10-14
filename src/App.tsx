@@ -23,6 +23,8 @@ import Footer from './components/Footer';
 import { useONNX } from './hooks/useONNX';
 import { useUpscale, cancelUpscale } from './hooks/useUpscale';
 import { makeId } from './lib/bgUtils';
+import { bgRemoverService } from './bgRemoverService';
+import { clearDownloadedModelCaches, requestPersistentModelStorage, subscribeToModelCacheCleared } from './utils/modelCache';
 import { buildPresetOptions, getDefaultPreset } from './constants';
 
 import Bgmarquee from './components/bgremove/Bgmarquee';
@@ -63,7 +65,8 @@ import TermsPage from './components/pages/TermsPage';
 
 const STORAGE_KEY = 'pixelify_upscaler_history_2026'; // legacy, no longer written
 const THEME_KEY = 'pixelify_theme_pref';
-const MAX_FILE_SIZE = 15 * 1024 * 1024;
+const MAX_UPSCALER_FILE_SIZE = 15 * 1024 * 1024; // 15 MB
+const MAX_BG_FILE_SIZE = 20 * 1024 * 1024;       // 20 MB
 
 export default function App() {
   const location = useLocation();
@@ -94,15 +97,47 @@ export default function App() {
   });
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const isSelectingSampleRef = useRef(false);
 
-  // Sync state with URL navigation via React Router
+  // Scroll to top helper ensuring top scroll across browsers, routes & layout recalculations
+  const scrollToTop = useCallback(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    if (document.documentElement) document.documentElement.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
+
+    // Double rAF ensures dynamically mounted DOM components don't displace scroll
+    requestAnimationFrame(() => {
+      window.scrollTo(0, 0);
+      if (document.documentElement) document.documentElement.scrollTop = 0;
+      if (document.body) document.body.scrollTop = 0;
+      requestAnimationFrame(() => {
+        window.scrollTo(0, 0);
+      });
+    });
+  }, []);
+
+  // Sync state with URL navigation via React Router & force top scroll
   const navigateTo = useCallback(
     (tab: ViewTab) => {
       const targetPath = tab === 'home' ? '/' : `/${tab}`;
+      scrollToTop();
       navigate(targetPath);
+      scrollToTop();
     },
-    [navigate]
+    [navigate, scrollToTop]
   );
+
+  // Automatically scroll to top whenever route changes (Home <-> BG <-> Upscaler, etc.)
+  useEffect(() => {
+    scrollToTop();
+  }, [location.pathname, scrollToTop]);
+
+  // Prevent browser history auto-restoring stale scroll offsets on route transition
+  useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+  }, []);
 
   // Theme effect application
   useEffect(() => {
@@ -125,7 +160,7 @@ export default function App() {
   const [bgJobs, setBgJobs] = useState<BGJob[]>([]);
 
   // Upscaler State Hooks
-  const { ortRef, backend, execEngine, sessionRef, isLoading: modelLoading, modelProgress, initONNX, loadModel } = useONNX();
+  const { ortRef, execEngine, sessionRef, isLoading: modelLoading, modelProgress, initONNX, loadModel, unloadModel } = useONNX();
   const { upscale } = useUpscale({ ortRef, sessionRef });
 
   // LIVE ENGINE STATE — what each tool's pipeline is ACTUALLY running on right now.
@@ -133,6 +168,13 @@ export default function App() {
   // BG remover: reported by the worker hosting the BiRefNet pipeline.
   const [bgEngine, setBgEngine] = useState<'wasm' | 'webgpu' | null>(null);
   const [bgWebgpuAvailable, setBgWebgpuAvailable] = useState<boolean>(false);
+  const [webgpuAvailable, setWebgpuAvailable] = useState<boolean | null>(null);
+  const [bgModelPhase, setBgModelPhase] = useState<'idle' | 'detecting' | 'downloading' | 'preparing' | 'ready' | 'error'>('idle');
+  const [bgModelProgress, setBgModelProgress] = useState(0);
+  const [upscalerPreloadError, setUpscalerPreloadError] = useState(false);
+  const [modelsCleared, setModelsCleared] = useState(false);
+  const [isClearingModelCache, setIsClearingModelCache] = useState(false);
+  const preloadCancelledRef = useRef(false);
 
   const [step, setStep] = useState<Step>('upload');
   const [items, setItems] = useState<UpscaleItem[]>([]);
@@ -178,24 +220,110 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    initONNX();
-  }, [initONNX]);
+    let cancelled = false;
+    preloadCancelledRef.current = false;
+    const unsubscribe = bgRemoverService.subscribeState((state) => {
+      setBgModelPhase(state.phase);
+      setBgModelProgress(state.progress);
+      setBgEngine(state.phase === 'idle' || state.phase === 'detecting' || state.phase === 'error'
+        ? null
+        : state.engine);
+      setBgWebgpuAvailable(state.webgpuAvailable);
+    });
+    const unsubscribeCacheClear = subscribeToModelCacheCleared(() => {
+      preloadCancelledRef.current = true;
+      bgRemoverService.reset();
+      void unloadModel();
+      setBgEngine(null);
+      setBgModelPhase('idle');
+      setBgModelProgress(0);
+      setUpscalerPreloadError(false);
+      setModelsCleared(true);
+      addToast('info', 'Downloaded models were cleared in another tab.');
+    });
 
-  // Pre-warm the upscaler model when visiting /upscaler so the engine badge
-  // reports LIVE immediately (and first upscale starts faster). ClearReality V1 is only 1.9MB.
-  const engineWarmupTried = useRef(false);
-  useEffect(() => {
-    if (activeTab === 'upscaler' && !engineWarmupTried.current && !execEngine && !modelLoading) {
-      engineWarmupTried.current = true;
-      loadModel('clearreality').catch(() => { /* badge stays DETECTING; retried on first upload */ });
+    const gpu = (navigator as any)?.gpu;
+    if (!gpu) {
+      setWebgpuAvailable(false);
+    } else {
+      let timeoutId: number | undefined;
+      const timeout = new Promise<null>((resolve) => {
+        timeoutId = window.setTimeout(() => resolve(null), 4500);
+      });
+      void Promise.race([gpu.requestAdapter(), timeout]).then(
+        (adapter: unknown) => {
+          if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+          if (!cancelled) setWebgpuAvailable(!!adapter);
+        },
+        () => {
+          if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+          if (!cancelled) setWebgpuAvailable(false);
+        }
+      );
     }
-  }, [activeTab, execEngine, modelLoading, loadModel]);
+    void requestPersistentModelStorage();
+
+    const preloadModels = async () => {
+      try {
+        if (cancelled || preloadCancelledRef.current) return;
+        const bgPreload = bgRemoverService.init();
+        await initONNX();
+        if (cancelled || preloadCancelledRef.current) return;
+        const loaded = await loadModel('clearreality');
+        if (!cancelled) setUpscalerPreloadError(!loaded);
+        void bgPreload;
+      } catch (err) {
+        if (!cancelled) {
+          setUpscalerPreloadError(true);
+          console.warn('AI model preload failed; models will retry when used:', err);
+        }
+      }
+    };
+
+    const requestIdleCallback = (window as any).requestIdleCallback as
+      | ((callback: () => void, options?: { timeout: number }) => number)
+      | undefined;
+    const cancelIdleCallback = (window as any).cancelIdleCallback as ((id: number) => void) | undefined;
+    const idleId = requestIdleCallback
+      ? requestIdleCallback(() => { void preloadModels(); }, { timeout: 1800 })
+      : null;
+    const timerId = idleId === null ? window.setTimeout(() => { void preloadModels(); }, 900) : null;
+
+    return () => {
+      cancelled = true;
+      unsubscribe();
+      unsubscribeCacheClear();
+      if (idleId !== null) cancelIdleCallback?.(idleId);
+      if (timerId !== null) window.clearTimeout(timerId);
+    };
+  }, [addToast, initONNX, loadModel, unloadModel]);
+
+  const handleClearModelCache = useCallback(async () => {
+    if (isClearingModelCache) return;
+    preloadCancelledRef.current = true;
+    setIsClearingModelCache(true);
+    try {
+      bgRemoverService.reset();
+      await unloadModel();
+      await clearDownloadedModelCaches();
+      setBgEngine(null);
+      setBgModelPhase('idle');
+      setBgModelProgress(0);
+      setUpscalerPreloadError(false);
+      setModelsCleared(true);
+      addToast('success', 'Downloaded AI models cleared from this browser.');
+    } catch (err) {
+      addToast('error', err instanceof Error ? err.message : 'Could not clear downloaded models.');
+    } finally {
+      setIsClearingModelCache(false);
+    }
+  }, [addToast, isClearingModelCache, unloadModel]);
 
   /* ----------------------------------------------------------
      ADD UPSCALE FILE (Creates individual UpscaleItem)
      ---------------------------------------------------------- */
   const addUpscaleFile = useCallback((file: File) => {
-    if (file.size > MAX_FILE_SIZE) {
+    if (file.size > MAX_UPSCALER_FILE_SIZE) {
       addToast('error', 'Please choose an image under 15 MB.');
       return;
     }
@@ -222,12 +350,13 @@ export default function App() {
       setSelectedId(newItem.id);
       setStep('config');
       loadModel('clearreality');
+      scrollToTop();
     };
     img.onerror = () => {
       addToast('error', 'Failed to load image file.');
     };
     img.src = url;
-  }, [addToast, loadModel]);
+  }, [addToast, loadModel, scrollToTop]);
 
   /* ----------------------------------------------------------
      HANDLE MODEL CHANGE (Per image)
@@ -476,25 +605,16 @@ export default function App() {
     [items]
   );
 
-  // Load a BG-remover sample image from the landing sections onto the canvas
-  const loadBgSample = useCallback(async (sampleUrl: string, name: string) => {
-    try {
-      const res = await fetch(sampleUrl);
-      const blob = await res.blob();
-      const file = new File([blob], `${name.toLowerCase().replace(/\s+/g, '_')}.png`, { type: blob.type || 'image/png' });
-      handleBGFiles([file]);
-    } catch {
-      addToast('error', 'Could not load sample.');
-    }
-  }, []);
-
   // Global File Picker Handler for BG Remove
-  const handleBGFiles = (fileList: FileList | File[]) => {
+  const handleBGFiles = useCallback((fileList: FileList | File[]) => {
     const files = Array.from(fileList);
-    const valid = files.filter((f) => f.type.startsWith('image/') && f.size <= MAX_FILE_SIZE);
+    const valid = files.filter((f) => f.type.startsWith('image/') && f.size <= MAX_BG_FILE_SIZE);
     if (!valid.length) {
-      addToast('error', 'Please choose images under 15 MB.');
+      addToast('error', 'Please choose images under 20 MB.');
       return;
+    }
+    if (valid.length < files.length) {
+      addToast('error', 'Some images exceeded the 20 MB limit and were skipped.');
     }
     const additions: BGJob[] = valid.map((file) => ({
       id: makeId(),
@@ -509,11 +629,54 @@ export default function App() {
     }));
     setBgJobs((prev) => [...prev, ...additions]);
     navigateTo('bg_remove');
+    scrollToTop();
     addToast('success', `${additions.length} image(s) added to Cutout Canvas.`);
-  };
+  }, [addToast, navigateTo, scrollToTop]);
+
+  // Load a BG-remover sample image from the landing sections onto the canvas
+  const loadBgSample = useCallback(async (sampleUrl: string, name: string) => {
+    if (isSelectingSampleRef.current) return;
+    isSelectingSampleRef.current = true;
+    try {
+      const res = await fetch(sampleUrl);
+      if (!res.ok) throw new Error('Fetch failed');
+      const blob = await res.blob();
+      const file = new File([blob], `${name.toLowerCase().replace(/\s+/g, '_')}.png`, { type: blob.type || 'image/png' });
+      handleBGFiles([file]);
+      scrollToTop();
+    } catch {
+      addToast('error', 'Could not load sample.');
+    } finally {
+      setTimeout(() => {
+        isSelectingSampleRef.current = false;
+      }, 600);
+    }
+  }, [handleBGFiles, scrollToTop, addToast]);
 
   const activeItem = items.find((i) => i.id === selectedId) || items[0];
   const visibleError = error || activeItem?.error || null;
+  const modelStatus = bgModelPhase === 'downloading'
+    ? `Downloading background-removal model (${Math.round(bgModelProgress)}%)`
+    : bgModelPhase === 'preparing'
+      ? 'Preparing background-removal model'
+      : bgModelPhase === 'detecting'
+        ? 'Checking graphics adapter'
+        : bgModelPhase === 'error'
+          ? 'Background model preload failed; it will retry when used'
+          : modelLoading
+            ? `Preparing upscaler model${modelProgress === null ? '' : ` (${Math.round(modelProgress)}%)`}`
+            : upscalerPreloadError && !execEngine
+              ? 'Upscaler model preload failed; it will retry when used'
+              : bgModelPhase === 'ready' && execEngine
+                ? 'Default AI models are ready in this browser'
+                : modelsCleared && execEngine
+                  ? 'Upscaler model ready; other models load when used'
+                  : modelsCleared
+                    ? 'Models cleared; they will download again when needed'
+                    : 'Preparing AI models in the background';
+  const canClearModelCache = !bgJobs.some((job) => job.status === 'loading' || job.status === 'processing')
+    && !items.some((item) => item.status === 'processing')
+    && !isClearingModelCache;
 
   return (
     <div className="app-shell min-h-screen font-sans bg-grid-pattern relative flex flex-col">
@@ -549,6 +712,11 @@ export default function App() {
         onTabChange={navigateTo}
         upscalerEngine={execEngine}
         bgEngine={bgEngine}
+        webgpuAvailable={webgpuAvailable ?? (bgWebgpuAvailable ? true : null)}
+        modelStatus={modelStatus}
+        isClearingModelCache={isClearingModelCache}
+        canClearModelCache={canClearModelCache}
+        onClearModelCache={handleClearModelCache}
         onOpenMobileSidebar={() => setIsMobileNavOpen(true)}
         mobileHidden={activeTab === 'upscaler' && step !== 'upload'}
       />
@@ -564,6 +732,11 @@ export default function App() {
         }}
         upscalerEngine={execEngine}
         bgEngine={bgEngine}
+        webgpuAvailable={webgpuAvailable ?? (bgWebgpuAvailable ? true : null)}
+        modelStatus={modelStatus}
+        isClearingModelCache={isClearingModelCache}
+        canClearModelCache={canClearModelCache}
+        onClearModelCache={handleClearModelCache}
       />
 
       {/* MAIN CONTENT AREA */}
@@ -585,18 +758,28 @@ export default function App() {
                 onLaunchUpscaler={() => navigateTo('upscaler')}
                 onLaunchBGRemove={() => navigateTo('bg_remove')}
                 onSelectSample={async (sampleUrl, type) => {
+                  if (isSelectingSampleRef.current) return;
+                  isSelectingSampleRef.current = true;
                   try {
                     const res = await fetch(sampleUrl);
+                    if (!res.ok) throw new Error('Failed to load sample');
                     const blob = await res.blob();
                     const file = new File([blob], 'sample.jpg', { type: blob.type || 'image/jpeg' });
+                    scrollToTop();
                     if (type === 'upscale') {
                       addUpscaleFile(file);
                       navigateTo('upscaler');
                     } else {
                       handleBGFiles([file]);
                     }
-                  } catch {
+                    scrollToTop();
+                  } catch (err) {
                     addToast('error', 'Could not load sample.');
+                    throw err;
+                  } finally {
+                    setTimeout(() => {
+                      isSelectingSampleRef.current = false;
+                    }, 600);
                   }
                 }}
                 onTabChange={navigateTo}
@@ -650,6 +833,7 @@ export default function App() {
                     onClear={handleClearAll}
                     beforeImage="/upscaler/shoes.jpeg"
                     afterImage="/upscaler/shoes.png"
+                    maxSizeMB={15}
                   />
                 )}
 
@@ -698,6 +882,7 @@ export default function App() {
                   jobs={bgJobs}
                   setJobs={setBgJobs}
                   addToast={addToast}
+                  onFileAdd={handleBGFiles}
                   onOpenPicker={() => fileInputRef.current?.click()}
                   onEngineReport={(engine, webgpuAvailable) => {
                     setBgEngine(engine);
@@ -708,9 +893,9 @@ export default function App() {
                   <>
                     <BgShowcase />
                     <Bgmarquee />
-                    <BgSampleGallery onLoadSample={loadBgSample} />
                     <BgPipeline />
                     <BgPrecision />
+                    <BgSampleGallery onLoadSample={loadBgSample} />
                     <BgFaq />
                   </>
                 )}
@@ -730,7 +915,7 @@ export default function App() {
 
           {/* FALLBACK ROUTE: Redirect to / */}
           <Route path="*" element={<Navigate to="/" replace />} />
-        
+
           <Route path="/404" element={<NotFound />} />
 
         </Routes>
