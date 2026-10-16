@@ -46,8 +46,8 @@ const FEATURES_TABS = [
     title: 'Background Remover',
     subtitle:
       'Isolate subjects with sub-pixel precision around transparent objects and fine hair strands.',
-    badge: 'BiRefNet AI',
-    detailTitle: 'BiRefNet Neural Segmentation',
+    badge: 'Chopper AI',
+    detailTitle: 'Chopper Neural Segmentation',
     detailDesc:
       'Dual-path vision transformers generate smooth alpha matte masks directly in browser memory.',
   },
@@ -56,8 +56,8 @@ const FEATURES_TABS = [
     title: 'Background Remover',
     subtitle:
       'Isolate subjects with sub-pixel precision around transparent objects and fine hair strands.',
-    badge: 'BiRefNet AI',
-    detailTitle: 'BiRefNet Neural Segmentation',
+    badge: 'Chopper AI',
+    detailTitle: 'Chopper Neural Segmentation',
     detailDesc:
       'Dual-path vision transformers generate smooth alpha matte masks directly in browser memory.',
   },
@@ -67,7 +67,7 @@ const FEATURES_TABS = [
     subtitle:
       'Reconstruct high-frequency textures and crisp edges up to 8K like resolution without artifacts.',
     badge: '8x Factor',
-    detailTitle: 'ClearReality, UltraSharp & Real-ESRGAN',
+    detailTitle: 'Vitality, Pixel-Dance & Alpha-Satoru',
     detailDesc:
       'Direct ONNX Runtime Web execution utilizing WebGPU shaders for hardware-accelerated tensor math.',
   },

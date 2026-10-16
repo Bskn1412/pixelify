@@ -6,7 +6,7 @@ interface ModelInfoPanelProps {
   currentModel: ModelKey;
 }
 
-const MODEL_KEYS: ModelKey[] = ['clearreality', 'ultrasharp', 'realesrgan'];
+const MODEL_KEYS: ModelKey[] = ['vitality', 'pixel-dance', 'alpha-satoru'];
 
 export default function ModelInfoPanel({ currentModel }: ModelInfoPanelProps) {
   const [open, setOpen] = useState(false);

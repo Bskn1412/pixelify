@@ -110,7 +110,7 @@ const DEFAULT_ENHANCEMENT_SETTINGS = {
    ============================================================ */
 
 function ModelGlyph({ model, className = "h-4.5 w-4.5" }: { model: ModelKey; className?: string }) {
-  if (model === "clearreality") {
+  if (model === "vitality") {
     /* Crisp diagonal edges */
     return (
       <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
@@ -122,7 +122,7 @@ function ModelGlyph({ model, className = "h-4.5 w-4.5" }: { model: ModelKey; cla
     );
   }
 
-  if (model === "ultrasharp") {
+  if (model === "pixel-dance") {
     /* Rising detail bars */
     return (
       <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
@@ -133,7 +133,7 @@ function ModelGlyph({ model, className = "h-4.5 w-4.5" }: { model: ModelKey; cla
     );
   }
 
-  /* realesrgan — layered restoration stack */
+  /* alpha-satoru — layered restoration stack */
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
       <rect x="3" y="14" width="7" height="7" rx="1.6" opacity="0.5" />
@@ -174,20 +174,20 @@ function ModelDropdown({
     ModelKey,
     { label: string; full: string; desc: string; popular?: boolean }
   > = {
-    clearreality: {
-      label: "vitality",
-      full: MODELS.clearreality?.name || "Vitality",
+    vitality: {
+      label: "Vitality",
+      full: MODELS.vitality?.name || "Vitality",
       desc: "Fastest model, crisp clean edges.",
       popular: true,
     },
-    ultrasharp: {
+    'pixel-dance': {
       label: "Pixel-Dance",
-      full: MODELS.ultrasharp?.name || "Pixel-Dance",
+      full: MODELS['pixel-dance']?.name || "Pixel-Dance",
       desc: "Max detail, up to 8K output.",
     },
-    realesrgan: {
+    'alpha-satoru': {
       label: "Alpha-Satoru",
-      full: MODELS.realesrgan?.name || "Alpha-Satoru",
+      full: MODELS['alpha-satoru']?.name || "Alpha-Satoru",
       desc: "Natural detail for portraits & photos.",
     },
   };
@@ -270,7 +270,7 @@ function ModelDropdown({
           className={`
             flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border
             ${
-              selectedKey === "clearreality"
+              selectedKey === "vitality"
                 ? "border-[#00FF85]/40 bg-[#00FF85]/15 text-[#00FF85]"
                 : "border-white/10 bg-white/[0.05] text-white/85"
             }

@@ -11,7 +11,7 @@ export default function AIUpscalerSection({ onLaunchUpscaler }: AIUpscalerSectio
     const sectionRef = useRef<HTMLElement>(null);
 
     /* Staggered entrance: each card slides up from below one by one when
-       the section scrolls into view (hero card → ultrasharp → org → clearreality).
+       the section scrolls into view (hero card → Pixel-Dance → org → Vitality).
        Triggered by a live scroll-position sweep (fresh getBoundingClientRect at
        scroll time — not ScrollTrigger's cached positions, which go stale on
        reflow and made animations finish before the user reached the section).
@@ -211,7 +211,7 @@ export default function AIUpscalerSection({ onLaunchUpscaler }: AIUpscalerSectio
                             with AI
                         </span>
                     </h2>
-                    {/* Description text with constrained max-width so it wraps before touching ClearReality */}
+                    {/* Description text with constrained max-width so it wraps before touching Vitality */}
                     <motion.p
                         initial={{ opacity: 0, y: 16 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -262,7 +262,7 @@ export default function AIUpscalerSection({ onLaunchUpscaler }: AIUpscalerSectio
                             {/* Top Badges */}
                             <div className="absolute bottom-4 right-4 flex items-center justify-between pointer-events-none">
                                 <div className="px-3 py-1 text-white rounded bg-black/75 backdrop-blur-md text-[10px] font-mono font-bold flex items-center gap-2 shadow-lg text-neutral-300 border border-white/10">
-                                    <span>REAL-ESRGAN</span>
+                                    <span>ALPHA-SATORU</span>
                                 </div>
                             </div>
                         </motion.div>
@@ -287,17 +287,17 @@ export default function AIUpscalerSection({ onLaunchUpscaler }: AIUpscalerSectio
                                 <div className="relative w-full h-[260px] sm:h-[295px] lg:h-[300px] bg-black overflow-hidden flex items-center justify-center group">
                                     <img
                                         src="/home/upscaler/spiderman_upscaled_8x_ultrasharp_reduced.jpg"
-                                        alt="AI Model 1 Upscaled Spiderman"
+                                        alt="Pixel-Dance Upscaled Spiderman"
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 select-none"
                                     />
                                     <div className="absolute text-white font-bold bottom-2 left-2 px-2 py-0.5 rounded bg-black/75 backdrop-blur-md text-[10px] font-mono font-bold text-neutral-300 border border-white/10"
                                     >
-                                        Ultrasharp
+                                        Pixel-Dance
                                     </div>
                                 </div>
                             </motion.div>
                             {/* --------------------------------------------------------------- */}
-                            {/* ORIGINAL SPIDERMAN CARD: ON TOP OF ULTRASHARP & LEFT OF CARD 3  */}
+                            {/* ORIGINAL SPIDERMAN CARD: ON TOP OF PIXEL-DANCE & LEFT OF CARD 3 */}
                             {/* --------------------------------------------------------------- */}
                             <div data-uc-reveal className="absolute bottom-[calc(100%+12px)] sm:bottom-[calc(100%+14px)] lg:bottom-[calc(100%+14px)] min-[1150px]:bottom-[calc(100%+2.5em)] xl:bottom-[calc(100%+3.5em)] 2xl:bottom-[calc(100%+5em)] left-[-70px] z-30">
                                 <motion.div
@@ -328,7 +328,7 @@ export default function AIUpscalerSection({ onLaunchUpscaler }: AIUpscalerSectio
                                 </motion.div>
                             </div>
                             {/* --------------------------------------------------------------- */}
-                            {/* CLEAR REALITY CARD: ON LEFT SIDE OF CARD 2 */}
+                            {/* VITALITY CARD: ON LEFT SIDE OF CARD 2 */}
                             {/* --------------------------------------------------------------- */}
                             <div data-uc-reveal className="absolute -left-[185px] sm:-left-[195px] lg:-left-[155px] min-[1150px]:-left-[185px] xl:-left-[220px] 2xl:-left-[230px] top-[10%] sm:top-[12%] lg:top-[6%] min-[1150px]:top-[-8%] xl:top-[-20%] z-10">
                                 <motion.div
@@ -344,19 +344,19 @@ export default function AIUpscalerSection({ onLaunchUpscaler }: AIUpscalerSectio
                                         : 'border-white/30 hover:border-white/80 shadow-[0_15px_40px_rgba(0,0,0,0.9),0_0_20px_rgba(255,255,255,0.1),inset_0_1px_2px_rgba(255,255,255,0.35)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.95),0_0_28px_rgba(255,255,255,0.25),inset_0_1px_3px_rgba(255,255,255,0.6)]'
                                         }`}
                                 >
-                                    {/* Image Preview Window (ClearReality) */}
+                                    {/* Image Preview Window (Vitality) */}
                                     <div className="relative w-full h-[200px] sm:h-[210px] lg:h-[220px] bg-black overflow-hidden flex items-center justify-center group">
                                         <img
                                             src="/home/upscaler/spiderman_upscaled_8x_creality_reduced.jpg"
-                                            alt="ClearReality Upscaled Spiderman"
+                                            alt="Vitality Upscaled Spiderman"
                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 select-none"
                                         />
                                         <div className="absolute text-white font-bold bottom-2 left-2 px-2 py-0.5 rounded bg-black/75 text-[10px] font-mono text-neutral-300 border border-white/10">
-                                            ClearReality
+                                            Vitality
                                         </div>
                                     </div>
                                 </motion.div>
-                                {/* AI DELEGATED SYMBOL: Directly below ClearReality card with curved arrow to Card 2 */}
+                                {/* AI DELEGATED SYMBOL: Directly below Vitality card with curved arrow to Card 2 */}
                                 <div className="absolute top-[calc(100%+50px)] left-1/2 -translate-x-[40px] flex flex-col items-center justify-center rotate-[30deg] select-none pointer-events-none whitespace-nowrap">
                                     <span
                                         className="text-md font-bold text-white italic tracking-tight drop-shadow-[0_0_8px_rgba(255,255,255,0.6)]"

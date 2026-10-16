@@ -17,13 +17,13 @@ const defaultCards: CardItem[] = [
     image: "/cards_imgs/spiderman.jpeg",
   },
   {
-    title: "Model: ClearReality V1",
+    title: "Model: Vitality",
     subtitle: "High-speed clean upscaling",
     color: "from-cyan-500 via-sky-500 to-blue-700",
     image: "/cards_imgs/spiderman_1model.png",
   },
   {
-    title: "Model: ESRGAN",
+    title: "Model: Alpha-Satoru",
     subtitle: "Create stunning AI artwork",
     color: "from-orange-400 via-pink-500 to-red-600",
     image: "/cards_imgs/spiderman1_2model.png",

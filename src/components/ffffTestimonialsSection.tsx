@@ -25,7 +25,7 @@ const TESTIMONIALS: Testimonial[] = [
     rating: 5,
     highlightTag: 'Saved 4+ hrs/day on hair cutouts',
     quote:
-      'The BiRefNet cutout accuracy around fine curly hair and semi-sheer fabrics is remarkable. Doing this 100% locally without uploading 80MB client RAW files to some random cloud server is a game-changer for our studio workflow.',
+      'The Chopper cutout accuracy around fine curly hair and semi-sheer fabrics is remarkable. Doing this 100% locally without uploading 80MB client RAW files to some random cloud server is a game-changer for our studio workflow.',
   },
   {
     id: 't2',
@@ -61,7 +61,7 @@ const TESTIMONIALS: Testimonial[] = [
     rating: 5,
     highlightTag: '4x Ultra-Sharp Texture Upscaling',
     quote:
-      'The ClearReality upscaler extracts crisp, high-frequency micro-details from low-res game textures without introducing the weird plastic hallucination artifacts that other upscalers suffer from. Truly studio-grade fidelity.',
+      'The Vitality upscaler extracts crisp, high-frequency micro-details from low-res game textures without introducing the weird plastic hallucination artifacts that other upscalers suffer from. Truly studio-grade fidelity.',
   },
   {
     id: 't5',

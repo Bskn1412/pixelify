@@ -38,16 +38,16 @@ export function EngineRow({ label, engine }: { label: string; engine: Engine }) 
       ) : engine === 'webgpu' ? (
         <span
           className="font-mono text-[9.5px] font-bold text-[#00FF85] bg-[#00FF85]/10 border border-[#00FF85]/20 px-1.5 py-0.5 rounded"
-          title="Hardware-accelerated GPU inference"
+          title="Hardware-accelerated GPU inference (Fast)"
         >
-          WEBGPU
+          Fast
         </span>
       ) : (
         <span
           className="font-mono text-[9.5px] font-bold text-sky-300 bg-sky-400/10 border border-sky-400/20 px-1.5 py-0.5 rounded"
-          title="WebAssembly (CPU) inference — WebGPU was unavailable or failed"
+          title="CPU inference (Standard)"
         >
-          WASM (CPU)
+          Standard
         </span>
       )}
     </div>
@@ -227,7 +227,7 @@ export default function Navbar({
               title="Settings & Preferences"
               aria-label="Settings and Preferences"
             >
-              <Icon name="settings" size={19} />
+              <Icon className='text-gray-300' name="settings" size={19} />
             </button>
 
             {/* SETTINGS DROPDOWN MENU */}
@@ -241,7 +241,7 @@ export default function Navbar({
                 <div className="flex items-center justify-between px-1 text-[11px]">
                   <span className="font-semibold text-neutral-400">WebGPU availability</span>
                   <span className={`font-mono text-[9.5px] font-bold ${webgpuAvailable === null ? 'text-neutral-500' : webgpuAvailable ? 'text-[#00FF85]' : 'text-sky-300'}`}>
-                    {webgpuAvailable === null ? 'CHECKING…' : webgpuAvailable ? 'AVAILABLE' : 'WASM FALLBACK'}
+                    {webgpuAvailable === null ? 'CHECKING…' : webgpuAvailable ? 'Fast' : 'Standard'}
                   </span>
                 </div>
                 <p className="px-1 text-[10px] leading-relaxed text-neutral-500">{modelStatus}</p>

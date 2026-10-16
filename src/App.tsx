@@ -7,7 +7,6 @@ import UploadArea from './components/UploadArea';
 // ImageComparison and ControlPanel replaced by UpscaleWorkspace
 import HomePage from './components/HomePage';
 // ProcessingOverlay and StatsBar are no longer used here
-import ErrorMessage from './components/ErrorMessage';
 import UpscaleWorkspace from './components/UpscaleWorkspace';
 
 import UpscaleShowcase from './components/upscaler/UpscaleShowcase';
@@ -25,7 +24,7 @@ import { useUpscale, cancelUpscale } from './hooks/useUpscale';
 import { makeId } from './lib/bgUtils';
 import { bgRemoverService } from './bgRemoverService';
 import { clearDownloadedModelCaches, requestPersistentModelStorage, subscribeToModelCacheCleared } from './utils/modelCache';
-import { buildPresetOptions, getDefaultPreset } from './constants';
+import { buildPresetOptions, getDefaultPreset, MAX_OUTPUT_DIM } from './constants';
 
 import Bgmarquee from './components/bgremove/Bgmarquee';
 
@@ -165,12 +164,13 @@ export default function App() {
 
   // LIVE ENGINE STATE — what each tool's pipeline is ACTUALLY running on right now.
   // Upscaler: read back from the ONNX session's execution providers.
-  // BG remover: reported by the worker hosting the BiRefNet pipeline.
+  // BG remover: reported by the worker hosting the Chopper pipeline.
   const [bgEngine, setBgEngine] = useState<'wasm' | 'webgpu' | null>(null);
   const [bgWebgpuAvailable, setBgWebgpuAvailable] = useState<boolean>(false);
   const [webgpuAvailable, setWebgpuAvailable] = useState<boolean | null>(null);
   const [bgModelPhase, setBgModelPhase] = useState<'idle' | 'detecting' | 'downloading' | 'preparing' | 'ready' | 'error'>('idle');
   const [bgModelProgress, setBgModelProgress] = useState(0);
+  const [bgFallbackReason, setBgFallbackReason] = useState<string | null>(null);
   const [upscalerPreloadError, setUpscalerPreloadError] = useState(false);
   const [modelsCleared, setModelsCleared] = useState(false);
   const [isClearingModelCache, setIsClearingModelCache] = useState(false);
@@ -179,7 +179,6 @@ export default function App() {
   const [step, setStep] = useState<Step>('upload');
   const [items, setItems] = useState<UpscaleItem[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   // AI Enhancement options defaults
   const DEFAULT_OPTIONS: EnhancementOptions = {
@@ -225,6 +224,7 @@ export default function App() {
     const unsubscribe = bgRemoverService.subscribeState((state) => {
       setBgModelPhase(state.phase);
       setBgModelProgress(state.progress);
+      setBgFallbackReason(state.fallbackReason);
       setBgEngine(state.phase === 'idle' || state.phase === 'detecting' || state.phase === 'error'
         ? null
         : state.engine);
@@ -237,6 +237,7 @@ export default function App() {
       setBgEngine(null);
       setBgModelPhase('idle');
       setBgModelProgress(0);
+      setBgFallbackReason(null);
       setUpscalerPreloadError(false);
       setModelsCleared(true);
       addToast('info', 'Downloaded models were cleared in another tab.');
@@ -269,7 +270,7 @@ export default function App() {
         const bgPreload = bgRemoverService.init();
         await initONNX();
         if (cancelled || preloadCancelledRef.current) return;
-        const loaded = await loadModel('clearreality');
+        const loaded = await loadModel('vitality');
         if (!cancelled) setUpscalerPreloadError(!loaded);
         void bgPreload;
       } catch (err) {
@@ -309,6 +310,7 @@ export default function App() {
       setBgEngine(null);
       setBgModelPhase('idle');
       setBgModelProgress(0);
+      setBgFallbackReason(null);
       setUpscalerPreloadError(false);
       setModelsCleared(true);
       addToast('success', 'Downloaded AI models cleared from this browser.');
@@ -330,26 +332,37 @@ export default function App() {
     const url = URL.createObjectURL(file);
     const img = new Image();
     img.onload = () => {
+      const width = img.naturalWidth || img.width;
+      const height = img.naturalHeight || img.height;
+      if (width * DEFAULT_OPTIONS.scale > MAX_OUTPUT_DIM || height * DEFAULT_OPTIONS.scale > MAX_OUTPUT_DIM) {
+        const supports2x = width * 2 <= MAX_OUTPUT_DIM && height * 2 <= MAX_OUTPUT_DIM;
+        addToast(
+          'info',
+          supports2x
+             ? `Image too large for 4x/8x. Select 2x to stay within the limit.`
+            : `Choose 2x to stay under the limit.`  
+          );
+      }
       const newItem: UpscaleItem = {
         id: makeId(),
         file,
         name: file.name,
         url,
         img,
-        width: img.naturalWidth || img.width,
-        height: img.naturalHeight || img.height,
+        width,
+        height,
         size: file.size,
         status: 'idle',
         progress: { percent: 0, text: '' },
         result: null,
         error: null,
         options: { ...DEFAULT_OPTIONS },
-        modelKey: 'clearreality',
+        modelKey: 'vitality',
       };
       setItems((prev) => [...prev, newItem]);
       setSelectedId(newItem.id);
       setStep('config');
-      loadModel('clearreality');
+      loadModel('vitality');
       scrollToTop();
     };
     img.onerror = () => {
@@ -425,6 +438,22 @@ export default function App() {
       const item = items.find((i) => i.id === id);
       if (!item || item.status === 'processing' || modelLoading) return;
 
+      const outputWidth = Math.round(item.width * item.options.scale);
+      const outputHeight = Math.round(item.height * item.options.scale);
+      if (outputWidth > MAX_OUTPUT_DIM || outputHeight > MAX_OUTPUT_DIM) {
+        const supports2x = item.width * 2 <= MAX_OUTPUT_DIM && item.height * 2 <= MAX_OUTPUT_DIM;
+        addToast(
+          'info',
+          supports2x
+            ? `Image too large for 4x/8x. Select 2x to stay within the limit.`
+            : `Choose 2x to stay under the limit.`
+        );
+        setItems((prev) => prev.map((entry) => entry.id === id
+          ? { ...entry, status: 'idle', error: null, progress: { percent: 0, text: '' } }
+          : entry));
+        return;
+      }
+
       // Prime audio context and ask for browser notification permission on user gesture
       primeAudio();
       requestNotificationPermission().catch(() => { });
@@ -485,19 +514,32 @@ export default function App() {
         if (err?.name === 'CancellationError' || /cancel/i.test(err?.message || '')) {
           return;
         }
+        const isOutputLimit = /Output would be .*exceeding the .* limit/i.test(err?.message || '');
+        if (isOutputLimit) {
+          const supports2x = item.width * 2 <= MAX_OUTPUT_DIM && item.height * 2 <= MAX_OUTPUT_DIM;
+          addToast('info', supports2x
+            ? `This image is too large for ${item.options.scale}×. Choose 2× to stay within the output limit.`
+            : 'This image is too large for the supported output limit. Use a smaller source image.');
+          setItems((prev) => prev.map((entry) => entry.id === id
+            ? { ...entry, status: 'idle', error: null, progress: { percent: 0, text: '' } }
+            : entry));
+          return;
+        }
+        console.error(`Upscaling failed for ${item.name}:`, err);
+        const userMessage = 'Could not upscale this image. Please retry, or choose a smaller image if the problem continues.';
         setItems((prev) =>
           prev.map((i) =>
             i.id === id
               ? {
                 ...i,
                 status: 'error',
-                error: err.message || 'Upscaling failed.',
+                error: userMessage,
                 progress: { percent: 0, text: '' },
               }
               : i
           )
         );
-        addToast('error', `Failed to upscale ${item.name}: ${err.message || 'Error occurred'}`);
+        addToast('error', userMessage);
       }
     },
     [items, modelLoading, upscale, addToast]
@@ -653,9 +695,9 @@ export default function App() {
     }
   }, [handleBGFiles, scrollToTop, addToast]);
 
-  const activeItem = items.find((i) => i.id === selectedId) || items[0];
-  const visibleError = error || activeItem?.error || null;
-  const modelStatus = bgModelPhase === 'downloading'
+  const modelStatus = bgFallbackReason && bgEngine === 'wasm'
+    ? `Standard mode: ${bgFallbackReason.slice(0, 110)}`
+    : bgModelPhase === 'downloading'
     ? `Downloading background-removal model (${Math.round(bgModelProgress)}%)`
     : bgModelPhase === 'preparing'
       ? 'Preparing background-removal model'
@@ -836,8 +878,6 @@ export default function App() {
                     maxSizeMB={15}
                   />
                 )}
-
-                <ErrorMessage message={visibleError} onDismiss={() => setError(null)} />
 
                 {step === 'upload' && (
                   <>

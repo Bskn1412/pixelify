@@ -9,7 +9,7 @@ interface FaqItem {
 const FAQ_ITEMS: FaqItem[] = [
   {
     q: 'How does Pixelify process images without uploading to cloud servers?',
-    a: 'Pixelify executes AI neural networks (BiRefNet for background removal, ClearReality & Real-ESRGAN for upscaling) directly in your browser using ONNX Runtime Web and WebGPU. Model weights are downloaded to your browser cache on first use, after which all tensor math runs locally on your device with 0 bytes uploaded to external servers.',
+    a: 'Pixelify executes AI neural networks (Chopper for background removal, Vitality, Pixel-Dance & Alpha-Satoru for upscaling) directly in your browser using ONNX Runtime Web and WebGPU. Model weights are downloaded to your browser cache on first use, after which all tensor math runs locally on your device with 0 bytes uploaded to external servers.',
   },
   {
     q: 'Is Pixelify really 100% free with no watermarks or subscriptions?',
@@ -24,8 +24,8 @@ const FAQ_ITEMS: FaqItem[] = [
     a: 'Yes! Once a neural model has been loaded once, its weights remain cached securely in your browser storage. You can open Pixelify and remove backgrounds or upscale photos on flights, train commutes, or remote locations without any Wi-Fi or cellular connection.',
   },
   {
-    q: 'How does BiRefNet compare to standard background removers?',
-    a: 'Most online tools use basic color-keying or low-resolution segmentation that destroys fine hair, fur, and glass transparency. BiRefNet (Bilateral Reference Network) performs sub-pixel edge matting, preserving microscopic hair strands, translucent veils, and complex contours with studio-grade precision.',
+    q: 'How does Chopper compare to standard background removers?',
+    a: 'Most online tools use basic color-keying or low-resolution segmentation that destroys fine hair, fur, and glass transparency. Chopper performs sub-pixel edge matting, preserving microscopic hair strands, translucent veils, and complex contours with studio-grade precision.',
   },
   {
     q: 'Does Pixelify work on mobile phones and tablets?',

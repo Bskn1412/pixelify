@@ -1206,6 +1206,7 @@ html.light .gradient-text {
         max-width: none;
 
         justify-content: center;
+        gap: 0;
     }
 
     /* The base rule pins the scroll cue to the bottom via margin-top:auto,
@@ -1318,6 +1319,12 @@ html.light .gradient-text {
         width: min(320px, 80%);
 
         box-sizing: border-box;
+    }
+}
+
+@media (min-width: 769px) {
+    .pixelify-hero .hero-top-group {
+        margin-top: clamp(28px, 8.5vh, 76px);
     }
 }
 

@@ -160,8 +160,8 @@ export default function MobileSidebar({
                   {webgpuAvailable === null
                     ? 'CHECKING…'
                     : webgpuAvailable
-                    ? 'AVAILABLE'
-                    : 'WASM FALLBACK'}
+                    ? 'Fast'
+                    : 'Standard'}
                 </span>
               </div>
             )}

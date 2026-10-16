@@ -156,10 +156,10 @@ export async function createSession(
     signal
   );
 
-  // ClearReality uses DepthToSpace / PixelShuffle. In ORT Web 1.19.2+, WebGPU JSEP kernel for DepthToSpace
+  // Vitality uses DepthToSpace / PixelShuffle. In ORT Web 1.19.2+, WebGPU JSEP kernel for DepthToSpace
   // has a known dimension mismatch bug with 4D output tensors [1, 512, 512, 3].
-  // Running ClearReality on WASM SIMD is ultra-fast (~100ms for 1.9MB model) and 100% stable.
-  const targetEngine = modelKey === 'clearreality' ? 'wasm' : forceEngine;
+  // Running Vitality on WASM SIMD is ultra-fast (~100ms for 1.9MB model) and 100% stable.
+  const targetEngine = modelKey === 'vitality' ? 'wasm' : forceEngine;
 
   if (targetEngine === 'wasm') {
     const session = await ort.InferenceSession.create(data, { executionProviders: ['wasm'] });
@@ -169,7 +169,7 @@ export async function createSession(
     return session;
   }
 
-  // WebGPU FIRST for heavy generative models (UltraSharp 67MB, Real-ESRGAN 65MB): probe GPU adapter
+  // WebGPU FIRST for heavy generative models (Pixel-Dance 67MB, Alpha-Satoru 65MB): probe GPU adapter
   let adapterOk = false;
   try {
     const gpu = (navigator as any).gpu;

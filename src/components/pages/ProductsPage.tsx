@@ -17,22 +17,22 @@ const TOC = [
 
 const MODELS = [
   {
-    key: 'clearreality',
-    name: 'ClearReality V1',
+    key: 'vitality',
+    name: 'Vitality',
     size: '1.9 MB',
     speed: '~120 ms',
     best: 'Fast previews, illustrations, anime, portraits',
   },
   {
-    key: 'ultrasharp',
-    name: '4x-UltraSharp',
+    key: 'pixel-dance',
+    name: 'Pixel-Dance',
     size: '67 MB',
     speed: '~650 ms',
     best: 'Photography, architecture, fine texture, 8K prints',
   },
   {
-    key: 'realesrgan',
-    name: 'Real-ESRGAN Studio',
+    key: 'alpha-satoru',
+    name: 'Alpha-Satoru',
     size: '65 MB',
     speed: '~450 ms',
     best: 'Portraits, heavy compression artifacts, restoration',
@@ -49,8 +49,8 @@ export default function ProductsPage({ onTabChange }: Props) {
       updated="Last updated: October 12, 2026"
       toc={TOC}
       documentTitle="Pixelify Products — Upscaler, Background Remover & Guides"
-      metaDescription="The full Pixelify lineup: AI Image Upscaler (ClearReality, UltraSharp,
-      Real-ESRGAN), Background Remover (BiRefNet), and the Blog & Guides: specs, formats and requirements."
+      metaDescription="The full Pixelify lineup: AI Image Upscaler (Vitality, Pixel-Dance,
+      Alpha-Satoru), Background Remover (Chopper), and the Blog & Guides: specs, formats and requirements."
       onTabChange={onTabChange}
     >
       <Section id="lineup" num={1} title="The lineup">
@@ -128,7 +128,7 @@ export default function ProductsPage({ onTabChange }: Props) {
 
       <Section id="bgremove" num={3} title="Background Remover">
         <P>
-          The remover uses a BiRefNet bilateral-reference segmentation model, an architecture
+          The remover uses the Chopper neural segmentation model, an architecture
           trained specifically to hold on to hair, fur, glass and other semi-transparent edges that
           colour-key tools destroy. It runs in a background Web Worker, so the page stays
           responsive while the model loads and segments.

@@ -72,9 +72,9 @@ const PAIRS: ShowcasePair[] = [
 ];
 
 const HERO_STATS = [
-  { value: '4×', label: 'Resolution Gain' },
+  { value: '8x', label: 'Resolution Gain' },
   { value: '100%', label: 'Private · On-Device' },
-  { value: '0', label: 'Uploads. Ever.' },
+  { value: '0', label: 'Bytes Leaving Machine' },
 ];
 
 const CYCLE_MS = 6500;
@@ -289,9 +289,8 @@ export const UpscaleShowcase: React.FC = () => {
           {PAIRS.slice(0, 2).map((p, i) => (
             <figure
               key={p.id}
-              className={`uc-float-card uc-fc-${i + 1} ${
-                p.width / p.height > 1 ? 'is-landscape' : 'is-portrait'
-              } ${active === i ? 'is-active' : ''}`}
+              className={`uc-float-card uc-fc-${i + 1} ${p.width / p.height > 1 ? 'is-landscape' : 'is-portrait'
+                } ${active === i ? 'is-active' : ''}`}
               style={
                 {
                   '--fc-delay': `${i * 0.14}s`,
@@ -314,12 +313,12 @@ export const UpscaleShowcase: React.FC = () => {
           <h1 className="uc-title pb-reveal" style={{ '--rv-i': 1 } as React.CSSProperties}>
             Every pixel,
             <br />
-            <em>re-engineered.</em>
+            <em>re-imagined.</em>
           </h1>
 
           <p className="uc-subtitle pb-reveal" style={{ '--rv-i': 2 } as React.CSSProperties}>
-            Real 4× results, rendered live on-device. Drag the lens — the left side
-            is the untouched original, the right is Pixelify after one pass.
+            Experience real 8x upscaling, rendered live on-device.
+            Slide the lens to compare: the untouched original on the left, and Pixelify’s single-pass result on the right.
           </p>
 
           <div className="pb-reveal uc-lens-wrap" style={{ '--rv-i': 3 } as React.CSSProperties}>
@@ -342,16 +341,15 @@ export const UpscaleShowcase: React.FC = () => {
           {PAIRS.slice(2).map((p, i) => (
             <figure
               key={p.id}
-              className={`uc-float-card uc-fc-r${i + 1} ${
-                p.width / p.height > 1 ? 'is-landscape' : 'is-portrait'
-              } ${active === i + 2 ? 'is-active' : ''}`}
+              className={`uc-float-card uc-fc-r${i + 1} ${p.width / p.height > 1 ? 'is-landscape' : 'is-portrait'
+                } ${active === i + 2 ? 'is-active' : ''}`}
               style={
                 {
                   '--fc-delay': `${0.2 + i * 0.14}s`,
                   '--card-ar': p.aspect,
                 } as React.CSSProperties
               }
-              onClick ={() => setActive(i + 2)}
+              onClick={() => setActive(i + 2)}
             >
               <img src={p.after} alt="" loading="lazy" draggable={false} />
               <figcaption className="uc-fc-caption">

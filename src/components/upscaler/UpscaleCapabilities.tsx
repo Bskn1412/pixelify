@@ -87,7 +87,7 @@ const CELLS: BentoCell[] = [
     id: 'detail',
     icon: <Sparkles size={18} strokeWidth={2} />,
     title: 'Generative Detail Engine',
-    desc: 'Edge-aware reconstruction rebuilds micro-texture — fabric weave, skin, chrome — instead of just stretching pixels.',
+    desc: 'Edge-aware reconstruction intelligently restores fine textures, skin details, and metallic reflections instead of stretching pixels.',
     span: 'uc-b-cell-a',
     visual: (
       <div className="uc-bento-visual">
@@ -135,7 +135,7 @@ const CELLS: BentoCell[] = [
     id: 'control',
     icon: <ArrowUpRight size={18} strokeWidth={2} />,
     title: 'Per-Image Control',
-    desc: 'Model, scale, denoise, sharpen and HDR — tuned independently for every file in the batch.',
+    desc: 'Model, scale, denoise, sharpen and HDR tuned independently for every file in the batch.',
     span: 'uc-b-cell-f',
     visual: <EnhancePanel />,
   },
@@ -168,13 +168,12 @@ export const UpscaleCapabilities: React.FC = () => {
 
       <header className="uc-capab-head">
         <h2 className="uc-capab-title pb-reveal" style={{ '--rv-i': 1 } as React.CSSProperties}>
-          A studio-grade toolkit,
+          A studio-grade <span className='text-[#00FF88]'>toolkit,</span>
           <br />
           <em>hiding in your browser tab.</em>
         </h2>
         <p className="uc-capab-sub pb-reveal" style={{ '--rv-i': 2 } as React.CSSProperties}>
-          Six systems working on every image you drop — the same pipeline the
-          showcase above was rendered with.
+          A powerful suite of object isolation and resolution enhancement engines running entirely inside this tab.
         </p>
       </header>
 

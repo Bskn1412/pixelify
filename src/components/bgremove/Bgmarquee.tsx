@@ -2,7 +2,7 @@
 export default function Bgmarquee(){
 
   const MARQUEE = [
-    'BiRefNet segmentation', 'WebGPU on-device', 'Zero uploads',
+    'Chopper segmentation', 'WebGPU on-device', 'Zero uploads',
     'Hair-level edges', 'Transparent PNG', 'No sign-up', 'Unlimited runs',
   ];
 

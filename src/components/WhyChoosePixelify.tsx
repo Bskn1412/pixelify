@@ -147,7 +147,7 @@ export default function WhyChoosePixelify() {
             <FeatureCard
               index={2}
               icon={BrainCircuit}
-              tag="BiRefNet & ClearReality"
+              tag="Chopper & Vitality"
               badge="8K Resolution"
               title="State-of-the-Art Neural Models"
               description="Trained on millions of high-res images to preserve flyaway hair strands, transparent glass, and micro-textures without plastic artifacts."

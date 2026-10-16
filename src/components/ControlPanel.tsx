@@ -45,39 +45,39 @@ export default function ControlPanel({
             <div className="flex items-center gap-1.5 bg-white/5 p-1 rounded-xl border border-white/10 flex-wrap">
               <button
                 type="button"
-                onClick={() => onModelChange('clearreality')}
+                onClick={() => onModelChange('vitality')}
                 disabled={busy}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  modelKey === 'clearreality'
+                  modelKey === 'vitality'
                     ? 'bg-primary text-white shadow'
                     : 'text-muted hover:text-white'
                 }`}
               >
-                ClearReality V1 (Fast)
+                Vitality (Fast)
               </button>
               <button
                 type="button"
-                onClick={() => onModelChange('ultrasharp')}
+                onClick={() => onModelChange('pixel-dance')}
                 disabled={busy}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  modelKey === 'ultrasharp'
+                  modelKey === 'pixel-dance'
                     ? 'bg-primary text-white shadow'
                     : 'text-muted hover:text-white'
                 }`}
               >
-                UltraSharp (8K Extreme)
+                Pixel-Dance (8K Extreme)
               </button>
               <button
                 type="button"
-                onClick={() => onModelChange('realesrgan')}
+                onClick={() => onModelChange('alpha-satoru')}
                 disabled={busy}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  modelKey === 'realesrgan'
+                  modelKey === 'alpha-satoru'
                     ? 'bg-primary text-white shadow'
                     : 'text-muted hover:text-white'
                 }`}
               >
-                Real-ESRGAN (Studio)
+                Alpha-Satoru (Studio)
               </button>
             </div>
           </div>

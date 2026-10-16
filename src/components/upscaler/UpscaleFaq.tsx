@@ -15,28 +15,28 @@ interface BrandFaqItem {
 
 const FAQ_ITEMS: BrandFaqItem[] = [
   {
-    q: 'How does Pixelify upscale to 8K?',
-    a: 'A neural super-resolution network reconstructs your image tile by tile, directly on your GPU. Each pass adds real detail — edges, texture, faces — so a small photo comes out crisp at up to 16,384 × 16,384 pixels. 8K output is one tap, not a render farm.',
+    q: 'How does Pixelify upscale to 8K like resolution?',
+    a: 'A neural super-resolution network reconstructs your image tile by tile, directly on your GPU. Each pass adds real detail, edges, texture, faces, so a small photo comes out crisp at up to 16,384 × 16,384 pixels. 8K output is one tap, not a render farm.',
   },
   {
     q: 'Is my image uploaded to a cloud server?',
-    a: 'Never. The model runs inside your browser tab via WebGPU / WebAssembly. Your photo is processed on your own silicon and stays on your device — there is no queue, no bucket, and no one watching.',
+    a: 'Never. The model runs inside your browser tab via WebGPU / WebAssembly. Your photo is processed on your own silicon and stays on your device. There is no queue, no bucket, and no one watching.',
   },
   {
     q: 'Do I need an account or credits?',
-    a: 'No sign-up, no email, no credit system. Open the page, drop an image, and upscale as many files as you want — unlimited runs, forever free.',
+    a: 'No sign-up, no email, no credit system. Open the page, drop an image, and upscale as many files as you want. Unlimited runs, forever free.',
   },
   {
     q: 'What can I export, and is there a watermark?',
-    a: 'Lossless PNG or WebP at the full upscaled resolution. No watermark, no quality cap, no daily limit — what you see in the preview is exactly what you download.',
+    a: 'Lossless PNG or WebP at the full upscaled resolution. No watermark, no quality cap, no daily limit. what you see in the preview is exactly what you download.',
   },
   {
     q: 'Will it work on my laptop or phone?',
-    a: 'Yes. On devices with WebGPU you get hardware acceleration; everywhere else the engine falls back to WebAssembly automatically, so the studio works in any modern browser.',
+    a: 'Yes. On devices with WebGPU you get hardware acceleration. Everywhere else the engine falls back to WebAssembly automatically, so the studio works in any modern browser.',
   },
   {
     q: 'How fast is a 4× upscale?',
-    a: 'The Turbo engine finishes most images in under a second on a mid-range GPU. The studio-grade Real-ESRGAN pass takes a few seconds for maximum fidelity — both run locally, so speed depends on your hardware, not a server queue.',
+    a: 'The Turbo engine finishes most images in under a second on a mid-range GPU. The studio-grade Alpha-Satoru pass takes a few seconds for maximum fidelity. Both run locally, so speed depends on your hardware, not a server queue.',
   },
 ];
 

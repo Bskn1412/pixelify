@@ -794,7 +794,7 @@ export default function BGComparator({
         {/* =========================================================
             LOADING / PROCESSING STATE
            ========================================================= */}
-        {isProcessing || !job.resultUrl ? (
+        {isProcessing || (!job.resultUrl && job.status !== 'error') ? (
           <div className="absolute inset-0 z-30 bg-slate-950/85 backdrop-blur-2xl flex flex-col items-center justify-center p-8 text-center gap-5">
             <img
               src={job.sourceUrl}
@@ -812,7 +812,7 @@ export default function BGComparator({
             <div className="relative z-10 max-w-sm">
               <h4 className="text-xl font-black text-white mb-1 tracking-tight">Extracting Subject...</h4>
               <p className="text-xs text-neutral-400 font-mono">
-                {job.message || 'BiRefNet vision transformers segmenting edges...'}
+                {job.message || 'Chopper neural network segmenting edges...'}
               </p>
             </div>
 
@@ -997,7 +997,7 @@ export default function BGComparator({
                       }}
                     >
                       <img
-                        src={job.resultUrl}
+                        src={job.resultUrl || job.sourceUrl}
                         alt={job.name}
                         className="w-full h-full object-contain pointer-events-none select-none"
                         style={{ filter: combinedFilter, clipPath: cropClipPath, imageRendering: 'auto' }}
@@ -1012,7 +1012,7 @@ export default function BGComparator({
             {isCompareMode && (
               <div className="absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden z-20">
                 <img
-                  src={job.resultUrl}
+                  src={job.resultUrl || job.sourceUrl}
                   alt="Result cutout"
                   className="max-h-full max-w-full object-contain transition-all"
                   style={{ filter: combinedFilter }}

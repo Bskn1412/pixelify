@@ -16,8 +16,49 @@ const GPU_PROBE_TIMEOUT_MS = 3500;
 // Model weights are fetched from the model repository; no local-model lookup.
 env.allowLocalModels = false;
 
+// Tune ORT WASM threading: multi-thread only when crossOriginIsolated.
+const onnxEnv = (env as any).backends?.onnx;
+if (onnxEnv?.wasm) {
+  const cores = (self.navigator as any)?.hardwareConcurrency ?? 4;
+  const isolated = (self as any).crossOriginIsolated === true;
+  onnxEnv.wasm.numThreads = isolated ? Math.min(4, cores) : 1;
+}
+
 const worker = self as DedicatedWorkerGlobalScope;
 const post = (message: Record<string, unknown>) => worker.postMessage(message);
+
+/**
+ * Conservative mobile device detection within Web Worker environment.
+ * Note: window, document, and matchMedia are NOT available in Web Workers.
+ * Mobile WebGPU often crashes the browser process outright with uncatchable OOM;
+ * forcing WASM (Standard) on mobile ensures rock-solid stability.
+ */
+function isMobileDevice(): boolean {
+  const nav = (worker.navigator || self.navigator) as any;
+  if (!nav) return false;
+
+  // 1. Modern Client Hints (e.g. Chrome on Android)
+  if (nav.userAgentData?.mobile === true) return true;
+
+  const ua = nav.userAgent || '';
+
+  // 2. Mobile User-Agent tokens
+  if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i.test(ua)) {
+    return true;
+  }
+
+  // 3. iPad on iOS 13+ (reports as Macintosh desktop UA, but has multi-touch points)
+  if (/Macintosh/i.test(ua) && typeof nav.maxTouchPoints === 'number' && nav.maxTouchPoints > 1) {
+    return true;
+  }
+
+  // 4. Low device memory indicator (<= 3GB RAM is mobile / low-spec)
+  if (typeof nav.deviceMemory === 'number' && nav.deviceMemory <= 3) {
+    return true;
+  }
+
+  return false;
+}
 
 let removerPromise: Promise<any> | null = null;
 let chosenEngine: Engine | null = null;
@@ -176,9 +217,24 @@ async function getRemover(forceWasm = false): Promise<any> {
 
   if (!removerPromise) {
     const promise = (async () => {
-      let engine: Engine = forceWasm ? 'wasm' : (await detectWebGPU() ? 'webgpu' : 'wasm');
-      webgpuAvailable = engine === 'webgpu';
-      post({ type: 'CAPABILITIES', engine, webgpuAvailable, forceWasm });
+      const isMobile = isMobileDevice();
+      const hasWebGpu = await detectWebGPU();
+      webgpuAvailable = hasWebGpu;
+
+      // Mobile devices enforce WASM (Standard CPU) to prevent uncatchable tab crashes/OOM
+      const engine: Engine = (forceWasm || isMobile) ? 'wasm' : (hasWebGpu ? 'webgpu' : 'wasm');
+      const fallbackReason = isMobile && hasWebGpu
+        ? 'Mobile device detected: using Standard (CPU) mode to prevent browser memory crashes.'
+        : undefined;
+
+      post({
+        type: 'CAPABILITIES',
+        engine,
+        webgpuAvailable,
+        forceWasm,
+        isMobile,
+        reason: fallbackReason,
+      });
       return createResilientPipeline(engine);
     })();
     removerPromise = promise;
@@ -242,6 +298,7 @@ async function handleMessage(data: WorkerMessage): Promise<void> {
     status('checking-webgpu');
     try {
       const remover = await getRemover(forceWasm === true);
+      const isMobile = isMobileDevice();
       // getRemover resolves only when a usable pipeline has actually initialized.
       post({
         type: 'READY',
@@ -249,6 +306,9 @@ async function handleMessage(data: WorkerMessage): Promise<void> {
         webgpuAvailable,
         model: MODEL_ID,
         elapsedMs: Math.round(performance.now() - initStartedAt),
+        reason: isMobile && webgpuAvailable
+          ? 'Mobile device detected: using Standard (CPU) mode to prevent browser memory crashes.'
+          : undefined,
       });
       void remover;
     } catch (error) {

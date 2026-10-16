@@ -39,10 +39,10 @@ export default function Footer({ onTabChange }: FooterProps) {
                 Background Remover
               </button>
               <a href="#models" onClick={(e) => { e.preventDefault(); onTabChange('upscaler'); }} className="text-muted hover:text-white transition">
-                Real-ESRGAN Model
+                Alpha-Satoru Model
               </a>
-              <a href="#birefnet" onClick={(e) => { e.preventDefault(); onTabChange('bg_remove'); }} className="text-muted hover:text-white transition">
-                BiRefNet Neural Cutouts
+              <a href="#chopper" onClick={(e) => { e.preventDefault(); onTabChange('bg_remove'); }} className="text-muted hover:text-white transition">
+                Chopper Neural Cutouts
               </a>
               <a href="#webgpu" onClick={(e) => e.preventDefault()} className="text-muted hover:text-white transition">
                 WebGPU Acceleration

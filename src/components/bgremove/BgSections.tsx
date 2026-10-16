@@ -50,7 +50,7 @@ const PlusMark: React.FC<{ style: React.CSSProperties; dim?: boolean }> = ({ sty
    1 — SHOWCASE : editorial split + rotated shots + marquee
    ============================================================ */
 const MARQUEE = [
-  'BiRefNet segmentation', 'WebGPU on-device', 'Zero uploads',
+  'Chopper segmentation', 'WebGPU on-device', 'Zero uploads',
   'Hair-level edges', 'Transparent PNG', 'No sign-up', 'Unlimited runs',
 ];
 
@@ -142,7 +142,7 @@ export const BgPipeline: React.FC = () => {
             <div>
               <span className="bgr-step-k">Segment</span>
               <h3>Neural separation</h3>
-              <p>BiRefNet runs directly on your hardware, leveraging WebGPU when available and WebAssembly everywhere else. Hair, fur and glass edges included.</p>
+              <p>Chopper runs directly on your hardware, leveraging WebGPU when available and WebAssembly everywhere else. Hair, fur and glass edges included.</p>
             </div>
           </article>
 
@@ -353,11 +353,11 @@ export const BgSampleGallery: React.FC<{ onLoadSample: (src: string, name: strin
 const FAQ_ITEMS = [
   {
     q: 'How do I remove a background for free?',
-    a: 'Open the Background Remover, drag your image into the upload area, and the AI cutout starts automatically. When it finishes, download the transparent PNG — no sign-up, no credits, no watermark.',
+    a: 'Open the Background Remover, drag your image into the upload area, and the AI cutout starts automatically. When it finishes, download the transparent PNG, no sign-up, no credits, no watermark.',
   },
   {
     q: 'Are my images uploaded to a server?',
-    a: 'No. The BiRefNet segmentation model runs directly inside your browser through Transformers.js with WebGPU or WebAssembly. Your photos never leave your device, which makes it safe for private or client work.',
+    a: 'No. The Chopper segmentation model runs directly inside your browser through Transformers.js with WebGPU or WebAssembly. Your photos never leave your device, which makes it safe for private or client work.',
   },
   {
     q: 'Which formats can I use and export?',
@@ -365,11 +365,11 @@ const FAQ_ITEMS = [
   },
   {
     q: 'Can I replace the removed background?',
-    a: 'Yes. Once the cutout is done, open the Background tab to place your subject on a transparent canvas, a solid or gradient color, or your own uploaded photo — then download the composite in one click.',
+    a: 'Yes. Once the cutout is done, open the Background tab to place your subject on a transparent canvas, a solid or gradient color, or your own uploaded photo, then download the composite in one click.',
   },
   {
     q: 'Does it handle hair, fur and glass?',
-    a: 'The bilateral-reference architecture is trained specifically on fine boundaries — hair strands, fur, and semi-transparent edges survive far better than with classic color-key tools.',
+    a: 'The bilateral-reference architecture is trained specifically on fine boundaries, hair strands, fur, and semi-transparent edges survive far better than with classic color-key tools.',
   },
   {
     q: 'Why is the first image slower?',

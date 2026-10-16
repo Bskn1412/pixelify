@@ -16,46 +16,21 @@ interface ReelItem {
 }
 
 const ROW_A: ReelItem[] = [
-  { src: '/showcase/preview/dress_upscaled_4x.png', name: 'One Piece · Wide', meta: '738px → 2952px', ratio: '365 / 547' },
-  { 
-    src: '/showcase/preview/pets_upscaled_4x.png', 
-    name: 'Automotive', 
-    meta: 'Reflective Surfaces', 
-    ratio: '321 / 175' 
-  },
-  { dark: true, src: '', name: '8K', meta: 'MAX OUTPUT RESOLUTION', ratio: 'auto' },
-  { src: '/showcase/preview/animal_upscaled_4x.png', name: 'Anime Portrait', meta: 'Line-Art Safe', ratio: '2 / 3' },
-  { src: '/showcase/preview/handshake_upscaled_4x.png', name: 'Cinematic', meta: 'Film Grain Kept', ratio: '948 / 533' },
-  { src: '/showcase/preview/watch_upscaled_4x.png', name: 'Cinematic', meta: 'Film Grain Kept', ratio: '3 / 4' },
+  { src: '/showcase/preview/dress_upscaled_4x.png', name: 'Fashion Portrait', meta: 'Editorial', ratio: '365 / 547' },
+  { src: '/showcase/preview/pets_upscaled_4x.png', name: 'Pets', meta: 'Fur-level', ratio: '321 / 175' },
+  { dark: true, src: '', name: '8K', meta: 'LIKE MAX OUTPUT RESOLUTION', ratio: 'auto' },
+  { src: '/showcase/preview/animal_upscaled_4x.png', name: 'Avian portrait', meta: 'Feather-grade', ratio: '2 / 3' },
+  { src: '/showcase/preview/handshake_upscaled_4x.png', name: 'Official portrait', meta: 'Photojournalism', ratio: '948 / 533' },
+  { src: '/showcase/preview/watch_upscaled_4x.png', name: 'Product', meta: 'Studio-quality', ratio: '3 / 4' },
 ];
 
 const ROW_B: ReelItem[] = [
-  { 
-    src: '/showcase/preview/shoes_upscaled_4x.png', 
-    name: 'Iconic Poster', 
-    meta: 'Print-Ready', 
-    ratio: '547 / 365' 
-  },
-  { dark: true, src: '', name: '0ms', meta: 'ZERO CLOUD LATENCY', ratio: 'auto' },
-  { 
-    src: '/showcase/preview/MyHeroAC_upscaled_4x.png', 
-    name: 'Tony · Frame', 
-    meta: 'Faces Restored', 
-    ratio: '597 / 335' 
-  },
-  { src: '/showcase/preview/bmw_upscaled_4x.png', name: 'Porsche 911', meta: 'Detail Recovery', ratio: '9 / 16' },
-  { 
-    src: '/showcase/preview/pubg_upscaled_4x.png', 
-    name: 'Illustration', 
-    meta: 'Color Fidelity', 
-    ratio: '1000 / 563' 
-  },
-  {
-    src: '/showcase/preview/demon-slayer_upscaled_4x.png', 
-    name: 'Illustration', 
-    meta: 'Color Fidelity', 
-    ratio: '16 / 9' 
-  },
+  { src: '/showcase/preview/shoes_upscaled_4x.png', name: 'Iconic Poster', meta: 'Print-Ready', ratio: '547 / 365' },
+  { dark: true, src: '', name: '4', meta: 'Moves to Finished Cutout', ratio: 'auto' },
+  { src: '/showcase/preview/MyHeroAC_upscaled_4x.png', name: 'Anime Art', meta: 'Faces Restored', ratio: '597 / 335' },
+  { src: '/showcase/preview/bmw_upscaled_4x.png', name: 'Automotive', meta: 'Detail Recovery', ratio: '9 / 16' },
+  { src: '/showcase/preview/pubg_upscaled_4x.png', name: 'Gaming', meta: 'Thumbnail-Ready', ratio: '1000 / 563' },
+  { src: '/showcase/preview/demon-slayer_upscaled_4x.png', name: 'Illustration', meta: 'Color Fidelity', ratio: '16 / 9' },
 ];
 
 /** Duplicate the list so the -50% keyframe loops seamlessly */
@@ -123,7 +98,7 @@ export const UpscaleShowreel: React.FC = () => {
     <section className="uc-reel" ref={rootRef}>
       <header className="uc-reel-head">
         <h2 className="uc-reel-title pb-reveal" style={{ '--rv-i': 1 } as React.CSSProperties}>
-          Straight out of the engine.
+          Straight out of the <span className='text-[#00FF85]'>engine.</span>
           <br />
           <em>No retouching. No Photoshop.</em>
         </h2>

@@ -52,7 +52,7 @@ export default function StatsBar({ image, result, backend, modelKey }: StatsBarP
           <div className="bg-white/5 p-3 rounded-xl border border-white/5">
             <div className="text-xs text-muted mb-1">Engine & Hardware</div>
             <div className="text-sm font-extrabold text-white truncate">
-              {m.name.split(' ')[0]} ({backend ? backend.toUpperCase() : 'WASM'})
+              {m.name.split(' ')[0]} ({backend === 'webgpu' ? 'Fast' : 'Standard'})
             </div>
           </div>
         </div>

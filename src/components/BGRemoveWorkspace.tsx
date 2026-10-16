@@ -256,11 +256,15 @@ export default function BGRemoveWorkspace({
       addToast('success', `${job.name} background removed!`);
     } catch (err: any) {
       console.error('processJob failed:', err);
+      const rawMessage = String(err?.message || '');
+      const userMessage = /webgpu|onnxruntime|ortRun|buffer|adapter|device lost/i.test(rawMessage)
+        ? 'Background removal hit a graphics-processing error. Please retry; if it happens again, reload the page and try once more.'
+        : 'Could not remove this background. Please try another image or retry.';
       updateJob(job.id, {
         status: 'error',
-        message: `Cutout failed: ${err?.message || 'unknown error'}`,
+        message: userMessage,
       });
-      addToast('error', `Cutout failed: ${err?.message || 'unknown error'}`);
+      addToast('error', userMessage);
     }
   }
 

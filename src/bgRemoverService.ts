@@ -19,6 +19,7 @@ export interface BGRemoverState {
   progress: number;
   phase: 'idle' | 'detecting' | 'downloading' | 'preparing' | 'ready' | 'error';
   error: string | null;
+  fallbackReason: string | null;
 }
 
 export type EngineSubscriber = (engine: BGEngine, webgpuAvailable: boolean) => void;
@@ -44,6 +45,7 @@ class BGRemoverService {
     progress: 0,
     phase: 'idle',
     error: null,
+    fallbackReason: null,
   };
   private initPromise: Promise<void> | null = null;
   private resolveInit: (() => void) | null = null;
@@ -108,6 +110,15 @@ class BGRemoverService {
           this.state.engine = msg.engine === 'webgpu' ? 'webgpu' : 'wasm';
           this.state.webgpuAvailable = !!msg.webgpuAvailable;
           this.state.phase = 'preparing';
+          if (msg.reason) {
+            this.state.fallbackReason = msg.reason;
+          } else if (this.state.webgpuAvailable && this.state.engine === 'wasm') {
+            this.state.fallbackReason = 'Mobile device: Standard mode used to prevent browser memory crashes.';
+          } else if (this.state.webgpuAvailable) {
+            this.state.fallbackReason = null;
+          } else if (!this.state.fallbackReason) {
+            this.state.fallbackReason = 'No usable WebGPU adapter/device was found.';
+          }
           this.notifyStateSubscribers();
           if (this.replayJobsOnReady) {
             this.replayJobsOnReady = false;
@@ -115,6 +126,16 @@ class BGRemoverService {
               this.worker?.postMessage({ type: 'REMOVE_BG', id, url: resolver.url });
             });
           }
+          return;
+        }
+
+        if (msg.type === 'ENGINE_FALLBACK') {
+          this.state.engine = 'wasm';
+          this.state.fallbackReason = typeof msg.reason === 'string'
+            ? `${msg.stage || 'WebGPU'}: ${msg.reason}`
+            : 'WebGPU initialization or inference failed.';
+          this.state.phase = 'preparing';
+          this.notifyStateSubscribers();
           return;
         }
 
@@ -126,6 +147,11 @@ class BGRemoverService {
           this.state.progress = 100;
           this.state.phase = 'ready';
           this.state.error = null;
+          if (msg.reason) {
+            this.state.fallbackReason = msg.reason;
+          } else if (this.state.webgpuAvailable && this.state.engine === 'wasm') {
+            this.state.fallbackReason = 'Mobile device: Standard mode used to prevent browser memory crashes.';
+          }
           this.notifyEngineSubscribers();
           this.notifyStateSubscribers();
           this.resolveInit?.();
@@ -240,6 +266,7 @@ class BGRemoverService {
       progress: 0,
       phase: 'idle',
       error: null,
+      fallbackReason: null,
     };
     this.notifyStateSubscribers();
   }
@@ -320,6 +347,7 @@ class BGRemoverService {
     this.state.isLoading = true;
     this.state.phase = 'detecting';
     this.state.error = null;
+    this.state.fallbackReason = reason;
     this.notifyStateSubscribers();
 
     try {

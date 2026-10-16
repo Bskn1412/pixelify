@@ -52,12 +52,12 @@ export default function AboutPage({ onTabChange }: Props) {
           items={[
             <>
               <strong>AI Image Upscaler:</strong> enlarge images 2×, 4× or 8× with three neural
-              models (ClearReality V1, 4x-UltraSharp, Real-ESRGAN), presets for portraits, art and
+              models (Vitality, Pixel-Dance, Alpha-Satoru), presets for portraits, art and
               landscapes, and optional denoise, sharpen, face restoration, colour and HDR passes.
               Export as PNG, WebP or JPEG.
             </>,
             <>
-              <strong>Background Remover:</strong> one-click neural cutouts using a BiRefNet
+              <strong>Background Remover:</strong> one-click neural cutouts using the Chopper
               segmentation model, with hair- and fur-level edge precision, erase/restore brushes,
               background replacement, and transparent PNG or WebP export.
             </>,

@@ -212,12 +212,12 @@ export default function BGRemoverSection({ onLaunchBGRemove }: BGRemoverSectionP
                         >
                             {/* Tilt Card (Original Photo) */}
                             <div className="bgr-3d-card">
-                                <img src="/bg-img.jpg" alt="Original Photo" />
+                                <img src="/home/bgremover/bg-img.jpg" alt="Original Photo" />
                             </div>
 
                             {/* Popup Cutout (Background Removed PNG) */}
                             <div className="bgr-3d-popup">
-                                <img src="/bg-removed.png" alt="Background Removed Cutout" />
+                                <img src="/home/bgremover/bg-removed.png" alt="Background Removed Cutout" />
                             </div>
                         </div>
 

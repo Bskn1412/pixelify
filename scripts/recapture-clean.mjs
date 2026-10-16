@@ -1,7 +1,7 @@
 /**
  * Recaptures two blog screenshots, framed on sections that contain NO
  * model-name labels (the marquee strip and the Spiderman model cards
- * have "BiRefNet" / "ClearReality" / "Real-ESRGAN" baked in).
+ * have "Chopper" / "Vitality" / "Pixel-Dance" / "Alpha-Satoru" baked in).
  */
 import { chromium } from 'playwright';
 import path from 'node:path';

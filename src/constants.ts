@@ -21,7 +21,7 @@ export interface PresetSettings
 }
 
 export const PRESET_SETTINGS: Record<ModelKey, Record<string, PresetSettings>> = {
-  clearreality: {
+  vitality: {
     Standard: {
       sharpness: 50,
       denoise: 50,
@@ -59,7 +59,7 @@ export const PRESET_SETTINGS: Record<ModelKey, Record<string, PresetSettings>> =
       contrast: 58,
     },
   },
-  ultrasharp: {
+  'pixel-dance': {
     Balanced: {
       sharpness: 50,
       denoise: 50,
@@ -69,7 +69,7 @@ export const PRESET_SETTINGS: Record<ModelKey, Record<string, PresetSettings>> =
       brightness: 50,
       contrast: 50,
     },
-    UltraSharp: {
+    PixelDance: {
       sharpness: 88,
       denoise: 35,
       faceEnhancement: 50,
@@ -97,7 +97,7 @@ export const PRESET_SETTINGS: Record<ModelKey, Record<string, PresetSettings>> =
       contrast: 60,
     },
   },
-  realesrgan: {
+  'alpha-satoru': {
     Balanced: {
       sharpness: 50,
       denoise: 50,
@@ -172,13 +172,13 @@ export function buildPresetOptions(
 
 /** Preset whose settings are all-neutral (i.e. the "Standard"/"Balanced" one). */
 export function getDefaultPreset(modelKey: ModelKey): string {
-  return modelKey === 'clearreality' ? 'Standard' : 'Balanced';
+  return modelKey === 'vitality' ? 'Standard' : 'Balanced';
 }
 
 export const MODELS: Record<ModelKey, ModelConfig> = {
-  clearreality: {
-    name: '4x-ClearReality V1 (Fast / Clean)',
-    file: 'models/4x-ClearRealityV1.onnx',
+  vitality: {
+    name: 'Vitality (Fast / Clean)',
+    file: 'models/Vitality.onnx',
     tileSize: 128,
     scale: 4,
     color: 'rgb',
@@ -189,7 +189,7 @@ export const MODELS: Record<ModelKey, ModelConfig> = {
       req: 'Ultra-Lightweight / SIMD',
     },
     description:
-      '4x ClearReality V1 — a lightweight high-clarity super-resolution model engineered for crisp edge reconstruction, de-blurring, and clean textures with minimal memory footprint.',
+      'Vitality — a lightweight high-clarity super-resolution model engineered for crisp edge reconstruction, de-blurring, and clean textures with minimal memory footprint.',
     recommendation: 'Best for instant previews, illustrations, portraits, anime, and fast processing on any hardware.',
     maxScale: 8,
     presets: ['Standard', 'Fast', 'Crisp', 'Illustration'],
@@ -200,9 +200,9 @@ export const MODELS: Record<ModelKey, ModelConfig> = {
       hdrBoost: true,
     },
   },
-  ultrasharp: {
-    name: '4x-UltraSharp (Extreme Clarity & 8K)',
-    file: 'models/4x-UltraSharp.onnx',
+  'pixel-dance': {
+    name: 'Pixel-Dance (Extreme Clarity & 8K)',
+    file: 'models/Pixel-Dance.onnx',
     tileSize: 128,
     scale: 4,
     color: 'rgb',
@@ -213,10 +213,10 @@ export const MODELS: Record<ModelKey, ModelConfig> = {
       req: 'WebGPU Preferred',
     },
     description:
-      '4x-UltraSharp — premier generative super-resolution model that reconstructs intricate realistic textures, micro-edges, and sharp photographic depth.',
+      'Pixel-Dance — premier generative super-resolution model that reconstructs intricate realistic textures, micro-edges, and sharp photographic depth.',
     recommendation: 'Best for high-end photography, complex scenery, architectural details, and 8K fine-art prints.',
     maxScale: 8,
-    presets: ['Balanced', 'UltraSharp', 'Photography', 'Landscape'],
+    presets: ['Balanced', 'PixelDance', 'Photography', 'Landscape'],
     defaultPreset: 'Balanced',
     features: {
       faceRestore: true,
@@ -224,9 +224,9 @@ export const MODELS: Record<ModelKey, ModelConfig> = {
       hdrBoost: true,
     },
   },
-  realesrgan: {
-    name: 'Real-ESRGAN Studio (4× / 8×)',
-    file: 'models/Real-ESRGAN-x4plus.onnx',
+  'alpha-satoru': {
+    name: 'Alpha-Satoru (Studio / 4× / 8×)',
+    file: 'models/Alpha-Satoru.onnx',
     tileSize: 128,
     scale: 4,
     color: 'rgb',
@@ -237,7 +237,7 @@ export const MODELS: Record<ModelKey, ModelConfig> = {
       req: 'WebGPU Preferred',
     },
     description:
-      'Real-ESRGAN — state-of-the-art super-resolution network that reconstructs high-frequency details, removes compression artifacts, and restores crisp focus.',
+      'Alpha-Satoru — state-of-the-art super-resolution network that reconstructs high-frequency details, removes compression artifacts, and restores crisp focus.',
     recommendation: 'Best for portraits, professional photos, high-res prints, and 8K displays.',
     maxScale: 8,
     presets: ['Balanced', 'Portrait', 'Landscape', 'Artwork'],
@@ -369,7 +369,7 @@ export const BG_FEATURES = [
   {
     icon: '🪄',
     title: 'One-Click Neural Cutouts',
-    description: 'BiRefNet AI detects your subject instantly and strips the background in a single click — no manual lassoing or green-screen required.'
+    description: 'Chopper AI detects your subject instantly and strips the background in a single click — no manual lassoing or green-screen required.'
   },
   {
     icon: '💇',
@@ -408,7 +408,7 @@ export const BG_HOW_IT_WORKS = [
   {
     num: '02',
     title: 'AI Removes the Background',
-    desc: 'The BiRefNet model segments your subject on-device in seconds — hair, glass, and complex edges included — fully automatically.',
+    desc: 'The Chopper model segments your subject on-device in seconds — hair, glass, and complex edges included — fully automatically.',
     icon: '🪄'
   },
   {
@@ -426,7 +426,7 @@ export const BG_FAQS = [
   },
   {
     q: 'Are my images uploaded to a server?',
-    a: 'No. Pixelify runs the BiRefNet segmentation model directly inside your browser using Transformers.js with WebGPU / WebAssembly. Your photos never leave your device, which makes it safe for private or client work.'
+    a: 'No. Pixelify runs the Chopper segmentation model directly inside your browser using Transformers.js with WebGPU / WebAssembly. Your photos never leave your device, which makes it safe for private or client work.'
   },
   {
     q: 'Which image formats are supported?',
@@ -438,7 +438,7 @@ export const BG_FAQS = [
   },
   {
     q: 'Does it work on hair, fur, and transparent objects?',
-    a: 'Yes. The bilateral reference (BiRefNet) architecture is specifically trained to preserve hair strands, fur, glass, and semi-transparent edges far better than classic color-key tools.'
+    a: 'Yes. The Chopper segmentation architecture is specifically trained to preserve hair strands, fur, glass, and semi-transparent edges far better than classic color-key tools.'
   },
   {
     q: 'Can I use it on a phone or tablet?',

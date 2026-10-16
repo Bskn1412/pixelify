@@ -7,7 +7,8 @@ Browser-only image super-resolution using ONNX Runtime Web. Runs completely clie
 - Drag & drop image upload
 - PNG, JPG, WEBP support
 - Maximum input size: 4096×4096
-- Two models: ESPCN (fast, 3×) and Real-ESRGAN (high quality, 4×)
+- Three upscaler models: Vitality (fast, 4×), Pixel-Dance (balanced, 4×), and Alpha-Satoru (maximum quality, 4×)
+- Chopper AI for instant background removal
 - WebGPU/WASM runtime with automatic detection
 - Tiled inference for large images
 - Side-by-side before/after comparison slider
@@ -16,17 +17,19 @@ Browser-only image super-resolution using ONNX Runtime Web. Runs completely clie
 ## Project Structure
 
 ```
-litert-upscaler/
+upscaler/
 ├── index.html
 ├── package.json         # React, Vite, Tailwind
 ├── vite.config.ts       # COOP/COEP headers, port 3000
 ├── tsconfig.json
 ├── tailwind.config.js
 ├── postcss.config.js
-├── models/
-│   ├── model.onnx              # ESPCN (235KB, 3×, Y-channel)
-│   ├── Real-ESRGAN-x4plus.onnx # Real-ESRGAN (~65MB, 4×, RGB)
-│   └── README.md
+├── public/
+│   └── models/
+│       ├── Vitality.onnx       # Vitality (~1.9MB, 4×, RGB)
+│       ├── Pixel-Dance.onnx    # Pixel-Dance (~66.9MB, 4×, RGB)
+│       ├── Alpha-Satoru.onnx   # Alpha-Satoru (~67.1MB, 4×, RGB)
+│       └── README.md
 ├── libs/
 │   ├── ort-wasm.wasm
 │   └── ort-wasm-simd.wasm
@@ -80,8 +83,10 @@ Output in `dist/` folder.
 
 | Model | Scale | Channels | Size | Speed |
 |-------|-------|----------|------|-------|
-| ESPCN | 3× | Y (luminance) | 235KB | ~50ms/tile |
-| Real-ESRGAN | 4× | RGB | 65MB | ~1-3s/tile |
+| Vitality | 4× | RGB | 1.9MB | ~200-400ms |
+| Pixel-Dance | 4× | RGB | 66.9MB | ~1-3s/tile |
+| Alpha-Satoru | 4× | RGB | 67.1MB | ~1-3s/tile |
+| Chopper (BG Remover) | - | RGB | - | Real-time |
 
 ## Deployment
 
@@ -110,7 +115,7 @@ For a local publish flow, run `npm run deploy` to build and push `dist/` to the 
 
 **Model fails to load**
 - Check browser console for errors
-- Real-ESRGAN is ~65MB and may take time to download
+- Pixel-Dance and Alpha-Satoru are ~67MB and may take time to download
 
 **Slow inference**
 - Enable WebAssembly SIMD
@@ -118,4 +123,4 @@ For a local publish flow, run `npm run deploy` to build and push `dist/` to the 
 
 **Memory errors**
 - Reduce input image size
-- Use ESPCN model instead of Real-ESRGAN
+- Use Vitality model instead of larger models

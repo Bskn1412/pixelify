@@ -52,10 +52,12 @@ litert-upscaler/
 │       ├── StatsBar.tsx          # Input/output dims, model, backend, time pills
 │       └── ErrorMessage.tsx      # Contextual error with dismiss
 │
-├── models/
-│   ├── model.onnx               # ESPCN model (235KB, scale 3×)
-│   ├── Real-ESRGAN-x4plus.onnx  # Real-ESRGAN model (65MB, scale 4×)
-│   └── README.md                # Model instructions
+├── public/
+│   └── models/
+│       ├── Vitality.onnx            # Vitality model (~1.9MB, scale 4×)
+│       ├── Pixel-Dance.onnx         # Pixel-Dance model (~66.9MB, scale 4×)
+│       ├── Alpha-Satoru.onnx        # Alpha-Satoru model (~67.1MB, scale 4×)
+│       └── README.md                # Model instructions
 │
 ├── libs/
 │   ├── ort-wasm.wasm            # WASM runtime (~10MB)
@@ -93,8 +95,8 @@ App (state owner)
 ```
 step: 'upload' | 'config' | 'processing' | 'result'
 image: ImageData | null       — file, url, img, width, height, name, size
-modelKey: 'espcn' | 'realesrgan'
-scale: number                 — 3 | 6 | 9 for ESPCN, 4 | 8 | 12 for Real-ESRGAN
+modelKey: 'vitality' | 'pixel-dance' | 'alpha-satoru'
+scale: number                 — 2 | 4 | 8
 result: UpscaleResult | null  — rgba, width, height, time
 error: string | null
 isProcessing: boolean
@@ -107,7 +109,7 @@ progress: { percent: number, text: string }
 |------|----------------|
 | `useONNX` | Dynamic import ONNX Runtime Web from CDN, detect backend (WebGPU/WASM), create/manage InferenceSession via refs |
 | `useImageFile` | Read file via FileReader, validate type/size (max 4096×4096), create Image element, expose `{ imageData, isLoading, error, handleFile, clear }` |
-| `useUpscale` | Orchestrate the full upscale pipeline: read canvas, extract channels (RGB or YCbCr), run multi-pass tiled inference, merge results, compute timing |
+| `useUpscale` | Orchestrate the full upscale pipeline: read canvas, extract channels, run multi-pass tiled inference, merge results, compute timing |
 
 ---
 
@@ -124,25 +126,27 @@ progress: { percent: number, text: string }
 ### Model Loading
 - ONNX Runtime Web loaded dynamically from CDN (`onnxruntime-web@1.17.3`)
 - WASM binaries served from CDN (`jsdelivr`)
-- Two model options with live switching
+- Three model options with live switching: **Vitality**, **Pixel-Dance**, **Alpha-Satoru**
+- Plus **Chopper** for background removal
 - Per-model badges: quality (teal), estimated time (amber), hardware requirements (coral)
 
 ### Model Architecture
 
-**ESPCN** (`models/model.onnx`):
-- Single-channel (Y) luminance processing
-- 224×224 tile size, 3× scale per pass
-- Color converted to YCbCr; Y upscaled via model, Cb/Cr via bicubic
+**Vitality** (`models/Vitality.onnx`):
+- Compact ultra-fast model (~1.9MB)
+- 4× scale native RGB inference
 
-**Real-ESRGAN** (`models/Real-ESRGAN-x4plus.onnx`):
-- RGB 3-channel processing
-- 128×128 tile size, 4× scale per pass
-- Full color processing through model
+**Pixel-Dance** (`models/Pixel-Dance.onnx`):
+- Photorealistic balanced model (~66.9MB)
+- 4× scale tiled RGB inference
+
+**Alpha-Satoru** (`models/Alpha-Satoru.onnx`):
+- Maximum fidelity anime/studio model (~67.1MB)
+- 4× scale tiled RGB inference
 
 **Multi-Pass Upscaling:**
-- Dynamic scale: 3×/6×/9× (ESPCN) or 4×/8×/12× (Real-ESRGAN)
-- Each pass feeds output back through model
-- Inter-pass resizing handled automatically
+- Dynamic scale options (2×, 4×, 8×)
+- Inter-pass downscale/upscale handled automatically
 
 ### Tiled Inference
 - Large images processed in tiles to manage memory
@@ -240,7 +244,7 @@ progress: { percent: number, text: string }
 - TFLite JS runtime (`@tensorflow/tfjs-tflite`) is not widely available
 - ONNX Runtime has equivalent browser-only capabilities
 - Same WebGPU/WASM detection and performance
-- Works with any ONNX super-resolution model (ESPCN, FSRCNN, Real-ESRGAN)
+- Works with any ONNX super-resolution model (Vitality, Pixel-Dance, Alpha-Satoru)
 
 ---
 

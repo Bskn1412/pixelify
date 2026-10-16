@@ -30,7 +30,7 @@ export default function UploadArea({
   fileSize,
   onClear,
   title = "Upscale",
-  description = "Upload your images or videos to\n enhance their resolution and quality.",
+  description = "Upload your images to\n enhance their resolution and quality.",
   beforeImage,
   afterImage,
   previewImage = "/spiderman3.jpeg",

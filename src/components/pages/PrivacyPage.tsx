@@ -129,7 +129,7 @@ export default function PrivacyPage({ onTabChange }: Props) {
             </>,
             <>
               <strong>Model files.</strong> Upscaler models are fetched from the same domain as the
-              site and then cached by your browser. The background remover's BiRefNet model is
+              site and then cached by your browser. The background remover's Chopper model is
               downloaded through Transformers.js from the
               <a href="https://huggingface.co" target="_blank" rel="noreferrer"> Hugging Face</a> model hub. It is a one-time ~40 MB file that is then cached. These requests contain a URL and nothing about your images.
             </>,
