@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c3aed" />
+      <stop offset="50%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#ec4899" />
+    </linearGradient>
+    <linearGradient id="pGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#e0e7ff" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.3" />
+    </filter>
+  </defs>
+  <!-- Background Icon Tile -->
+  <rect x="4" y="4" width="56" height="56" rx="16" fill="url(#bgGrad)" filter="url(#shadow)" />
+  <rect x="5" y="5" width="54" height="54" rx="15" stroke="rgba(255,255,255,0.2)" stroke-width="2" />
+  
+  <!-- Stylized Pixel 'P' & Sparkle -->
+  <path d="M22 18H38C42.4183 18 46 21.5817 46 26C46 30.4183 42.4183 34 38 34H30V46H22V18ZM30 26H37C38.1046 26 39 25.1046 39 24C39 22.8954 38.1046 22 37 22H30V26Z" fill="url(#pGrad)" />
+  <!-- Pixel Accent Cube -->
+  <rect x="41" y="37" width="9" height="9" rx="2" fill="#38bdf8" />
+</svg>
