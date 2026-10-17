@@ -37,8 +37,6 @@ import {
   sendDesktopNotification,
 } from './utils/notifications';
 
-import CardDeck from './components/CardsTest';
-
 import PixelifyStory from './components/PixelifyStory';
 import { MODELS } from './constants';
 
@@ -61,6 +59,7 @@ import AboutPage from './components/pages/AboutPage';
 import ProductsPage from './components/pages/ProductsPage';
 import PrivacyPage from './components/pages/PrivacyPage';
 import TermsPage from './components/pages/TermsPage';
+import DeviceRecommendationNotice from './components/DeviceRecommendationNotice';
 
 const STORAGE_KEY = 'pixelify_upscaler_history_2026'; // legacy, no longer written
 const THEME_KEY = 'pixelify_theme_pref';
@@ -787,13 +786,6 @@ export default function App() {
           {/* ROUTE 1: HOME PAGE (/) */}
 
           <Route
-            path="/cards"
-            element={
-              <CardDeck />
-            }
-          />
-
-          <Route
             path="/"
             element={
               <HomePage
@@ -865,6 +857,8 @@ export default function App() {
             path="/upscaler"
             element={
               <div className="flex flex-col gap-8 w-full px-2">
+
+                <DeviceRecommendationNotice tool="upscale" />
 
                 {step === 'upload' && (
                   <UploadArea

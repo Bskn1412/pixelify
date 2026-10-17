@@ -1,6 +1,5 @@
 import React, { useState, useRef, useLayoutEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
 import gsap from 'gsap';
 interface AIUpscalerSectionProps {
     onLaunchUpscaler: () => void;

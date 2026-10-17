@@ -1,8 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import type { ViewTab } from '../types';
-import Icon from './Icon';
-import Logo from './Logo';
 
 interface FooterProps {
   onTabChange: (tab: ViewTab) => void;

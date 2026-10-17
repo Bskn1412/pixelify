@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Scissors, Image as ImageIcon, Sparkles, SlidersHorizontal, PanelsTopLeft, Columns2, Undo2, Redo2, Download as DownloadIcon, ChevronDown, ZoomIn, ZoomOut, RotateCcw, RotateCw, Crop as CropIcon, Plus, FlipHorizontal, FlipVertical, Check, X } from 'lucide-react';
-import Icon from './Icon';
+import { Scissors, Image as ImageIcon, Sparkles, SlidersHorizontal, PanelsTopLeft, Columns2, Undo2, Redo2, Download as DownloadIcon, ChevronDown, ZoomIn, ZoomOut, RotateCcw, Crop as CropIcon, FlipHorizontal, FlipVertical, Check, X } from 'lucide-react';
 import UploadArea from './UploadArea';
 import BGComparator, { ImageAdjustments, ImageEffects } from './BGComparator';
 import type { FabricEditMode, FabricCropRatio, FabricImageEditorHandle, SubjectTransform } from './bgremove/FabricImageEditor';
@@ -18,6 +17,7 @@ import {
   ELEMENT_PRESETS,
   renderDesignLayersToCanvas,
 } from './bgremove/DesignAssets';
+import DeviceRecommendationNotice from './DeviceRecommendationNotice';
 
 interface BGRemoveWorkspaceProps {
   jobs: BGJob[];
@@ -2364,6 +2364,9 @@ export default function BGRemoveWorkspace({
       ) : (
         /* EMPTY STATE: USER HAS NOT UPLOADED AN IMAGE YET */
         <div className="flex flex-col gap-6 w-full">
+
+        <DeviceRecommendationNotice tool="bg_remove" />
+        
           <UploadArea
             onFile={handleUpload}
             isLoading={false}

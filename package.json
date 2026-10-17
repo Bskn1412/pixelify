@@ -1,7 +1,7 @@
 {
-  "name": "litert-upscaler",
+  "name": "pixelify",
   "version": "1.0.0",
-  "description": "Browser-only image upscaler using ONNX Runtime Web",
+  "description": "AI Photo Editor | BGRemover/Upscaler",
   "type": "module",
   "scripts": {
     "dev": "vite",

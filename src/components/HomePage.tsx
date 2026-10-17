@@ -1,10 +1,7 @@
 // HomePage.tsx
 import React from 'react';
 import { motion } from 'framer-motion';
-import Icon from './Icon';
 import Footer from './Footer';
-import PoppedCard from './PoppedCard';
-import CardsTest from './CardsTest';
 import TruckScene from './TruckScene';
 import type { ViewTab } from '../types';
 import Hero from "./Hero";
@@ -12,15 +9,10 @@ import PixelifyStory from './PixelifyStory';
 import BGRemoverSection from './BGRemoverSection';
 import AIUpscalerSection from './AIUpscalerSection';
 import WhyChoosePixelify from './WhyChoosePixelify';
-import TestimonialsSection from './ffffTestimonialsSection';
 import HomeFaq from './HomeFaq';
 import Testimonials from "./TestimonialsSection";
 import HomeDemo from './HomeDemo';
 import './test.css';
-
-
-import Why from './pixelify-home-sections/WhyChoosePixelify';
-import './pixelify-home-sections/test.css'
 interface HomePageProps {
   onLaunchUpscaler: () => void;
   onLaunchBGRemove: () => void;
@@ -78,8 +70,8 @@ export default function HomePage({
             <AIUpscalerSection onLaunchUpscaler={onLaunchUpscaler} />
 
             {/* ROW 3: WHY CHOOSE PIXELIFY (CURVED BACKGROUND LIKE BGREMOVER) */}
-           
-              <WhyChoosePixelify />
+
+            <WhyChoosePixelify />
 
           </div>
         </section>
@@ -95,8 +87,8 @@ export default function HomePage({
         {/* ========================================================================= */}
         {/* TESTIMONIALS SECTION (WHITE BG WITH ROUNDED CORNERS) */}
         {/* ========================================================================= */}
-       
-          <Testimonials />
+
+        <Testimonials />
 
         {/* ========================================================================= */}
         {/* INSTANT DEMOS GRID */}

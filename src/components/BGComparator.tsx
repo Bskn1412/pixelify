@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Crop as CropIcon } from 'lucide-react';
 import Icon from './Icon';
 import FabricImageEditor, {
