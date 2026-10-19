@@ -1,0 +1,69 @@
+/* ============================================================
+   SolvingOrb / OrbProgressRing — companion styles
+   Layout: SVG ring fills the root, orb centered in the hole.
+   ============================================================ */
+
+.opr-root {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.opr-root .opr-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.opr-root .opr-orb {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* --- Track: subtle breathing pulse, phase-locked via --opr-dur --- */
+@keyframes opr-track-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.opr-root .opr-track {
+  animation: opr-track-pulse var(--opr-dur, 2.6s) ease-in-out infinite;
+}
+
+/* --- Indeterminate arc: grow → chase → wrap sweep --- */
+@keyframes opr-sweep {
+  0% {
+    stroke-dasharray: 0 100;
+    stroke-dashoffset: 0;
+  }
+  45% {
+    stroke-dasharray: 55 100;
+    stroke-dashoffset: -18;
+  }
+  100% {
+    stroke-dasharray: 8 100;
+    stroke-dashoffset: -100;
+  }
+}
+
+.opr-root .opr-progress {
+  animation: opr-sweep var(--opr-dur, 2.6s) cubic-bezier(0.45, 0.1, 0.55, 0.9) infinite;
+}
+
+/* Determinate mode: no keyframes, static dash set inline. */
+.opr-root .opr-progress-static {
+  transition: stroke-dasharray 0.25s ease-out;
+}
+
+/* Respect reduced-motion users: freeze animation, keep state readable. */
+@media (prefers-reduced-motion: reduce) {
+  .opr-root .opr-track,
+  .opr-root .opr-progress {
+    animation: none;
+  }
+}

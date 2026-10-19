@@ -1,0 +1,10 @@
+node_modules/
+.temp_frames/
+dist/
+out/
+.next/
+*.tsbuildinfo
+
+# accidental copies / local junk
+.git copy/
+.freebuff/
