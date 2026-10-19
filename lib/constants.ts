@@ -175,10 +175,19 @@ export function getDefaultPreset(modelKey: ModelKey): string {
   return modelKey === 'vitality' ? 'Standard' : 'Balanced';
 }
 
+/** ONNX models are fetched from raw.githubusercontent.com — it serves
+ *  Access-Control-Allow-Origin: * (GitHub release download URLs do NOT, they
+ *  302 to release-assets.githubusercontent.com which omits CORS headers and
+ *  breaks fetch()). Same-origin /models/* copies in public/ remain as an
+ *  automatic fallback, so this also keeps ~130MB of model traffic off the
+ *  Vercel bandwidth quota while staying resilient to GitHub rate limits. */
+const MODEL_BASE_URL =
+  'https://raw.githubusercontent.com/yash5800/pixelify/main/public/models/';
+
 export const MODELS: Record<ModelKey, ModelConfig> = {
   vitality: {
     name: 'Vitality (Fast / Clean)',
-    file: 'models/Vitality.onnx',
+    file: `${MODEL_BASE_URL}Vitality.onnx`,
     tileSize: 128,
     scale: 4,
     color: 'rgb',
@@ -202,7 +211,7 @@ export const MODELS: Record<ModelKey, ModelConfig> = {
   },
   'pixel-dance': {
     name: 'Pixel-Dance (Extreme Clarity & 8K)',
-    file: 'models/Pixel-Dance.onnx',
+    file: `${MODEL_BASE_URL}Pixel-Dance.onnx`,
     tileSize: 128,
     scale: 4,
     color: 'rgb',
@@ -226,7 +235,7 @@ export const MODELS: Record<ModelKey, ModelConfig> = {
   },
   'alpha-satoru': {
     name: 'Alpha-Satoru (Studio / 4× / 8×)',
-    file: 'models/Alpha-Satoru.onnx',
+    file: `${MODEL_BASE_URL}Alpha-Satoru.onnx`,
     tileSize: 128,
     scale: 4,
     color: 'rgb',

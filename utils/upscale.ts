@@ -115,9 +115,28 @@ async function fetchModelWithCache(
   signal?: AbortSignal
 ): Promise<Uint8Array> {
   const url = originModelUrl(path);
+  const localUrl = localModelUrl(url);
+
+  // Cache first: primary key, then the legacy same-origin key (pre-GitHub
+  // migration) so existing clients don't re-download ~64MB per model.
   try {
     const cache = await caches.open('onnx-models');
     const cached = await cache.match(url);
+    if (!cached && localUrl) {
+      const legacy = await cache.match(localUrl);
+      if (legacy) {
+        const legacyBuf = new Uint8Array(await legacy.arrayBuffer());
+        if (legacyBuf.byteLength > 100000) {
+          try {
+            await cache.put(url, new Response(legacyBuf));
+            await cache.delete(localUrl);
+          } catch { /* re-keying is best-effort */ }
+          onProgress?.(100);
+          return legacyBuf;
+        }
+        await cache.delete(localUrl);
+      }
+    }
     if (cached) {
       const buf = new Uint8Array(await cached.arrayBuffer());
       // Valid ONNX models in our app are at least 1.5MB. If a 404 or corrupted stub was cached, invalidate it!
@@ -127,30 +146,42 @@ async function fetchModelWithCache(
       }
       await cache.delete(url);
     }
-    const res = await fetch(url, { signal });
-    if (!res.ok) {
-      throw new Error(`Failed to load model file ${path}: HTTP ${res.status}`);
-    }
-    const data = await readWithProgress(res, onProgress, expectedBytes);
-    if (data.byteLength > 100000) {
-      await cache.put(url, new Response(data));
-    }
-    return data;
-  } catch (err) {
-    if (signal?.aborted) throw err;
-    // Direct network fallback if Cache API fails or throws
-    const res = await fetch(url, { signal });
-    if (!res.ok) {
-      throw new Error(`Failed to load model file ${path}: HTTP ${res.status}`);
-    }
-    return await readWithProgress(res, onProgress, expectedBytes);
+  } catch {
+    // Cache API unavailable (private browsing etc.) — fall through to network.
   }
+
+  // raw.githubusercontent.com is the primary source (CORS-enabled, outside the
+  // Vercel bandwidth quota); the same-origin copy is the fallback when GitHub
+  // throttles or is unreachable. Cache under the primary key either way so
+  // isUpscalerModelCached() stays consistent across sources.
+  const sources = localUrl ? [url, localUrl] : [url];
+  let lastError: unknown;
+  for (const source of sources) {
+    try {
+      const res = await fetch(source, { signal });
+      if (!res.ok) {
+        throw new Error(`Failed to load model file ${path}: HTTP ${res.status}`);
+      }
+      const data = await readWithProgress(res, onProgress, expectedBytes);
+      if (data.byteLength > 100000) {
+        try {
+          const cache = await caches.open('onnx-models');
+          await cache.put(url, new Response(data));
+        } catch { /* caching is best-effort */ }
+      }
+      return data;
+    } catch (err) {
+      if (signal?.aborted) throw err;
+      lastError = err;
+    }
+  }
+  throw lastError;
 }
 
-/** Models live in /public — resolve them against the ORIGIN, not the current
- *  route. A relative 'models/X.onnx' from /upscaler/ fetches
- *  /upscaler/models/X.onnx and 404s, and Cache API keys must be identical
- *  across routes for the cache-hit logic to work. */
+/** Model URLs are absolute (raw.githubusercontent.com); relative paths still
+ *  resolve against the ORIGIN, not the current route. A relative 'models/X.onnx'
+ *  from /upscaler/ fetches /upscaler/models/X.onnx and 404s, and Cache API keys
+ *  must be identical across routes for the cache-hit logic to work. */
 function originModelUrl(path: string): string {
   try {
     return new URL(path, self.location.origin).href;
@@ -159,12 +190,29 @@ function originModelUrl(path: string): string {
   }
 }
 
+/** Same-origin copy of a model (public/models/) — the pre-CDN cache key and the
+ *  network fallback when raw.githubusercontent.com is throttled or unreachable. */
+function localModelUrl(url: string): string | null {
+  try {
+    const parsed = new URL(url, self.location.origin);
+    if (parsed.origin === self.location.origin) return null;
+    const name = parsed.pathname.split('/').pop();
+    if (!name || !name.endsWith('.onnx')) return null;
+    return new URL(`models/${name}`, self.location.origin).href;
+  } catch {
+    return null;
+  }
+}
+
 /** True when the model bytes are already in the Cache API — lets callers skip download UI. */
 export async function isUpscalerModelCached(modelKey: ModelKey): Promise<boolean> {
   try {
     const cache = await caches.open('onnx-models');
-    const cached = await cache.match(originModelUrl(MODELS[modelKey].file));
-    return !!cached;
+    const url = originModelUrl(MODELS[modelKey].file);
+    if (await cache.match(url)) return true;
+    // Legacy same-origin key from before models moved to raw.githubusercontent.com.
+    const localUrl = localModelUrl(url);
+    return !!localUrl && !!(await cache.match(localUrl));
   } catch {
     return false;
   }
