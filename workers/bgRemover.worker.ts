@@ -31,7 +31,7 @@ async function loadTransformers(preferredUrl?: string): Promise<void> {
       // Model weights are fetched from the model repository; no local-model lookup.
       env.allowLocalModels = false;
 
-      // If a custom model weights URL is provided (e.g. from NEXT_PUBLIC_HF_CHOPPER_MODEL),
+      // If a custom model weights URL is provided (e.g. from HF_CHOPPER_MODEL),
       // intercept ONNX model fetches to stream the weights directly from that URL.
       const originalFetch = env.fetch || (typeof globalThis.fetch === 'function' ? globalThis.fetch.bind(globalThis) : undefined);
       if (originalFetch) {

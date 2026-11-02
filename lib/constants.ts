@@ -177,7 +177,7 @@ export function getDefaultPreset(modelKey: ModelKey): string {
 
 /** Upscaler models default to local same-origin /models/ copies with support
  *  for optional CDN / Hugging Face remote overrides via env. */
-const RAW_MODEL_BASE_URL = process.env.NEXT_PUBLIC_MODEL_BASE_URL || '/models/';
+const RAW_MODEL_BASE_URL = process.env.MODEL_BASE_URL || '/models/';
 const MODEL_BASE_URL = RAW_MODEL_BASE_URL.endsWith('/') ? RAW_MODEL_BASE_URL : `${RAW_MODEL_BASE_URL}/`;
 
 /** Resolves model URL with fallback and automatically converts HF /blob/ to /resolve/ */
@@ -191,7 +191,7 @@ export const MODELS: Record<ModelKey, ModelConfig> = {
   vitality: {
     name: 'Vitality (Fast / Clean)',
     file: resolveModelUrl(
-      process.env.NEXT_PUBLIC_HF_VITALITY_MODEL || process.env.NEXT_PUBLIC_HG_VITALITY_MODEL,
+      process.env.HF_VITALITY_MODEL || process.env.HG_VITALITY_MODEL,
       'Vitality.tflite'
     ),
     tileSize: 128,
@@ -218,7 +218,7 @@ export const MODELS: Record<ModelKey, ModelConfig> = {
   'pixel-dance': {
     name: 'Pixel-Dance (Extreme Clarity & 8K)',
     file: resolveModelUrl(
-      process.env.NEXT_PUBLIC_HF_PIXEL_DANCE_MODEL || process.env.NEXT_PUBLIC_HG_PIXEL_DANCE_MODEL,
+      process.env.HF_PIXEL_DANCE_MODEL || process.env.HG_PIXEL_DANCE_MODEL,
       'Pixel-Dance.tflite'
     ),
     tileSize: 128,
@@ -245,7 +245,7 @@ export const MODELS: Record<ModelKey, ModelConfig> = {
   'alpha-satoru': {
     name: 'Alpha-Satoru (Studio / 4× / 8×)',
     file: resolveModelUrl(
-      process.env.NEXT_PUBLIC_HF_ALPHA_SATORU_MODEL || process.env.NEXT_PUBLIC_HG_ALPHA_SATORU_MODEL,
+      process.env.HF_ALPHA_SATORU_MODEL || process.env.HG_ALPHA_SATORU_MODEL,
       'Alpha-Satoru.tflite'
     ),
     tileSize: 128,
@@ -273,16 +273,16 @@ export const MODELS: Record<ModelKey, ModelConfig> = {
 
 /** Optional remote URL for background removal model (Chopper) configured via env. */
 export const CHOPPER_MODEL_URL =
-  process.env.NEXT_PUBLIC_HF_CHOPPER_MODEL || process.env.NEXT_PUBLIC_HG_CHOPPER_MODEL
+  process.env.HF_CHOPPER_MODEL || process.env.HG_CHOPPER_MODEL
     ? resolveModelUrl(
-      process.env.NEXT_PUBLIC_HF_CHOPPER_MODEL || process.env.NEXT_PUBLIC_HG_CHOPPER_MODEL,
+      process.env.HF_CHOPPER_MODEL || process.env.HG_CHOPPER_MODEL,
       'chopper.onnx'
     )
     : undefined;
 
 /** Optional remote URL for background removal model (Diablo) configured via env. Falls back to /models/Diablo.onnx */
 export const DIABLO_MODEL_URL = resolveModelUrl(
-  process.env.NEXT_PUBLIC_HF_DIABLO_MODEL || process.env.NEXT_PUBLIC_HG_DIABLO_MODEL,
+  process.env.HF_DIABLO_MODEL || process.env.HG_DIABLO_MODEL,
   'Diablo.onnx'
 );
 

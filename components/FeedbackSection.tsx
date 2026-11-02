@@ -393,11 +393,11 @@ export function FeedbackForm({
 
   const formRef = useRef<HTMLFormElement>(null);
 
-  const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
-  const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
-  const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
+  const publicKey = process.env.EMAILJS_PUBLIC_KEY;
+  const serviceId = process.env.EMAILJS_SERVICE_ID;
+  const templateId = process.env.EMAILJS_TEMPLATE_ID;
   const recipientEmail =
-    process.env.NEXT_PUBLIC_FEEDBACK_TO_EMAIL?.trim();
+    process.env.FEEDBACK_TO_EMAIL?.trim();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
