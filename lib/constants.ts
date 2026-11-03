@@ -177,7 +177,7 @@ export function getDefaultPreset(modelKey: ModelKey): string {
 
 /** Upscaler models default to local same-origin /models/ copies with support
  *  for optional CDN / Hugging Face remote overrides via env. */
-const RAW_MODEL_BASE_URL = process.env.MODEL_BASE_URL || '/models/';
+const RAW_MODEL_BASE_URL = process.env.MODEL_BASE_URL || process.env.NEXT_PUBLIC_MODEL_BASE_URL || '/models/';
 const MODEL_BASE_URL = RAW_MODEL_BASE_URL.endsWith('/') ? RAW_MODEL_BASE_URL : `${RAW_MODEL_BASE_URL}/`;
 
 /** Resolves model URL with fallback and automatically converts HF /blob/ to /resolve/ */
@@ -191,7 +191,7 @@ export const MODELS: Record<ModelKey, ModelConfig> = {
   vitality: {
     name: 'Vitality (Fast / Clean)',
     file: resolveModelUrl(
-      process.env.HF_VITALITY_MODEL || process.env.HG_VITALITY_MODEL,
+      process.env.HF_VITALITY_MODEL || process.env.NEXT_PUBLIC_HF_VITALITY_MODEL || process.env.HG_VITALITY_MODEL,
       'Vitality.tflite'
     ),
     tileSize: 128,
@@ -218,7 +218,7 @@ export const MODELS: Record<ModelKey, ModelConfig> = {
   'pixel-dance': {
     name: 'Pixel-Dance (Extreme Clarity & 8K)',
     file: resolveModelUrl(
-      process.env.HF_PIXEL_DANCE_MODEL || process.env.HG_PIXEL_DANCE_MODEL,
+      process.env.HF_PIXEL_DANCE_MODEL || process.env.NEXT_PUBLIC_HF_PIXEL_DANCE_MODEL || process.env.HG_PIXEL_DANCE_MODEL,
       'Pixel-Dance.tflite'
     ),
     tileSize: 128,
@@ -245,7 +245,7 @@ export const MODELS: Record<ModelKey, ModelConfig> = {
   'alpha-satoru': {
     name: 'Alpha-Satoru (Studio / 4× / 8×)',
     file: resolveModelUrl(
-      process.env.HF_ALPHA_SATORU_MODEL || process.env.HG_ALPHA_SATORU_MODEL,
+      process.env.HF_ALPHA_SATORU_MODEL || process.env.NEXT_PUBLIC_HF_ALPHA_SATORU_MODEL || process.env.HG_ALPHA_SATORU_MODEL,
       'Alpha-Satoru.tflite'
     ),
     tileSize: 128,
@@ -273,18 +273,38 @@ export const MODELS: Record<ModelKey, ModelConfig> = {
 
 /** Optional remote URL for background removal model (Chopper) configured via env. */
 export const CHOPPER_MODEL_URL =
-  process.env.HF_CHOPPER_MODEL || process.env.HG_CHOPPER_MODEL
+  (process.env.HF_CHOPPER_MODEL || process.env.NEXT_PUBLIC_HF_CHOPPER_MODEL || process.env.HG_CHOPPER_MODEL)
     ? resolveModelUrl(
-      process.env.HF_CHOPPER_MODEL || process.env.HG_CHOPPER_MODEL,
+      process.env.HF_CHOPPER_MODEL || process.env.NEXT_PUBLIC_HF_CHOPPER_MODEL || process.env.HG_CHOPPER_MODEL,
       'chopper.onnx'
     )
     : undefined;
 
 /** Optional remote URL for background removal model (Diablo) configured via env. Falls back to /models/Diablo.onnx */
 export const DIABLO_MODEL_URL = resolveModelUrl(
-  process.env.HF_DIABLO_MODEL || process.env.HG_DIABLO_MODEL,
+  process.env.HF_DIABLO_MODEL || process.env.NEXT_PUBLIC_HF_DIABLO_MODEL || process.env.HG_DIABLO_MODEL,
   'Diablo.onnx'
 );
+
+/** Remote URLs for LiteRT WebAssembly runtimes hosted on Hugging Face */
+export const LITERT_WASM_URLS = {
+  compat: resolveModelUrl(
+    process.env.HF_COMPACT_INTERNAL || process.env.NEXT_PUBLIC_HF_COMPACT_INTERNAL || process.env.HF_COMPAT_INTERNAL || process.env.NEXT_PUBLIC_HF_COMPAT_INTERNAL,
+    'https://huggingface.co/Joker5800/pixelify/resolve/main/wasm/litert_wasm_compat_internal.wasm'
+  ),
+  internal: resolveModelUrl(
+    process.env.HF_INTERNAL || process.env.NEXT_PUBLIC_HF_INTERNAL,
+    'https://huggingface.co/Joker5800/pixelify/resolve/main/wasm/litert_wasm_internal.wasm'
+  ),
+  jspi: resolveModelUrl(
+    process.env.HF_JSPI_INTERNAL || process.env.NEXT_PUBLIC_HF_JSPI_INTERNAL,
+    'https://huggingface.co/Joker5800/pixelify/resolve/main/wasm/litert_wasm_jspi_internal.wasm'
+  ),
+  threaded: resolveModelUrl(
+    process.env.HF_THREADED_INTERNAL || process.env.NEXT_PUBLIC_HF_THREADED_INTERNAL,
+    'https://huggingface.co/Joker5800/pixelify/resolve/main/wasm/litert_wasm_threaded_internal.wasm'
+  ),
+};
 
 export const MAX_OUTPUT_DIM = 16384;
 
@@ -504,37 +524,6 @@ export const BG_HOW_IT_WORKS = [
     title: 'Refine, Replace & Download',
     desc: 'Swap the background, apply effects, brush-fix edges, then export a transparent PNG, WebP, or JPG with one click.',
     icon: '⚡'
-  }
-];
-
-export const BG_FAQS = [
-  {
-    q: 'How do I remove the background from a photo for free?',
-    a: 'Open the Background Remover page, drag your image into the upload area, and the AI cutout starts automatically. When processing finishes you can download a transparent PNG for free. No sign-up, no credits, and no watermark.'
-  },
-  {
-    q: 'Are my images uploaded to a server?',
-    a: 'No. Pixelify runs the Chopper segmentation model directly inside your browser using Transformers.js with WebGPU / WebAssembly. Your photos never leave your device, which makes it safe for private or client work.'
-  },
-  {
-    q: 'Which image formats are supported?',
-    a: 'You can upload PNG, JPG, and WebP images up to 20 MB. Results export as transparent PNG (recommended for cutouts), WebP for the web, or JPG with a solid background.'
-  },
-  {
-    q: 'Can I replace the background with another photo or color?',
-    a: 'Yes. After the cutout completes, open the Background tab to place your subject on a transparent, solid color, gradient preset, or your own uploaded photo, then download the composite in one click.'
-  },
-  {
-    q: 'Does it work on hair, fur, and transparent objects?',
-    a: 'Yes. The Chopper segmentation architecture is specifically trained to preserve hair strands, fur, glass, and semi-transparent edges far better than classic color-key tools.'
-  },
-  {
-    q: 'Can I use it on a phone or tablet?',
-    a: 'Yes. The workspace is fully responsive and works in mobile browsers like Chrome and Safari. On devices without WebGPU it automatically falls back to WebAssembly, so cutouts still work everywhere.'
-  },
-  {
-    q: 'Why does the first image take longer to process?',
-    a: 'The neural model (roughly 40 MB) is downloaded to your browser cache the first time. After that it is reused, so every following image is processed much faster.'
   }
 ];
 

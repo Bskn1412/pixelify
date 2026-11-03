@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback, useLayoutEffect } from 'react';
-import { Menu, Trash2, WifiOff, Wifi, Cpu, Gauge, ExternalLink } from 'lucide-react';
+import { Menu, Trash2, WifiOff, Wifi, Cpu, Gauge, ExternalLink, Globe, ChevronDown, Check } from 'lucide-react';
 import type { ViewTab, ThemeMode } from '../types';
 import type { ModelDownloadItem } from '../types';
 import Icon from './Icon';
 import Logo from './Logo';
 import ModelDownloadIndicator from './ModelDownloadIndicator';
 import { useApp } from './AppProvider';
+import { SITE_LANGUAGES } from '../lib/i18n';
 import Link from 'next/link';
 
 type Engine = 'webgpu' | 'wasm' | null;
@@ -90,12 +91,14 @@ export default function Navbar({
   isOnline = true,
   justReconnected = false,
 }: NavbarProps) {
-  const { warmup, isMobileSidebarOpen: ctxMobileOpen } = useApp();
+  const { warmup, isMobileSidebarOpen: ctxMobileOpen, currentLang, setCurrentLang } = useApp();
   const isMobileMenuOpen = isMobileSidebarOpen || ctxMobileOpen || false;
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isLangOpen, setIsLangOpen] = useState(false);
   const [isNavHidden, setIsNavHidden] = useState(false);
   const lastScrollY = useRef(0);
   const settingsRef = useRef<HTMLDivElement>(null);
+  const langRef = useRef<HTMLDivElement>(null);
 
   /* DESKTOP ACTIVE PILL — CSS transform transition (compositor-driven).
      Deliberately NOT a framer-motion layout animation: layout/FLIP runs on
@@ -203,6 +206,9 @@ export default function Navbar({
     function handleClickOutside(event: MouseEvent) {
       if (settingsRef.current && !settingsRef.current.contains(event.target as Node)) {
         setIsSettingsOpen(false);
+      }
+      if (langRef.current && !langRef.current.contains(event.target as Node)) {
+        setIsLangOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
@@ -394,7 +400,10 @@ export default function Navbar({
             {/* SETTINGS GEAR ICON BUTTON */}
             <div className="relative" ref={settingsRef}>
             <button
-              onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+              onClick={() => {
+                setIsSettingsOpen(!isSettingsOpen);
+                setIsLangOpen(false);
+              }}
               className="hidden sm:flex w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-xl text-white items-center justify-center transition-all shadow-xl active:scale-95"
               title="Settings & Preferences"
               aria-label="Settings and Preferences"
@@ -445,6 +454,71 @@ export default function Navbar({
                 </div>
               </div>
             )}
+            </div>
+
+            {/* LANGUAGE SELECTOR PILL BUTTON */}
+            <div className="relative" ref={langRef}>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLangOpen(!isLangOpen);
+                  setIsSettingsOpen(false);
+                }}
+                className="flex items-center gap-1.5 h-10 sm:h-11 px-3 sm:px-3.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-xl text-white transition-all shadow-xl active:scale-95 text-xs font-semibold"
+                title="Select Language"
+                aria-label="Select Language"
+                aria-expanded={isLangOpen}
+              >
+                <Globe size={16} className="text-gray-300 shrink-0" />
+                <span className="font-bold tracking-wider text-white/95 text-xs sm:text-[13px]">
+                  {(currentLang || 'en').toUpperCase()}
+                </span>
+                <ChevronDown
+                  size={14}
+                  className={`text-gray-400 shrink-0 transition-transform duration-200 ${isLangOpen ? 'rotate-180' : ''}`}
+                />
+              </button>
+
+              {/* LANGUAGE DROPDOWN MENU */}
+              {isLangOpen && (
+                <div className="absolute right-0 mt-2.5 w-48 rounded-2xl bg-[#121218]/95 backdrop-blur-xl border border-white/15 p-1.5 shadow-2xl z-50 animate-fade-in flex flex-col gap-0.5">
+                  {SITE_LANGUAGES.map((lang) => {
+                    const isSelected = (currentLang || 'en') === lang.code;
+                    return (
+                      <button
+                        key={lang.code}
+                        type="button"
+                        disabled={!lang.active}
+                        onClick={() => {
+                          if (lang.active) {
+                            setCurrentLang(lang.code);
+                            setIsLangOpen(false);
+                          }
+                        }}
+                        className={`flex items-center justify-between w-full px-2.5 py-2 rounded-xl text-xs transition-colors ${
+                          isSelected
+                            ? 'bg-white/15 text-white font-bold'
+                            : lang.active
+                            ? 'text-white/80 hover:bg-white/10 hover:text-white'
+                            : 'text-white/30 cursor-not-allowed opacity-50'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="mt-1 font-mono text-[11px] font-bold text-white/50">{lang.short}</span>
+                          <span>{lang.nativeLabel}</span>
+                        </div>
+                        {isSelected ? (
+                          <Check size={14} className="text-[#00ff85]" />
+                        ) : !lang.active ? (
+                          <span className="text-[9px] font-medium tracking-wide px-1.5 py-0.5 rounded bg-white/5 text-white/40">
+                            Soon
+                          </span>
+                        ) : null}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
 

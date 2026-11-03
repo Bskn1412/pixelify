@@ -4,6 +4,10 @@
   "description": "AI Photo Editor | BGRemover/Upscaler",
   "type": "module",
   "scripts": {
+    "copy:litert": "node scripts/copy-litert.js",
+    "postinstall": "node scripts/copy-litert.js",
+    "prebuild": "node scripts/copy-litert.js",
+    "predev": "node scripts/copy-litert.js",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -11,7 +15,6 @@
   },
   "devDependencies": {
     "@types/node": "26.6.5",
-    "@litertjs/core": "^2.6.0",
     "@types/react": "^18.3.31",
     "@types/react-dom": "^18.3.7",
     "autoprefixer": "^10.5.4",
@@ -20,9 +23,11 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@litertjs/core": "^2.6.0",
     "@emailjs/browser": "^5.0.3",
     "@react-three/drei": "^9.122.0",
     "@react-three/fiber": "^8.18.0",
+    "@vercel/analytics": "^2.0.1",
     "fabric": "^6.7.1",
     "framer-motion": "^12.43.0",
     "gsap": "^3.15.0",

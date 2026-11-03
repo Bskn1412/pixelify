@@ -32,31 +32,150 @@ async function loadTransformers(preferredUrl?: string): Promise<void> {
       env.allowLocalModels = false;
 
       // If a custom model weights URL is provided (e.g. from HF_CHOPPER_MODEL),
-      // intercept ONNX model fetches to stream the weights directly from that URL.
+      // intercept ONNX model fetches to stream the weights directly from that URL with progress.
       const originalFetch = env.fetch || (typeof globalThis.fetch === 'function' ? globalThis.fetch.bind(globalThis) : undefined);
       if (originalFetch) {
         env.fetch = async (input: string | URL | Request, init?: any) => {
           const urlStr = typeof input === 'string' ? input : input instanceof Request ? input.url : input.href;
-          if (modelUrlOverride && (urlStr.endsWith('.onnx') || urlStr.includes('onnx/model'))) {
+          const isWeightsRequest = (modelUrlOverride && (urlStr.endsWith('.onnx') || urlStr.includes('onnx/model'))) ||
+            urlStr.endsWith('chopper.onnx');
+
+          if (isWeightsRequest) {
+            const targetUrl = modelUrlOverride || urlStr;
+            const isHf = targetUrl.includes('huggingface.co');
             const cache = typeof caches !== 'undefined' ? await caches.open('transformers-cache').catch(() => null) : null;
-            const cached = await cache?.match(modelUrlOverride);
+
+            // 1. Check cache first
+            let cached = await cache?.match(targetUrl);
+            if (!cached && targetUrl !== urlStr) {
+              cached = await cache?.match(urlStr);
+            }
             if (cached) {
-              const isHf = modelUrlOverride.includes('huggingface.co');
-              console.log(`[Pixelify BG] Loaded Chopper model from ${isHf ? 'Hugging Face' : 'public/models'} (Browser Cache): ${modelUrlOverride}`);
-              return cached;
+              const ab = await cached.arrayBuffer();
+              if (ab && ab.byteLength > 100_000) {
+                console.log(`[Pixelify BG] Loaded Chopper model from ${isHf ? 'Hugging Face' : 'public/models'} (Browser Cache): ${(ab.byteLength / (1024 * 1024)).toFixed(1)} MB`);
+                return new Response(ab, {
+                  status: 200,
+                  headers: {
+                    'content-type': 'application/octet-stream',
+                    'content-length': String(ab.byteLength),
+                  },
+                });
+              }
             }
 
-            const isHf = modelUrlOverride.includes('huggingface.co');
-            console.log(`[Pixelify BG] Downloading Chopper model from ${isHf ? 'Hugging Face' : 'public/models'}: ${modelUrlOverride}`);
-            const res = await originalFetch(modelUrlOverride, init);
-            if (res.ok && cache) {
-              console.log(`[Pixelify BG] Successfully downloaded and cached Chopper model from ${isHf ? 'Hugging Face' : 'public/models'}`);
-              try {
-                await cache.put(modelUrlOverride, res.clone());
-              } catch { /* best effort */ }
+            // 2. Stream download from remote URL with chunked progress reporting
+            console.log(`[Pixelify BG] Downloading Chopper model from ${isHf ? 'Hugging Face' : 'public/models'}: ${targetUrl}`);
+            post({
+              type: 'PROGRESS',
+              stage: 'model-download',
+              progress: 0,
+              loaded: 0,
+              total: 44 * 1024 * 1024,
+              isWeights: true,
+              model: 'chopper',
+              file: 'chopper.onnx',
+            });
+
+            const res = await originalFetch(targetUrl, init);
+            if (!res.ok) {
+              throw new Error(`Could not download Chopper model weights from ${targetUrl} (HTTP ${res.status}).`);
             }
-            return res;
+
+            const total = Number(res.headers.get('content-length') || 0) || 44 * 1024 * 1024;
+            let downloadedBytes: Uint8Array;
+
+            if (res.body && typeof res.body.getReader === 'function') {
+              const reader = res.body.getReader();
+              const chunks: Uint8Array[] = [];
+              let received = 0;
+              let lastReportedPct = -1;
+
+              while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                if (value) {
+                  chunks.push(value);
+                  received += value.byteLength;
+                  if (total > 0) {
+                    const pct = Math.max(0, Math.min(100, Math.round((received / total) * 100)));
+                    if (pct !== lastReportedPct) {
+                      lastReportedPct = pct;
+                      post({
+                        type: 'PROGRESS',
+                        stage: 'model-download',
+                        progress: pct,
+                        loaded: received,
+                        total,
+                        isWeights: true,
+                        model: 'chopper',
+                        file: 'chopper.onnx',
+                      });
+                    }
+                  } else {
+                    post({
+                      type: 'STATUS',
+                      stage: 'downloading-chopper',
+                      loaded: received,
+                      model: 'chopper',
+                    });
+                  }
+                }
+              }
+
+              downloadedBytes = new Uint8Array(received);
+              let offset = 0;
+              for (const chunk of chunks) {
+                downloadedBytes.set(chunk, offset);
+                offset += chunk.byteLength;
+              }
+            } else {
+              const ab = await res.arrayBuffer();
+              downloadedBytes = new Uint8Array(ab);
+            }
+
+            if (!downloadedBytes || downloadedBytes.byteLength === 0) {
+              throw new Error('Chopper model weights are empty or could not be read.');
+            }
+
+            console.log(`[Pixelify BG] Successfully downloaded and cached Chopper model from ${isHf ? 'Hugging Face' : 'public/models'} (${(downloadedBytes.byteLength / (1024 * 1024)).toFixed(1)} MB)`);
+
+            // 3. Save into browser Cache API under both targetUrl and the original transformers request URL
+            if (cache && downloadedBytes.byteLength > 100_000) {
+              try {
+                const headers = {
+                  'content-type': 'application/octet-stream',
+                  'content-length': String(downloadedBytes.byteLength),
+                };
+                await cache.put(targetUrl, new Response(downloadedBytes.slice().buffer, { status: 200, headers }));
+                if (urlStr !== targetUrl) {
+                  await cache.put(urlStr, new Response(downloadedBytes.slice().buffer, { status: 200, headers }));
+                }
+              } catch (err) {
+                console.warn('[Pixelify BG] Caching Chopper weights failed (best effort):', err);
+              }
+            }
+
+            post({
+              type: 'PROGRESS',
+              stage: 'model-download',
+              progress: 100,
+              loaded: downloadedBytes.byteLength,
+              total: downloadedBytes.byteLength,
+              isWeights: true,
+              model: 'chopper',
+              file: 'chopper.onnx',
+            });
+
+            return new Response(downloadedBytes.buffer as ArrayBuffer, {
+              status: 200,
+              headers: {
+                'content-type': 'application/octet-stream',
+                'content-length': String(downloadedBytes.byteLength),
+              },
+            });
           }
+
           if (urlStr.endsWith('.onnx') || urlStr.includes('onnx/model')) {
             const isHf = urlStr.includes('huggingface.co');
             console.log(`[Pixelify BG] Downloading background remover model from ${isHf ? 'Hugging Face' : 'public/models'}: ${urlStr}`);

@@ -81,6 +81,7 @@ export interface BGComparatorProps {
   onDeleteLayer?: (id: string) => void;
   onResetSubjectPosition?: () => void;
   onArtboardSizeChange?: (width: number, height: number) => void;
+  onRetry?: () => void;
 }
 
 export default function BGComparator({
@@ -130,6 +131,7 @@ export default function BGComparator({
   onDeleteLayer,
   onResetSubjectPosition,
   onArtboardSizeChange,
+  onRetry,
 }: BGComparatorProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const artboardRef = useRef<HTMLDivElement | null>(null);
@@ -330,23 +332,6 @@ export default function BGComparator({
     return () => observer.disconnect();
   }, []);
 
-  // Track background photo dimensions
-  const [bgDimensions, setBgDimensions] = useState<{ width: number; height: number } | null>(null);
-  useEffect(() => {
-    if (!customBgImage) {
-      setBgDimensions(null);
-      return;
-    }
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => {
-      if (img.naturalWidth > 0 && img.naturalHeight > 0) {
-        setBgDimensions({ width: img.naturalWidth, height: img.naturalHeight });
-      }
-    };
-    img.src = customBgImage;
-  }, [customBgImage]);
-
   // Track cutout natural dimensions
   const [cutoutDimensions, setCutoutDimensions] = useState<{ width: number; height: number } | null>(null);
   useEffect(() => {
@@ -370,11 +355,11 @@ export default function BGComparator({
   }, [job.id, job.resultUrl]);
 
   // Compute adaptive artboard dimensions (contain / fit without cropping)
-  const naturalArtboardWidth = bgDimensions?.width || cutoutDimensions?.width || 1200;
-  const naturalArtboardHeight = bgDimensions?.height || cutoutDimensions?.height || 900;
+  const naturalArtboardWidth = cutoutDimensions?.width || 1200;
+  const naturalArtboardHeight = cutoutDimensions?.height || 900;
 
   let artboardRatio = naturalArtboardWidth / naturalArtboardHeight;
-  if (!customBgImage && cropRatio !== 'free') {
+  if (cropRatio !== 'free') {
     const [rw, rh] = cropRatio.split(':').map(Number);
     if (rw && rh) artboardRatio = rw / rh;
   }
@@ -609,7 +594,7 @@ export default function BGComparator({
       if (!ctx) return;
 
       const currentTf = subjectTransform || DEFAULT_SUBJECT_TRANSFORM;
-      const fitFactor = customBgImage ? 0.75 : 1.0;
+      const fitFactor = 1.0;
       const baseCutoutFit = cutoutDimensions
         ? Math.min(
           (artboardDisplayWidth * fitFactor) / cutoutDimensions.width,
@@ -1005,9 +990,41 @@ export default function BGComparator({
         </div>
 
         {/* =========================================================
-            LOADING / PROCESSING STATE
+            ERROR STATE
            ========================================================= */}
-        {isProcessing || (!job.resultUrl && job.status !== 'error') ? (
+        {job.status === 'error' ? (
+          <div
+            className="absolute inset-0 z-30 bg-slate-950/90 backdrop-blur-2xl flex flex-col items-center justify-center p-8 text-center gap-5 select-none"
+            onPointerDown={(e) => e.stopPropagation()}
+            onPointerMove={(e) => e.stopPropagation()}
+            onPointerUp={(e) => e.stopPropagation()}
+            onWheel={(e) => e.stopPropagation()}
+          >
+            <img
+              src={job.sourceUrl}
+              alt="Source preview"
+              className="absolute inset-0 w-full h-full object-cover opacity-15 filter blur-2xl scale-110 pointer-events-none"
+            />
+            <div className="relative w-16 h-16 rounded-full bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-2xl shadow-[0_0_25px_rgba(244,63,94,0.3)]">
+              ⚠️
+            </div>
+            <div className="relative z-10 max-w-sm">
+              <h4 className="text-xl font-bold text-white mb-1.5 tracking-tight">Processing Error</h4>
+              <p className="text-xs text-neutral-300 font-mono mb-4 leading-relaxed">
+                {job.message || 'Could not remove background from this image.'}
+              </p>
+              {onRetry && (
+                <button
+                  type="button"
+                  onClick={onRetry}
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#00FF85] to-emerald-400 text-black font-bold text-xs tracking-wide shadow-lg shadow-[#00FF85]/20 hover:brightness-110 transition active:scale-95 cursor-pointer"
+                >
+                  ↻ Retry Background Removal
+                </button>
+              )}
+            </div>
+          </div>
+        ) : isProcessing || (!job.resultUrl) ? (
           <div
             className="absolute inset-0 z-30 bg-slate-950/85 backdrop-blur-2xl flex flex-col items-center justify-center p-8 text-center gap-5 select-none"
             onPointerDown={(e) => {
@@ -1086,7 +1103,7 @@ export default function BGComparator({
                   )}
                 </>
               ) : customBgColor ? (
-                <div className="w-full h-full" style={{ backgroundColor: customBgColor }} />
+                <div className="w-full h-full" style={{ background: customBgColor }} />
               ) : (
                 <div className={`w-full h-full ${backgroundStyle}`} />
               )}
@@ -1142,7 +1159,7 @@ export default function BGComparator({
                 const currentTf = subjectTransform || DEFAULT_SUBJECT_TRANSFORM;
                 const cutoutCenterX = artboardDisplayWidth / 2 + currentTf.relX * artboardDisplayWidth;
                 const cutoutCenterY = artboardDisplayHeight / 2 + currentTf.relY * artboardDisplayHeight;
-                const fitFactor = customBgImage ? 0.75 : 1.0;
+                const fitFactor = 1.0;
                 const baseCutoutFit = cutoutDimensions
                   ? Math.min(
                     (artboardDisplayWidth * fitFactor) / cutoutDimensions.width,
@@ -1209,7 +1226,7 @@ export default function BGComparator({
                 const currentTf = subjectTransform || DEFAULT_SUBJECT_TRANSFORM;
                 const cutoutCenterX = artboardDisplayWidth / 2 + currentTf.relX * artboardDisplayWidth;
                 const cutoutCenterY = artboardDisplayHeight / 2 + currentTf.relY * artboardDisplayHeight;
-                const fitFactor = customBgImage ? 0.75 : 1.0;
+                const fitFactor = 1.0;
                 const baseCutoutFit = cutoutDimensions
                   ? Math.min(
                     (artboardDisplayWidth * fitFactor) / cutoutDimensions.width,
@@ -1440,7 +1457,10 @@ export default function BGComparator({
                           color: tl.color,
                           textAlign: tl.align,
                           backgroundColor: pillBg,
-                          textShadow: tl.glow
+                          WebkitTextStroke: tl.strokeWidth && tl.strokeColor ? `${tl.strokeWidth}px ${tl.strokeColor}` : undefined,
+                          textShadow: tl.textShadow
+                            ? tl.textShadow
+                            : tl.glow
                             ? `0 0 20px ${tl.color}`
                             : tl.shadow
                             ? '0 4px 14px rgba(0,0,0,0.8)'

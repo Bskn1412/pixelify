@@ -8,7 +8,7 @@ export interface TextLayer {
   y: number; // percentage 0 - 100
   fontSize: number; // px at standard scale (1 - 1000)
   fontFamily: string;
-  fontWeight: 'normal' | '600' | 'bold' | '900';
+  fontWeight: 'normal' | '500' | '600' | '700' | '800' | 'bold' | '900';
   italic?: boolean;
   underline?: boolean;
   letterSpacing?: number; // px
@@ -19,6 +19,37 @@ export interface TextLayer {
   bgPill?: 'none' | 'black' | 'mint' | 'white' | 'crimson' | 'sky' | 'amber';
   shadow?: boolean;
   glow?: boolean;
+  strokeColor?: string;
+  strokeWidth?: number;
+  textShadow?: string;
+}
+
+export interface FontCombinationLine {
+  text: string;
+  fontFamily: string;
+  fontSize: number;
+  fontWeight: 'normal' | '500' | '600' | '700' | '800' | 'bold' | '900';
+  italic?: boolean;
+  underline?: boolean;
+  uppercase?: boolean;
+  letterSpacing?: number;
+  lineHeight?: number;
+  color: string;
+  strokeColor?: string;
+  strokeWidth?: number;
+  textShadow?: string;
+  glow?: boolean;
+  shadow?: boolean;
+  bgPill?: 'none' | 'black' | 'mint' | 'white' | 'crimson' | 'sky' | 'amber';
+  yOffset: number; // offset in % from group center (-8 to +8)
+}
+
+export interface FontCombination {
+  id: string;
+  name: string;
+  category: 'all' | 'social' | 'ecommerce' | 'neon' | 'retro' | 'luxury' | 'events' | 'lifestyle';
+  cardBg?: string;
+  lines: FontCombinationLine[];
 }
 
 export interface FontPreset {
@@ -113,6 +144,743 @@ export const TEXT_PRESETS = [
   { label: 'BESTSELLER', text: '★ BESTSELLER', fontSize: 28, fontWeight: 'bold', color: '#F59E0B', bgPill: 'black' },
   { label: 'VERIFIED ✓', text: 'VERIFIED ✓', fontSize: 24, fontWeight: 'bold', color: '#38BDF8', bgPill: 'none' },
   { label: 'PRO STUDIO', text: 'PRO STUDIO', fontSize: 34, fontWeight: '900', color: '#FFFFFF', bgPill: 'mint' },
+];
+
+export const FONT_COMBINATIONS: FontCombination[] = [
+  // --- NEON & GLOW (Image 2 style) ---
+  {
+    id: 'creating-magic',
+    name: 'Creating Magic',
+    category: 'neon',
+    lines: [
+      {
+        text: 'creating',
+        fontFamily: 'Dancing Script',
+        fontSize: 30,
+        fontWeight: 'bold',
+        color: '#E9D5FF',
+        glow: true,
+        yOffset: -4.5,
+      },
+      {
+        text: 'MAGIC',
+        fontFamily: 'Syne',
+        fontSize: 44,
+        fontWeight: '900',
+        uppercase: true,
+        letterSpacing: 3,
+        color: '#FFFFFF',
+        strokeColor: '#C084FC',
+        strokeWidth: 1.5,
+        textShadow: '0 0 24px rgba(192, 132, 252, 0.9)',
+        yOffset: 4.5,
+      },
+    ],
+  },
+  {
+    id: 'cyber-week',
+    name: 'Cyber Week',
+    category: 'neon',
+    lines: [
+      {
+        text: 'CYBER',
+        fontFamily: 'Orbitron',
+        fontSize: 34,
+        fontWeight: '900',
+        uppercase: true,
+        letterSpacing: 4,
+        color: '#00FF85',
+        glow: true,
+        yOffset: -4,
+      },
+      {
+        text: 'WEEK',
+        fontFamily: 'Orbitron',
+        fontSize: 42,
+        fontWeight: '900',
+        uppercase: true,
+        letterSpacing: 6,
+        color: '#38BDF8',
+        glow: true,
+        yOffset: 4,
+      },
+    ],
+  },
+  {
+    id: 'music-festival',
+    name: 'Music Festival',
+    category: 'neon',
+    lines: [
+      {
+        text: 'MUSIC',
+        fontFamily: 'Syne',
+        fontSize: 38,
+        fontWeight: '900',
+        uppercase: true,
+        letterSpacing: 3,
+        color: '#C084FC',
+        glow: true,
+        yOffset: -4,
+      },
+      {
+        text: 'FESTIVAL',
+        fontFamily: 'Syne',
+        fontSize: 32,
+        fontWeight: '900',
+        uppercase: true,
+        letterSpacing: 6,
+        color: '#F43F5E',
+        glow: true,
+        yOffset: 4,
+      },
+    ],
+  },
+
+  // --- CREATOR & SOCIAL (Image 2 & 3 style) ---
+  {
+    id: 'like-and-subscribe',
+    name: 'Like & Subscribe',
+    category: 'social',
+    lines: [
+      {
+        text: 'LIKE &',
+        fontFamily: 'Bungee',
+        fontSize: 36,
+        fontWeight: '900',
+        uppercase: true,
+        color: '#FACC15',
+        textShadow: '0 4px 0 #CA8A04',
+        yOffset: -4.5,
+      },
+      {
+        text: 'SUBSCRIBE',
+        fontFamily: 'Righteous',
+        fontSize: 34,
+        fontWeight: '900',
+        uppercase: true,
+        letterSpacing: 1,
+        color: '#EA580C',
+        strokeColor: '#EA580C',
+        strokeWidth: 1.5,
+        textShadow: '0 2px 10px rgba(234, 88, 12, 0.4)',
+        yOffset: 4.5,
+      },
+    ],
+  },
+  {
+    id: 'thank-you-brush',
+    name: 'Thank You Brush',
+    category: 'social',
+    lines: [
+      {
+        text: 'Thank you!',
+        fontFamily: 'Pacifico',
+        fontSize: 44,
+        fontWeight: 'bold',
+        color: '#2563EB',
+        textShadow: '2px 4px 12px rgba(37, 99, 235, 0.45)',
+        yOffset: 0,
+      },
+    ],
+  },
+  {
+    id: 'podcast-on-air',
+    name: 'Podcast On Air',
+    category: 'social',
+    lines: [
+      {
+        text: 'PODCAST',
+        fontFamily: 'Space Grotesk',
+        fontSize: 34,
+        fontWeight: '900',
+        uppercase: true,
+        letterSpacing: 4,
+        color: '#FFFFFF',
+        shadow: true,
+        yOffset: -3.5,
+      },
+      {
+        text: '● LIVE ON AIR',
+        fontFamily: 'Plus Jakarta Sans',
+        fontSize: 20,
+        fontWeight: 'bold',
+        uppercase: true,
+        letterSpacing: 2,
+        color: '#F43F5E',
+        bgPill: 'black',
+        yOffset: 4.5,
+      },
+    ],
+  },
+  {
+    id: 'follow-for-more',
+    name: 'Follow For More',
+    category: 'social',
+    lines: [
+      {
+        text: 'Follow us',
+        fontFamily: 'Satisfy',
+        fontSize: 32,
+        fontWeight: 'bold',
+        color: '#38BDF8',
+        yOffset: -4,
+      },
+      {
+        text: 'FOR DAILY UPDATES',
+        fontFamily: 'Montserrat',
+        fontSize: 22,
+        fontWeight: '900',
+        uppercase: true,
+        letterSpacing: 2,
+        color: '#FFFFFF',
+        shadow: true,
+        yOffset: 4,
+      },
+    ],
+  },
+
+  // --- E-COMMERCE & RETAIL (Image 2 style) ---
+  {
+    id: 'order-now',
+    name: 'Order Now!',
+    category: 'ecommerce',
+    lines: [
+      {
+        text: 'Order',
+        fontFamily: 'Satisfy',
+        fontSize: 36,
+        fontWeight: 'bold',
+        italic: true,
+        color: '#06B6D4',
+        textShadow: '0 2px 8px rgba(6, 182, 212, 0.3)',
+        yOffset: -4,
+      },
+      {
+        text: 'Now!',
+        fontFamily: 'Anton',
+        fontSize: 44,
+        fontWeight: '900',
+        color: '#EA580C',
+        textShadow: '0 3px 0 #C2410C',
+        yOffset: 4,
+      },
+    ],
+  },
+  {
+    id: 'shop-now-gold',
+    name: 'Shop Now Luxury',
+    category: 'ecommerce',
+    lines: [
+      {
+        text: 'SHOP',
+        fontFamily: 'Cinzel',
+        fontSize: 36,
+        fontWeight: '900',
+        uppercase: true,
+        letterSpacing: 5,
+        color: '#CA8A04',
+        textShadow: '0 2px 10px rgba(202, 138, 4, 0.3)',
+        yOffset: -4,
+      },
+      {
+        text: 'NOW!',
+        fontFamily: 'Cinzel',
+        fontSize: 42,
+        fontWeight: '900',
+        uppercase: true,
+        letterSpacing: 6,
+        color: '#EAB308',
+        textShadow: '0 3px 12px rgba(234, 179, 8, 0.4)',
+        yOffset: 4,
+      },
+    ],
+  },
+  {
+    id: 'flash-sale-50',
+    name: 'Flash Sale 50% Off',
+    category: 'ecommerce',
+    lines: [
+      {
+        text: 'FLASH SALE',
+        fontFamily: 'Bebas Neue',
+        fontSize: 40,
+        fontWeight: '900',
+        uppercase: true,
+        letterSpacing: 2,
+        color: '#FFFFFF',
+        shadow: true,
+        yOffset: -4,
+      },
+      {
+        text: '50% OFF',
+        fontFamily: 'Bebas Neue',
+        fontSize: 46,
+        fontWeight: '900',
+        uppercase: true,
+        letterSpacing: 2,
+        color: '#00FF85',
+        bgPill: 'black',
+        yOffset: 4,
+      },
+    ],
+  },
+  {
+    id: 'limited-drop',
+    name: 'Limited Drop',
+    category: 'ecommerce',
+    lines: [
+      {
+        text: 'LIMITED EDITION',
+        fontFamily: 'Space Grotesk',
+        fontSize: 24,
+        fontWeight: '700',
+        uppercase: true,
+        letterSpacing: 4,
+        color: '#9CA3AF',
+        yOffset: -3.5,
+      },
+      {
+        text: 'EXCLUSIVE DROP',
+        fontFamily: 'Bebas Neue',
+        fontSize: 46,
+        fontWeight: '900',
+        uppercase: true,
+        letterSpacing: 3,
+        color: '#00FF85',
+        shadow: true,
+        yOffset: 4,
+      },
+    ],
+  },
+
+  // --- RETRO & CARTOON 3D (Image 2 & 3 style) ---
+  {
+    id: 'new-drop',
+    name: 'New Drop!',
+    category: 'retro',
+    lines: [
+      {
+        text: 'NEW',
+        fontFamily: 'Righteous',
+        fontSize: 38,
+        fontWeight: '900',
+        uppercase: true,
+        color: '#3B1D0E',
+        textShadow: '3px 3px 0 #84CC16',
+        yOffset: -4,
+      },
+      {
+        text: 'DROP!',
+        fontFamily: 'Righteous',
+        fontSize: 44,
+        fontWeight: '900',
+        uppercase: true,
+        color: '#3B1D0E',
+        textShadow: '3px 3px 0 #84CC16',
+        yOffset: 4,
+      },
+    ],
+  },
+  {
+    id: 'thank-you-stacked',
+    name: 'Thank You 3D',
+    category: 'retro',
+    lines: [
+      {
+        text: 'Thank',
+        fontFamily: 'Bungee',
+        fontSize: 34,
+        fontWeight: '900',
+        color: '#FEF08A',
+        textShadow: '3px 3px 0 #FB7185',
+        yOffset: -4,
+      },
+      {
+        text: 'you!',
+        fontFamily: 'Bungee',
+        fontSize: 34,
+        fontWeight: '900',
+        color: '#FEF08A',
+        textShadow: '3px 3px 0 #FB7185',
+        yOffset: 4,
+      },
+    ],
+  },
+  {
+    id: 'fire-away',
+    name: 'Fire Away',
+    category: 'retro',
+    lines: [
+      {
+        text: 'FIRE',
+        fontFamily: 'Righteous',
+        fontSize: 42,
+        fontWeight: '900',
+        italic: true,
+        uppercase: true,
+        color: '#EA580C',
+        textShadow: '2px 3px 0 #9A3412',
+        yOffset: -4,
+      },
+      {
+        text: 'away',
+        fontFamily: 'Dancing Script',
+        fontSize: 32,
+        fontWeight: 'bold',
+        italic: true,
+        color: '#6B7280',
+        yOffset: 3.5,
+      },
+    ],
+  },
+  {
+    id: 'game-over',
+    name: 'Game Over',
+    category: 'retro',
+    lines: [
+      {
+        text: 'GAME',
+        fontFamily: 'Russo One',
+        fontSize: 40,
+        fontWeight: '900',
+        uppercase: true,
+        color: '#38BDF8',
+        textShadow: '3px 3px 0 #1E3A8A',
+        yOffset: -4,
+      },
+      {
+        text: 'OVER',
+        fontFamily: 'Russo One',
+        fontSize: 40,
+        fontWeight: '900',
+        uppercase: true,
+        color: '#F43F5E',
+        textShadow: '3px 3px 0 #881337',
+        yOffset: 4,
+      },
+    ],
+  },
+  {
+    id: 'vintage-club',
+    name: 'Vintage Club',
+    category: 'retro',
+    lines: [
+      {
+        text: 'VINTAGE',
+        fontFamily: 'DM Serif Display',
+        fontSize: 36,
+        fontWeight: 'bold',
+        uppercase: true,
+        letterSpacing: 3,
+        color: '#D97706',
+        yOffset: -3.5,
+      },
+      {
+        text: 'C L U B',
+        fontFamily: 'Space Grotesk',
+        fontSize: 22,
+        fontWeight: '700',
+        uppercase: true,
+        letterSpacing: 8,
+        color: '#9CA3AF',
+        yOffset: 3.5,
+      },
+    ],
+  },
+
+  // --- LUXURY & EDITORIAL (Image 3 style) ---
+  {
+    id: 'golden-hour',
+    name: 'Golden Hour',
+    category: 'luxury',
+    lines: [
+      {
+        text: 'GOLDEN',
+        fontFamily: 'Playfair Display',
+        fontSize: 36,
+        fontWeight: '900',
+        uppercase: true,
+        letterSpacing: 4,
+        color: '#CA8A04',
+        textShadow: '0 2px 12px rgba(202, 138, 4, 0.4)',
+        yOffset: -4,
+      },
+      {
+        text: 'HOUR',
+        fontFamily: 'Playfair Display',
+        fontSize: 36,
+        fontWeight: '900',
+        uppercase: true,
+        letterSpacing: 5,
+        color: '#EAB308',
+        textShadow: '0 2px 14px rgba(234, 179, 8, 0.45)',
+        yOffset: 4,
+      },
+    ],
+  },
+  {
+    id: 'haute-couture',
+    name: 'Haute Couture',
+    category: 'luxury',
+    lines: [
+      {
+        text: 'HAUTE',
+        fontFamily: 'Cormorant Garamond',
+        fontSize: 32,
+        fontWeight: '600',
+        italic: true,
+        letterSpacing: 4,
+        color: '#D1D5DB',
+        yOffset: -3.5,
+      },
+      {
+        text: 'COUTURE',
+        fontFamily: 'Cinzel',
+        fontSize: 38,
+        fontWeight: '900',
+        uppercase: true,
+        letterSpacing: 8,
+        color: '#FFFFFF',
+        shadow: true,
+        yOffset: 4,
+      },
+    ],
+  },
+  {
+    id: 'grand-collection',
+    name: 'Grand Collection',
+    category: 'luxury',
+    lines: [
+      {
+        text: 'THE LUXURY',
+        fontFamily: 'Cinzel',
+        fontSize: 24,
+        fontWeight: '700',
+        uppercase: true,
+        letterSpacing: 6,
+        color: '#CA8A04',
+        yOffset: -3.5,
+      },
+      {
+        text: 'COLLECTION',
+        fontFamily: 'Playfair Display',
+        fontSize: 38,
+        fontWeight: '900',
+        uppercase: true,
+        letterSpacing: 4,
+        color: '#FFFFFF',
+        shadow: true,
+        yOffset: 4,
+      },
+    ],
+  },
+
+  // --- EVENTS & CELEBRATION (Image 3 style) ---
+  {
+    id: 'happy-birthday',
+    name: 'Happy Birthday',
+    category: 'events',
+    lines: [
+      {
+        text: 'Happy',
+        fontFamily: 'Caveat',
+        fontSize: 38,
+        fontWeight: 'bold',
+        color: '#FFFFFF',
+        yOffset: -4.5,
+      },
+      {
+        text: 'BIRTHDAY',
+        fontFamily: 'Montserrat',
+        fontSize: 32,
+        fontWeight: '900',
+        uppercase: true,
+        letterSpacing: 3,
+        color: '#FFFFFF',
+        shadow: true,
+        yOffset: 4.5,
+      },
+    ],
+  },
+  {
+    id: 'save-the-date',
+    name: 'Save The Date',
+    category: 'events',
+    lines: [
+      {
+        text: 'Save the',
+        fontFamily: 'Cormorant Garamond',
+        fontSize: 30,
+        fontWeight: '600',
+        italic: true,
+        letterSpacing: 2,
+        color: '#D1D5DB',
+        yOffset: -3.5,
+      },
+      {
+        text: 'DATE',
+        fontFamily: 'Cinzel',
+        fontSize: 42,
+        fontWeight: '900',
+        uppercase: true,
+        letterSpacing: 8,
+        color: '#CA8A04',
+        textShadow: '0 2px 10px rgba(202, 138, 4, 0.4)',
+        yOffset: 4,
+      },
+    ],
+  },
+  {
+    id: 'party-all-night',
+    name: 'Party All Night',
+    category: 'events',
+    lines: [
+      {
+        text: 'PARTY',
+        fontFamily: 'Bungee',
+        fontSize: 38,
+        fontWeight: '900',
+        uppercase: true,
+        color: '#EC4899',
+        textShadow: '2px 2px 0 #9D174D',
+        yOffset: -4,
+      },
+      {
+        text: 'TONIGHT',
+        fontFamily: 'Righteous',
+        fontSize: 36,
+        fontWeight: '900',
+        uppercase: true,
+        letterSpacing: 2,
+        color: '#FACC15',
+        yOffset: 4,
+      },
+    ],
+  },
+
+  // --- LIFESTYLE, FOOD & CAFE (Image 3 style) ---
+  {
+    id: 'coffee-break',
+    name: 'Coffee Break',
+    category: 'lifestyle',
+    lines: [
+      {
+        text: 'Coffee Break',
+        fontFamily: 'DM Serif Display',
+        fontSize: 38,
+        fontWeight: 'bold',
+        color: '#065F46',
+        letterSpacing: 1,
+        textShadow: '0 2px 10px rgba(6, 95, 70, 0.4)',
+        yOffset: 0,
+      },
+    ],
+  },
+  {
+    id: 'sweet-treats',
+    name: 'Sweet Treats',
+    category: 'lifestyle',
+    lines: [
+      {
+        text: 'Sweet',
+        fontFamily: 'Pacifico',
+        fontSize: 36,
+        fontWeight: 'bold',
+        color: '#F472B6',
+        textShadow: '2px 2px 0 #9D174D',
+        yOffset: -4,
+      },
+      {
+        text: 'TREATS',
+        fontFamily: 'Bungee',
+        fontSize: 32,
+        fontWeight: '900',
+        uppercase: true,
+        color: '#FBBF24',
+        yOffset: 4,
+      },
+    ],
+  },
+  {
+    id: 'summer-vibes',
+    name: 'Summer Vibes',
+    category: 'lifestyle',
+    lines: [
+      {
+        text: 'SUMMER',
+        fontFamily: 'Righteous',
+        fontSize: 38,
+        fontWeight: '900',
+        uppercase: true,
+        letterSpacing: 2,
+        color: '#06B6D4',
+        textShadow: '2px 3px 0 #0284C7',
+        yOffset: -4,
+      },
+      {
+        text: 'Vibes',
+        fontFamily: 'Satisfy',
+        fontSize: 32,
+        fontWeight: 'bold',
+        italic: true,
+        color: '#F59E0B',
+        yOffset: 3.5,
+      },
+    ],
+  },
+  {
+    id: 'beast-mode',
+    name: 'Beast Mode Fitness',
+    category: 'lifestyle',
+    lines: [
+      {
+        text: 'BEAST',
+        fontFamily: 'Anton',
+        fontSize: 48,
+        fontWeight: '900',
+        uppercase: true,
+        letterSpacing: 2,
+        color: '#F43F5E',
+        shadow: true,
+        yOffset: -4.5,
+      },
+      {
+        text: 'MODE',
+        fontFamily: 'Bebas Neue',
+        fontSize: 40,
+        fontWeight: '900',
+        uppercase: true,
+        letterSpacing: 4,
+        color: '#FFFFFF',
+        yOffset: 4.5,
+      },
+    ],
+  },
+  {
+    id: 'organic-and-fresh',
+    name: 'Organic & Fresh',
+    category: 'lifestyle',
+    lines: [
+      {
+        text: 'ORGANIC',
+        fontFamily: 'Outfit',
+        fontSize: 26,
+        fontWeight: '900',
+        uppercase: true,
+        letterSpacing: 3,
+        color: '#10B981',
+        yOffset: -3.5,
+      },
+      {
+        text: 'Fresh & Pure',
+        fontFamily: 'Caveat',
+        fontSize: 36,
+        fontWeight: 'bold',
+        color: '#84CC16',
+        yOffset: 3.5,
+      },
+    ],
+  },
 ];
 
 export const ELEMENT_PRESETS: ElementPreset[] = [
@@ -456,14 +1224,26 @@ export function renderDesignLayersToCanvas(
     }
 
     // Glow or Shadow
-    if (tl.glow) {
+    if (tl.textShadow) {
+      const parts = tl.textShadow.trim().split(/\s+/);
+      const ox = parseFloat(parts[0]) || 0;
+      const oy = parseFloat(parts[1]) || 0;
+      const blur = parseFloat(parts[2]) || 0;
+      const col = parts.slice(3).join(' ') || 'rgba(0, 0, 0, 0.8)';
+      ctx.shadowColor = col;
+      ctx.shadowOffsetX = ox * scale;
+      ctx.shadowOffsetY = oy * scale;
+      ctx.shadowBlur = blur * scale;
+    } else if (tl.glow) {
       ctx.shadowColor = tl.color || '#00FF85';
       ctx.shadowBlur = 24 * scale;
       ctx.shadowOffsetY = 0;
+      ctx.shadowOffsetX = 0;
     } else if (tl.shadow) {
       ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
       ctx.shadowBlur = 14 * scale;
       ctx.shadowOffsetY = 4 * scale;
+      ctx.shadowOffsetX = 0;
     }
 
     ctx.fillStyle = tl.color || '#FFFFFF';
@@ -478,16 +1258,22 @@ export function renderDesignLayersToCanvas(
       if (tl.align === 'left') {
         ctx.textAlign = 'left';
         lineX = pixelX - maxLineWidth / 2;
-        ctx.fillText(line, lineX, lineY);
       } else if (tl.align === 'right') {
         ctx.textAlign = 'right';
         lineX = pixelX + maxLineWidth / 2;
-        ctx.fillText(line, lineX, lineY);
       } else {
         ctx.textAlign = 'center';
         lineX = pixelX;
-        ctx.fillText(line, lineX, lineY);
       }
+
+      if (tl.strokeColor && tl.strokeWidth) {
+        ctx.save();
+        ctx.strokeStyle = tl.strokeColor;
+        ctx.lineWidth = tl.strokeWidth * scale * 2;
+        ctx.strokeText(line, lineX, lineY);
+        ctx.restore();
+      }
+      ctx.fillText(line, lineX, lineY);
 
       // Underline support
       if (tl.underline) {

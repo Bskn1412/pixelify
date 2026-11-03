@@ -26,7 +26,14 @@ export async function clearDownloadedModelCaches(): Promise<void> {
     throw new Error('This browser does not support clearing model storage.');
   }
 
-  await Promise.all(MODEL_CACHE_NAMES.map((name) => caches.delete(name)));
+  const allCacheNames = await caches.keys().catch(() => []);
+  const toDelete = new Set<string>([
+    ...MODEL_CACHE_NAMES,
+    ...allCacheNames.filter((name) => /model|transformer|onnx|litert|runtime/i.test(name)),
+  ]);
+
+  await Promise.all(Array.from(toDelete).map((name) => caches.delete(name).catch(() => false)));
+  console.log('[Pixelify Model Cache] 🧹 Purged model caches:', Array.from(toDelete).join(', '));
   modelCacheChannel?.postMessage({ type: 'cleared', source: CACHE_CLIENT_ID });
 }
 

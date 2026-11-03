@@ -379,8 +379,24 @@ const FAQ_ITEMS = [
     a: 'Open the Background Remover, drag your image into the upload area, and the AI cutout starts automatically. When it finishes, download the transparent PNG, no sign-up, no credits, no watermark.',
   },
   {
+    q: 'What is the Diablo model and how does it differ from Chopper?',
+    a: 'Chopper is our ultra-fast default model optimized for rapid cutouts across all devices. Diablo is our premium high-precision neural model powered by a 1024×1024 input tensor and advanced edge matting, engineered specifically to preserve fine flyaway hair, pet fur, transparent glass, and intricate edges with zero halo artifacts.',
+  },
+  {
+    q: 'When should I use Diablo instead of Chopper?',
+    a: 'Chopper is ideal for everyday e-commerce product photos, logos, and general cutouts where speed is paramount. Use Diablo when maximum detail is needed: studio portraits with complex hair, furry animals, semi-transparent fabrics, jewelry, or high-resolution marketing assets.',
+  },
+  {
+    q: 'How do I activate the Diablo Ultra Precision model?',
+    a: 'Once your cutout is generated, you will see a "Refine with Diablo Ultra Precision" option right inside the Cutout tools sidebar. Clicking it instantly switches to Diablo\'s high-definition matting pipeline. You can also re-process any image with Diablo whenever you need the highest fidelity.',
+  },
+  {
+    q: 'Does Diablo run locally and work offline?',
+    a: 'Yes. Both Chopper and Diablo execute 100% on your device using WebGPU with automatic multi-threaded WebAssembly fallback. Once Diablo\'s neural weights are downloaded to your browser\'s local cache on first use, it runs completely offline without sending your photos to any cloud server.',
+  },
+  {
     q: 'Are my images uploaded to a server?',
-    a: 'No. The Chopper segmentation model runs directly inside your browser through Transformers.js with WebGPU or WebAssembly. Your photos never leave your device, which makes it safe for private or client work.',
+    a: 'No. The AI models run directly inside your browser through WebGPU or WebAssembly. Your photos never leave your device, which makes Pixelify completely safe for private, confidential, or client work.',
   },
   {
     q: 'Which formats can I use and export?',
@@ -392,11 +408,11 @@ const FAQ_ITEMS = [
   },
   {
     q: 'Does it handle hair, fur and glass?',
-    a: 'The bilateral-reference architecture is trained specifically on fine boundaries, hair strands, fur, and semi-transparent edges survive far better than with classic color-key tools.',
+    a: 'The bilateral-reference architecture is trained specifically on fine boundaries. For standard photos, Chopper preserves edges cleanly; for intricate hair strands, wisps, and fur, the Diablo Ultra Precision model delivers studio-grade alpha transparency.',
   },
   {
     q: 'Why is the first image slower?',
-    a: 'The roughly 40 MB model downloads to your browser cache on first use. Every image after that reuses it, so processing drops to a couple of seconds on most hardware.',
+    a: 'The neural model downloads to your browser cache on first use. Every image after that reuses the cached weights instantly, so processing drops to just a few seconds on most hardware.',
   },
 ];
 

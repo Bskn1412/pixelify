@@ -334,7 +334,7 @@ const FabricImageEditor = forwardRef<FabricImageEditorHandle, FabricImageEditorP
 
       const cutoutWidth = image.width || 1;
       const cutoutHeight = image.height || 1;
-      const fitFactor = hasCustomBg ? 0.75 : 1.0;
+      const fitFactor = 1.0;
       const fit = Math.min((width * fitFactor) / cutoutWidth, (height * fitFactor) / cutoutHeight);
       baseScaleRef.current = fit;
 

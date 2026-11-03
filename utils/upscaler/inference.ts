@@ -49,8 +49,13 @@ function getCandidateUrls(path: string): string[] {
       if (filename && filename.endsWith('.tflite')) {
         const local = new URL(`/models/${filename}`, location.origin);
         local.searchParams.set('litert', MODEL_ASSET_REVISION);
-        if (local.href !== primary) {
+        if (local.href !== primary && !urls.includes(local.href)) {
           urls.push(local.href);
+        }
+        const hf = new URL(`https://huggingface.co/Joker5800/pixelify/resolve/main/${filename}`);
+        hf.searchParams.set('litert', MODEL_ASSET_REVISION);
+        if (hf.href !== primary && !urls.includes(hf.href)) {
+          urls.push(hf.href);
         }
       }
     } catch {
@@ -266,6 +271,7 @@ export async function createSession(
   runtime: LiteRtRuntime, key: ModelKey, preferred?: UpscalerAccelerator,
   onProgress?: ModelLoadProgress, signal?: AbortSignal,
 ): Promise<LiteRtSession> {
+  onProgress?.(0);
   const bytes = await modelBytes(MODELS[key].file, (pct) => onProgress?.(Math.round(pct * .85)), signal);
   let lastError: unknown;
   let fallbackReason: string | undefined;

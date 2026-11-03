@@ -15,7 +15,7 @@ const Loader = ({ progress, className, width }: LoaderProps) => {
   const determinate = typeof progress === "number";
   const pct = determinate
     ? Math.max(0, Math.min(100, progress as number))
-    : null;
+    : 0;
 
   return (
     <div
@@ -26,10 +26,10 @@ const Loader = ({ progress, className, width }: LoaderProps) => {
     >
       <div
         className={`ml-bar${determinate ? " ml-bar--determinate" : ""}`}
-        style={determinate ? { width: `${pct}%` } : undefined}
+        style={{ width: `${pct}%` }}
       />
       <div className="ml-text">
-        {determinate ? `${Math.round(pct as number)}%` : "40%"}
+        {`${Math.round(pct)}%`}
       </div>
       <div className="ml-particles">
         <div className="ml-particle" />

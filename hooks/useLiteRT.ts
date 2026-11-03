@@ -66,12 +66,12 @@ export function useLiteRT(): UseLiteRTReturn {
     const showProgressUI = !opts?.silentIfCached || !cached;
 
     const loadPromise = (async () => {
-      if (showProgressUI) {
-        setIsLoading(true);
-        setModelProgress(0);
-      }
       try {
         if (!runtimeRef.current) await initLiteRT();
+        if (showProgressUI) {
+          setIsLoading(true);
+          setModelProgress(0);
+        }
         const session = await createSession(
           runtimeRef.current,
           key,

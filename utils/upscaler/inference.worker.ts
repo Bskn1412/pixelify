@@ -31,11 +31,35 @@ scope.onmessage = async ({ data }: MessageEvent<InitMessage | RunMessage | Relea
   }
   if (data.type === 'init') {
     try {
+      const g = self as any;
+      g.HF_COMPACT_INTERNAL = process.env.HF_COMPACT_INTERNAL || process.env.NEXT_PUBLIC_HF_COMPACT_INTERNAL;
+      g.HF_COMPAT_INTERNAL = process.env.HF_COMPAT_INTERNAL || process.env.NEXT_PUBLIC_HF_COMPAT_INTERNAL || g.HF_COMPACT_INTERNAL;
+      g.HF_INTERNAL = process.env.HF_INTERNAL || process.env.NEXT_PUBLIC_HF_INTERNAL;
+      g.HF_JSPI_INTERNAL = process.env.HF_JSPI_INTERNAL || process.env.NEXT_PUBLIC_HF_JSPI_INTERNAL;
+      g.HF_THREADED_INTERNAL = process.env.HF_THREADED_INTERNAL || process.env.NEXT_PUBLIC_HF_THREADED_INTERNAL;
+
+      const getWasmUrl = (path: string) => {
+        const fileName = path.split('/').pop() || path;
+        const envMap: Record<string, string | undefined> = {
+          'litert_wasm_compat_internal.wasm': g.HF_COMPACT_INTERNAL || g.HF_COMPAT_INTERNAL || 'https://huggingface.co/Joker5800/pixelify/resolve/main/wasm/litert_wasm_compat_internal.wasm',
+          'litert_wasm_internal.wasm': g.HF_INTERNAL || 'https://huggingface.co/Joker5800/pixelify/resolve/main/wasm/litert_wasm_internal.wasm',
+          'litert_wasm_jspi_internal.wasm': g.HF_JSPI_INTERNAL || 'https://huggingface.co/Joker5800/pixelify/resolve/main/wasm/litert_wasm_jspi_internal.wasm',
+          'litert_wasm_threaded_internal.wasm': g.HF_THREADED_INTERNAL || 'https://huggingface.co/Joker5800/pixelify/resolve/main/wasm/litert_wasm_threaded_internal.wasm',
+        };
+        const raw = envMap[fileName];
+        return raw ? raw.replace('/blob/', '/resolve/') : undefined;
+      };
+
       // Emscripten's worker branch resolves .wasm artifacts against the worker
       // script location (/_next/static/chunks/…), not the base passed to
-      // loadLiteRt. Seed the global Module with an explicit locateFile so the
-      // runtime artifacts resolve to the public /litert/wasm/ directory.
-      (self as unknown as { Module?: unknown }).Module = { locateFile: (path: string) => '/litert/wasm/' + path };
+      // loadLiteRt. Seed the global Module with an explicit locateFile so remote
+      // wasm URLs resolve directly, or fallback to the public /litert/wasm/ directory.
+      (self as unknown as { Module?: unknown }).Module = {
+        locateFile: (path: string) => {
+          const remoteUrl = getWasmUrl(path);
+          return remoteUrl || ('/litert/wasm/' + path);
+        }
+      };
       if (data.accelerator === 'webgpu') await ensureHardwareWebGPUAdapter();
       const jspi = await supportsFeature('jspi').catch(() => false);
       await loadLiteRt('/litert/wasm/', { jspi });

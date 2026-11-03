@@ -18,6 +18,7 @@ import type { ViewTab } from '../../types';
 import BlogCard from './BlogCard';
 import Footer from '../Footer';
 import type { Post } from '../../data/posts';
+import { useApp } from '../AppProvider';
 
 interface BlogListProps {
   onTabChange: (tab: ViewTab) => void;
@@ -40,13 +41,13 @@ function MetaLine({ post, className = '' }: { post: Post; className?: string }) 
 export default function BlogList({ onTabChange, initialLang }: BlogListProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { currentLang, setCurrentLang } = useApp();
   const page = Number(searchParams.get('page')) || 1;
   const query = searchParams.get('q') || '';
-  // Language scope: an index page (e.g. /blogs/fr/) pins the language,
-  // otherwise the ?lang= query filters, defaulting to 'all'.
-  const rawLang = searchParams.get('lang') || initialLang || 'all';
-  const langFilter = rawLang === 'all' || isSupportedLang(rawLang) ? rawLang : 'all';
-  const isMixed = langFilter === 'all';
+  // Scoped strictly to the selected language: top nav selection (currentLang), ?lang=, or page route
+  const effectiveLang = initialLang || searchParams.get('lang') || currentLang || 'en';
+  const langFilter = isSupportedLang(effectiveLang) ? effectiveLang : 'en';
+  const isMixed = false;
   const [input, setInput] = useState(query);
 
   useEffect(() => setInput(query), [query]);
@@ -141,19 +142,22 @@ export default function BlogList({ onTabChange, initialLang }: BlogListProps) {
             />
           </div>
 
-          {/* LANGUAGE FILTER — "All" mixes every language, each chip scopes the feed */}
+          {/* LANGUAGE FILTER — shows only currently active language(s) */}
           <div className="mt-5 flex flex-wrap items-center gap-2" role="group" aria-label="Filter articles by language">
             <span className="mr-1 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">
               Lang
             </span>
-            {[{ code: 'all', label: 'All' }, ...LANGUAGES].map((lang) => {
+            {LANGUAGES.map((lang) => {
               const active = langFilter === lang.code;
               const count = getAllPosts(lang.code).length;
               return (
                 <button
                   key={lang.code}
                   type="button"
-                  onClick={() => updateParam('lang', lang.code === 'all' ? null : lang.code)}
+                  onClick={() => {
+                    updateParam('lang', lang.code);
+                    setCurrentLang(lang.code);
+                  }}
                   aria-pressed={active}
                   className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition ${
                     active

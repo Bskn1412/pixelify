@@ -41,6 +41,7 @@ import {
   requestNotificationPermission,
   sendDesktopNotification,
 } from '../utils/notifications';
+import { DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY } from '../lib/i18n';
 import ScrollToTopButton from './ScrollToTopButton';
 
 const STORAGE_KEY = 'pixelify_upscaler_history_2026'; // legacy, no longer written
@@ -100,6 +101,9 @@ interface AppContextValue {
   isMobileSidebarOpen: boolean;
   mobileHidden: boolean;
   isOnline: boolean;
+  /* language */
+  currentLang: string;
+  setCurrentLang: (lang: string) => void;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -143,6 +147,20 @@ export default function AppProvider({ children }: { children: React.ReactNode })
     if (saved === 'dark' || saved === 'light' || saved === 'system') return saved;
     return 'dark';
   });
+
+  // Global language state
+  const [currentLang, setCurrentLangState] = useState<string>(() => {
+    if (typeof window === 'undefined') return DEFAULT_LANGUAGE;
+    return localStorage.getItem(LANGUAGE_STORAGE_KEY) || DEFAULT_LANGUAGE;
+  });
+
+  const setCurrentLang = useCallback((lang: string) => {
+    setCurrentLangState(lang);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+      document.cookie = `${LANGUAGE_STORAGE_KEY}=${lang}; path=/; max-age=31536000; SameSite=Lax`;
+    }
+  }, []);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const isSelectingSampleRef = useRef(false);
@@ -441,35 +459,55 @@ export default function AppProvider({ children }: { children: React.ReactNode })
     const preloadModels = async () => {
       try {
         if (cancelled || preloadCancelledRef.current) return;
-        const bgPreload = bgRemoverService.init();
-        // Probe caches BEFORE touching any badge state: a fully-cached visit
-        // then performs ZERO navbar updates (no icon flicker), while real
-        // downloads still show the full plan during runtime init.
-        const targets: ModelKey[] = [];
-        for (const key of UPSCALER_PRELOAD_ORDER) {
-          if (cancelled || preloadCancelledRef.current) return;
-          let cached = false;
-          try { cached = await isUpscalerModelCached(key); } catch { cached = false; }
-          if (!cached) targets.push(key);
+
+        const isBgPage = pathname?.startsWith('/bg_remove');
+        const isUpscalerPage = pathname?.startsWith('/upscaler');
+
+        if (isBgPage) {
+          // On background removal route: ONLY pre-warm background remover service
+          await bgRemoverService.init();
+          return;
         }
-        if (targets.length > 0) setUpscalerPreloadQueue(targets);
-        await initLiteRT();
+
+        if (isUpscalerPage) {
+          // On upscaler route: ONLY pre-warm LiteRT upscaler
+          let vitalityCached = false;
+          try { vitalityCached = await isUpscalerModelCached('vitality'); } catch { vitalityCached = false; }
+
+          if (!vitalityCached && !cancelled && !preloadCancelledRef.current) {
+            await initLiteRT();
+            if (cancelled || preloadCancelledRef.current) return;
+
+            setActiveUpscalerModel('vitality');
+            const ok = await loadModel('vitality', { silentIfCached: true });
+            if (!cancelled) setUpscalerPreloadError(!ok);
+          }
+          return;
+        }
+
+        // On landing page or general navigation: Sequential preload to avoid network congestion
+        await bgRemoverService.init();
         if (cancelled || preloadCancelledRef.current) return;
-        // Pre-warm ONLY the default upscaler model (Vitality). Heavy
-        // variants (Pixel-Dance, Alpha-Satoru) stay on-demand.
-        for (const key of targets) {
+
+        let vitalityCached = false;
+        try { vitalityCached = await isUpscalerModelCached('vitality'); } catch { vitalityCached = false; }
+
+        if (!vitalityCached && !cancelled && !preloadCancelledRef.current) {
+          await initLiteRT();
           if (cancelled || preloadCancelledRef.current) return;
-          setActiveUpscalerModel(key);
-          const ok = await loadModel(key, { silentIfCached: true });
-          if (key === 'vitality' && !cancelled) setUpscalerPreloadError(!ok);
-          setUpscalerPreloadQueue((q) => q.filter((k) => k !== key));
+
+          setActiveUpscalerModel('vitality');
+          const ok = await loadModel('vitality', { silentIfCached: true });
+          if (!cancelled) setUpscalerPreloadError(!ok);
         }
-        setUpscalerPreloadQueue([]);
-        void bgPreload;
       } catch (err) {
         if (!cancelled) {
           setUpscalerPreloadError(true);
           console.warn('AI model preload failed; models will retry when used:', err);
+        }
+      } finally {
+        if (!cancelled) {
+          setUpscalerPreloadQueue([]);
         }
       }
     };
@@ -490,7 +528,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
       if (idleId !== null) cancelIdleCallback?.(idleId);
       if (timerId !== null) window.clearTimeout(timerId);
     };
-  }, [addToast, initLiteRT, loadModel, unloadModel]);
+  }, [addToast, initLiteRT, loadModel, unloadModel, pathname]);
 
   const handleClearModelCache = useCallback(async () => {
     if (isClearingModelCache) return;
@@ -514,6 +552,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
       addToast('error', err instanceof Error ? err.message : 'Could not clear downloaded models.');
     } finally {
       setIsClearingModelCache(false);
+      preloadCancelledRef.current = false;
     }
   }, [addToast, isClearingModelCache, unloadModel]);
 
@@ -565,12 +604,6 @@ export default function AppProvider({ children }: { children: React.ReactNode })
     if (modelLoading && modelProgress !== null) {
       out.push({ id: 'upscaler', name: upscalerActiveName, progress: Math.round(modelProgress) });
     }
-    // Queued preload models show as pending (0%) rows so the badge reflects
-    // the full first-visit download plan, not just the active transfer.
-    for (const key of upscalerPreloadQueue) {
-      if (modelLoading && modelProgress !== null && key === upscalerActiveKey) continue;
-      out.push({ id: `queued-${key}`, name: MODELS[key].name, progress: 0 });
-    }
     // Cached Chopper reports a 100% progress tick — that's not a download;
     // bgDownloadActive goes true only once a real <95% transfer tick lands.
     if (bgModelPhase === 'downloading' && bgDownloadActive) {
@@ -581,7 +614,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
       });
     }
     return out;
-  }, [modelLoading, modelProgress, upscalerActiveName, upscalerActiveKey, upscalerPreloadQueue, bgModelPhase, bgModelProgress, bgDownloadActive, bgModelLoadName]);
+  }, [modelLoading, modelProgress, upscalerActiveName, bgModelPhase, bgModelProgress, bgDownloadActive, bgModelLoadName]);
 
   /* ----------------------------------------------------------
      ADD UPSCALE FILE (Creates individual UpscaleItem)
@@ -702,7 +735,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
   const handleUpscaleItem = useCallback(
     async (id: string) => {
       const item = items.find((i) => i.id === id);
-      if (!item || item.status === 'processing' || modelLoading) return;
+      if (!item || item.status === 'processing') return;
 
       const outputWidth = Math.round(item.width * item.options.scale);
       const outputHeight = Math.round(item.height * item.options.scale);
@@ -740,6 +773,18 @@ export default function AppProvider({ children }: { children: React.ReactNode })
       );
 
       try {
+        if (!sessionRef.current || sessionRef.current?.__modelKey !== item.modelKey) {
+          setActiveUpscalerModel(item.modelKey);
+          setItems((prev) =>
+            prev.map((i) =>
+              i.id === id
+                ? { ...i, progress: { percent: 8, text: `Loading ${MODELS[item.modelKey].name}...` } }
+                : i
+            )
+          );
+          await loadModel(item.modelKey);
+        }
+
         const res = await upscale(
           id,
           item.img,
@@ -1090,6 +1135,8 @@ export default function AppProvider({ children }: { children: React.ReactNode })
     isMobileSidebarOpen: isMobileNavOpen,
     mobileHidden,
     isOnline,
+    currentLang,
+    setCurrentLang,
   }), [
     activeTab, navigateTo, warmup, modelDownloads, addToast, openPicker,
     bgJobs, bgEngine, setBgJobs, setBgEngine, setBgWebgpuAvailable,
@@ -1102,6 +1149,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
     webgpuAvailable, modelStatus, isClearingModelCache, canClearModelCache,
     handleClearModelCache, onOpenMobileSidebar, mobileHidden,
     isOnline, isOfflineBannerOpen, justReconnected, setIsOfflineBannerOpen,
+    currentLang, setCurrentLang,
   ]);
 
   return (

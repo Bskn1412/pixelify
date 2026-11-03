@@ -18,6 +18,8 @@ import {
   FONT_FAMILIES,
   COLOR_PALETTE,
   ELEMENT_PRESETS,
+  FONT_COMBINATIONS,
+  FontCombination,
   renderDesignLayersToCanvas,
 } from './bgremove/DesignAssets';
 import {
@@ -40,19 +42,275 @@ type BgSubTab = 'photo' | 'color';
 type DesignSubTab = 'text' | 'elements' | 'layers';
 type CropRatio = FabricCropRatio;
 
-const COLOR_PRESETS = [
+export interface BgPreset {
+  id: string;
+  label: string;
+  style?: string;
+  fill?: string | null;
+  gradient?: {
+    angle: number;
+    stops: { offset: number; color: string }[];
+    css: string;
+  };
+}
+
+const COLOR_PRESETS: BgPreset[] = [
   { id: 'transparent', label: 'Transparent', style: 'bg-[repeating-conic-gradient(#26282e_0%_25%,#1b1d22_0%_50%)] [background-size:20px_20px]', fill: null },
-  { id: 'white', label: 'White', style: '', fill: '#ffffff' },
-  { id: 'dark', label: 'Midnight', style: '', fill: '#09090D' },
+  // Monochromatic & Grays (Canva row 1)
+  { id: 'white', label: 'Pure White', style: '', fill: '#FFFFFF' },
+  { id: 'light-gray', label: 'Light Platinum', style: '', fill: '#E5E7EB' },
+  { id: 'silver', label: 'Silver Gray', style: '', fill: '#9CA3AF' },
+  { id: 'medium-gray', label: 'Neutral Gray', style: '', fill: '#6B7280' },
+  { id: 'charcoal', label: 'Charcoal', style: '', fill: '#374151' },
+  { id: 'dark', label: 'Deep Black', style: '', fill: '#09090D' },
+  // Reds, Corals, Pinks & Purples (Canva row 2)
+  { id: 'crimson', label: 'Crimson Red', style: '', fill: '#EF4444' },
+  { id: 'coral', label: 'Coral', style: '', fill: '#F87171' },
+  { id: 'hot-pink', label: 'Vibrant Pink', style: '', fill: '#F43F5E' },
+  { id: 'pink', label: 'Pastel Pink', style: '', fill: '#F9A8D4' },
+  { id: 'lavender', label: 'Soft Lavender', style: '', fill: '#E9D5FF' },
+  { id: 'lilac', label: 'Lilac Purple', style: '', fill: '#C084FC' },
+  { id: 'violet', label: 'Royal Violet', style: '', fill: '#7C3AED' },
+  { id: 'indigo', label: 'Deep Indigo', style: '', fill: '#4338CA' },
+  // Cyans, Teals & Blues (Canva row 3)
+  { id: 'teal', label: 'Ocean Teal', style: '', fill: '#0891B2' },
+  { id: 'cyan', label: 'Bright Cyan', style: '', fill: '#06B6D4' },
+  { id: 'sky', label: 'Sky Aqua', style: '', fill: '#38BDF8' },
+  { id: 'blue', label: 'Electric Blue', style: '', fill: '#3B82F6' },
+  { id: 'cobalt', label: 'Royal Cobalt', style: '', fill: '#1D4ED8' },
+  { id: 'navy', label: 'Navy Blue', style: '', fill: '#1E3A8A' },
+  { id: 'midnight', label: 'Midnight Blue', style: '', fill: '#0F172A' },
+  // Greens, Yellows & Oranges (Canva row 4)
   { id: 'mint', label: 'Mint Studio', style: '', fill: '#00FF85' },
-  { id: 'blue', label: 'Sky Blue', style: '', fill: '#38bdf8' },
-  { id: 'pink', label: 'Pastel Pink', style: '', fill: '#f9a8d4' },
-  { id: 'sunset', label: 'Coral', style: '', fill: '#fb7185' },
-  { id: 'slate', label: 'Dark Slate', style: '', fill: '#64748b' },
+  { id: 'emerald', label: 'Emerald Green', style: '', fill: '#10B981' },
+  { id: 'lime', label: 'Bright Lime', style: '', fill: '#84CC16' },
+  { id: 'yellow', label: 'Lemon Yellow', style: '', fill: '#FACC15' },
+  { id: 'amber', label: 'Warm Amber', style: '', fill: '#FBBF24' },
+  { id: 'orange', label: 'Sunset Orange', style: '', fill: '#FB923C' },
+  { id: 'tangerine', label: 'Vivid Tangerine', style: '', fill: '#EA580C' },
 ];
 
+const GRADIENT_PRESETS: BgPreset[] = [
+  // --- Monochromatic ---
+  {
+    id: 'grad-charcoal',
+    label: 'Dark Charcoal',
+    fill: null,
+    gradient: {
+      angle: 180,
+      css: 'linear-gradient(180deg, #374151 0%, #111827 100%)',
+      stops: [{ offset: 0, color: '#374151' }, { offset: 1, color: '#111827' }],
+    },
+  },
+  {
+    id: 'grad-silver',
+    label: 'Silver Metallic',
+    fill: null,
+    gradient: {
+      angle: 180,
+      css: 'linear-gradient(180deg, #4b5563 0%, #d1d5db 100%)',
+      stops: [{ offset: 0, color: '#4b5563' }, { offset: 1, color: '#d1d5db' }],
+    },
+  },
+  {
+    id: 'grad-smoke',
+    label: 'White Studio',
+    fill: null,
+    gradient: {
+      angle: 180,
+      css: 'linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%)',
+      stops: [{ offset: 0, color: '#ffffff' }, { offset: 1, color: '#cbd5e1' }],
+    },
+  },
+  {
+    id: 'grad-obsidian',
+    label: 'Soft Obsidian',
+    fill: null,
+    gradient: {
+      angle: 135,
+      css: 'linear-gradient(135deg, #18181b 0%, #09090b 100%)',
+      stops: [{ offset: 0, color: '#18181b' }, { offset: 1, color: '#09090b' }],
+    },
+  },
+
+  // --- Cool Tones ---
+  {
+    id: 'grad-midnight',
+    label: 'Midnight Galaxy',
+    fill: null,
+    gradient: {
+      angle: 180,
+      css: 'linear-gradient(180deg, #1e1b4b 0%, #030712 100%)',
+      stops: [{ offset: 0, color: '#1e1b4b' }, { offset: 1, color: '#030712' }],
+    },
+  },
+  {
+    id: 'grad-cyan-blue',
+    label: 'Ocean Cyan',
+    fill: null,
+    gradient: {
+      angle: 135,
+      css: 'linear-gradient(135deg, #06b6d4 0%, #2563eb 100%)',
+      stops: [{ offset: 0, color: '#06b6d4' }, { offset: 1, color: '#2563eb' }],
+    },
+  },
+  {
+    id: 'grad-violet-blue',
+    label: 'Electric Iris',
+    fill: null,
+    gradient: {
+      angle: 135,
+      css: 'linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%)',
+      stops: [{ offset: 0, color: '#8b5cf6' }, { offset: 1, color: '#3b82f6' }],
+    },
+  },
+  {
+    id: 'grad-aurora',
+    label: 'Northern Lights',
+    fill: null,
+    gradient: {
+      angle: 135,
+      css: 'linear-gradient(135deg, #059669 0%, #0284c7 100%)',
+      stops: [{ offset: 0, color: '#059669' }, { offset: 1, color: '#0284c7' }],
+    },
+  },
+  {
+    id: 'grad-frost',
+    label: 'Frost Breeze',
+    fill: null,
+    gradient: {
+      angle: 135,
+      css: 'linear-gradient(135deg, #e0f2fe 0%, #7dd3fc 100%)',
+      stops: [{ offset: 0, color: '#e0f2fe' }, { offset: 1, color: '#7dd3fc' }],
+    },
+  },
+
+  // --- Warm Tones ---
+  {
+    id: 'grad-golden-bronze',
+    label: 'Golden Bronze',
+    fill: null,
+    gradient: {
+      angle: 180,
+      css: 'linear-gradient(180deg, #451a03 0%, #ca8a04 100%)',
+      stops: [{ offset: 0, color: '#451a03' }, { offset: 1, color: '#ca8a04' }],
+    },
+  },
+  {
+    id: 'grad-sunset',
+    label: 'Sunset Horizon',
+    fill: null,
+    gradient: {
+      angle: 180,
+      css: 'linear-gradient(180deg, #831843 0%, #ea580c 50%, #facc15 100%)',
+      stops: [{ offset: 0, color: '#831843' }, { offset: 0.5, color: '#ea580c' }, { offset: 1, color: '#facc15' }],
+    },
+  },
+  {
+    id: 'grad-lime-citrus',
+    label: 'Fresh Lime',
+    fill: null,
+    gradient: {
+      angle: 180,
+      css: 'linear-gradient(180deg, #65a30d 0%, #bef264 100%)',
+      stops: [{ offset: 0, color: '#65a30d' }, { offset: 1, color: '#bef264' }],
+    },
+  },
+  {
+    id: 'grad-peach-sunrise',
+    label: 'Peach Sunrise',
+    fill: null,
+    gradient: {
+      angle: 135,
+      css: 'linear-gradient(135deg, #fb7185 0%, #fb923c 100%)',
+      stops: [{ offset: 0, color: '#fb7185' }, { offset: 1, color: '#fb923c' }],
+    },
+  },
+  {
+    id: 'grad-cherry-amber',
+    label: 'Cherry Amber',
+    fill: null,
+    gradient: {
+      angle: 135,
+      css: 'linear-gradient(135deg, #dc2626 0%, #f59e0b 100%)',
+      stops: [{ offset: 0, color: '#dc2626' }, { offset: 1, color: '#f59e0b' }],
+    },
+  },
+  {
+    id: 'grad-rose-velvet',
+    label: 'Rose Velvet',
+    fill: null,
+    gradient: {
+      angle: 135,
+      css: 'linear-gradient(135deg, #9d174d 0%, #f472b6 100%)',
+      stops: [{ offset: 0, color: '#9d174d' }, { offset: 1, color: '#f472b6' }],
+    },
+  },
+  {
+    id: 'grad-pastel-dream',
+    label: 'Pastel Dream',
+    fill: null,
+    gradient: {
+      angle: 135,
+      css: 'linear-gradient(135deg, #fbcfe8 0%, #ddd6fe 100%)',
+      stops: [{ offset: 0, color: '#fbcfe8' }, { offset: 1, color: '#ddd6fe' }],
+    },
+  },
+];
+
+function drawCanvasGradient(
+  ctx: CanvasRenderingContext2D,
+  angleDeg: number,
+  stops: { offset: number; color: string }[],
+  width: number,
+  height: number
+) {
+  let x0 = 0;
+  let y0 = 0;
+  let x1 = 0;
+  let y1 = height;
+
+  if (angleDeg === 180) {
+    x0 = 0;
+    y0 = 0;
+    x1 = 0;
+    y1 = height;
+  } else if (angleDeg === 135) {
+    x0 = 0;
+    y0 = 0;
+    x1 = width;
+    y1 = height;
+  } else if (angleDeg === 90) {
+    x0 = 0;
+    y0 = 0;
+    x1 = width;
+    y1 = 0;
+  } else if (angleDeg === 0) {
+    x0 = 0;
+    y0 = height;
+    x1 = 0;
+    y1 = 0;
+  } else {
+    const angleRad = ((angleDeg - 90) * Math.PI) / 180;
+    const cx = width / 2;
+    const cy = height / 2;
+    const diag = Math.sqrt(width * width + height * height) / 2;
+    x0 = cx - Math.cos(angleRad) * diag;
+    y0 = cy - Math.sin(angleRad) * diag;
+    x1 = cx + Math.cos(angleRad) * diag;
+    y1 = cy + Math.sin(angleRad) * diag;
+  }
+
+  const grad = ctx.createLinearGradient(x0, y0, x1, y1);
+  for (const s of stops) {
+    grad.addColorStop(s.offset, s.color);
+  }
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, width, height);
+}
+
 interface EditorSnapshot {
-  selectedBg: (typeof COLOR_PRESETS)[number];
+  selectedBg: BgPreset;
   customBgColor?: string;
   customBgImage?: string;
   subjectBgBlur: number;
@@ -106,6 +364,7 @@ export default function BGRemoveWorkspace({
   const [bgSubTab, setBgSubTab] = useState<BgSubTab>('photo');
   const [designSubTab, setDesignSubTab] = useState<DesignSubTab>('text');
   const [elementCategory, setElementCategory] = useState<'all' | 'badges' | 'shapes' | 'stickers'>('all');
+  const [fontComboCategory, setFontComboCategory] = useState<string>('all');
 
   const [isCompareMode, setIsCompareMode] = useState(false);
   const [viewportZoom, setViewportZoom] = useState(1);
@@ -161,7 +420,7 @@ export default function BGRemoveWorkspace({
   }, [bgModelKey, selectedId]);
 
   // Background options
-  const [selectedBg, setSelectedBg] = useState(COLOR_PRESETS[0]);
+  const [selectedBg, setSelectedBg] = useState<BgPreset>(COLOR_PRESETS[0]);
   const [customBgColor, setCustomBgColor] = useState<string | undefined>(undefined);
   const [customBgImage, setCustomBgImage] = useState<string | undefined>(undefined);
   const [subjectBgBlur, setSubjectBgBlur] = useState(0);
@@ -392,7 +651,7 @@ export default function BGRemoveWorkspace({
           if (isWeights || pct > 0) {
             const mapped = Math.min(50, Math.max(6, Math.round(6 + pct * 0.44)));
             currentProgress = Math.max(currentProgress, mapped);
-            currentMessage = `Downloading AI vision model (${pct}%)...`;
+            currentMessage = `Downloading AI vision model...`;
             lastReportedProgress = Math.round(currentProgress);
             lastReportedMessage = currentMessage;
             updateJob(job.id, {
@@ -599,6 +858,38 @@ export default function BGRemoveWorkspace({
     setTextLayers((prev) => [...prev, newLayer]);
     setSelectedLayerId(newLayer.id);
     addToast('success', 'Custom text added to canvas');
+  }
+
+  function addFontCombination(combo: FontCombination) {
+    recordEditorEdit();
+    const newLayers: TextLayer[] = combo.lines.map((line, idx) => ({
+      id: `text-${makeId()}-${idx}`,
+      text: line.text,
+      x: 50,
+      y: Math.max(10, Math.min(90, 48 + line.yOffset)),
+      fontSize: line.fontSize,
+      fontFamily: line.fontFamily,
+      fontWeight: line.fontWeight,
+      italic: line.italic,
+      underline: line.underline,
+      uppercase: line.uppercase,
+      letterSpacing: line.letterSpacing,
+      lineHeight: line.lineHeight || 1.2,
+      color: line.color,
+      align: 'center',
+      bgPill: line.bgPill || 'none',
+      shadow: line.shadow,
+      glow: line.glow,
+      strokeColor: line.strokeColor,
+      strokeWidth: line.strokeWidth,
+      textShadow: line.textShadow,
+    }));
+
+    setTextLayers((prev) => [...prev, ...newLayers]);
+    if (newLayers[0]) {
+      setSelectedLayerId(newLayers[0].id);
+    }
+    addToast('success', `Added "${combo.name}" font preset!`);
   }
 
   function addElementPreset(preset: ElementPreset) {
@@ -887,10 +1178,7 @@ export default function BGRemoveWorkspace({
       let exportWidth = cutoutImg.width;
       let exportHeight = cutoutImg.height;
 
-      if (bgImg && bgImg.naturalWidth > 0 && bgImg.naturalHeight > 0) {
-        exportWidth = bgImg.naturalWidth;
-        exportHeight = bgImg.naturalHeight;
-      } else if (cropRatio !== 'free') {
+      if (cropRatio !== 'free') {
         const [rw, rh] = cropRatio.split(':').map(Number);
         if (rw && rh) {
           const targetRatio = rw / rh;
@@ -922,7 +1210,24 @@ export default function BGRemoveWorkspace({
       if (bgImg) {
         ctx.save();
         if (bgBlur > 0) ctx.filter = `blur(${bgBlur * 2}px)`;
-        ctx.drawImage(bgImg, 0, 0, exportWidth, exportHeight);
+
+        // Cover the canvas accurately (matching object-cover, centered)
+        const bgRatio = bgImg.naturalWidth / bgImg.naturalHeight;
+        const targetRatio = exportWidth / exportHeight;
+        let sx = 0;
+        let sy = 0;
+        let sWidth = bgImg.naturalWidth;
+        let sHeight = bgImg.naturalHeight;
+
+        if (bgRatio > targetRatio) {
+          sWidth = bgImg.naturalHeight * targetRatio;
+          sx = (bgImg.naturalWidth - sWidth) / 2;
+        } else {
+          sHeight = bgImg.naturalWidth / targetRatio;
+          sy = (bgImg.naturalHeight - sHeight) / 2;
+        }
+
+        ctx.drawImage(bgImg, sx, sy, sWidth, sHeight, 0, 0, exportWidth, exportHeight);
         ctx.restore();
 
         if (bgDarken > 0) {
@@ -932,6 +1237,8 @@ export default function BGRemoveWorkspace({
       } else if (customBgColor) {
         ctx.fillStyle = customBgColor;
         ctx.fillRect(0, 0, exportWidth, exportHeight);
+      } else if (selectedBg.gradient) {
+        drawCanvasGradient(ctx, selectedBg.gradient.angle || 135, selectedBg.gradient.stops, exportWidth, exportHeight);
       } else if (selectedBg.fill) {
         ctx.fillStyle = selectedBg.fill;
         ctx.fillRect(0, 0, exportWidth, exportHeight);
@@ -951,7 +1258,7 @@ export default function BGRemoveWorkspace({
       const cutoutCenterX = exportWidth / 2 + currentTf.relX * exportWidth;
       const cutoutCenterY = exportHeight / 2 + currentTf.relY * exportHeight;
 
-      const fitFactor = bgImg ? 0.75 : 1.0;
+      const fitFactor = 1.0;
       const baseFit = Math.min((exportWidth * fitFactor) / cutoutImg.width, (exportHeight * fitFactor) / cutoutImg.height, 1);
       const drawW = cutoutImg.width * baseFit * currentTf.scale;
       const drawH = cutoutImg.height * baseFit * currentTf.scale;
@@ -1059,6 +1366,11 @@ export default function BGRemoveWorkspace({
   const filteredElements = ELEMENT_PRESETS.filter((p) => {
     if (elementCategory === 'all') return true;
     return p.category === elementCategory;
+  });
+
+  const filteredFontCombinations = FONT_COMBINATIONS.filter((c) => {
+    if (fontComboCategory === 'all') return true;
+    return c.category === fontComboCategory;
   });
 
   /* ----------------------------------------------------------
@@ -1461,7 +1773,7 @@ export default function BGRemoveWorkspace({
               cutoutTool={cutoutTool}
               brushSize={brushSize}
               backgroundStyle={selectedBg.style}
-              customBgColor={customBgColor || selectedBg.fill || undefined}
+              customBgColor={customBgColor || selectedBg.gradient?.css || selectedBg.fill || undefined}
               customBgImage={customBgImage}
               subjectBgBlur={subjectBgBlur}
               bgBlur={bgBlur}
@@ -1498,6 +1810,11 @@ export default function BGRemoveWorkspace({
               textLayers={textLayers}
               elementLayers={elementLayers}
               selectedLayerId={selectedLayerId}
+              onRetry={() => {
+                if (selected) {
+                  processJob(selected, selected.model || bgModelKey);
+                }
+              }}
               onSelectLayer={handleSelectLayer}
               onUpdateTextLayerPosition={(id, x, y) => updateTextLayer(id, { x, y })}
               onUpdateElementLayerPosition={(id, x, y) => updateElementLayer(id, { x, y })}
@@ -1926,57 +2243,141 @@ export default function BGRemoveWorkspace({
                     )}
 
                     {bgSubTab === 'color' && (
-                      <div className="flex flex-col gap-3">
-                        <span className="font-bold text-slate-800 dark:text-white">Backdrop color</span>
-                        <div className="grid grid-cols-4 gap-2.5">
-                          {COLOR_PRESETS.map((preset) => (
+                      <div className="flex flex-col gap-4">
+                        {/* 1. SOLID COLORS SECTION */}
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-slate-800 dark:text-white flex items-center gap-1.5">
+                              <span></span> Solid colors
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-4 gap-2.5">
+                            {/* 1a. Transparent preset */}
                             <button
-                              key={preset.id}
+                              key={COLOR_PRESETS[0].id}
                               type="button"
-                              title={preset.label}
-                              aria-label={`Use ${preset.label} backdrop`}
-                              aria-pressed={selectedBg.id === preset.id && !customBgColor && !customBgImage}
+                              title={COLOR_PRESETS[0].label}
+                              aria-label={`Use ${COLOR_PRESETS[0].label} backdrop`}
+                              aria-pressed={selectedBg.id === COLOR_PRESETS[0].id && !customBgColor && !customBgImage}
                               onClick={() => {
                                 recordEditorEdit();
-                                setSelectedBg(preset);
+                                setSelectedBg(COLOR_PRESETS[0]);
                                 setCustomBgColor(undefined);
                                 setCustomBgImage(undefined);
                                 setSubjectBgBlur(0);
                               }}
-                              className={`relative aspect-square rounded-xl border-2 transition cursor-pointer ${selectedBg.id === preset.id && !customBgColor && !customBgImage
-                                ? 'border-[#00FF85] ring-2 ring-[#00FF85]/20'
-                                : 'border-transparent hover:border-white/40'
-                                }`}
+                              className={`relative aspect-square rounded-xl border-2 transition cursor-pointer ${
+                                selectedBg.id === COLOR_PRESETS[0].id && !customBgColor && !customBgImage
+                                  ? 'border-[#00FF85] ring-2 ring-[#00FF85]/20'
+                                  : 'border-transparent hover:border-white/40'
+                              }`}
                             >
                               <span
-                                className={`absolute inset-0 rounded-[10px] border border-black/10 ${preset.style}`}
-                                style={preset.fill ? { backgroundColor: preset.fill } : {}}
+                                className={`absolute inset-0 rounded-[10px] border border-black/10 ${COLOR_PRESETS[0].style || ''}`}
                               />
-                              {preset.id === 'transparent' && (
-                                <svg className="absolute left-1/2 top-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                  <path fillRule="evenodd" clipRule="evenodd" d="M12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3ZM5 12C5 8.13401 8.13401 5 12 5C13.5725 5 15.0239 5.51851 16.1925 6.39389L6.39389 16.1925C5.51851 15.0239 5 13.5725 5 12ZM7.80819 17.6067C8.97671 18.4817 10.4278 19 12 19C15.866 19 19 15.866 19 12C19 10.4278 18.4817 8.97671 17.6067 7.80819L7.80819 17.6067Z" fill="currentColor" />
-                                </svg>
-                              )}
+                              <svg className="absolute left-1/2 top-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path fillRule="evenodd" clipRule="evenodd" d="M12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3ZM5 12C5 8.13401 8.13401 5 12 5C13.5725 5 15.0239 5.51851 16.1925 6.39389L6.39389 16.1925C5.51851 15.0239 5 13.5725 5 12ZM7.80819 17.6067C8.97671 18.4817 10.4278 19 12 19C15.866 19 19 15.866 19 12C19 10.4278 18.4817 8.97671 17.6067 7.80819L7.80819 17.6067Z" fill="currentColor" />
+                              </svg>
                             </button>
-                          ))}
-                          <div className="relative">
-                            <div className={`relative aspect-square w-full overflow-hidden rounded-xl border-2 ${customBgColor ? 'border-[#00FF85] ring-2 ring-[#00FF85]/20' : 'border-slate-300 dark:border-white/15'}`}>
-                              <span className="absolute inset-0 rounded-[10px]" style={{ background: customBgColor || 'linear-gradient(135deg, #f72585 0%, #7b2ff7 22%, #247bff 44%, #00c9a7 66%, #ffb703 84%, #f72585 100%)' }} />
-                              <span className="pointer-events-none absolute inset-0 flex items-center justify-center text-xl font-medium text-white drop-shadow">+</span>
-                              <input
-                                type="color"
-                                value={customBgColor || '#ffffff'}
-                                onChange={(event) => {
+
+                            {/* 1b. Custom Color Picker - Positioned right after transparent! */}
+                            <div className="relative">
+                              <div
+                                className={`relative aspect-square w-full overflow-hidden rounded-xl border-2 transition cursor-pointer ${
+                                  customBgColor ? 'border-[#00FF85] ring-2 ring-[#00FF85]/20' : 'border-slate-300 dark:border-white/15 hover:border-white/40'
+                                }`}
+                              >
+                                <span
+                                  className="absolute inset-0 rounded-[10px]"
+                                  style={{
+                                    background: customBgColor || 'linear-gradient(135deg, #f72585 0%, #7b2ff7 22%, #247bff 44%, #00c9a7 66%, #ffb703 84%, #f72585 100%)',
+                                  }}
+                                />
+                                <span className="pointer-events-none absolute inset-0 flex items-center justify-center text-xl font-medium text-white drop-shadow">
+                                  +
+                                </span>
+                                <input
+                                  type="color"
+                                  value={customBgColor || '#ffffff'}
+                                  onChange={(event) => {
+                                    recordEditorEdit();
+                                    setCustomBgColor(event.target.value);
+                                    setCustomBgImage(undefined);
+                                    setSubjectBgBlur(0);
+                                  }}
+                                  className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                                  aria-label="Open custom backdrop color picker"
+                                  title="Pick custom color"
+                                />
+                              </div>
+                            </div>
+
+                            {/* 1c. All Other Solid Colors */}
+                            {COLOR_PRESETS.slice(1).map((preset) => (
+                              <button
+                                key={preset.id}
+                                type="button"
+                                title={preset.label}
+                                aria-label={`Use ${preset.label} backdrop`}
+                                aria-pressed={selectedBg.id === preset.id && !customBgColor && !customBgImage}
+                                onClick={() => {
                                   recordEditorEdit();
-                                  setCustomBgColor(event.target.value);
+                                  setSelectedBg(preset);
+                                  setCustomBgColor(undefined);
                                   setCustomBgImage(undefined);
                                   setSubjectBgBlur(0);
                                 }}
-                                className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                                aria-label="Open custom backdrop color picker"
-                                title="Custom color"
-                              />
-                            </div>
+                                className={`relative aspect-square rounded-xl border-2 transition cursor-pointer ${
+                                  selectedBg.id === preset.id && !customBgColor && !customBgImage
+                                    ? 'border-[#00FF85] ring-2 ring-[#00FF85]/20'
+                                    : 'border-transparent hover:border-white/40'
+                                }`}
+                              >
+                                <span
+                                  className={`absolute inset-0 rounded-[10px] border border-black/10 ${preset.style || ''}`}
+                                  style={preset.fill ? { backgroundColor: preset.fill } : {}}
+                                />
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* 2. GRADIENT COLORS SECTION */}
+                        <div className="flex flex-col gap-2 pt-2 border-t border-slate-200 dark:border-white/10">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-slate-800 dark:text-white flex items-center gap-1.5">
+                              Gradient Colors
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-4 gap-2.5">
+                            {GRADIENT_PRESETS.map((preset) => (
+                              <button
+                                key={preset.id}
+                                type="button"
+                                title={preset.label}
+                                aria-label={`Use ${preset.label} backdrop gradient`}
+                                aria-pressed={selectedBg.id === preset.id && !customBgColor && !customBgImage}
+                                onClick={() => {
+                                  recordEditorEdit();
+                                  setSelectedBg(preset);
+                                  setCustomBgColor(undefined);
+                                  setCustomBgImage(undefined);
+                                  setSubjectBgBlur(0);
+                                }}
+                                className={`relative aspect-square rounded-xl border-2 transition cursor-pointer ${
+                                  selectedBg.id === preset.id && !customBgColor && !customBgImage
+                                    ? 'border-[#00FF85] ring-2 ring-[#00FF85]/20'
+                                    : 'border-transparent hover:border-white/40'
+                                }`}
+                              >
+                                <span
+                                  className="absolute inset-0 rounded-[10px] border border-black/10 shadow-inner"
+                                  style={{ background: preset.gradient?.css }}
+                                />
+                              </button>
+                            ))}
                           </div>
                         </div>
                       </div>
@@ -2663,73 +3064,161 @@ export default function BGRemoveWorkspace({
 
                     {/* DESIGN: TEXT SECTION */}
                     {designSubTab === 'text' && (
-                      <div className="flex flex-col gap-3">
-                        <button
-                          type="button"
-                          onClick={() => addCustomText('Your text', 32)}
-                          className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#00FF85] px-3 py-2.5 text-xs font-extrabold text-[#07110B] shadow-md shadow-[#00FF85]/10 transition hover:bg-[#35FFA0] active:scale-[0.99]"
-                        >
-                          <span className="text-base font-light">+</span>
-                          <span>Add text box</span>
-                        </button>
+                      <div className="flex flex-col gap-4">
+                        {/* 1. Quick Add Text Buttons */}
+                        <div className="flex flex-col gap-2.5">
+                          <button
+                            type="button"
+                            onClick={() => addCustomText('Your text', 32)}
+                            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#00FF85] px-3 py-2.5 text-xs font-extrabold text-[#07110B] shadow-md shadow-[#00FF85]/10 transition hover:bg-[#35FFA0] active:scale-[0.99] cursor-pointer"
+                          >
+                            <span className="text-base font-light">+</span>
+                            <span>Add text box</span>
+                          </button>
 
-                        <div className="grid grid-cols-3 gap-2">
+                          <div className="grid grid-cols-3 gap-2">
+                            <button
+                              type="button"
+                              onClick={() => addCustomText('Heading text', 44)}
+                              className="flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-2.5 text-center transition hover:border-[#00B96B] hover:bg-slate-50 dark:border-white/10 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] cursor-pointer"
+                            >
+                              <span className="text-sm font-extrabold text-slate-900 dark:text-white">Heading</span>
+                              <span className="text-[10px] text-slate-500 dark:text-white/40">44px</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => addCustomText('Subheading text', 26)}
+                              className="flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-2.5 text-center transition hover:border-[#00B96B] hover:bg-slate-50 dark:border-white/10 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] cursor-pointer"
+                            >
+                              <span className="text-xs font-bold text-slate-800 dark:text-white/90">Subheading</span>
+                              <span className="text-[10px] text-slate-500 dark:text-white/40">26px</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => addCustomText('Body description text', 18)}
+                              className="flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-2.5 text-center transition hover:border-[#00B96B] hover:bg-slate-50 dark:border-white/10 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] cursor-pointer"
+                            >
+                              <span className="text-[11px] font-medium text-slate-700 dark:text-white/70">Body</span>
+                              <span className="text-[10px] text-slate-500 dark:text-white/40">18px</span>
+                            </button>
+                          </div>
+
+                          {/* Quick upload custom font banner */}
                           <button
                             type="button"
-                            onClick={() => addCustomText('Heading text', 44)}
-                            className="flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-2.5 text-center transition hover:border-[#00B96B] hover:bg-slate-50 dark:border-white/10 dark:bg-white/[0.04] dark:hover:bg-white/[0.08]"
+                            onClick={() => fontFileInputRef.current?.click()}
+                            className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-[#00B96B]/40 bg-[#00FF85]/5 px-3 py-2 text-[11px] font-bold text-[#087847] transition hover:bg-[#00FF85]/10 dark:text-[#00FF85] cursor-pointer"
                           >
-                            <span className="text-sm font-extrabold text-slate-900 dark:text-white">Heading</span>
-                            <span className="text-[10px] text-slate-500 dark:text-white/40">44px</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => addCustomText('Subheading text', 26)}
-                            className="flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-2.5 text-center transition hover:border-[#00B96B] hover:bg-slate-50 dark:border-white/10 dark:bg-white/[0.04] dark:hover:bg-white/[0.08]"
-                          >
-                            <span className="text-xs font-bold text-slate-800 dark:text-white/90">Subheading</span>
-                            <span className="text-[10px] text-slate-500 dark:text-white/40">26px</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => addCustomText('Body description text', 18)}
-                            className="flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-2.5 text-center transition hover:border-[#00B96B] hover:bg-slate-50 dark:border-white/10 dark:bg-white/[0.04] dark:hover:bg-white/[0.08]"
-                          >
-                            <span className="text-[11px] font-medium text-slate-700 dark:text-white/70">Body</span>
-                            <span className="text-[10px] text-slate-500 dark:text-white/40">18px</span>
+                            <Upload className="h-3.5 w-3.5" />
+                            <span>Upload custom font (.ttf, .otf, .woff2)</span>
                           </button>
                         </div>
 
-                        {/* Quick upload custom font banner */}
-                        <button
-                          type="button"
-                          onClick={() => fontFileInputRef.current?.click()}
-                          className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-[#00B96B]/40 bg-[#00FF85]/5 px-3 py-2 text-[11px] font-bold text-[#087847] transition hover:bg-[#00FF85]/10 dark:text-[#00FF85]"
-                        >
-                          <Upload className="h-3.5 w-3.5" />
-                          <span>Upload custom font (.ttf, .otf, .woff2)</span>
-                        </button>
-
-                        {/* Selected Text Layer Inspector */}
-                        {selectedTextLayer ? (
-                          <ModernTextInspector
-                            layer={selectedTextLayer}
-                            fonts={allFonts}
-                            onUpdate={(changes) => updateTextLayer(selectedTextLayer.id, changes)}
-                            onDelete={() => deleteLayer(selectedTextLayer.id)}
-                            onDuplicate={() => duplicateLayer(selectedTextLayer.id)}
-                            onUploadFontClick={() => fontFileInputRef.current?.click()}
-                          />
-                        ) : (
-                          <div className="rounded-xl border border-dashed border-slate-200 p-4 text-center dark:border-white/10">
-                            <p className="text-xs font-semibold text-slate-600 dark:text-white/60">
-                              No text selected
-                            </p>
-                            <p className="mt-1 text-[11px] text-slate-400 dark:text-white/40">
-                              Double-click any text on the artboard to edit directly, or select a text layer to customize.
-                            </p>
+                        {/* 2. Selected Text Layer Inspector */}
+                        {selectedTextLayer && (
+                          <div className="flex flex-col gap-2 pt-1 border-t border-slate-200 dark:border-white/10">
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/40">
+                              Selected Text Properties
+                            </span>
+                            <ModernTextInspector
+                              layer={selectedTextLayer}
+                              fonts={allFonts}
+                              onUpdate={(changes) => updateTextLayer(selectedTextLayer.id, changes)}
+                              onDelete={() => deleteLayer(selectedTextLayer.id)}
+                              onDuplicate={() => duplicateLayer(selectedTextLayer.id)}
+                              onUploadFontClick={() => fontFileInputRef.current?.click()}
+                            />
                           </div>
                         )}
+
+                        {/* 3. PREMIUM FONT COMBINATIONS (Canva Style - Images 2 & 3) */}
+                        <div className="flex flex-col gap-2.5 pt-2 border-t border-slate-200 dark:border-white/10">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-slate-800 dark:text-white flex items-center gap-1.5">
+                              <span className="text-sm">✨</span> Font combinations
+                            </span>
+                            <span className="text-[10px] font-semibold text-slate-400 dark:text-white/40">
+                              {filteredFontCombinations.length} presets
+                            </span>
+                          </div>
+
+                          {/* Category Filter Pills */}
+                          <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none">
+                            {[
+                              { id: 'all', label: 'All' },
+                              { id: 'social', label: 'Social' },
+                              { id: 'ecommerce', label: 'Shop' },
+                              { id: 'neon', label: 'Neon' },
+                              { id: 'retro', label: 'Retro' },
+                              { id: 'luxury', label: 'Luxury' },
+                              { id: 'events', label: 'Events' },
+                              { id: 'lifestyle', label: 'Cafe & Food' },
+                            ].map((cat) => (
+                              <button
+                                key={cat.id}
+                                type="button"
+                                onClick={() => setFontComboCategory(cat.id)}
+                                className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition shrink-0 cursor-pointer ${
+                                  fontComboCategory === cat.id
+                                    ? 'bg-[#00FF85] text-slate-900 shadow-sm'
+                                    : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white'
+                                }`}
+                              >
+                                {cat.label}
+                              </button>
+                            ))}
+                          </div>
+
+                          {/* 2-Column Grid of Canva Style Font Combination Cards */}
+                          <div className="grid grid-cols-2 gap-2.5">
+                            {filteredFontCombinations.map((combo) => (
+                              <button
+                                key={combo.id}
+                                type="button"
+                                onClick={() => addFontCombination(combo)}
+                                className="relative group flex flex-col items-center justify-center p-3.5 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.03] hover:border-[#00FF85] hover:bg-slate-100 dark:hover:bg-white/[0.08] transition shadow-sm hover:shadow-md min-h-[105px] text-center overflow-hidden cursor-pointer active:scale-[0.98]"
+                                title={`Add ${combo.name}`}
+                              >
+                                {/* Styled typography preview */}
+                                <div className="flex flex-col items-center justify-center gap-0.5 pointer-events-none select-none">
+                                  {combo.lines.map((l, i) => (
+                                    <span
+                                      key={i}
+                                      style={{
+                                        fontFamily: l.fontFamily,
+                                        fontSize: `${Math.round(l.fontSize * 0.52)}px`,
+                                        fontWeight: l.fontWeight,
+                                        fontStyle: l.italic ? 'italic' : 'normal',
+                                        letterSpacing: l.letterSpacing ? `${l.letterSpacing * 0.5}px` : undefined,
+                                        textTransform: l.uppercase ? 'uppercase' : 'none',
+                                        color: l.color,
+                                        WebkitTextStroke: l.strokeWidth && l.strokeColor ? `${Math.max(1, Math.round(l.strokeWidth * 0.6))}px ${l.strokeColor}` : undefined,
+                                        textShadow: l.textShadow
+                                          ? l.textShadow
+                                          : l.glow
+                                          ? `0 0 12px ${l.color}`
+                                          : l.shadow
+                                          ? '0 2px 8px rgba(0,0,0,0.8)'
+                                          : undefined,
+                                        backgroundColor: l.bgPill === 'black' ? 'rgba(9, 9, 13, 0.85)' : l.bgPill === 'mint' ? '#00FF85' : undefined,
+                                        padding: l.bgPill && l.bgPill !== 'none' ? '1px 6px' : undefined,
+                                        borderRadius: l.bgPill && l.bgPill !== 'none' ? '6px' : undefined,
+                                      }}
+                                      className="leading-tight transition-transform group-hover:scale-105"
+                                    >
+                                      {l.uppercase ? l.text.toUpperCase() : l.text}
+                                    </span>
+                                  ))}
+                                </div>
+
+                                {/* Canva Crown Badge (bottom right corner, exact UI from user images 2 & 3!) */}
+                                <div className="absolute bottom-1.5 right-1.5 w-5 h-5 rounded-md bg-neutral-900/80 dark:bg-black/60 border border-white/10 flex items-center justify-center text-[10px] shadow-sm pointer-events-none group-hover:bg-[#00FF85]/20 group-hover:border-[#00FF85]/40 transition">
+                                  <span className="text-[#FBBF24]">👑</span>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     )}
 

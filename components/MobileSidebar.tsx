@@ -1,8 +1,10 @@
 import React, { useEffect } from 'react';
-import { X, Home, Eraser, Maximize, ChevronRight, Trash2, ExternalLink, Cpu } from 'lucide-react';
+import { X, Home, Eraser, Maximize, ChevronRight, Trash2, ExternalLink, Cpu, Globe, Check } from 'lucide-react';
 import type { ViewTab } from '../types';
 import Logo from './Logo';
 import { EngineRow } from './Navbar';
+import { useApp } from './AppProvider';
+import { SITE_LANGUAGES } from '../lib/i18n';
 import Link from 'next/link';
 
 type Engine = 'webgpu' | 'wasm' | null;
@@ -51,6 +53,8 @@ export default function MobileSidebar({
   onClearModelCache,
   isOnline = true,
 }: MobileSidebarProps) {
+  const { currentLang, setCurrentLang } = useApp();
+
   // Close on Escape while open
   useEffect(() => {
     if (!open) return;
@@ -175,6 +179,45 @@ export default function MobileSidebar({
               {modelStatus}
             </p>
           )}
+
+          {/* LANGUAGE SELECTOR */}
+          <div className="pt-2 border-t border-white/[0.06]">
+            <div className="mb-2 flex items-center justify-between text-[11px] font-semibold text-neutral-400">
+              <span className="flex items-center gap-1.5"><Globe size={13} className="text-violet-300" /> Language</span>
+              <span className="font-mono text-[10px] text-white/50 uppercase font-bold">{currentLang}</span>
+            </div>
+            <div className="grid grid-cols-2 gap-1.5">
+              {SITE_LANGUAGES.map((lang) => {
+                const isSelected = currentLang === lang.code;
+                return (
+                  <button
+                    key={lang.code}
+                    type="button"
+                    disabled={!lang.active}
+                    onClick={() => {
+                      if (lang.active) {
+                        setCurrentLang(lang.code);
+                      }
+                    }}
+                    className={`flex items-center justify-between rounded-xl px-2.5 py-2 text-xs transition-colors ${
+                      isSelected
+                        ? 'border border-[#00ff85]/30 bg-[#00ff85]/10 font-bold text-white'
+                        : lang.active
+                        ? 'border border-white/10 bg-white/[0.04] text-neutral-300 hover:bg-white/[0.08]'
+                        : 'border border-white/5 bg-transparent text-neutral-600 opacity-40 cursor-not-allowed'
+                    }`}
+                  >
+                    <span>{lang.nativeLabel}</span>
+                    {isSelected ? (
+                      <Check size={12} className="text-[#00ff85]" />
+                    ) : !lang.active ? (
+                      <span className="text-[9px] text-neutral-500 font-mono">Soon</span>
+                    ) : null}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           {onClearModelCache && (
             <div className="flex flex-col gap-1.5 pt-2.5">

@@ -11,6 +11,7 @@ import '@/styles/solving-orb.css';
 import '@/styles/upscaling-loader.css';
 import '@/styles/bgremove-sections.css';
 import '@/styles/home.css';
+import { Analytics } from "@vercel/analytics/next";
 
 const SITE_URL = 'https://pixelify.me';
 
@@ -194,6 +195,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           crossOrigin="anonymous"
           strategy="afterInteractive"
         />
+
+        <Analytics />
       </body>
     </html>
   );

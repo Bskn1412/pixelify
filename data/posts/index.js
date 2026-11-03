@@ -36,31 +36,16 @@
  */
 
 import { POSTS_EN } from './posts_en';
-import { POSTS_FR } from './posts_fr';
-import { POSTS_ZH } from './posts_zh';
-import { POSTS_JA } from './posts_ja';
-import { POSTS_HI } from './posts_hi';
-import { POSTS_RU } from './posts_ru';
 
 /** Supported UI languages, in display order. `code` is the URL segment. */
 export const LANGUAGES = [
   { code: 'en', label: 'English', short: 'EN' },
-  { code: 'fr', label: 'Français', short: 'FR' },
-  { code: 'zh', label: '中文', short: 'ZH' },
-  { code: 'ja', label: '日本語', short: 'JA' },
-  { code: 'hi', label: 'हिन्दी', short: 'HI' },
-  { code: 'ru', label: 'Русский', short: 'RU' },
 ];
 
 export const DEFAULT_LANG = 'en';
 
 const SOURCES = {
   en: POSTS_EN,
-  fr: POSTS_FR,
-  zh: POSTS_ZH,
-  ja: POSTS_JA,
-  hi: POSTS_HI,
-  ru: POSTS_RU,
 };
 
 export function isSupportedLang(code) {
