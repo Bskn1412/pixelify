@@ -1,0 +1,753 @@
+{
+  "common": {
+    "appName": "Pixelify",
+    "tagline": "完全プライベート・端末内完結の AI 画像編集ツール",
+    "loading": "読み込み中...",
+    "error": "エラーが発生しました",
+    "success": "完了",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "download": "ダウンロード",
+    "remove": "削除",
+    "clear": "クリア",
+    "reset": "リセット",
+    "back": "戻る",
+    "next": "次へ",
+    "soon": "近日公開",
+    "active": "有効",
+    "online": "オンライン",
+    "offline": "オフライン",
+    "reconnected": "オンライン",
+    "live": "リアルタイム",
+    "original": "元画像",
+    "enhanced": "高画質化後",
+    "cutout": "切り抜き"
+  },
+  "nav": {
+    "home": "ホーム",
+    "bgRemove": "背景透過・切り抜き",
+    "upscaler": "AI 超解像拡大",
+    "blogs": "ブログ",
+    "settingsTitle": "設定と環境設定",
+    "processingEngines": "処理エンジン",
+    "webgpuSupport": "WebGPU サポート状況",
+    "checking": "確認中...",
+    "available": "利用可能",
+    "unavailable": "利用不可",
+    "clearModels": "モデルキャッシュの削除",
+    "clearing": "削除中…",
+    "clearModelsDesc": "ブラウザ内に保存された AI モデルデータを削除します",
+    "learnWebgpu": "WebGPU について詳しく知る",
+    "selectLanguage": "表示言語を選択"
+  },
+  "hero": {
+    "your": "あなたの",
+    "images": "写真",
+    "device": "デバイス",
+    "control": "主権",
+    "powered": "駆動",
+    "by": "技術",
+    "brand": "Pixelify",
+    "subtitle": "ブラウザ内で完結するローカル AI。画像の拡大・復元・背景削除をクラウド送信なしで完全プライベートに実行します。",
+    "launchBg": "背景切り抜きを開始",
+    "launchUpscaler": "超解像拡大を開始",
+    "scrollDown": "下へスクロール"
+  },
+  "homeStudio": {
+    "badge": "スタジオを選択",
+    "title": "あらゆる画像に対応する専用 AI ツール",
+    "subtitle": "目的に合わせて最適化された高機能ワークステーションをお選びください。"
+  },
+  "whyPixelify": {
+    "eyebrow": "PIXELIFY が選ばれる理由",
+    "titlePrefix": "多くのクリエイターや開発者が選ぶ",
+    "subtitle": "ブラウザ内でダイレクトに動作するエンタープライズ級ニューラルネットワーク。待ち時間なし、課金トークンなし、プライバシー侵害なし。",
+    "zeroCloudTag": "クラウド送信ゼロ",
+    "zeroCloudBadge": "100% プライベート",
+    "zeroCloudTitle": "あなたの画像はあなたの手元に",
+    "zeroCloudDesc": "Pixelify はブラウザ内部だけで画像を処理します。外部サーバーにアップロードされることは一切ありません。",
+    "sandboxing": "クライアント側サンドボックス：",
+    "sandboxingActive": "稼働中",
+    "processedOnDevice": "端末内オンデバイス処理",
+    "webgpuTag": "WebGPU + WASM",
+    "webgpuBadge": "ネイティブ級の速さ",
+    "webgpuTitle": "GPU ハードウェアアクセラレーション",
+    "webgpuDesc": "LiteRT と WebGPU を介してローカル GPU を直接駆動。ネットワーク通信を排除し、瞬時の高速処理を実現します。",
+    "engineHardware": "ハードウェアエンジン：",
+    "engineParallelism": "GPU コア並列処理",
+    "neuralTag": "Chopper & Vitality",
+    "neuralBadge": "8K 解像度対応",
+    "neuralTitle": "最先端ニューラルモデル",
+    "neuralDesc": "数百万枚の高解像度画像で学習。髪の毛のほつれやガラスの透明感、微細な質感を不自然なアーティファクトなしに再現します。",
+    "paywallTag": "完全無料・課金なし",
+    "paywallBadge": "透かしなし",
+    "paywallTitle": "無制限の生成と処理",
+    "paywallDesc": "月額プランやクレジット消費はありません。必要なだけ何枚でも高画質化や背景切り抜きが可能です。",
+    "offlineTag": "永続キャッシュ",
+    "offlineBadge": "オフライン対応",
+    "offlineTitle": "機内モードでもどこでも動作",
+    "offlineDesc": "モデルデータはブラウザのキャッシュに自動保存されます。一度読み込めば、ネット接続がなくても使用できます。",
+    "proStudioTag": "プロ向けキャンバス",
+    "proStudioBadge": "一括処理対応",
+    "proStudioTitle": "直感的なクリエイティブスタジオ",
+    "proStudioDesc": "スプリット画面でのビフォーアフター比較、透過 Alpha マット、背景色の自由変更、可逆 PNG/WebP 書き出しに対応。",
+    "featureSubPixel": "サブピクセル精度マスク",
+    "featureScaling": "2倍・4倍・8倍 拡大",
+    "featureFormats": "透過 PNG / WebP 形式",
+    "featureBatch": "ドラッグ＆ドロップ一括処理",
+    "cloudTitle": "従来のクラウド型 AI サービス",
+    "cloudPoint1": "画像データが外部サーバーやクラウドログに送信・保存される",
+    "cloudPoint2": "高額な月額サブスクリプションや厳しいクレジット枚数制限",
+    "cloudPoint3": "無料プランでは画質が強制的に圧縮され、透かし（ウォーターマーク）が付く",
+    "localTitle": "Pixelify ブラウザ内ローカル AI",
+    "localPoint1": "100% プライベート。写真データはブラウザの RAM 内にとどまります",
+    "localPoint2": "完全無料、無制限処理、サーバー待ち行列なし",
+    "localPoint3": "非圧縮の高精度 PNG、WebP、JPG でそのままダウンロード可能",
+    "footerPill1": "ローカルファーストの安心設計",
+    "footerPill2": "日常的な画像編集タスクをスピーディに解決"
+  },
+  "homeFaq": {
+    "titlePrefix": "よくある",
+    "titleMiddle": "ご質問と",
+    "titleSuffix": "回答",
+    "items": [
+      {
+        "q": "サーバーに画像をアップロードせずにどうやって処理しているのですか？",
+        "a": "WebGPU と ONNX Runtime を使用し、AI モデルをブラウザ内部で直接実行するため、画像が外部サーバーへ送信されることはありません。"
+      },
+      {
+        "q": "本当に完全無料で透かし（ウォーターマーク）や課金はありませんか？",
+        "a": "はい。会員登録やサブスクリプション、クレジットの購入は一切不要です。透かしも付かず自由にダウンロードできます。"
+      },
+      {
+        "q": "拡大可能な最大画像サイズと解像度はどのくらいですか？",
+        "a": "最大 40 MB、最大 16K 解像度（16,384 × 16,384 px）まで対応しています（お使いのデバイスのメモリ容量に依存します）。"
+      },
+      {
+        "q": "インターネット接続がないオフライン環境でも使えますか？",
+        "a": "初回アクセス時に AI モデルがブラウザ内にキャッシュされるため、次回以降はオフラインや飛行機内でも処理が可能です。"
+      },
+      {
+        "q": "Chopper モデルは通常の背景削除ツールと何が違いますか？",
+        "a": "髪の毛やペットの毛並み、細いエッジを正確に認識するように設計されており、輪郭がカクつくのを防ぎます。"
+      },
+      {
+        "q": "スマートフォンやタブレット端末でも利用できますか？",
+        "a": "はい！WebGPU または WebAssembly に対応した最新のモバイルブラウザでスムーズにご利用いただけます。"
+      },
+      {
+        "q": "個人のプライベート写真や機密性の高い業務データも安全ですか？",
+        "a": "完全に安全です。データはお使いの端末内のみで処理され、サイトのアクセス解析も編集内容にはアクセスできません。"
+      },
+      {
+        "q": "端末の容量を空けるためにダウンロードしたモデルを削除するには？",
+        "a": "設定メニューから「モデルキャッシュの削除」を選択することで、ブラウザ全体を初期化することなく AI データのみを安全に消去できます。"
+      }
+    ]
+  },
+  "upscaler": {
+    "badge": "端末内ニューラル超解像エンジン",
+    "title": "AI 画像超解像・高画質化",
+    "subtitle": "写真やイラストを最大 16K まで圧倒的な透明感で拡大。WebGPU によるローカル GPU 処理で、送信なし・トラッキングなしの安心設計。",
+    "dropzoneTitle": "拡大したい画像をここにドロップ",
+    "dropzoneSubtitle": "またはデバイスからファイルを選択",
+    "dropzoneLimits": "PNG, JPG, WebP（最大 15 MB まで）",
+    "modelSelection": "拡大モデルの選択",
+    "scaleFactor": "拡大倍率",
+    "faceEnhance": "顔認識フェイス復元",
+    "faceEnhanceDesc": "瞳、まつ毛、自然な肌の質感をクリアに復元します",
+    "denoise": "ノイズ除去",
+    "sharpen": "シャープネス強調",
+    "enhanceButton": "超解像拡大を実行",
+    "processing": "高画質化処理中…",
+    "downloadButton": "拡大画像をダウンロード",
+    "beforeAfter": "比較（元画像 / 高画質化後）",
+    "clearAll": "すべてクリア",
+    "original": "元画像",
+    "upscaled": "拡大後"
+  },
+  "upscaleCapabilities": {
+    "title": "圧倒的な再現性を追求",
+    "subtitle": "被写体切り抜きと超解像エンジンの強力なスイートが、このタブ内だけで完全に動作します。",
+    "detailTitle": "ディテール生成エンジン",
+    "detailDesc": "エッジ検出技術により、肌の質感や金属の光沢を自然に再現します。",
+    "speedTitle": "WebGPU 高速パイプライン",
+    "speedDesc": "GPU 直接実行と WASM フォールバックにより、ミリ秒単位の高速処理を実現します。",
+    "speedLabel": "一般的な GPU での高速パス処理時間",
+    "facesTitle": "人物の顔パーツ復元",
+    "facesDesc": "圧縮でぼやけてしまった瞳やまつ毛、表情のニュアンスを繊細に蘇らせます。",
+    "privacyTitle": "画像はブラウザの外に出ません",
+    "privacyDesc": "すべての演算はお使いの端末のチップ上で行われます。順番待ちもアカウント作成も不要です。",
+    "privacyBadge": "このデバイス内のみ",
+    "scaleTitle": "2倍から最大 16K 出力まで",
+    "scaleDesc": "タイル分割レンダリングにより、タブをクラッシュさせることなく超巨大キャンバスを処理します。",
+    "scaleLabel": "px 最大キャンバス辺",
+    "controlTitle": "ファイルごとの個別調整",
+    "controlDesc": "モデル、倍率、ノイズ除去、シャープネスなどを画像ごとに自由にカスタマイズ可能です。",
+    "titleLead": "スタジオ品質の",
+    "titleAccent": "プロ向けツール群が、",
+    "titleTail": "あなたのブラウザタブの中に。"
+  },
+  "upscaleJourney": {
+    "title": "利用の流れ",
+    "subtitle": "低画質のサムネイルから印刷可能な高解像度マスターまで、シンプルな 3 ステップ。",
+    "step1K": "01",
+    "step1Title": "画像を投入",
+    "step1Desc": "PNG、JPG、WebP をドラッグするか、Ctrl+V でクリップボードから直接貼り付けます。",
+    "step1Status": "準備完了",
+    "step2K": "02",
+    "step2Title": "モデルと倍率を選択",
+    "step2Desc": "高速なら Vitality、最高品質なら Pixel-Dance や Alpha-Satoru を選び、パラメータを調整します。",
+    "step2Status": "設定中",
+    "step3K": "03",
+    "step3Title": "AI がリアルタイム処理",
+    "step3Desc": "GPU 内でタイル状に高速復元。画像が外部サーバーへ送信されることはありません。",
+    "step3Status": "推論中",
+    "step4K": "04",
+    "step4Title": "可逆形式で保存",
+    "step4Desc": "透かしなし、圧縮劣化なしのフル解像度 PNG または WebP をダウンロードします。",
+    "step4Status": "保存完了",
+    "titleLead": "わずか4つのステップ。",
+    "titleItalic": "スタジオ級の仕上がり。"
+  },
+  "upscaleFaq": {
+    "titlePrefix": "よくある",
+    "titleMiddle": "ご質問と",
+    "titleSuffix": "回答",
+    "items": [
+      {
+        "q": "どのようにして 8K 相当の高解像度化を実現しているのですか？",
+        "a": "ニューラル超解像ネットワークが GPU 上で画像をタイルごとに分析し、質感や輪郭を正確に補完・再構成します。"
+      },
+      {
+        "q": "画像が外部のクラウドサーバーに送信されることはありますか？",
+        "a": "絶対にありません。WebGPU / WebAssembly を利用し、お使いのブラウザ内部のハードウェアだけで完結します。"
+      },
+      {
+        "q": "アカウント登録や有料ポイントの購入は必要ですか？",
+        "a": "不要です。メールアドレスの登録もクレジット購入もなく、いつでも何枚でも無料でお使いいただけます。"
+      },
+      {
+        "q": "保存できる形式は何ですか？透かしは入りますか？",
+        "a": "非可逆圧縮のない高精細 PNG および WebP 形式でダウンロードできます。透かしは一切入りません。"
+      },
+      {
+        "q": "一般的なノートパソコンやスマートフォンでも動きますか？",
+        "a": "はい。WebGPU 対応環境ではハードウェアアクセラレーションが働き、非対応環境でも自動で WebAssembly に切り替わります。"
+      },
+      {
+        "q": "4倍拡大にはどのくらいの時間がかかりますか？",
+        "a": "近年の一般的な GPU であれば、Turbo エンジンを使用することで約 1 秒前後で完了します。"
+      }
+    ]
+  },
+  "bgRemove": {
+    "badge": "無料 · オンデバイス · 高度なプライバシー",
+    "title": "AI 背景透過・切り抜きツール",
+    "subtitle": "被写体をわずか数秒でスタジオ品質で切り抜き。髪の毛、ガラス、細い輪郭もきれいに残せます。完全オフライン動作対応。",
+    "dropzoneTitle": "画像をドロップして切り抜き開始",
+    "dropzoneSubtitle": "またはファイルを選択",
+    "dropzoneLimits": "PNG, JPG, WebP（最大 20 MB まで）",
+    "refineDiablo": "Diablo 超高精度モードで再処理",
+    "diabloActive": "Diablo 超高精度モード稼働中",
+    "brushErase": "消しゴム",
+    "brushRestore": "復元ブラシ",
+    "brushSize": "ブラシサイズ",
+    "brushFeather": "ぼかし（フェザー）",
+    "backgroundColor": "背景色の変更",
+    "transparent": "透明背景",
+    "customColor": "カスタムカラー",
+    "solids": "標準単色カラー",
+    "gradients": "標準グラデーション",
+    "addPhoto": "背景に写真を追加",
+    "aspectRatio": "トリミング縦横比",
+    "textOverlay": "テキストを追加",
+    "downloadCutout": "透過 PNG を保存",
+    "tabCutout": "切り抜き",
+    "tabBackdrop": "背景設定",
+    "tabText": "文字入力",
+    "tabRefine": "微調整"
+  },
+  "bgSections": {
+    "marquee": [
+      "Chopper 高精度セグメンテーション",
+      "WebGPU 端末内実行",
+      "アップロード不要",
+      "髪の毛一本まで再現",
+      "透過 PNG 書き出し",
+      "ユーザー登録不要",
+      "無制限・完全無料"
+    ],
+    "pipelineStep1K": "入力",
+    "pipelineStep1Title": "素早くドロップ",
+    "pipelineStep1Desc": "画像をドラッグするかクリップボードから貼り付けるだけで、端末のメモリ上に即座に読み込まれます。",
+    "pipelineStep2K": "検出",
+    "pipelineStep2Title": "ニューラルバイラテラルマッティング",
+    "pipelineStep2Desc": "Chopper と Diablo が複雑な髪の毛や輪郭を高精度なサブピクセルマスクで識別します。",
+    "pipelineStep3K": "完成",
+    "pipelineStep3Title": "調整して保存",
+    "pipelineStep3Desc": "ブラシで微調整したり背景色を変えたりして、ワンクリックで透過 PNG、WebP、JPG に保存できます。",
+    "lensLive": "リアルタイム · 端末内実行",
+    "lensOriginal": "元画像",
+    "lensCutout": "切り抜き後",
+    "faqItems": [
+      {
+        "q": "無料で背景を削除するにはどうすればいいですか？",
+        "a": "背景削除ツールを開き、画像をドロップするだけで自動的に切り抜きが始まります。完了後、登録不要・透かしなしで透過 PNG を保存できます。"
+      },
+      {
+        "q": "Diablo モデルとは何ですか？Chopper との違いは？",
+        "a": "Chopper はあらゆる端末で高速に動く軽量モデルです。Diablo は 1024×1024 テンソルと高度なエッジマッティングを備えたフラッグシップモデルで、細い髪の毛、動物の毛並み、透明なガラス製品のハロー（白浮き）を完全に抑えて切り抜きます。"
+      },
+      {
+        "q": "どのような時に Diablo を使うべきですか？",
+        "a": "通常のネットショップ商品画像やロゴは Chopper で十分です。風になびく髪の毛のポートレート写真やペットの写真、ジュエリーなど、細部にこだわりたいときは Diablo をおすすめします。"
+      },
+      {
+        "q": "Diablo 超高精度モデルはどのように起動しますか？",
+        "a": "一度切り抜きを行った後、ツールバーに表示される「Diablo 超高精度モードで再処理」をクリックするだけで、最高解像度で再計算されます。"
+      },
+      {
+        "q": "Diablo もローカルで動作し、オフラインでも使えますか？",
+        "a": "はい。Chopper も Diablo も WebGPU と WebAssembly により 100% 端末内で動作するため、初回のキャッシュ後はネットなしで使えます。"
+      },
+      {
+        "q": "画像がサーバーにアップロードされることはありますか？",
+        "a": "ありません。写真はブラウザ内にとどまるため、機密保持が求められるデザイン案件や個人的な写真でも安心です。"
+      },
+      {
+        "q": "対応しているファイル形式と保存形式は？",
+        "a": "最大 20 MB までの PNG、JPG、WebP に対応しています。透過 PNG、透明度を保った WebP、白背景 JPG などで書き出せます。"
+      },
+      {
+        "q": "切り抜いた後に別の背景を合成できますか？",
+        "a": "はい！「背景設定」タブから透明、単色、グラデーションを選んだり、お好みの風景写真をアップロードして合成できます。"
+      },
+      {
+        "q": "風になびく髪や透明なグラスもきれいに抜けますか？",
+        "a": "はい。Chopper でも綺麗に仕上がりますが、Diablo モデルを使用すればスタジオ撮影のような自然な半透明透過が得られます。"
+      },
+      {
+        "q": "1枚目の処理が少し遅いのはなぜですか？",
+        "a": "初回使用時のみ AI モデルがブラウザのキャッシュに保存されるためです。2枚目以降は数秒で処理されます。"
+      }
+    ],
+    "showcaseEyebrow": "切り抜きスタジオ",
+    "showcaseTitleLead": "背景は、",
+    "showcaseTitleGone": "きれいに消える。",
+    "showcaseTitleSubject": "被写体だけが、",
+    "showcaseTitleStays": "美しく残る。",
+    "showcaseDesc": "ローカルGPUで動作する高精度セグメンテーションネットワークを採用。クラウドサービスへのアップロードが完了する前に、あなたの端末で切り抜きが完了します。",
+    "shotProduct": "商品カット · 01",
+    "shotPortrait": "人物写真 · 02",
+    "shotStudio": "スタジオ撮影 · 03",
+    "pipelineEyebrow": "パイプライン",
+    "pipelineTitleLead": "シンプルな3ステップ。",
+    "pipelineTitleItalic": "確かなプライバシー。",
+    "pipelineDesc": "ドラッグ＆ドロップから完成まで、1バイトも端末の外へ出ることなく処理されます。",
+    "pipelineHint": "被写体をロック · 端末内処理",
+    "precisionEyebrow": "輪郭の精密さ",
+    "precisionTitleLead": "ズームして、",
+    "precisionTitleItalic": "その目で確かめてください。",
+    "precisionDesc": "スライダーを動かして比較してください。左側が元の写真、右側が切り抜かれた被写体です。見たままの仕上がりでダウンロードできます。",
+    "statModel": "初回実行後にモデルを自動キャッシュ",
+    "statMax": "1画像あたりの最大容量",
+    "statFmt": "PNG · WebP · JPG 保存対応",
+    "statHw": "すべてあなたの端末上で演算処理",
+    "galleryEyebrow": "リアルタイム体験",
+    "galleryTitleLead": "サンプルを選択。",
+    "galleryTitleItalic": "一瞬で背景が分離。",
+    "galleryDesc": "実際にご自身の画像で使うものと全く同じAIモデルが動作します。下から選んですぐにお試しください。",
+    "sample1Name": "ストリートポートレート",
+    "sample1Tag": "ポートレート",
+    "sample2Name": "スタジオ撮影",
+    "sample2Tag": "スタジオ",
+    "sample3Name": "野生動物",
+    "sample3Tag": "自然"
+  },
+  "footer": {
+    "slogan": "次世代の画像体験をあなたの手元に",
+    "feedbackTitle": "ご意見・お問い合わせ",
+    "feedbackDesc": "改善のご要望や不具合報告などお気軽にご連絡ください",
+    "productCol": "プロダクト",
+    "resourcesCol": "リソース",
+    "companyCol": "運営情報",
+    "legalCol": "規約・法務",
+    "followCol": "公式アカウント",
+    "upscaler": "AI 画像高画質化・超解像",
+    "bgRemover": "背景透過・切り抜き",
+    "products": "全機能一覧",
+    "docs": "ドキュメント",
+    "blogs": "技術ブログ",
+    "faqs": "よくある質問",
+    "sysReq": "動作環境",
+    "about": "Pixelify について",
+    "contact": "お問い合わせ",
+    "privacy": "プライバシーポリシー",
+    "terms": "利用規約",
+    "rights": "All rights reserved. 端末内オンデバイス処理。"
+  },
+  "blogs": {
+    "title": "ブログ＆AI ガイド",
+    "subtitle": "ローカル AI、プライバシー、背景切り抜き、超解像、WebGPU に関する最新技術情報。",
+    "searchPlaceholder": "タイトルやキーワードで検索…",
+    "filterLang": "言語",
+    "all": "すべて",
+    "readTime": "分で読める",
+    "by": "著者",
+    "shareArticle": "記事を共有",
+    "linkCopied": "リンクをコピーしました",
+    "moreFrom": "おすすめ記事",
+    "backToBlogs": "記事一覧に戻る",
+    "notFound": "記事が見つかりません",
+    "notFoundDesc": "お探しの記事はこの言語では公開されていません。"
+  },
+  "uploadArea": {
+    "upscaleTitle": "高画質化",
+    "upscaleDesc": "画像をアップロードして\n解像度と品質を向上させます。",
+    "cutoutTitle": "切り抜き",
+    "cutoutDesc": "ここに画像をドロップして切り抜きを開始\n20MB未満のPNG、JPG、WebPファイルを選択。",
+    "uploadMedia": "メディアをアップロード",
+    "processing": "処理中...",
+    "remove": "削除"
+  },
+  "bgRemoverSection": {
+    "titlePrefix": "AIによる高精度な",
+    "titleSuffix": "背景切り抜き",
+    "item1TitleLead": "完全無料",
+    "item1TitleTail": "＆無制限で利用可能。",
+    "item1Desc": "ポートレート、商品写真、複雑な画像の背景をわずか数秒で除去。面倒な手作業の選択や有料クレジットは一切不要です。",
+    "item2TitleLead": "端末内プライバシー保護",
+    "item2TitleTail": "クラウドへの画像送信ゼロ。",
+    "item2Desc": "AIがブラウザ上で直接処理するため、画像が端末外に送信されることはありません。完全ローカルの安心設計です。",
+    "item3TitleLead": "カスタム背景合成",
+    "item3TitleTail": "＆オリジナル解像度でそのまま保存。",
+    "item3Desc": "透明なPNG切り抜きを高解像度でダウンロードしたり、新しい背景色や写真を合成してオリジナルのサイズで書き出せます。",
+    "exploreButton": "背景リムーバーを試す"
+  },
+  "aiUpscalerSection": {
+    "titleLead": "お使いの端末上でAIを活用して",
+    "titleAccent": "画像を高画質化・拡大",
+    "desc": "写真、アニメ、商品写真、ポートレート、古い写真を2倍・4倍・8倍に拡大。AIアップスケーラーがオフラインで鮮明なディテールを生成します。",
+    "exploreButton": "AIアップスケーラーを試す",
+    "aiDelegated": "AIモデル自動適用"
+  },
+  "homeDemo": {
+    "badge": "インタラクティブデモ",
+    "title": "ワンクリックでサンプルを試す",
+    "loading": "読み込み中…",
+    "bgRemoveType": "背景切り抜き",
+    "aiUpscaleType": "AI拡大",
+    "samples": {
+      "sports": {
+        "name": "スポーツ",
+        "desc": "サブピクセル単位のエッジ検出で被写体を抽出"
+      },
+      "anime": {
+        "name": "アニメイラスト",
+        "desc": "微細な質感を保ちながら4倍高画質化"
+      },
+      "ocean": {
+        "name": "海の生き物",
+        "desc": "商用利用可能な美しい商品カットアウト"
+      },
+      "oldPhoto": {
+        "name": "古い写真",
+        "desc": "商用利用可能な美しい商品カットアウト"
+      }
+    },
+    "features": [
+      {
+        "title": "背景リムーバー",
+        "subtitle": "透明な物体や細い髪の毛もサブピクセルの精度で正確に分離します。",
+        "badge": "Chopper AI",
+        "detailTitle": "Chopper ニューラルセグメンテーション",
+        "detailDesc": "デュアルパス・ビジョントランスフォーマーがブラウザメモリ内で滑らかなアルファマスクを生成。"
+      },
+      {
+        "title": "背景リムーバー",
+        "subtitle": "透明な物体や細い髪の毛もサブピクセルの精度で正確に分離します。",
+        "badge": "Chopper AI",
+        "detailTitle": "Chopper ニューラルセグメンテーション",
+        "detailDesc": "デュアルパス・ビジョントランスフォーマーがブラウザメモリ内で滑らかなアルファマスクを生成。"
+      },
+      {
+        "title": "AIアップスケーラー",
+        "subtitle": "不要なノイズや歪みを抑え、最大8K相当の解像度まで鮮明な輪郭を復元。",
+        "badge": "最大8倍拡大",
+        "detailTitle": "Vitality、Pixel-Dance、Alpha-Satoru",
+        "detailDesc": "WebGPUシェーダーを利用したLiteRT直接実行により、高速テンソル演算を実現。"
+      },
+      {
+        "title": "AIアップスケーラー",
+        "subtitle": "クラウドサーバー不要、外部送信ゼロ。画像がPCの外へ出ることはありません。",
+        "badge": "ローカルWASM",
+        "detailTitle": "完全オフラインの安全性",
+        "detailDesc": "WASM SIMDとWebGPUにより、完全オフラインでの処理が可能です。"
+      }
+    ]
+  },
+  "homeWorkflow": {
+    "workspace": "PIXELIFY",
+    "workspaceSub": "/ ワークスペース",
+    "privacyFirst": "プライバシー最優先",
+    "interactivePreview": "インタラクティブプレビュー",
+    "exploreBefore": "ツールを開く前にワークフローを体験できます。",
+    "desktopExp": "デスクトップ環境",
+    "workflow": "ワークフロー",
+    "pauseDemo": "デモを一時停止",
+    "playDemo": "デモを再生",
+    "nextWorkflow": "次のワークフロー",
+    "nextStep": "次のステップ",
+    "processing": "処理中",
+    "previewReady": "プレビュー準備完了",
+    "demoMode": "デモモード",
+    "step0": "画像を追加して開始",
+    "step1": "設定の調整",
+    "step2Bg": "被写体の境界線を精密補正中",
+    "step2Upscale": "画像ディテールを鮮明化中",
+    "step3": "プレビューが完成しました",
+    "simpleWorkflow": "シンプルでわかりやすい手順",
+    "simpleWorkflowDesc": "これは動作確認用のデモです。実際のツールを開いてご自身の画像を処理してください。",
+    "exploreSettings": "設定を確認",
+    "sampleImageLoaded": "サンプル画像を読み込みました",
+    "enlargement": "拡大倍率",
+    "featherEdges": "エッジのぼかし",
+    "previewWorkflow": "ワークフローをプレビュー",
+    "refiningSubjectBoundaries": "被写体の輪郭を補正しています",
+    "enhancingImageDetail": "画像の細部をクリアに再現しています",
+    "simulatedNotice": "※これは動作イメージです。このデモ内で実際の画像データは送信・処理されません。",
+    "preparingPreview": "プレビューを作成中",
+    "simulated": "シミュレーション",
+    "previewState": "プレビュー状態",
+    "enhancedPreview": "高画質化プレビュー",
+    "cutoutPreview": "切り抜きプレビュー",
+    "previewNotice": "これは画面上のプレビューです。画像を処理するには実際のツールを開いてください。",
+    "openUpscaler": "AIアップスケーラーを開く",
+    "openBgRemover": "背景リムーバーを開く",
+    "demoOnly": "デモ専用 · アップロード不要",
+    "exploreInterface": "上のステップをクリックしてUIを操作できます。",
+    "back": "戻る",
+    "launchTool": "ツールを起動",
+    "sessionDetails": "セッション詳細",
+    "dimensions": "解像度サイズ",
+    "mode": "モード",
+    "interactiveDemo": "インタラクティブデモ",
+    "privacyByDesign": "プライバシー重視設計",
+    "privacyByDesignDesc": "このウォークスルーはサンプルUIです。実際の画像はお使いの端末内で安全に処理されます。",
+    "noAccountNeeded": "アカウント登録やファイルのアップロードなしですぐにお試しいただけます。",
+    "detailPreview": "ディテールプレビュー",
+    "flows": {
+      "upscale": {
+        "name": "写真アップスケーラー",
+        "description": "写真の鮮明さとディテールを強化",
+        "steps": [
+          "鮮明にしたい写真や拡大したい画像を用意します。",
+          "拡大したい倍率を選択します。",
+          "デモが端末内での高画質化処理を再現します。",
+          "プレビューを確認し、本物のツールを開いて画像を処理します。"
+        ]
+      },
+      "background": {
+        "name": "背景リムーバー",
+        "description": "きれいな切り抜き画像を作成",
+        "steps": [
+          "被写体がはっきりしたポートレートや画像を選択します。",
+          "切り抜きのプレビューと境界補正オプションを確認します。",
+          "被写体検出とマスク生成をシミュレーションします。",
+          "プレビューを確認し、本物のツールを開いて画像を処理します。"
+        ]
+      },
+      "anime": {
+        "name": "アニメ・イラスト拡大",
+        "description": "輪郭線をシャープに保持",
+        "steps": [
+          "イラストや圧縮されたアニメ画像を用意します。",
+          "イラスト用の拡大倍率を設定します。",
+          "輪郭線と色鮮やかさの補正をシミュレーションします。",
+          "プレビューを確認し、本物のツールを開いて画像を処理します。"
+        ]
+      },
+      "product": {
+        "name": "商品カットアウト",
+        "description": "商品画像の輪郭を綺麗に整理",
+        "steps": [
+          "ECサイトやバナー用に商品画像を用意します。",
+          "商品の輪郭線の滑らかさオプションを確認します。",
+          "物体認識とフチのノイズ除去をシミュレーションします。",
+          "プレビューを確認し、本物のツールを開いて画像を処理します。"
+        ]
+      }
+    },
+    "stepLabels": [
+      "アップロード",
+      "設定",
+      "処理",
+      "確認"
+    ]
+  },
+  "pixelifyStory": {
+    "words": [
+      "PIXELIFY",
+      "ローカル",
+      "AI",
+      "あなたの",
+      "画像のために",
+      "高画質化",
+      "復元",
+      "ディテール向上",
+      "クラウドへ",
+      "一切アップロードなし",
+      "あなたの大切な",
+      "ピクセルは",
+      "あなたの",
+      "手元に"
+    ]
+  },
+  "upscaleShowreel": {
+    "titleStraight": "エンジンから",
+    "titleEngine": "直接出力。",
+    "subtitle": "レタッチ不要。Photoshop不要。",
+    "fashionPortrait": "ファッションポートレート",
+    "editorial": "エディトリアル",
+    "pets": "ペット",
+    "furLevel": "毛並みレベル",
+    "maxResolution": "最大解像度出力",
+    "avianPortrait": "野鳥ポートレート",
+    "featherGrade": "羽毛ディテール",
+    "officialPortrait": "公式ポートレート",
+    "photojournalism": "報道写真",
+    "product": "商品カット",
+    "studioQuality": "スタジオ品質",
+    "iconicPoster": "象徴的ポスター",
+    "printReady": "印刷対応品質",
+    "movesCutout": "切り抜き完了までの手順",
+    "animeArt": "アニメアート",
+    "facesRestored": "顔の鮮明復元",
+    "automotive": "自動車",
+    "detailRecovery": "ディテール復元",
+    "gaming": "ゲーム画面",
+    "thumbnailReady": "サムネイル対応",
+    "illustration": "イラスト",
+    "colorFidelity": "忠実な色再現"
+  },
+  "upscaleShowcase": {
+    "titlePixel": "すべてのピクセルを、",
+    "titleReimagined": "再創造。",
+    "subtitle": "端末上でリアルタイム描画される真の8倍アップスケールを体感。スライダーを動かして比較：左側は無加工の原画、右側はPixelifyの一発出力結果。",
+    "statMaxScale": "最大倍率",
+    "statPrivate": "完全プライベート＆端末内処理",
+    "statCloudLatency": "クラウド遅延",
+    "lensOriginal": "オリジナル",
+    "lensUpscaled": "アップスケール後",
+    "lensNext": "次のサンプル",
+    "pairCyberpunk": "サイバーパンク肖像",
+    "pairCyberpunkMeta": "東京ネオン、顔立ちの微細ディテールを復元",
+    "pairSneaker": "ビンテージスニーカー",
+    "pairSneakerMeta": "革のシボ感・ステッチを復元",
+    "pairWatch": "高級クロノグラフ",
+    "pairWatchMeta": "ヘアライン仕上げの金属、文字盤くっきり",
+    "pairLandscape": "山岳の眺望",
+    "pairLandscapeMeta": "生い茂る木々の鮮明化、シャープな尾根"
+  },
+  "upscaleWorkspace": {
+    "headerTitle": "Upscale",
+    "headerSubtitle": "AI解像度＆ディテール向上",
+    "modelLabel": "モデル",
+    "scaleFactor": "拡大倍率",
+    "advancedSettings": "高度な設定",
+    "advanced": "詳細設定",
+    "presets": "プリセット",
+    "preset": "プリセット",
+    "sharpness": "シャープネス",
+    "sharpnessDesc": "輪郭や微細なエッジの強調度合いを調整します。",
+    "denoise": "ノイズ除去",
+    "denoiseDesc": "ざらつきや圧縮ノイズを滑らかに除去します。",
+    "faceEnhance": "顔パーツ復元",
+    "faceEnhanceDesc": "顔の輪郭や表情の鮮明度を復元します。",
+    "colorEnhance": "色彩強化",
+    "colorEnhanceDesc": "色の鮮やかさと全体のバランスを向上させます。",
+    "hdr": "HDR",
+    "hdrDesc": "ダイナミックレンジを広げ、明暗の階調を高めます。",
+    "brightness": "明るさ",
+    "brightnessDesc": "画像全体の明度を調整します。",
+    "contrast": "コントラスト",
+    "contrastDesc": "明暗の対比の強弱を調整します。",
+    "btnUpscale": "アップスケール",
+    "btnEnhancing": "処理中…",
+    "btnDownload": "ダウンロード",
+    "btnReEnhance": "再処理",
+    "btnCancel": "キャンセル",
+    "btnReset": "リセット",
+    "btnAdd": "追加",
+    "labelOriginal": "元画像",
+    "labelEnhanced": "高画質化後",
+    "enhancedBadge": "処理完了",
+    "enhancingBadge": "高画質化中...",
+    "loadingModel": "AIモデルを読み込み中...",
+    "modelCacheNote": "AIモデルは初回のみダウンロードされ、以降はブラウザキャッシュから即座に動作します。",
+    "enhancingImage": "処理中：",
+    "neuralActive": "ニューラル超解像エンジン稼働中",
+    "popular": "人気",
+    "modelVitalityDesc": "最速モデル、クリアで引き締まった輪郭。",
+    "modelPixelDanceDesc": "最高ディテール、最大8K解像度対応。",
+    "modelAlphaSatoruDesc": "ポートレートや写真の自然な質感を再現。"
+  },
+  "modelLoading": {
+    "downloadingTitle": "AIモデルをダウンロード中",
+    "leftBadge": "残り",
+    "extractingSubject": "被写体を抽出中...",
+    "segmentingEdges": "ニューラルネットワークが境界を精密分割中...",
+    "analyzingContours": "輪郭とライティングを解析中...",
+    "loadingVisionWeights": "ビジョンモデルの重みを読み込み中...",
+    "diabloEdgeMatting": "Diabloモデルで精密マッティング処理中...",
+    "segmentingSubject": "ニューラルネットワークが被写体を分離中...",
+    "extractingHairFur": "細い毛髪・ペットの毛並み・透過部分を抽出中...",
+    "extractingCutout": "クリアな切り抜きを生成中...",
+    "refiningAlpha": "サブピクセル単位でアルファマスクを調整中...",
+    "finalizingAlpha": "アルファ透過処理を最終仕上げ中...",
+    "renderingPng": "透過PNG画像をレンダリング中...",
+    "processingError": "処理エラー",
+    "errorDefault": "この画像の背景を削除できませんでした。",
+    "retryBgRemoval": "↻ 背景削除を再試行",
+    "cleanCutout": "✓ 切り抜き完了",
+    "removingBg": "◆ 背景を削除中…",
+    "waitCaption1": "AIモデルを初回のみダウンロード中...",
+    "waitCaption2": "ブラウザに保存して次回から即時起動...",
+    "waitCaption3": "AIファイルをダウンロード中（初回のみ）...",
+    "waitCaption4": "AIニューラルエンジンを起動中...",
+    "waitCaption5": "写真を細部まで解析中...",
+    "waitCaption6": "初回パスのため少々お待ちください...",
+    "waitCaption7": "画像の各領域を準備中...",
+    "waitCaption8": "最高品質を優先して処理中...",
+    "waitCaption9": "細部まで鮮明なディテールを付加中...",
+    "waitCaption10": "微細な質感をシャープに補正中...",
+    "waitCaption11": "1ピクセルずつ鮮明度を向上中...",
+    "waitCaption12": "超高解像度で写真を再構築中...",
+    "waitCaption13": "ニューラルネットワークで描画中...",
+    "waitCaption14": "自然で生き生きとした色合いを再現中...",
+    "waitCaption15": "間もなく完了、最終ポリッシュ中...",
+    "waitCaption16": "輪郭と微細ディテールを微調整中...",
+    "waitCaption17": "鮮鋭度と立体感を強調中...",
+    "waitCaption18": "仕上げのクオリティ調整中...",
+    "waitCaption19": "最終調整を行っています...",
+    "waitCaption20": "ほぼ完了しました...",
+    "waitCaption21": "すべてのピクセルを最高品質に..."
+  },
+  "deviceNotice": {
+    "title": "PC環境でより快適に動作します",
+    "bgRemoveDesc": "Pixelifyはモバイルでも利用可能です。より高速なAI背景切り抜きを行うには、デスクトップまたはノートPCのご利用をおすすめします。",
+    "upscaleDesc": "Pixelifyはスマホでも動作します。より高速なAIアップスケールにはPC環境が最適です。",
+    "tip": "ヒント",
+    "understand": "了解しました"
+  },
+  "bgMarquee": [
+    "Chopper 高精度セグメンテーション",
+    "WebGPU 端末内処理",
+    "クラウド送信ゼロ",
+    "髪の毛1本までの精度",
+    "透過PNG保存",
+    "登録不要",
+    "無制限実行"
+  ]
+}

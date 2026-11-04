@@ -26,6 +26,7 @@ import {
   ModernTextInspector,
   ModernElementInspector,
 } from './bgremove/ModernDesignControls';
+import { useTranslation } from '@/locales';
 
 interface BGRemoveWorkspaceProps {
   jobs: BGJob[];
@@ -359,6 +360,7 @@ export default function BGRemoveWorkspace({
   onFileAdd,
   onEngineReport,
 }: BGRemoveWorkspaceProps) {
+  const { t } = useTranslation();
   const [selectedId, setSelectedId] = useState<string | null>(jobs[0]?.id || null);
   const [activeTab, setActiveTab] = useState<TabType>('cutout');
   const [bgSubTab, setBgSubTab] = useState<BgSubTab>('photo');
@@ -569,8 +571,8 @@ export default function BGRemoveWorkspace({
 
     let currentProgress = isModelReady ? 20 : 6;
     let currentMessage = isModelReady
-      ? 'Analyzing image contours & lighting...'
-      : 'Loading vision model weights...';
+      ? (t.modelLoading?.analyzingContours || 'Analyzing image contours & lighting...')
+      : (t.modelLoading?.loadingVisionWeights || 'Loading vision model weights...');
     let lastReportedProgress = currentProgress;
     let lastReportedMessage = currentMessage;
 
@@ -607,19 +609,19 @@ export default function BGRemoveWorkspace({
 
         let stageMsg = currentMessage;
         if (currentProgress < 30) {
-          stageMsg = 'Analyzing image contours & lighting...';
+          stageMsg = t.modelLoading?.analyzingContours || 'Analyzing image contours & lighting...';
         } else if (currentProgress < 55) {
           stageMsg = isDiablo
-            ? 'Diablo neural edge matting in progress...'
-            : 'Neural network segmenting subject...';
+            ? (t.modelLoading?.diabloEdgeMatting || 'Diablo neural edge matting in progress...')
+            : (t.modelLoading?.segmentingSubject || 'Neural network segmenting subject...');
         } else if (currentProgress < 75) {
           stageMsg = isDiablo
-            ? 'Extracting fine hair, fur & edge transparency...'
-            : 'Extracting clean subject cutout...';
+            ? (t.modelLoading?.extractingHairFur || 'Extracting fine hair, fur & edge transparency...')
+            : (t.modelLoading?.extractingCutout || 'Extracting clean subject cutout...');
         } else if (currentProgress < 90) {
-          stageMsg = 'Refining transparent alpha channels...';
+          stageMsg = t.modelLoading?.refiningAlpha || 'Refining sub-pixel alpha mask...';
         } else {
-          stageMsg = 'Polishing transparent edge detail...';
+          stageMsg = t.modelLoading?.finalizingAlpha || 'Finalizing alpha matte transparency...';
         }
         currentMessage = stageMsg;
 
@@ -1449,7 +1451,7 @@ export default function BGRemoveWorkspace({
               className="w-full py-2.5 px-3 rounded-xl border border-amber-400/40 bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 font-bold text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <Focus className="h-4 w-4 text-amber-300 shrink-0" />
-              <span>Switch to Diablo Model</span>
+              <span>{t.bgRemove.refineDiablo}</span>
             </button>
           ) : showDiabloConfirm ? (
             /* Diablo not cached & user clicked Try Diablo — explicit confirmation card */
@@ -1474,14 +1476,14 @@ export default function BGRemoveWorkspace({
                   className="flex-1 py-2 px-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs transition flex items-center justify-center gap-1.5 shadow-md shadow-amber-400/20 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <Focus className="h-3.5 w-3.5 shrink-0" />
-                  <span>Download & Try Diablo</span>
+                  <span>{t.bgRemove.refineDiablo}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowDiabloConfirm(false)}
                   className="py-2 px-3 rounded-xl border border-slate-300 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-white/70 font-bold text-xs transition cursor-pointer"
                 >
-                  Cancel
+                  {t.common.cancel}
                 </button>
               </div>
             </div>
@@ -1494,7 +1496,7 @@ export default function BGRemoveWorkspace({
               className="w-full py-2.5 px-3 rounded-xl border border-amber-400/40 bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 font-bold text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <Focus className="h-4 w-4 text-amber-300 shrink-0" />
-              <span>Try Diablo model</span>
+              <span>{t.bgRemove.refineDiablo}</span>
             </button>
           )}
         </div>
@@ -1507,9 +1509,9 @@ export default function BGRemoveWorkspace({
         onFile={handleUpload}
         isLoading={false}
         onClear={() => setJobs([])}
-        title="Cutout"
+        title={t.uploadArea?.cutoutTitle || "Cutout"}
         maxSizeMB={20}
-        description={'Drop your images here to start cutout\nSelect PNG, JPG, or WebP files under 20MB.'}
+        description={t.uploadArea?.cutoutDesc || "Drop your images here to start cutout\nSelect PNG, JPG, or WebP files under 20MB."}
         beforeImage="/bgremove/baby-4.jpg"
         afterImage="/bgremove/baby-4-cutout.png"
       />
@@ -1529,11 +1531,11 @@ export default function BGRemoveWorkspace({
         {/* LEFT SIDE: FEATURE TABS */}
         <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto scrollbar-none">
           {[
-            { id: 'cutout' as TabType, label: 'Cutout', Icon: Scissors },
-            { id: 'background' as TabType, label: 'Background', Icon: ImageIcon },
+            { id: 'cutout' as TabType, label: t.bgRemove.tabCutout || 'Cutout', Icon: Scissors },
+            { id: 'background' as TabType, label: t.bgRemove.tabBackdrop || 'Background', Icon: ImageIcon },
             { id: 'effects' as TabType, label: 'Effects', Icon: Sparkles },
-            { id: 'adjust' as TabType, label: 'Adjust', Icon: SlidersHorizontal },
-            { id: 'design' as TabType, label: 'Design', Icon: PanelsTopLeft },
+            { id: 'adjust' as TabType, label: t.bgRemove.tabRefine || 'Adjust', Icon: SlidersHorizontal },
+            { id: 'design' as TabType, label: t.bgRemove.tabText || 'Design', Icon: PanelsTopLeft },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -1620,7 +1622,7 @@ export default function BGRemoveWorkspace({
               className="px-4 sm:px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-xs shadow-lg shadow-blue-600/30 transition flex items-center gap-1.5 cursor-pointer"
             >
               <DownloadIcon className="h-3.5 w-3.5" />
-              <span>{isDownloading ? 'Rendering' : 'Download'}</span>
+              <span>{isDownloading ? (t.common.loading || 'Rendering') : (t.common.download || 'Download')}</span>
               <ChevronDown className="h-3.5 w-3.5" />
             </button>
 
@@ -1747,12 +1749,12 @@ export default function BGRemoveWorkspace({
               </span>
               {selected?.status === 'done' && (
                 <span className="text-[11px] font-mono px-2.5 py-1 rounded-full bg-[#00FF85]/15 text-[#00FF85] border border-[#00FF85]/30 font-bold">
-                  ✓ Clean Cutout{selected.model ? ` · ${BG_MODELS[selected.model].label}` : ''}
+                  {t.modelLoading?.cleanCutout || '✓ Clean Cutout'}{selected.model ? ` · ${BG_MODELS[selected.model].label}` : ''}
                 </span>
               )}
               {selected?.status === 'ready' && (
                 <span className="text-[11px] font-mono px-2.5 py-1 rounded-full bg-[#00FF85]/15 text-[#00FF85] border border-[#00FF85]/30 font-bold">
-                  ◆ Removing background…
+                  {t.modelLoading?.removingBg || '◆ Removing background…'}
                 </span>
               )}
             </div>

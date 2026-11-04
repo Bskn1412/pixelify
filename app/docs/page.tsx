@@ -1,13 +1,10 @@
-import type { Metadata } from 'next';
-import DocumentationView from '@/components/DocumentationView';
+import { DocsHome } from "@/components/pixelify-docs/docs-home";
 
-export const metadata: Metadata = {
-  title: 'Pixelify Help Center | Guides & Documentation',
-  description:
-    'Learn how to use Pixelify’s on-device image upscaler and background remover, check browser requirements, and find help for common issues.',
-  alternates: { canonical: '/docs/' },
+export const metadata = {
+  title: "Pixelify Docs — Learn, create, and get more from Pixelify",
+  description: "Guides, tutorials, and answers for Pixelify's browser-based AI image tools.",
 };
 
-export default function DocumentationPage() {
-  return <DocumentationView />;
+export default function DocsPage() {
+  return <DocsHome />;
 }

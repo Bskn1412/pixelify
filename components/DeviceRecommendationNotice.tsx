@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   MonitorSmartphone,
   Bell,
 } from 'lucide-react';
+import { useTranslation } from '@/locales';
 
 type PixelifyTool = 'bg_remove' | 'upscale';
 
@@ -50,11 +51,16 @@ export default function DeviceRecommendationNotice({
   tool,
   className = '',
 }: DeviceRecommendationNoticeProps) {
+  const { t } = useTranslation();
   const [mobile, setMobile] = useState<boolean | null>(null);
   const [dismissed, setDismissed] = useState<boolean>(false);
 
   const prefersReducedMotion = useReducedMotion();
-  const content = TOOL_CONTENT[tool];
+  const title = t.deviceNotice?.title || TOOL_CONTENT[tool].title;
+  const description =
+    tool === 'bg_remove'
+      ? t.deviceNotice?.bgRemoveDesc || TOOL_CONTENT.bg_remove.description
+      : t.deviceNotice?.upscaleDesc || TOOL_CONTENT.upscale.description;
 
   useEffect(() => {
     setMobile(detectMobile());
@@ -138,7 +144,7 @@ export default function DeviceRecommendationNotice({
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="text-sm font-semibold tracking-tight text-white sm:text-base">
-              {content.title}
+              {title}
             </h3>
 
             <span
@@ -155,7 +161,7 @@ export default function DeviceRecommendationNotice({
                 className="h-3 w-3"
                 aria-hidden="true"
               />
-              QUICK TIP
+              {t.deviceNotice?.tip || "QUICK TIP"}
             </span>
           </div>
 
@@ -166,7 +172,7 @@ export default function DeviceRecommendationNotice({
               sm:text-sm sm:leading-6
             "
           >
-            {content.description}
+            {description}
           </p>
         </div>
 
@@ -193,7 +199,7 @@ export default function DeviceRecommendationNotice({
               sm:text-sm
             "
           >
-            I understand
+            {t.deviceNotice?.understand || "I understand"}
           </button>
         </div>
       </div>

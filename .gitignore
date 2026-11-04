@@ -13,3 +13,7 @@ out/
 .env
 .env*.local
 .env.example
+
+# Local blog archive for staggered daily rollout (not in git)
+data/blog_archive/
+blog_stash/

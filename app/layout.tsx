@@ -13,6 +13,8 @@ import '@/styles/bgremove-sections.css';
 import '@/styles/home.css';
 import { Analytics } from "@vercel/analytics/next";
 
+import '@/styles/pixelify-docs.css';
+
 const SITE_URL = 'https://pixelify.me';
 
 export const metadata: Metadata = {

@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Download } from 'lucide-react';
 import type { ModelDownloadItem } from '../types';
+import { useTranslation } from '@/locales';
 
 /**
  * Navbar download indicator. Rendered only while a model is actually
@@ -13,6 +14,7 @@ import type { ModelDownloadItem } from '../types';
  * progress bar per model and a "left" count.
  */
 export default function ModelDownloadIndicator({ items }: { items: ModelDownloadItem[] }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
@@ -57,9 +59,9 @@ export default function ModelDownloadIndicator({ items }: { items: ModelDownload
       {open && items.length > 0 && (
         <div className="absolute right-0 mt-3 w-72 rounded-2xl bg-[#121218] border border-white/15 p-3.5 shadow-2xl z-50 animate-fade-in flex flex-col gap-3">
           <div className="px-1 py-0.5 border-b border-white/10 flex items-center justify-between gap-2 text-xs font-bold text-white pb-2">
-            <span>Downloading AI models</span>
+            <span>{t.modelLoading?.downloadingTitle || "Downloading AI models"}</span>
             <span className="font-mono text-[10px] font-bold text-[#00FF85]">
-              {items.length} LEFT
+              {items.length} {t.modelLoading?.leftBadge || "LEFT"}
             </span>
           </div>
 

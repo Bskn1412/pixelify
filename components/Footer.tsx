@@ -2,12 +2,15 @@ import React from 'react';
 import Link from 'next/link';
 import { MessageSquare, ArrowRight } from 'lucide-react';
 import type { ViewTab } from '../types';
+import { useTranslation } from '../locales';
 
 interface FooterProps {
   onTabChange: (tab: ViewTab) => void;
 }
 
 export default function Footer({ onTabChange }: FooterProps) {
+  const { t } = useTranslation();
+
   return (
     <footer className="w-full border-t border-white/10 pt-8 sm:pt-10 pb-8 sm:pb-10 bg-neutral-950/80 backdrop-blur-2xl relative z-10 select-none">
       <div className="max-w-7xl mx-auto px-5 sm:px-10 flex flex-col gap-14 sm:gap-20">
@@ -17,7 +20,7 @@ export default function Footer({ onTabChange }: FooterProps) {
           {/* LEFT HEADLINE */}
           <div className="max-w-sm flex flex-col gap-3 sm:gap-4">
             <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
-              Experience liftoff
+              {t.footer.slogan}
             </h2>
 
             {/* CONTACT & FEEDBACK CALLOUT */}
@@ -32,10 +35,10 @@ export default function Footer({ onTabChange }: FooterProps) {
                   </div>
                   <div className="flex flex-col text-left min-w-0">
                     <span className="text-[15px] sm:text-[14.5px] font-semibold text-white group-hover:text-white transition-colors">
-                      Share Feedback & Contact
+                      {t.footer.feedbackTitle}
                     </span>
                     <span className="text-[11px] text-muted truncate">
-                      Suggestions, issues or ideas? Reach out
+                      {t.footer.feedbackDesc}
                     </span>
                   </div>
                 </div>
@@ -49,33 +52,33 @@ export default function Footer({ onTabChange }: FooterProps) {
           {/* RIGHT LINK COLUMNS */}
           <div className="grid w-full grid-cols-2 gap-x-8 gap-y-8 text-[15px] sm:text-[14.5px] sm:grid-cols-3 lg:w-auto lg:grid-cols-4 lg:gap-x-8 xl:gap-x-10">
             <nav aria-label="Product links" className="flex flex-col items-start gap-2.5">
-              <h3 className="mb-0.5 text-[11px] font-bold uppercase tracking-wider text-white">Product</h3>
-              <button onClick={() => onTabChange('upscaler')} className="text-left text-muted transition hover:text-white">AI Image Upscaler</button>
-              <button onClick={() => onTabChange('bg_remove')} className="text-left text-muted transition hover:text-white">Background Remover</button>
-              <Link href="/products" className="text-muted transition hover:text-white">Products &amp; Features</Link>
+              <h3 className="mb-0.5 text-[11px] font-bold uppercase tracking-wider text-white">{t.footer.productCol}</h3>
+              <button onClick={() => onTabChange('upscaler')} className="text-left text-muted transition hover:text-white">{t.footer.upscaler}</button>
+              <button onClick={() => onTabChange('bg_remove')} className="text-left text-muted transition hover:text-white">{t.footer.bgRemover}</button>
+              <Link href="/products" className="text-muted transition hover:text-white">{t.footer.products}</Link>
             </nav>
 
             <nav aria-label="Resources links" className="flex flex-col items-start gap-2.5">
-              <h3 className="mb-0.5 text-[11px] font-bold uppercase tracking-wider text-white">Resources</h3>
-              <Link href="/docs" className="text-muted transition hover:text-white">Docs</Link>
-              <button onClick={() => onTabChange('blogs')} className="text-left text-muted transition hover:text-white">Blogs</button>
-              <Link href="/#home-faq" className="text-muted transition hover:text-white">FAQs</Link>
-              <Link href="/products#requirements" className="text-muted transition hover:text-white">System requirements</Link>
+              <h3 className="mb-0.5 text-[11px] font-bold uppercase tracking-wider text-white">{t.footer.resourcesCol}</h3>
+              <Link href="/docs" className="text-muted transition hover:text-white">{t.footer.docs}</Link>
+              <button onClick={() => onTabChange('blogs')} className="text-left text-muted transition hover:text-white">{t.footer.blogs}</button>
+              <Link href="/#home-faq" className="text-muted transition hover:text-white">{t.footer.faqs}</Link>
+              <Link href="/products#requirements" className="text-muted transition hover:text-white">{t.footer.sysReq}</Link>
             </nav>
 
             <nav aria-label="Company and legal links" className="flex flex-col items-start gap-2.5">
-              <h3 className="mb-0.5 text-[11px] font-bold uppercase tracking-wider text-white">Company</h3>
-              <Link href="/about" className="text-muted transition hover:text-white">About Pixelify</Link>
-              <Link href="/contact" className="text-muted transition hover:text-white">Contact</Link>
+              <h3 className="mb-0.5 text-[11px] font-bold uppercase tracking-wider text-white">{t.footer.companyCol}</h3>
+              <Link href="/about" className="text-muted transition hover:text-white">{t.footer.about}</Link>
+              <Link href="/contact" className="text-muted transition hover:text-white">{t.footer.contact}</Link>
               <div className="mt-3 flex flex-col items-start gap-2.5 border-t border-white/10 pt-3">
-                <h4 className="text-[10px] font-bold uppercase tracking-wider text-white">Legal</h4>
-                <Link href="/privacy" className="text-muted transition hover:text-white">Privacy Policy</Link>
-                <Link href="/terms" className="text-muted transition hover:text-white">Terms of Service</Link>
+                <h4 className="text-[10px] font-bold uppercase tracking-wider text-white">{t.footer.legalCol}</h4>
+                <Link href="/privacy" className="text-muted transition hover:text-white">{t.footer.privacy}</Link>
+                <Link href="/terms" className="text-muted transition hover:text-white">{t.footer.terms}</Link>
               </div>
             </nav>
 
             <nav aria-label="Follow links" className="flex flex-col items-start gap-3">
-              <h3 className="mb-0.5 text-[11px] font-bold uppercase tracking-wider text-white">Follow</h3>
+              <h3 className="mb-0.5 text-[11px] font-bold uppercase tracking-wider text-white">{t.footer.followCol}</h3>
               <div className="flex flex-wrap gap-2" aria-label="Social profiles">
                 <SocialPlaceholder name="YouTube"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.3 3.6-6.3 3.6Z" /></SocialPlaceholder>
                 <SocialPlaceholder name="X"><path d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3L12 14.6 5.5 22H2.4l7.3-8.4L1.9 2h6.4l4.5 6.7L18.9 2Zm-1.1 18h1.7L7.4 3.9H5.6L17.8 20Z" /></SocialPlaceholder>
@@ -97,7 +100,7 @@ export default function Footer({ onTabChange }: FooterProps) {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted text-center sm:text-left">
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3">
             <span className="font-bold text-white font-sans text-sm">Pixelify</span>
-            <span>© 2026 Pixelify Inc. All rights reserved.</span>
+            <span>{t.footer.rights || (t.footer as any).copyright}</span>
           </div>
 
         </div>

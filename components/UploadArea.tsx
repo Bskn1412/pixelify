@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, type DragEvent } from "react";
+import { useTranslation } from "@/locales";
 
 interface UploadAreaProps {
   onFile: (file: File) => void;
@@ -29,13 +30,16 @@ export default function UploadArea({
   fileName,
   fileSize,
   onClear,
-  title = "Upscale",
-  description = "Upload your images to\n enhance their resolution and quality.",
+  title,
+  description,
   beforeImage,
   afterImage,
   previewImage = "/spiderman3.jpeg",
   maxSizeMB = 15,
 }: UploadAreaProps) {
+  const { t } = useTranslation();
+  const displayTitle = title || t.uploadArea?.upscaleTitle || "Upscale";
+  const displayDesc = description || t.uploadArea?.upscaleDesc || "Upload your images to\n enhance their resolution and quality.";
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [dragging, setDragging] = useState(false);
@@ -384,7 +388,7 @@ export default function UploadArea({
               sm:text-[40px]
             "
           >
-            {title}
+            {displayTitle}
           </h1>
 
           {/* =================================================
@@ -401,7 +405,7 @@ export default function UploadArea({
               text-white/40
             "
           >
-            {description.split('\n').map((line, index) => (
+            {displayDesc.split('\n').map((line, index) => (
               <React.Fragment key={line + index}>
                 {index > 0 && <br />}
                 {line}
@@ -492,7 +496,7 @@ export default function UploadArea({
                     hover:text-white
                   "
                 >
-                  Remove
+                  {t.common.remove}
                 </button>
               </div>
             </div>
@@ -561,7 +565,7 @@ export default function UploadArea({
                 />
               </svg>
 
-              {isLoading ? "Processing..." : "Upload Media"}
+              {isLoading ? (t.uploadArea?.processing || t.common.loading || "Processing...") : (t.uploadArea?.uploadMedia || "Upload Media")}
             </button>
           )}
 

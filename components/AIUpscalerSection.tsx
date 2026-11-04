@@ -2,10 +2,12 @@ import React, { useState, useRef, useLayoutEffect } from 'react';
 import { motion } from 'framer-motion';
 import gsap from 'gsap';
 import { useApp } from './AppProvider';
+import { useTranslation } from '@/locales';
 interface AIUpscalerSectionProps {
     onLaunchUpscaler: () => void;
 }
 export default function AIUpscalerSection({ onLaunchUpscaler }: AIUpscalerSectionProps) {
+    const { t } = useTranslation();
     const [activeCard, setActiveCard] = useState<number | null>(null);
     const stageRef = useRef<HTMLDivElement>(null);
     const sectionRef = useRef<HTMLElement>(null);
@@ -207,9 +209,9 @@ export default function AIUpscalerSection({ onLaunchUpscaler }: AIUpscalerSectio
                 {/* Responsive padding and alignment for mobile & desktop */}
                 <div className="flex flex-col gap-4 max-w-md lg:max-w-[380px] min-[1150px]:max-w-[430px] xl:max-w-lg pt-12 sm:pt-16 lg:pt-12 xl:pt-20 z-30 text-center lg:text-left items-center lg:items-start">                    {/* Title — reference style: flat green lead word + big bold white text */}
                     <h2 className="text-2xl sm:text-3xl lg:text-[28px] min-[1150px]:text-[32px] xl:text-[38px] 2xl:text-[40px] font-extrabold tracking-tight text-white leading-[1.18]">
-                        Upscale images on your device{' '}
+                        {t.aiUpscalerSection?.titleLead || 'Upscale images on your device'}{' '}
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00FF85] via-[#00C86A] to-[#38ef7d]">
-                            with AI
+                            {t.aiUpscalerSection?.titleAccent || 'with AI'}
                         </span>
                     </h2>
                     {/* Description text with constrained max-width so it wraps before touching Vitality */}
@@ -220,7 +222,7 @@ export default function AIUpscalerSection({ onLaunchUpscaler }: AIUpscalerSectio
                         transition={{ duration: 0.6, delay: 0.15, ease: 'easeOut' }}
                         className="mt-2 text-xs sm:text-sm text-neutral-400 font-normal leading-relaxed max-w-[310px] sm:max-w-[330px] lg:max-w-[330px] min-[1150px]:max-w-[380px] xl:max-w-[460px] mx-auto lg:mx-0"
                     >
-                        Enlarge photos, anime, product images, portraits, and old pictures by 2x, 4x or 8x. AI Upscaler improves clarity and generates cleaner detail in a fast offline workflow.
+                        {t.aiUpscalerSection?.desc || 'Enlarge photos, anime, product images, portraits, and old pictures by 2x, 4x or 8x. AI Upscaler improves clarity and generates cleaner detail in a fast offline workflow.'}
                     </motion.p>
                     {/* Launch Studio CTA (Desktop only, positioned under text) */}
                     <div className="hidden lg:flex pt-8 sm:pt-10 lg:pt-14 flex-col sm:flex-row items-center lg:items-start gap-3 sm:gap-4 w-full sm:w-auto">
@@ -229,7 +231,7 @@ export default function AIUpscalerSection({ onLaunchUpscaler }: AIUpscalerSectio
                             onMouseEnter={() => warmup('upscaler')}
                             className="w-fit justify-center px-6 py-3.5 rounded-full bg-[#00FF85] hover:bg-[#00E575] text-black font-extrabold text-xs sm:text-sm shadow-[0_0_25px_rgba(0,255,133,0.35)] hover:shadow-[0_0_35px_rgba(0,255,133,0.55)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2 group cursor-pointer"
                         >
-                            <span>Explore AI Upscaler</span>
+                            <span>{t.aiUpscalerSection?.exploreButton || 'Explore AI Upscaler'}</span>
                             <span className="group-hover:translate-x-1 transition-transform">→</span>
                         </button>
                     </div>
@@ -364,7 +366,7 @@ export default function AIUpscalerSection({ onLaunchUpscaler }: AIUpscalerSectio
                                         className="text-md font-bold text-white italic tracking-tight drop-shadow-[0_0_8px_rgba(255,255,255,0.6)]"
                                         style={{ fontFamily: 'cursive, system-ui, sans-serif' }}
                                     >
-                                        AI Delegated
+                                        {t.aiUpscalerSection?.aiDelegated || 'AI Delegated'}
                                     </span>
                                     {/* Curved SVG Arrow curving towards Card 2 */}
                                     <svg
@@ -403,7 +405,7 @@ export default function AIUpscalerSection({ onLaunchUpscaler }: AIUpscalerSectio
                             onTouchStart={() => warmup('upscaler')}
                             className="w-fit justify-center px-6 py-3.5 rounded-full bg-[#00FF85] hover:bg-[#00E575] text-black font-extrabold text-xs sm:text-sm shadow-[0_0_25px_rgba(0,255,133,0.35)] hover:shadow-[0_0_35px_rgba(0,255,133,0.55)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2 group cursor-pointer"
                         >
-                            <span>Explore AI Upscaler</span>
+                            <span>{t.aiUpscalerSection?.exploreButton || 'Explore AI Upscaler'}</span>
                             <span className="group-hover:translate-x-1 transition-transform">→</span>
                         </button>
                     </div>

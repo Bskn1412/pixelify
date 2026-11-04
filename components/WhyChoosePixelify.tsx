@@ -15,6 +15,7 @@ import {
   CircleCheckBig,
   CloudOff,
 } from 'lucide-react';
+import { useTranslation } from '@/locales';
 
 type FeatureCardProps = {
   icon: React.ElementType;
@@ -80,6 +81,7 @@ function FeatureCard({
 }
 
 export default function WhyChoosePixelify() {
+  const { t } = useTranslation();
   return (
     <section
       className="pixelify-why-section w-full overflow-hidden"
@@ -98,14 +100,14 @@ export default function WhyChoosePixelify() {
             transition={{ duration: 0.6, ease: 'easeOut' }}
           >
             <span className="pixelify-eyebrow">
-              THE PIXELIFY DIFFERENCE
+              {t.whyPixelify.eyebrow}
             </span>
             <h2 id="why-pixelify-title" className="mt-5 text-balance text-3xl font-black leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl">
-              Why creators &amp; engineers choose{' '}
+              {t.whyPixelify.titlePrefix}{' '}
               <span className="bg-gradient-to-r from-emerald-300 via-[#00FF85] to-emerald-500 bg-clip-text text-transparent">Pixelify</span>
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-neutral-300/75 sm:text-base">
-              Enterprise-grade neural networks running completely inside your browser. No cloud queues, no credit tokens, and zero privacy compromises.
+              {t.whyPixelify.subtitle}
             </p>
           </motion.header>
 
@@ -113,21 +115,21 @@ export default function WhyChoosePixelify() {
             <FeatureCard
               index={0}
               icon={ShieldCheck}
-              tag="Zero Cloud Uploads"
-              badge="100% Private"
-              title="Your images stay yours."
-              description="Pixelify processes your images directly in your browser. Your files stay on your device instead of being uploaded to a processing server."
+              tag={t.whyPixelify.zeroCloudTag}
+              badge={t.whyPixelify.zeroCloudBadge}
+              title={t.whyPixelify.zeroCloudTitle}
+              description={t.whyPixelify.zeroCloudDesc}
               highlight
               className="sm:col-span-2 lg:col-span-2"
               visual={
                 <div className="flex flex-col items-start justify-between gap-3 text-xs font-mono sm:flex-row sm:items-center">
                   <div className="flex flex-wrap items-center gap-2 text-neutral-400">
                     <Lock size={14} className="text-[#00FF85]" />
-                    <span>Client-Side Sandboxing:</span>
-                    <span className="font-semibold text-white">Active</span>
+                    <span>{t.whyPixelify.sandboxing}</span>
+                    <span className="font-semibold text-white">{t.whyPixelify.sandboxingActive}</span>
                   </div>
                   <div className="flex max-w-full items-center gap-2 rounded-lg border border-white/15 bg-white/[0.07] px-3 py-2 text-[#00FF85]">
-                    <CloudOff size={14} className="text-[#00FF85]" /><span>Processed On-Device</span>
+                    <CloudOff size={14} className="text-[#00FF85]" /><span>{t.whyPixelify.processedOnDevice}</span>
                   </div>
                 </div>
               }
@@ -136,56 +138,61 @@ export default function WhyChoosePixelify() {
             <FeatureCard
               index={1}
               icon={Zap}
-              tag="WebGPU + WASM"
-              badge="Near-Native"
-              title="Raw Hardware Acceleration"
-              description="Direct GPU shaders via LiteRT and WebGPU eliminate slow server roundtrips for instant real-time processing."
+              tag={t.whyPixelify.webgpuTag}
+              badge={t.whyPixelify.webgpuBadge}
+              title={t.whyPixelify.webgpuTitle}
+              description={t.whyPixelify.webgpuDesc}
               tone="mint"
-              visual={<div className="flex flex-wrap items-center justify-between gap-2 text-xs"><span className="flex items-center gap-2 font-semibold"><Cpu size={15} /> Hardware Engine:</span><span className="rounded-full border border-emerald-300/70 bg-emerald-100/80 px-3 py-1 font-bold text-emerald-800">GPU Core Parallelism</span></div>}
+              visual={<div className="flex flex-wrap items-center justify-between gap-2 text-xs"><span className="flex items-center gap-2 font-semibold"><Cpu size={15} /> {t.whyPixelify.engineHardware}</span><span className="rounded-full border border-emerald-300/70 bg-emerald-100/80 px-3 py-1 font-bold text-emerald-800">{t.whyPixelify.engineParallelism}</span></div>}
             />
 
             <FeatureCard
               index={2}
               icon={BrainCircuit}
-              tag="Chopper & Vitality"
-              badge="8K Resolution"
-              title="State-of-the-Art Neural Models"
-              description="Trained on millions of high-res images to preserve flyaway hair strands, transparent glass, and micro-textures without plastic artifacts."
+              tag={t.whyPixelify.neuralTag}
+              badge={t.whyPixelify.neuralBadge}
+              title={t.whyPixelify.neuralTitle}
+              description={t.whyPixelify.neuralDesc}
               tone="violet"
             />
 
             <FeatureCard
               index={3}
               icon={InfinityIcon}
-              tag="No Paywalls"
-              badge="Zero Watermarks"
-              title="Unlimited Generations"
-              description="No $40/month subscriptions, no credit tokens, and no forced downscaling. Generate as many cutouts and upscales as you need."
+              tag={t.whyPixelify.paywallTag}
+              badge={t.whyPixelify.paywallBadge}
+              title={t.whyPixelify.paywallTitle}
+              description={t.whyPixelify.paywallDesc}
               tone="amber"
             />
 
             <FeatureCard
               index={4}
               icon={WifiOff}
-              tag="Persistent Cache"
-              badge="Works Offline"
-              title="Anywhere, Even Airplane Mode"
-              description="Model weights cache automatically in your browser. Once loaded once, upscale and edit seamlessly without an active internet connection."
+              tag={t.whyPixelify.offlineTag}
+              badge={t.whyPixelify.offlineBadge}
+              title={t.whyPixelify.offlineTitle}
+              description={t.whyPixelify.offlineDesc}
               tone="blue"
             />
 
             <FeatureCard
               index={5}
               icon={Sliders}
-              tag="Pro Canvas Studio"
-              badge="Batch Ready"
-              title="Interactive Creative Studio"
-              description="Split-screen compare sliders, transparent alpha matting, custom backdrop replacement, and lossless PNG/WebP exports built for designers."
+              tag={t.whyPixelify.proStudioTag}
+              badge={t.whyPixelify.proStudioBadge}
+              title={t.whyPixelify.proStudioTitle}
+              description={t.whyPixelify.proStudioDesc}
               tone="rose"
               className="sm:col-span-2 lg:col-span-3"
               visual={
                 <div className="grid grid-cols-1 gap-3 text-xs sm:grid-cols-2 lg:grid-cols-4">
-                  {['Sub-pixel masking', '2x, 4x, 8x scaling', 'Transparent PNG / WebP', 'Batch drag & drop'].map((item) => (
+                  {[
+                    t.whyPixelify.featureSubPixel,
+                    t.whyPixelify.featureScaling,
+                    t.whyPixelify.featureFormats,
+                    t.whyPixelify.featureBatch,
+                  ].map((item) => (
                     <div key={item} className="flex items-center gap-2 font-medium">
                       <CircleCheckBig size={15} className="shrink-0 text-emerald-600" />
                       <span>{item}</span>
@@ -199,28 +206,28 @@ export default function WhyChoosePixelify() {
           <div className="pixelify-comparison mt-7 rounded-2xl p-5 sm:mt-9 sm:rounded-3xl sm:p-8">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
               <div className="flex flex-col gap-3.5">
-                <span className="text-md font-bold uppercase tracking-wider text-rose-400">Traditional Cloud AI Tools</span>
+                <span className="text-md font-bold uppercase tracking-wider text-rose-400">{t.whyPixelify.cloudTitle}</span>
                 <ul className="flex flex-col gap-3 text-sm text-neutral-300">
-                  <li className="flex items-start gap-2.5"><XCircle size={16} className="mt-0.5 shrink-0 text-rose-500" /><span>Images uploaded to third-party servers and cloud logs</span></li>
-                  <li className="flex items-start gap-2.5"><XCircle size={16} className="mt-0.5 shrink-0 text-rose-500" /><span>$20 to $60/month subscriptions or restrictive token credit meters</span></li>
-                  <li className="flex items-start gap-2.5"><XCircle size={16} className="mt-0.5 shrink-0 text-rose-500" /><span>Compressed outputs with forced watermarks on free tiers</span></li>
+                  <li className="flex items-start gap-2.5"><XCircle size={16} className="mt-0.5 shrink-0 text-rose-500" /><span>{t.whyPixelify.cloudPoint1}</span></li>
+                  <li className="flex items-start gap-2.5"><XCircle size={16} className="mt-0.5 shrink-0 text-rose-500" /><span>{t.whyPixelify.cloudPoint2}</span></li>
+                  <li className="flex items-start gap-2.5"><XCircle size={16} className="mt-0.5 shrink-0 text-rose-500" /><span>{t.whyPixelify.cloudPoint3}</span></li>
                 </ul>
               </div>
               <div className="flex flex-col gap-3.5 border-t border-neutral-200 pt-6 md:border-l md:border-t-0 md:pl-8 md:pt-0">
-                <span className="text-md font-bold uppercase tracking-wider text-emerald-400">Pixelify Local In-Browser AI</span>
+                <span className="text-md font-bold uppercase tracking-wider text-emerald-400">{t.whyPixelify.localTitle}</span>
                 <ul className="flex flex-col gap-3 text-sm font-medium text-neutral-300">
-                  <li className="flex items-start gap-2.5"><CheckCircle2 size={16} className="mt-0.5 shrink-0 text-emerald-600" /><span>100% private, photos stay strictly in your browser RAM</span></li>
-                  <li className="flex items-start gap-2.5"><CheckCircle2 size={16} className="mt-0.5 shrink-0 text-emerald-600" /><span>Completely free with unlimited processing &amp; zero waitlists</span></li>
-                  <li className="flex items-start gap-2.5"><CheckCircle2 size={16} className="mt-0.5 shrink-0 text-emerald-600" /><span>Full-fidelity uncompressed PNG, WebP, and JPG downloads</span></li>
+                  <li className="flex items-start gap-2.5"><CheckCircle2 size={16} className="mt-0.5 shrink-0 text-emerald-600" /><span>{t.whyPixelify.localPoint1}</span></li>
+                  <li className="flex items-start gap-2.5"><CheckCircle2 size={16} className="mt-0.5 shrink-0 text-emerald-600" /><span>{t.whyPixelify.localPoint2}</span></li>
+                  <li className="flex items-start gap-2.5"><CheckCircle2 size={16} className="mt-0.5 shrink-0 text-emerald-600" /><span>{t.whyPixelify.localPoint3}</span></li>
                 </ul>
               </div>
             </div>
           </div>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-center text-xs text-white/55 sm:mt-10 sm:text-sm">
-            <span className="inline-flex items-center gap-2"><Lock size={14} className="text-[#00FF85]" /> Local-first workflow</span>
+            <span className="inline-flex items-center gap-2"><Lock size={14} className="text-[#00FF85]" /> {t.whyPixelify.footerPill1}</span>
             <span className="hidden h-1 w-1 rounded-full bg-white/25 sm:block" />
-            <span>Built for quick, everyday image tasks</span>
+            <span>{t.whyPixelify.footerPill2}</span>
           </div>
         </div>
       </div>

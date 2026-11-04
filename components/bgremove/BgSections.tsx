@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { Plus, ArrowRight, MoveHorizontal } from 'lucide-react';
 import '@/styles/bgremove-sections.css';
+import { useTranslation } from '@/locales';
 
 /* ============================================================
    BG REMOVE PAGE SECTIONS — dark "studio band" system (bgr-*)
@@ -56,33 +57,35 @@ const MARQUEE = [
 
 export const BgShowcase: React.FC = () => {
   const ref = useReveal<HTMLElement>();
+  const { t } = useTranslation();
   return (
     <section className="bgr-section" ref={ref}>
       <div className="bgr-hero">
         <div className="bgr-hero-copy">
-          <span className="bgr-eyebrow pb-reveal">Cutout Studio</span>
+          <span className="bgr-eyebrow pb-reveal">{t.bgSections?.showcaseEyebrow || "Cutout Studio"}</span>
           <h2 className="bgr-display pb-reveal" style={{ '--rv-i': '0.06s' } as React.CSSProperties}>
-            The background
+            {t.bgSections?.showcaseTitleLead || "The background"}
             <br />
-            is <em>gone</em>.<br />
-            The subject <span className="grn">stays.</span>
+            {t.bgSections?.showcaseTitleGone || <>is <em>gone</em>.</>}<br />
+            {t.bgSections?.showcaseTitleSubject || "The subject"} <span className="grn">{t.bgSections?.showcaseTitleStays || "stays."}</span>
           </h2>
           <p className="bgr-lede pb-reveal" style={{ '--rv-i': '0.12s' } as React.CSSProperties}>
-            Powered by a high-precision segmentation network running on your local GPU. Drop a frame and the cutout is done before a cloud service would have finished uploading.          </p>
+            {t.bgSections?.showcaseDesc || "Powered by a high-precision segmentation network running on your local GPU. Drop a frame and the cutout is done before a cloud service would have finished uploading."}
+          </p>
         </div>
 
         <div className="bgr-shots">
           <figure className="bgr-shot pb-reveal" style={{ '--rot': '-4deg', left: '0%', top: '8%', '--rv-i': '0.15s', zIndex: 2 } as React.CSSProperties}>
             <img src={IMG_CUTOUT_STANDALONE} alt="Product cutout" loading="lazy" draggable={false} />
-            <figcaption>Product · 01</figcaption>
+            <figcaption>{t.bgSections?.shotProduct || "Product · 01"}</figcaption>
           </figure>
           <figure className="bgr-shot pb-reveal" style={{ '--rot': '2.5deg', left: '30%', top: '0%', '--rv-i': '0.24s', zIndex: 3 } as React.CSSProperties}>
             <img src={IMG_CUTOUT_STANDALONE2} alt="Portrait cutout" loading="lazy" draggable={false} />
-            <figcaption>Portrait · 02</figcaption>
+            <figcaption>{t.bgSections?.shotPortrait || "Portrait · 02"}</figcaption>
           </figure>
           <figure className="bgr-shot pb-reveal" style={{ '--rot': '5deg', left: '58%', top: '16%', '--rv-i': '0.33s', zIndex: 1 } as React.CSSProperties}>
             <img src={IMG_CUTOUT_STANDALONE3} alt="Studio cutout" loading="lazy" draggable={false} />
-            <figcaption>Studio · 03</figcaption>
+            <figcaption>{t.bgSections?.shotStudio || "Studio · 03"}</figcaption>
           </figure>
         </div>
       </div>
@@ -108,22 +111,23 @@ const Crosshair: React.FC = () => (
 
 export const BgPipeline: React.FC = () => {
   const ref = useReveal<HTMLElement>();
+  const { t } = useTranslation();
   return (
     <section className="bgr-section" ref={ref}>
       <div className="bgr-pipe">
         <div className="bgr-pipe-left">
-          <span className="bgr-eyebrow pb-reveal">The pipeline</span>
+          <span className="bgr-eyebrow pb-reveal">{t.bgSections?.pipelineEyebrow || "The pipeline"}</span>
           <h2 className="bgr-display pb-reveal" style={{ '--rv-i': '0.06s' } as React.CSSProperties}>
-            Three moves.
+            {t.bgSections?.pipelineTitleLead || "Three moves."}
             <br />
-            <em>Absolute privacy.</em>
+            <em>{t.bgSections?.pipelineTitleItalic || "Absolute privacy."}</em>
           </h2>
           <p className="bgr-lede pb-reveal" style={{ '--rv-i': '0.12s' } as React.CSSProperties}>
-            From drag-and-drop to finished cutout without a single byte leaving the machine.
+            {t.bgSections?.pipelineDesc || "From drag-and-drop to finished cutout without a single byte leaving the machine."}
           </p>
           <div className="bgr-cross-wrap pb-reveal" style={{ '--rv-i': '0.18s' } as React.CSSProperties} aria-hidden="true">
             <Crosshair />
-            <span className="bgr-cross-hint">subject locked · on-device</span>
+            <span className="bgr-cross-hint">{t.bgSections?.pipelineHint || "subject locked · on-device"}</span>
           </div>
         </div>
 
@@ -131,27 +135,27 @@ export const BgPipeline: React.FC = () => {
           <article className="bgr-step pb-reveal" style={{ '--rv-i': '0.08s' } as React.CSSProperties}>
             <span className="bgr-ghost">01</span>
             <div>
-              <span className="bgr-step-k">Drop</span>
-              <h3>Land the image</h3>
-              <p>PNG, JPG or WebP up to 20 MB by dragging it in, pasting with Ctrl+V, or pick a file. Processing begins the moment it arrives.</p>
+              <span className="bgr-step-k">{t.bgSections.pipelineStep1K}</span>
+              <h3>{t.bgSections.pipelineStep1Title}</h3>
+              <p>{t.bgSections.pipelineStep1Desc}</p>
             </div>
           </article>
 
           <article className="bgr-step pb-reveal" style={{ '--rv-i': '0.16s' } as React.CSSProperties}>
             <span className="bgr-ghost">02</span>
             <div>
-              <span className="bgr-step-k">Segment</span>
-              <h3>Neural separation</h3>
-              <p>Chopper runs directly on your hardware, leveraging WebGPU when available and WebAssembly everywhere else. Hair, fur and glass edges included.</p>
+              <span className="bgr-step-k">{t.bgSections.pipelineStep2K}</span>
+              <h3>{t.bgSections.pipelineStep2Title}</h3>
+              <p>{t.bgSections.pipelineStep2Desc}</p>
             </div>
           </article>
 
           <article className="bgr-step pb-reveal" style={{ '--rv-i': '0.24s' } as React.CSSProperties}>
             <span className="bgr-ghost">03</span>
             <div>
-              <span className="bgr-step-k">Ship</span>
-              <h3>Refine & export</h3>
-              <p>Brush edges back, swap backgrounds, and add shadows. Then, save as a transparent PNG, WebP, or JPG in a single click.</p>
+              <span className="bgr-step-k">{t.bgSections.pipelineStep3K}</span>
+              <h3>{t.bgSections.pipelineStep3Title}</h3>
+              <p>{t.bgSections.pipelineStep3Desc}</p>
             </div>
           </article>
         </div>
@@ -164,6 +168,7 @@ export const BgPipeline: React.FC = () => {
    4 — PRECISION : viewfinder lens + counter stats
    ============================================================ */
 const Lens: React.FC<{ before: string; after: string }> = ({ before, after }) => {
+  const { t } = useTranslation();
   const [cut, setCut] = useState(50);
   // Default to actual GTA pair aspect ratio (1680x2100 -> 0.8) so it never scales or shifts on initial load or reload
   const [ar, setAr] = useState(1680 / 2100);
@@ -229,9 +234,9 @@ const Lens: React.FC<{ before: string; after: string }> = ({ before, after }) =>
         <span className="bgr-lens-handle" style={{ left: `${cut}%` }}>
           <span className="bgr-lens-knob"><MoveHorizontal size={15} strokeWidth={2.4} /></span>
         </span>
-        <span className="bgr-lens-rec">Live · On-device</span>
-        <span className="bgr-lens-tag is-before">Original</span>
-        <span className="bgr-lens-tag is-after">Cutout</span>
+        <span className="bgr-lens-rec">{t.bgSections.lensLive}</span>
+        <span className="bgr-lens-tag is-before">{t.bgSections.lensOriginal}</span>
+        <span className="bgr-lens-tag is-after">{t.bgSections.lensCutout}</span>
       </div>
     </div>
   );
@@ -239,6 +244,7 @@ const Lens: React.FC<{ before: string; after: string }> = ({ before, after }) =>
 
 export const BgPrecision: React.FC = () => {
   const ref = useReveal<HTMLElement>();
+  const { t } = useTranslation();
   return (
     <section className="bgr-section" ref={ref}>
       <PlusMark style={{ top: '4%', right: '2%' }} />
@@ -250,32 +256,32 @@ export const BgPrecision: React.FC = () => {
         </div>
 
         <div>
-          <span className="bgr-eyebrow pb-reveal">Edge precision</span>
+          <span className="bgr-eyebrow pb-reveal">{t.bgSections?.precisionEyebrow || "Edge precision"}</span>
           <h2 className="bgr-display pb-reveal" style={{ '--rv-i': '0.06s', fontSize: 'clamp(34px, 4.4vw, 56px)' } as React.CSSProperties}>
-            Zoom in.
+            {t.bgSections?.precisionTitleLead || "Zoom in."}
             <br />
-            <em>Judge yourself.</em>
+            <em>{t.bgSections?.precisionTitleItalic || "Judge yourself."}</em>
           </h2>
           <p className="bgr-lede pb-reveal" style={{ '--rv-i': '0.12s', fontSize: 13.5 } as React.CSSProperties}>
-            Drag the slider across the frame, the left side shows the original shot, the right shows the isolated subject. Your export keeps exactly what you see here.
+            {t.bgSections?.precisionDesc || "Drag the slider across the frame, the left side shows the original shot, the right shows the isolated subject. Your export keeps exactly what you see here."}
           </p>
 
           <div className="bgr-stats">
             <div className="bgr-stat pb-reveal" style={{ '--rv-i': '0.16s' } as React.CSSProperties}>
               <b>40<small>MB</small></b>
-              <span>Model cached after first run</span>
+              <span>{t.bgSections?.statModel || "Model cached after first run"}</span>
             </div>
             <div className="bgr-stat pb-reveal" style={{ '--rv-i': '0.22s' } as React.CSSProperties}>
               <b>15<small>MB</small></b>
-              <span>Maximum upload per image</span>
+              <span>{t.bgSections?.statMax || "Maximum upload per image"}</span>
             </div>
             <div className="bgr-stat pb-reveal" style={{ '--rv-i': '0.28s' } as React.CSSProperties}>
               <b>3<small>FMT</small></b>
-              <span>PNG · WebP · JPG exports</span>
+              <span>{t.bgSections?.statFmt || "PNG · WebP · JPG exports"}</span>
             </div>
             <div className="bgr-stat pb-reveal" style={{ '--rv-i': '0.34s' } as React.CSSProperties}>
               <b>100<small>%</small></b>
-              <span>Processed on your hardware</span>
+              <span>{t.bgSections?.statHw || "Processed on your hardware"}</span>
             </div>
           </div>
         </div>
@@ -302,8 +308,15 @@ const SAMPLES: SampleDef[] = [
 
 export const BgSampleGallery: React.FC<{ onLoadSample: (src: string, name: string) => void }> = ({ onLoadSample }) => {
   const ref = useReveal<HTMLElement>();
+  const { t } = useTranslation();
   const previewRef = useRef<HTMLDivElement>(null);
   const previewImgRef = useRef<HTMLImageElement>(null);
+
+  const samples: SampleDef[] = useMemo(() => [
+    { src: IMG_S1, name: t.bgSections?.sample1Name || 'Street Portrait', tag: t.bgSections?.sample1Tag || 'Portrait' },
+    { src: IMG_S2, name: t.bgSections?.sample2Name || 'Studio Subject', tag: t.bgSections?.sample2Tag || 'Studio' },
+    { src: IMG_S3, name: t.bgSections?.sample3Name || 'Wildlife Shot', tag: t.bgSections?.sample3Tag || 'Wildlife' },
+  ], [t]);
 
   const showPreview = useCallback((src: string, x: number, y: number) => {
     const el = previewRef.current;
@@ -329,20 +342,20 @@ export const BgSampleGallery: React.FC<{ onLoadSample: (src: string, name: strin
 
       <div className="bgr-samples-head">
         <div>
-          <span className="bgr-eyebrow pb-reveal">Try it live</span>
+          <span className="bgr-eyebrow pb-reveal">{t.bgSections?.galleryEyebrow || "Try it live"}</span>
           <h2 className="bgr-display pb-reveal" style={{ '--rv-i': '0.06s' } as React.CSSProperties}>
-            Pick a frame.
+            {t.bgSections?.galleryTitleLead || "Pick a frame."}
             <br />
-            <em>Watch it split.</em>
+            <em>{t.bgSections?.galleryTitleItalic || "Watch it split."}</em>
           </h2>
         </div>
         <p className="bgr-lede pb-reveal" style={{ '--rv-i': '0.12s', maxWidth: 380 } as React.CSSProperties}>
-          Each row runs the exact network you'll use on your own files. Click an option below to start the cutout instantly on the canvas.
+          {t.bgSections?.galleryDesc || "Each row runs the exact network you'll use on your own files. Click an option below to start the cutout instantly on the canvas."}
         </p>
       </div>
 
       <div className="bgr-index" onMouseLeave={hidePreview}>
-        {SAMPLES.map((s, i) => (
+        {samples.map((s, i) => (
           <button
             key={s.name}
             type="button"
@@ -419,6 +432,8 @@ const FAQ_ITEMS = [
 export const BgFaq: React.FC = () => {
   const ref = useReveal<HTMLElement>();
   const [openIdx, setOpenIdx] = useState<number | null>(0);
+  const { t } = useTranslation();
+  const faqItems = t.bgSections?.faqItems || FAQ_ITEMS;
 
   return (
     <section className="uc-faq" ref={ref}>
@@ -429,7 +444,7 @@ export const BgFaq: React.FC = () => {
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'FAQPage',
-            mainEntity: FAQ_ITEMS.map((f) => ({
+            mainEntity: faqItems.map((f) => ({
               '@type': 'Question',
               name: f.q,
               acceptedAnswer: { '@type': 'Answer', text: f.a },
@@ -441,12 +456,14 @@ export const BgFaq: React.FC = () => {
       <div className="uc-faq-inner">
         <header className="uc-faq-head">
           <h2 className="uc-faq-title pb-reveal" style={{ '--rv-i': 1 } as React.CSSProperties}>
-           <span className='text-[#00ff85]'>F</span>requently <span className='text-[#00ff85]'>A</span>sked <span className='text-[#00ff85]'>Q</span>uestions
+           <span className='text-[#00ff85]'>{t.homeFaq?.titlePrefix || 'Frequently'}</span>{' '}
+           <span className='text-[#00ff85]'>{t.homeFaq?.titleMiddle || 'Asked'}</span>{' '}
+           <span className='text-[#00ff85]'>{t.homeFaq?.titleSuffix || 'Questions'}</span>
           </h2>
         </header>
 
         <div className="uc-faq-list">
-          {FAQ_ITEMS.map((item, idx) => {
+          {faqItems.map((item, idx) => {
             const isOpen = openIdx === idx;
             return (
               <article

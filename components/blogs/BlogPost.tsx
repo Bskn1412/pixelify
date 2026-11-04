@@ -14,6 +14,8 @@ import type { ViewTab } from '../../types';
 import BlogContent from './BlogContent';
 import BlogCard from './BlogCard';
 import Footer from '../Footer';
+import { useTranslation } from '../../locales';
+import { useApp } from '../AppProvider';
 
 interface BlogPostProps {
   slug: string;
@@ -34,11 +36,20 @@ export function TagPill({ tag }: { tag: string }) {
 }
 
 export default function BlogPost({ slug, lang, onTabChange }: BlogPostProps) {
+  const { currentLang, setCurrentLang } = useApp();
+  const { t } = useTranslation();
   // /blogs/<slug> is English; /blogs/<lang>/<slug> is a translation.
-  const postLang = lang && isSupportedLang(lang) ? lang : 'en';
+  const routeLang = lang && isSupportedLang(lang) ? lang : 'en';
+  const postLang = currentLang && isSupportedLang(currentLang) ? currentLang : routeLang;
   const post = slug ? getPostBySlug(slug, postLang) : null;
   const related = slug ? getRelatedPosts(slug, 3, postLang) : [];
   const [shared, setShared] = useState(false);
+
+  useEffect(() => {
+    if (lang && isSupportedLang(lang) && lang !== currentLang) {
+      setCurrentLang(lang);
+    }
+  }, [lang, currentLang, setCurrentLang]);
 
   // Reading a translated article should expose its language to screen
   // readers and to the browser; the page chrome stays English.
@@ -92,13 +103,13 @@ export default function BlogPost({ slug, lang, onTabChange }: BlogPostProps) {
           <span className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-[#A4D641]">
             404
           </span>
-          <h1 className="mt-4 text-3xl font-bold text-white sm:text-4xl">Article not found</h1>
-          <p className="mt-3 text-[15px] text-muted">The page you were looking for doesn't exist.</p>
+          <h1 className="mt-4 text-3xl font-bold text-white sm:text-4xl">{t.blogs.notFound}</h1>
+          <p className="mt-3 text-[15px] text-muted">{t.blogs.notFoundDesc}</p>
           <Link
             href="/blogs"
             className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#0A0A0A] transition hover:bg-white/90"
           >
-            ← Back to all articles
+            ← {t.blogs.backToBlogs}
           </Link>
         </div>
         <Footer onTabChange={onTabChange} />
@@ -205,19 +216,19 @@ export default function BlogPost({ slug, lang, onTabChange }: BlogPostProps) {
               type="button"
               onClick={handleShare}
               className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-full border border-white/25 bg-transparent px-4 py-1.5 text-[13px] font-medium leading-none text-white/90 transition hover:border-white/50 hover:text-white"
-              aria-label="Share this article"
+              aria-label={t.blogs.shareArticle}
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7" />
                 <path d="M16 6l-4-4-4 4" />
                 <path d="M12 2v13" />
               </svg>
-              {shared ? 'Link copied' : 'Share'}
+              {shared ? t.blogs.linkCopied : t.blogs.shareArticle}
             </button>
           </div>
           {/* more-from row, like the reference's post-footer */}
           <div className="mt-5 border-t border-white/10 pt-4 text-[13px] text-white/55">
-            More from{' '}
+            {t.blogs.moreFrom}{' '}
             <Link
               href={post.lang === 'en' ? '/blogs' : `/blogs?lang=${post.lang}`}
               className="font-medium text-white underline underline-offset-2 hover:text-white/80"
@@ -234,7 +245,7 @@ export default function BlogPost({ slug, lang, onTabChange }: BlogPostProps) {
       {related.length > 0 && (
         <section className="w-full border-t border-white/10 bg-[#0F0F0F]">
           <div className="mx-auto w-full max-w-[1092px] px-4 py-14 sm:px-6">
-            <h2 className="font-sans text-[20px] font-bold tracking-tight text-white">More from Pixelify</h2>
+            <h2 className="font-sans text-[20px] font-bold tracking-tight text-white">{t.blogs.moreFrom}</h2>
 
             <div className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {related.map((p) => (

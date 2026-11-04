@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useApp } from './AppProvider';
+import { useTranslation } from '@/locales';
 
 interface BGRemoverSectionProps {
     onLaunchBGRemove: () => void;
 }
 
 export default function BGRemoverSection({ onLaunchBGRemove }: BGRemoverSectionProps) {
+    const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState(0);
     const [isHovered, setIsHovered] = useState(false);
     const { warmup } = useApp();
@@ -99,8 +101,8 @@ export default function BGRemoverSection({ onLaunchBGRemove }: BGRemoverSectionP
                 {/* ========================================================================= */}
                 <div className="flex flex-col items-center justify-center text-center">
                     <h2 className="text-2xl sm:text-3xl lg:text-[34px] xl:text-[38px] font-extrabold tracking-tight text-neutral-950 leading-tight">
-                        Precision Background Removal{' '}
-                        <span className="text-[#00C86A]">with AI</span>
+                        {t.bgRemoverSection?.titlePrefix || 'Precision Background Removal'}{' '}
+                        <span className="text-[#00C86A]">{t.bgRemoverSection?.titleSuffix || 'with AI'}</span>
                     </h2>
                 </div>
 
@@ -123,7 +125,7 @@ export default function BGRemoverSection({ onLaunchBGRemove }: BGRemoverSectionP
                                     className={`text-xl sm:text-2xl lg:text-[32px] xl:text-[36px] font-bold tracking-tight transition-colors duration-300 leading-tight ${activeTab === 0 ? 'text-neutral-950' : 'text-neutral-400 hover:text-neutral-600'
                                         }`}
                                 >
-                                    <span className={activeTab === 0 ? 'text-[#00C86A]' : ''}>100% Free </span>and unlimited.
+                                    <span className={activeTab === 0 ? 'text-[#00C86A]' : ''}>{t.bgRemoverSection?.item1TitleLead || '100% Free'} </span>{t.bgRemoverSection?.item1TitleTail || 'and unlimited.'}
                                 </h3>
                                 {activeTab === 0 && (
                                     <motion.div
@@ -133,7 +135,7 @@ export default function BGRemoverSection({ onLaunchBGRemove }: BGRemoverSectionP
                                         className="mt-3 flex flex-col gap-2 sm:gap-3 max-w-lg"
                                     >
                                         <p className="text-xs sm:text-sm lg:text-base text-neutral-600 font-normal leading-relaxed">
-                                            Remove backgrounds from portraits, product photos, and complex images in seconds. No tedious manual selection or paid credits required.
+                                            {t.bgRemoverSection?.item1Desc || 'Remove backgrounds from portraits, product photos, and complex images in seconds. No tedious manual selection or paid credits required.'}
                                         </p>
                                     </motion.div>
                                 )}
@@ -148,7 +150,7 @@ export default function BGRemoverSection({ onLaunchBGRemove }: BGRemoverSectionP
                                     className={`text-xl sm:text-2xl lg:text-[32px] xl:text-[36px] font-bold tracking-tight transition-colors duration-300 leading-tight ${activeTab === 1 ? 'text-neutral-950' : 'text-neutral-400 hover:text-neutral-600'
                                         }`}
                                 >
-                                    <span className={activeTab === 1 ? 'text-[#00C86A]' : ''}>On-Device Privacy</span> with zero cloud uploads.
+                                    <span className={activeTab === 1 ? 'text-[#00C86A]' : ''}>{t.bgRemoverSection?.item2TitleLead || 'On-Device Privacy'}</span> {t.bgRemoverSection?.item2TitleTail || 'with zero cloud uploads.'}
                                 </h3>
                                 {activeTab === 1 && (
                                     <motion.div
@@ -158,7 +160,7 @@ export default function BGRemoverSection({ onLaunchBGRemove }: BGRemoverSectionP
                                         className="mt-3 flex flex-col gap-2 sm:gap-3 max-w-lg"
                                     >
                                         <p className="text-xs sm:text-sm lg:text-base text-neutral-600 font-normal leading-relaxed">
-                                           Your images stay on your device while the AI processes them in your browser. Enjoy a more private workflow without uploading photos to a server.
+                                            {t.bgRemoverSection?.item2Desc || 'Your images stay on your device while the AI processes them in your browser. Enjoy a more private workflow without uploading photos to a server.'}
                                         </p>
                                     </motion.div>
                                 )}
@@ -173,7 +175,7 @@ export default function BGRemoverSection({ onLaunchBGRemove }: BGRemoverSectionP
                                     className={`text-xl sm:text-2xl lg:text-[32px] xl:text-[36px] font-bold tracking-tight transition-colors duration-300 leading-tight ${activeTab === 2 ? 'text-neutral-950' : 'text-neutral-400 hover:text-neutral-600'
                                         }`}
                                 >
-                                    <span className={activeTab === 2 ? 'text-[#00C86A]' : ''}>Custom Backdrops</span> & full original resolution export.
+                                    <span className={activeTab === 2 ? 'text-[#00C86A]' : ''}>{t.bgRemoverSection?.item3TitleLead || 'Custom Backdrops'}</span> {t.bgRemoverSection?.item3TitleTail || '& full original resolution export.'}
                                 </h3>
                                 {activeTab === 2 && (
                                     <motion.div
@@ -183,7 +185,7 @@ export default function BGRemoverSection({ onLaunchBGRemove }: BGRemoverSectionP
                                         className="mt-3 flex flex-col gap-2 sm:gap-3 max-w-lg"
                                     >
                                         <p className="text-xs sm:text-sm lg:text-base text-neutral-600 font-normal leading-relaxed">
-                                            Download crisp transparent PNG cutouts or give your images a new background. Export at the original image dimensions, ready for websites, stores, and creative projects.
+                                            {t.bgRemoverSection?.item3Desc || 'Download crisp transparent PNG cutouts or give your images a new background. Export at the original image dimensions, ready for websites, stores, and creative projects.'}
                                         </p>
                                     </motion.div>
                                 )}
@@ -197,7 +199,7 @@ export default function BGRemoverSection({ onLaunchBGRemove }: BGRemoverSectionP
                                 onMouseEnter={() => warmup('bg_remove')}
                                 className="w-fit justify-center px-6 py-3.5 rounded-full bg-neutral-950 hover:bg-black text-white font-bold text-sm shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2 group cursor-pointer"
                             >
-                                <span>Explore BG Remover</span>
+                                <span>{t.bgRemoverSection?.exploreButton || 'Explore BG Remover'}</span>
                                 <span className="text-[#00FF85] group-hover:translate-x-1 transition-transform">→</span>
                             </button>
                         </div>
@@ -232,7 +234,7 @@ export default function BGRemoverSection({ onLaunchBGRemove }: BGRemoverSectionP
                                 onTouchStart={() => warmup('bg_remove')}
                                 className="w-fit justify-center px-6 py-3.5 rounded-full bg-neutral-950 hover:bg-black text-white font-bold text-sm shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2 group cursor-pointer"
                             >
-                                <span>Explore BG Remover</span>
+                                <span>{t.bgRemoverSection?.exploreButton || 'Explore BG Remover'}</span>
                                 <span className="text-[#00FF85] group-hover:translate-x-1 transition-transform">→</span>
                             </button>
                         </div>

@@ -1,11 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { X, Home, Eraser, Maximize, ChevronRight, Trash2, ExternalLink, Cpu, Globe, Check } from 'lucide-react';
 import type { ViewTab } from '../types';
 import Logo from './Logo';
 import { EngineRow } from './Navbar';
 import { useApp } from './AppProvider';
 import { SITE_LANGUAGES } from '../lib/i18n';
+import { useTranslation } from '../locales';
 import Link from 'next/link';
+import { useRouter, usePathname } from 'next/navigation';
 
 type Engine = 'webgpu' | 'wasm' | null;
 
@@ -54,6 +56,58 @@ export default function MobileSidebar({
   isOnline = true,
 }: MobileSidebarProps) {
   const { currentLang, setCurrentLang } = useApp();
+  const { t } = useTranslation();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleLanguageChange = useCallback((newLang: string) => {
+    setCurrentLang(newLang);
+    onClose();
+
+    if (pathname && pathname.startsWith('/blogs')) {
+      const rawSegments = pathname.replace(/^\/blogs\/?/, '').split('/').filter(Boolean);
+      if (rawSegments.length === 0) {
+        if (newLang === 'en') {
+          router.push('/blogs');
+        } else {
+          router.push(`/blogs/${newLang}`);
+        }
+        return;
+      }
+      if (rawSegments.length === 1) {
+        const seg = rawSegments[0];
+        const isLangIndex = SITE_LANGUAGES.some((l) => l.code === seg);
+        if (isLangIndex) {
+          if (newLang === 'en') {
+            router.push('/blogs');
+          } else {
+            router.push(`/blogs/${newLang}`);
+          }
+        } else {
+          if (newLang === 'en') {
+            router.push(`/blogs/${seg}`);
+          } else {
+            router.push(`/blogs/${newLang}/${seg}`);
+          }
+        }
+        return;
+      }
+      if (rawSegments.length >= 2) {
+        const slug = rawSegments[1];
+        if (newLang === 'en') {
+          router.push(`/blogs/${slug}`);
+        } else {
+          router.push(`/blogs/${newLang}/${slug}`);
+        }
+        return;
+      }
+    }
+  }, [pathname, router, setCurrentLang, onClose]);
+  const navItems = [
+    { tab: 'home' as ViewTab, label: t.nav.home, Icon: Home },
+    { tab: 'bg_remove' as ViewTab, label: t.nav.bgRemove, Icon: Eraser },
+    { tab: 'upscaler' as ViewTab, label: t.nav.upscaler, Icon: Maximize },
+  ];
 
   // Close on Escape while open
   useEffect(() => {
@@ -114,7 +168,7 @@ export default function MobileSidebar({
 
         {/* NAV LINKS (flat rows: icon + label + right chevron) */}
         <nav className="flex flex-col gap-1 px-3" aria-label="Mobile sidebar navigation">
-          {NAV_ITEMS.map(({ tab, label, Icon }) => {
+          {navItems.map(({ tab, label, Icon }) => {
             const isActive = activeTab === tab;
             return (
               <button
@@ -150,11 +204,11 @@ export default function MobileSidebar({
           </div>
           <div className="flex flex-col gap-1.5 rounded-xl border border-white/[0.07] bg-black/25 px-2.5 py-2">
             
-            <EngineRow label="AI Upscaler engine" engine={upscalerEngine} />
-            <EngineRow label="BG Remover engine" engine={bgEngine} />
+            <EngineRow label={t.nav.upscaler} engine={upscalerEngine} />
+            <EngineRow label={t.nav.bgRemove} engine={bgEngine} />
             {webgpuAvailable !== undefined && (
               <div className="flex items-center justify-between text-[11px]">
-                <span className="font-semibold text-neutral-400">WebGPU availability</span>
+                <span className="font-semibold text-neutral-400">{t.nav.webgpuSupport}</span>
                 <span
                   className={`font-mono text-[9.5px] font-bold ${
                     webgpuAvailable === null
@@ -165,10 +219,10 @@ export default function MobileSidebar({
                   }`}
                 >
                   {webgpuAvailable === null
-                    ? 'CHECKING…'
+                    ? t.nav.checking
                     : webgpuAvailable
-                    ? 'Fast'
-                    : 'Standard'}
+                    ? t.nav.available
+                    : t.nav.unavailable}
                 </span>
               </div>
             )}
@@ -183,7 +237,7 @@ export default function MobileSidebar({
           {/* LANGUAGE SELECTOR */}
           <div className="pt-2 border-t border-white/[0.06]">
             <div className="mb-2 flex items-center justify-between text-[11px] font-semibold text-neutral-400">
-              <span className="flex items-center gap-1.5"><Globe size={13} className="text-violet-300" /> Language</span>
+              <span className="flex items-center gap-1.5"><Globe size={13} className="text-violet-300" /> {t.nav.selectLanguage}</span>
               <span className="font-mono text-[10px] text-white/50 uppercase font-bold">{currentLang}</span>
             </div>
             <div className="grid grid-cols-2 gap-1.5">
@@ -196,7 +250,7 @@ export default function MobileSidebar({
                     disabled={!lang.active}
                     onClick={() => {
                       if (lang.active) {
-                        setCurrentLang(lang.code);
+                        handleLanguageChange(lang.code);
                       }
                     }}
                     className={`flex items-center justify-between rounded-xl px-2.5 py-2 text-xs transition-colors ${
@@ -207,12 +261,20 @@ export default function MobileSidebar({
                         : 'border border-white/5 bg-transparent text-neutral-600 opacity-40 cursor-not-allowed'
                     }`}
                   >
-                    <span>{lang.nativeLabel}</span>
-                    {isSelected ? (
-                      <Check size={12} className="text-[#00ff85]" />
-                    ) : !lang.active ? (
-                      <span className="text-[9px] text-neutral-500 font-mono">Soon</span>
-                    ) : null}
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <div className="w-3.5 h-3.5 flex items-center justify-center shrink-0">
+                        {isSelected && <Check size={12} className="text-[#00ff85]" />}
+                      </div>
+                      <span className="truncate">{lang.nativeLabel}</span>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0 ml-1.5">
+                      <span className="font-mono text-[10px] text-neutral-400 font-bold">
+                        {lang.short}
+                      </span>
+                      {!lang.active && (
+                        <span className="text-[9px] text-neutral-500 font-mono">{t.common.soon}</span>
+                      )}
+                    </div>
                   </button>
                 );
               })}
@@ -226,19 +288,19 @@ export default function MobileSidebar({
                 onClick={onClearModelCache}
                 disabled={isClearingModelCache || !canClearModelCache}
                 className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-[11px] font-semibold text-neutral-300 transition-colors hover:bg-white/[0.08] hover:text-white disabled:cursor-not-allowed disabled:opacity-40 active:scale-[0.98]"
-                title="Remove downloaded AI models from this browser"
+                title={t.nav.clearModelsDesc}
               >
                 <Trash2 size={13} className={isClearingModelCache ? 'animate-pulse text-white/50' : 'text-white/50'} />
-                <span>{isClearingModelCache ? 'Clearing models…' : 'Clear downloaded models'}</span>
+                <span>{isClearingModelCache ? t.nav.clearing : t.nav.clearModels}</span>
               </button>
               <Link
                 href={"/blogs/enable_webgpu_guide_b5c9e8"}
                 onClick={onClose}
                 className="flex w-full items-center justify-center gap-2 rounded-xl border border-violet-400/20 bg-violet-400/[0.07] px-3 py-2.5 text-[11px] font-medium text-violet-200 transition-colors hover:bg-violet-400/[0.14] hover:text-violet-100 active:scale-[0.98]"
-                title="Learn how to enable WebGPU in your browser"
+                title={t.nav.learnWebgpu}
               >
                 <ExternalLink size={13} className="shrink-0 text-violet-300" />
-                <span>Learn about WebGPU</span>
+                <span>{t.nav.learnWebgpu}</span>
               </Link>
             </div>
           )}

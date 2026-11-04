@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
+import { useTranslation } from '@/locales';
 
 /* ============================================================
    SECTION 2 — INFINITE SHOWREEL MARQUEE
@@ -55,6 +56,25 @@ const Card: React.FC<{ item: ReelItem }> = ({ item }) =>
 
 export const UpscaleShowreel: React.FC = () => {
   const rootRef = useRef<HTMLElement>(null);
+  const { t } = useTranslation();
+
+  const rowA: ReelItem[] = useMemo(() => [
+    { src: '/showcase/preview/dress_upscaled_4x.png', name: t.upscaleShowreel?.fashionPortrait || 'Fashion Portrait', meta: t.upscaleShowreel?.editorial || 'Editorial', ratio: '365 / 547' },
+    { src: '/showcase/preview/pets_upscaled_4x.png', name: t.upscaleShowreel?.pets || 'Pets', meta: t.upscaleShowreel?.furLevel || 'Fur-level', ratio: '321 / 175' },
+    { dark: true, src: '', name: '8K', meta: t.upscaleShowreel?.maxResolution || 'LIKE MAX OUTPUT RESOLUTION', ratio: 'auto' },
+    { src: '/showcase/preview/animal_upscaled_4x.png', name: t.upscaleShowreel?.avianPortrait || 'Avian portrait', meta: t.upscaleShowreel?.featherGrade || 'Feather-grade', ratio: '2 / 3' },
+    { src: '/showcase/preview/handshake_upscaled_4x.png', name: t.upscaleShowreel?.officialPortrait || 'Official portrait', meta: t.upscaleShowreel?.photojournalism || 'Photojournalism', ratio: '948 / 533' },
+    { src: '/showcase/preview/watch_upscaled_4x.png', name: t.upscaleShowreel?.product || 'Product', meta: t.upscaleShowreel?.studioQuality || 'Studio-quality', ratio: '3 / 4' },
+  ], [t.upscaleShowreel]);
+
+  const rowB: ReelItem[] = useMemo(() => [
+    { src: '/showcase/preview/shoes_upscaled_4x.png', name: t.upscaleShowreel?.iconicPoster || 'Iconic Poster', meta: t.upscaleShowreel?.printReady || 'Print-Ready', ratio: '547 / 365' },
+    { dark: true, src: '', name: '4', meta: t.upscaleShowreel?.movesCutout || 'Moves to Finished Cutout', ratio: 'auto' },
+    { src: '/showcase/preview/MyHeroAC_upscaled_4x.png', name: t.upscaleShowreel?.animeArt || 'Anime Art', meta: t.upscaleShowreel?.facesRestored || 'Faces Restored', ratio: '597 / 335' },
+    { src: '/showcase/preview/bmw_upscaled_4x.png', name: t.upscaleShowreel?.automotive || 'Automotive', meta: t.upscaleShowreel?.detailRecovery || 'Detail Recovery', ratio: '9 / 16' },
+    { src: '/showcase/preview/pubg_upscaled_4x.png', name: t.upscaleShowreel?.gaming || 'Gaming', meta: t.upscaleShowreel?.thumbnailReady || 'Thumbnail-Ready', ratio: '1000 / 563' },
+    { src: '/showcase/preview/demon-slayer_upscaled_4x.png', name: t.upscaleShowreel?.illustration || 'Illustration', meta: t.upscaleShowreel?.colorFidelity || 'Color Fidelity', ratio: '16 / 9' },
+  ], [t.upscaleShowreel]);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -98,23 +118,24 @@ export const UpscaleShowreel: React.FC = () => {
     <section className="uc-reel" ref={rootRef}>
       <header className="uc-reel-head">
         <h2 className="uc-reel-title pb-reveal" style={{ '--rv-i': 1 } as React.CSSProperties}>
-          Straight out of the <span className='text-[#00FF85]'>engine.</span>
+          {t.upscaleShowreel?.titleStraight || "Straight out of the"}{' '}
+          <span className="text-[#00FF85]">{t.upscaleShowreel?.titleEngine || "engine."}</span>
           <br />
-          <em>No retouching. No Photoshop.</em>
+          <em>{t.upscaleShowreel?.subtitle || "No retouching. No Photoshop."}</em>
         </h2>
       </header>
 
       <div className="uc-reel-rows pb-reveal" style={{ '--rv-i': 2 } as React.CSSProperties}>
         <div className="uc-reel-row uc-reel-row-a">
           <div className="uc-reel-track">
-            {loop(ROW_A).map((item, i) => (
+            {loop(rowA).map((item, i) => (
               <Card key={`a-${i}`} item={item} />
             ))}
           </div>
         </div>
         <div className="uc-reel-row uc-reel-row-b">
           <div className="uc-reel-track">
-            {loop(ROW_B).map((item, i) => (
+            {loop(rowB).map((item, i) => (
               <Card key={`b-${i}`} item={item} />
             ))}
           </div>

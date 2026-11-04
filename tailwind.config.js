@@ -1,6 +1,13 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}', './hooks/*.{ts,tsx}', './utils/*.{ts,tsx}', './lib/*.{ts,tsx}'],
+  content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}', './hooks/*.{ts,tsx}', './utils/*.{ts,tsx}', './lib/*.{ts,tsx}',
+
+    "./app/docs/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/pixelify-docs/**/*.{js,ts,jsx,tsx,mdx}",
+    "./data/docs/**/*.{js,ts,jsx,tsx,mdx}",
+
+
+  ],
   theme: {
     extend: {
       colors: {

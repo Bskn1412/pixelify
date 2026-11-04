@@ -45,7 +45,49 @@ const UPSCALER_CAPTIONS: Record<Exclude<CaptionBand, 'download'>, string[]> = {
   ],
 };
 
-function poolFor(percent: number, isDownload: boolean): string[] {
+function poolFor(percent: number, isDownload: boolean, dict?: Record<string, string>): string[] {
+  if (dict) {
+    if (isDownload) {
+      return [
+        dict.waitCaption1 || DOWNLOAD_CAPTIONS[0],
+        dict.waitCaption2 || DOWNLOAD_CAPTIONS[1],
+        dict.waitCaption3 || DOWNLOAD_CAPTIONS[2],
+      ];
+    }
+    if (percent < 25) {
+      return [
+        dict.waitCaption4 || UPSCALER_CAPTIONS.early[0],
+        dict.waitCaption5 || UPSCALER_CAPTIONS.early[1],
+        dict.waitCaption6 || UPSCALER_CAPTIONS.early[2],
+        dict.waitCaption7 || UPSCALER_CAPTIONS.early[3],
+        dict.waitCaption8 || UPSCALER_CAPTIONS.early[4],
+      ];
+    }
+    if (percent < 60) {
+      return [
+        dict.waitCaption9 || UPSCALER_CAPTIONS.mid[0],
+        dict.waitCaption10 || UPSCALER_CAPTIONS.mid[1],
+        dict.waitCaption11 || UPSCALER_CAPTIONS.mid[2],
+        dict.waitCaption12 || UPSCALER_CAPTIONS.mid[3],
+        dict.waitCaption13 || UPSCALER_CAPTIONS.mid[4],
+        dict.waitCaption14 || UPSCALER_CAPTIONS.mid[5],
+      ];
+    }
+    if (percent < 90) {
+      return [
+        dict.waitCaption15 || UPSCALER_CAPTIONS.late[0],
+        dict.waitCaption16 || UPSCALER_CAPTIONS.late[1],
+        dict.waitCaption17 || UPSCALER_CAPTIONS.late[2],
+        dict.waitCaption18 || UPSCALER_CAPTIONS.late[3],
+      ];
+    }
+    return [
+      dict.waitCaption19 || UPSCALER_CAPTIONS.final[0],
+      dict.waitCaption20 || UPSCALER_CAPTIONS.final[1],
+      dict.waitCaption21 || UPSCALER_CAPTIONS.final[2],
+    ];
+  }
+
   if (isDownload) return DOWNLOAD_CAPTIONS;
   const pools = UPSCALER_CAPTIONS;
   if (percent < 25) return pools.early;
@@ -55,8 +97,8 @@ function poolFor(percent: number, isDownload: boolean): string[] {
 }
 
 /** Deterministic per tick → no flicker from rerenders; rotates on interval. */
-export function pickCaption(percent: number, isDownload: boolean, tick: number): string {
-  const pool = poolFor(percent, isDownload);
+export function pickCaption(percent: number, isDownload: boolean, tick: number, dict?: Record<string, string>): string {
+  const pool = poolFor(percent, isDownload, dict);
   const index = ((tick % pool.length) + pool.length) % pool.length;
   return pool[index];
 }

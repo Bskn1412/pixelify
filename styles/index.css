@@ -215,23 +215,102 @@ html.light .gradient-text {
     -webkit-text-fill-color: transparent;
 }
 
-/* Custom Scrollbars */
+/* ============================================================
+   GLOBAL SCROLLBAR SYSTEM
+   Dark track, rounded silver pill thumb, sleek top/bottom arrows
+   ============================================================ */
+* {
+    scrollbar-width: auto;
+    scrollbar-color: #a1a1aa #141417;
+}
+
 ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 10px;
+    height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(9, 9, 11, 0.8);
+    background: #141417;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.15);
+    background-color: #a1a1aa;
     border-radius: 9999px;
+    border: 2px solid #141417;
+    background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(99, 102, 241, 0.5);
+    background-color: #d4d4d8;
+}
+
+::-webkit-scrollbar-thumb:active {
+    background-color: #f4f4f5;
+}
+
+::-webkit-scrollbar-corner {
+    background: #141417;
+}
+
+/* Scrollbar Buttons (top / bottom arrows) */
+::-webkit-scrollbar-button:single-button:vertical:decrement {
+    height: 14px;
+    width: 10px;
+    background-color: #141417;
+    background-position: center 4px;
+    background-repeat: no-repeat;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='6' viewBox='0 0 8 6' fill='%23a1a1aa'><polygon points='4,0 8,6 0,6'/></svg>");
+}
+::-webkit-scrollbar-button:single-button:vertical:decrement:hover {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='6' viewBox='0 0 8 6' fill='%23ffffff'><polygon points='4,0 8,6 0,6'/></svg>");
+}
+
+::-webkit-scrollbar-button:single-button:vertical:increment {
+    height: 14px;
+    width: 10px;
+    background-color: #141417;
+    background-position: center 4px;
+    background-repeat: no-repeat;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='6' viewBox='0 0 8 6' fill='%23a1a1aa'><polygon points='4,6 8,0 0,0'/></svg>");
+}
+::-webkit-scrollbar-button:single-button:vertical:increment:hover {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='6' viewBox='0 0 8 6' fill='%23ffffff'><polygon points='4,6 8,0 0,0'/></svg>");
+}
+
+/* Horizontal scrollbar buttons (left / right arrows) */
+::-webkit-scrollbar-button:single-button:horizontal:decrement {
+    width: 14px;
+    height: 10px;
+    background-color: #141417;
+    background-position: 4px center;
+    background-repeat: no-repeat;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='8' viewBox='0 0 6 8' fill='%23a1a1aa'><polygon points='0,4 6,0 6,8'/></svg>");
+}
+::-webkit-scrollbar-button:single-button:horizontal:decrement:hover {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='8' viewBox='0 0 6 8' fill='%23ffffff'><polygon points='0,4 6,0 6,8'/></svg>");
+}
+
+::-webkit-scrollbar-button:single-button:horizontal:increment {
+    width: 14px;
+    height: 10px;
+    background-color: #141417;
+    background-position: 4px center;
+    background-repeat: no-repeat;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='8' viewBox='0 0 6 8' fill='%23a1a1aa'><polygon points='6,4 0,0 0,8'/></svg>");
+}
+::-webkit-scrollbar-button:single-button:horizontal:increment:hover {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='8' viewBox='0 0 6 8' fill='%23ffffff'><polygon points='6,4 0,0 0,8'/></svg>");
+}
+
+/* Utility to hide scrollbar where explicitly requested */
+.scrollbar-none::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+.scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
 /* Pulse shimmer for processing */

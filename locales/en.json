@@ -1,0 +1,758 @@
+{
+  "common": {
+    "appName": "Pixelify",
+    "tagline": "Private, on-device AI image processing",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "download": "Download",
+    "remove": "Remove",
+    "clear": "Clear",
+    "reset": "Reset",
+    "back": "Back",
+    "next": "Next",
+    "soon": "Soon",
+    "active": "Active",
+    "online": "Online",
+    "offline": "Offline",
+    "reconnected": "Online",
+    "live": "Live",
+    "original": "Original",
+    "enhanced": "Enhanced",
+    "cutout": "Cutout"
+  },
+  "nav": {
+    "home": "Home",
+    "bgRemove": "BG Remover",
+    "upscaler": "AI Upscaler",
+    "blogs": "Blogs",
+    "settingsTitle": "Settings & Preferences",
+    "processingEngines": "Processing engines",
+    "webgpuSupport": "WebGPU support",
+    "checking": "Checking...",
+    "available": "Available",
+    "unavailable": "Unavailable",
+    "clearModels": "Clear models",
+    "clearing": "Clearing…",
+    "clearModelsDesc": "Remove downloaded AI models from this browser",
+    "learnWebgpu": "Learn about WebGPU",
+    "selectLanguage": "Select Language"
+  },
+  "hero": {
+    "your": "YOUR",
+    "images": "images",
+    "device": "device",
+    "control": "control",
+    "powered": "powered",
+    "by": "by",
+    "brand": "Pixelify",
+    "subtitle": "Upscale, restore, and transform your images locally, directly in your browser. No uploads. No cloud processing.",
+    "launchBg": "Launch BG Remover",
+    "launchUpscaler": "Launch AI Upscaler",
+    "scrollDown": "Scroll down"
+  },
+  "homeStudio": {
+    "badge": "Choose Your Studio",
+    "title": "AI Tools for Every Image",
+    "subtitle": "Pick the workstation built specifically for your image processing needs."
+  },
+  "whyPixelify": {
+    "eyebrow": "THE PIXELIFY DIFFERENCE",
+    "titlePrefix": "Why creators & engineers choose",
+    "subtitle": "Enterprise-grade neural networks running completely inside your browser. No cloud queues, no credit tokens, and zero privacy compromises.",
+    "zeroCloudTag": "Zero Cloud Uploads",
+    "zeroCloudBadge": "100% Private",
+    "zeroCloudTitle": "Your images stay yours.",
+    "zeroCloudDesc": "Pixelify processes your images directly in your browser. Your files stay on your device instead of being uploaded to a processing server.",
+    "sandboxing": "Client-Side Sandboxing:",
+    "sandboxingActive": "Active",
+    "processedOnDevice": "Processed On-Device",
+    "webgpuTag": "WebGPU + WASM",
+    "webgpuBadge": "Near-Native",
+    "webgpuTitle": "Raw Hardware Acceleration",
+    "webgpuDesc": "Direct GPU shaders via LiteRT and WebGPU eliminate slow server roundtrips for instant real-time processing.",
+    "engineHardware": "Hardware Engine:",
+    "engineParallelism": "GPU Core Parallelism",
+    "neuralTag": "Chopper & Vitality",
+    "neuralBadge": "8K Resolution",
+    "neuralTitle": "State-of-the-Art Neural Models",
+    "neuralDesc": "Trained on millions of high-res images to preserve flyaway hair strands, transparent glass, and micro-textures without plastic artifacts.",
+    "paywallTag": "No Paywalls",
+    "paywallBadge": "Zero Watermarks",
+    "paywallTitle": "Unlimited Generations",
+    "paywallDesc": "No $40/month subscriptions, no credit tokens, and no forced downscaling. Generate as many cutouts and upscales as you need.",
+    "offlineTag": "Persistent Cache",
+    "offlineBadge": "Works Offline",
+    "offlineTitle": "Anywhere, Even Airplane Mode",
+    "offlineDesc": "Model weights cache automatically in your browser. Once loaded once, upscale and edit seamlessly without an active internet connection.",
+    "proStudioTag": "Pro Canvas Studio",
+    "proStudioBadge": "Batch Ready",
+    "proStudioTitle": "Interactive Creative Studio",
+    "proStudioDesc": "Split-screen compare sliders, transparent alpha matting, custom backdrop replacement, and lossless PNG/WebP exports built for designers.",
+    "featureSubPixel": "Sub-pixel masking",
+    "featureScaling": "2x, 4x, 8x scaling",
+    "featureFormats": "Transparent PNG / WebP",
+    "featureBatch": "Batch drag & drop",
+    "cloudTitle": "Traditional Cloud AI Tools",
+    "cloudPoint1": "Images uploaded to third-party servers and cloud logs",
+    "cloudPoint2": "$20 to $60/month subscriptions or restrictive token credit meters",
+    "cloudPoint3": "Compressed outputs with forced watermarks on free tiers",
+    "localTitle": "Pixelify Local In-Browser AI",
+    "localPoint1": "100% private, photos stay strictly in your browser RAM",
+    "localPoint2": "Completely free with unlimited processing & zero waitlists",
+    "localPoint3": "Full-fidelity uncompressed PNG, WebP, and JPG downloads",
+    "footerPill1": "Local-first workflow",
+    "footerPill2": "Built for quick, everyday image tasks"
+  },
+  "homeFaq": {
+    "titlePrefix": "Frequently",
+    "titleMiddle": "Asked",
+    "titleSuffix": "Questions",
+    "items": [
+      {
+        "q": "How does Pixelify process images without uploading to cloud servers?",
+        "a": "The AI runs right in your browser using WebGPU and ONNX Runtime, so your images stay on your device—not on someone else’s server."
+      },
+      {
+        "q": "Is Pixelify really 100% free with no watermarks or subscriptions?",
+        "a": "Yes—no subscriptions, credits, watermarks, or surprise paywalls; just upload, edit, and download."
+      },
+      {
+        "q": "What is the maximum resolution and image size I can upscale?",
+        "a": "Upscale images up to 40 MB and 16K resolution (16,384 × 16,384 px)—your device’s memory is the only real boss here."
+      },
+      {
+        "q": "Can I use Pixelify offline without an active internet connection?",
+        "a": "Once the AI models are cached, you can process images offline—perfect for flights, commutes, or Wi-Fi that decided to take a day off."
+      },
+      {
+        "q": "How does Chopper compare to standard background removers?",
+        "a": "Chopper is designed to preserve tricky details like hair, fur, and fine edges, so your subject doesn’t end up looking like it lost a fight with scissors."
+      },
+      {
+        "q": "Does Pixelify work on mobile phones and tablets?",
+        "a": "Yes! Pixelify works on supported mobile browsers too, using WebGPU or a compatible WASM fallback when available."
+      },
+      {
+        "q": "Are my private photos and client confidential assets safe?",
+        "a": "Your images stay on your device during processing; even our site-visit counter has no business knowing what you’re editing."
+      },
+      {
+        "q": "How do I clear downloaded models if I need to free up browser storage?",
+        "a": "Open Settings and select “Clear downloaded models”—a quick cleanup without having to clear your entire browser cache."
+      }
+    ]
+  },
+  "upscaler": {
+    "badge": "On-Device Neural Super-Resolution",
+    "title": "AI Image Upscaler",
+    "subtitle": "Upscale photos and digital art up to 16K with crystal clarity. Running 100% on your device GPU via WebGPU — no uploads, zero tracking.",
+    "dropzoneTitle": "Drop image here to upscale",
+    "dropzoneSubtitle": "or browse from your device",
+    "dropzoneLimits": "PNG, JPG, WebP up to 15 MB",
+    "modelSelection": "Upscaling Model",
+    "scaleFactor": "Scale Factor",
+    "faceEnhance": "Face Enhancement",
+    "faceEnhanceDesc": "Restore facial clarity, eyes, and skin textures",
+    "denoise": "Denoise",
+    "sharpen": "Sharpen",
+    "enhanceButton": "Upscale Image",
+    "processing": "Upscaling…",
+    "downloadButton": "Download Upscaled Image",
+    "beforeAfter": "Before / After",
+    "clearAll": "Clear All",
+    "original": "Original",
+    "upscaled": "Upscaled"
+  },
+  "upscaleCapabilities": {
+    "title": "Built for Maximum Fidelity",
+    "subtitle": "A powerful suite of object isolation and resolution enhancement engines running entirely inside this tab.",
+    "detailTitle": "Generative Detail Engine",
+    "detailDesc": "Edge-aware reconstruction intelligently restores fine textures, skin details, and metallic reflections instead of stretching pixels.",
+    "speedTitle": "WebGPU Fast Path",
+    "speedDesc": "Hardware-accelerated inference with WASM fallback. Turbo passes finish in milliseconds.",
+    "speedLabel": "turbo pass on a mid-range GPU",
+    "facesTitle": "Face Restoration",
+    "facesDesc": "Portrait-aware pass revives eyes, lashes and skin tones destroyed by compression.",
+    "privacyTitle": "Nothing Leaves the Browser",
+    "privacyDesc": "Frames are processed on your silicon. No queue, no account, no watermark.",
+    "privacyBadge": "this device only",
+    "scaleTitle": "2× to 16K Output",
+    "scaleDesc": "Tile-and-stitch pipeline scales anything up to 16,384px without crashing the tab.",
+    "scaleLabel": "px maximum canvas edge",
+    "controlTitle": "Per-Image Control",
+    "controlDesc": "Model, scale, denoise, sharpen and HDR tuned independently for every file in the batch.",
+    "titleLead": "A studio-grade",
+    "titleAccent": "toolkit,",
+    "titleTail": "hiding in your browser tab."
+  },
+  "upscaleJourney": {
+    "title": "How It Works",
+    "subtitle": "From low-res thumbnail to print-ready master in three effortless steps.",
+    "step1K": "01",
+    "step1Title": "Drop anything",
+    "step1Desc": "Drag a PNG, JPG or WebP into the studio or paste straight from the clipboard with Ctrl+V. Up to 15 MB, zero setup.",
+    "step1Status": "READY",
+    "step2K": "02",
+    "step2Title": "Pick your model",
+    "step2Desc": "Vitality for instant passes, or Pixel-Dance & Alpha-Satoru for maximum fidelity, then dial in denoise, sharpen and HDR per image.",
+    "step2Status": "TUNING",
+    "step3K": "03",
+    "step3Title": "Watch it work",
+    "step3Desc": "Tiles stream through the GPU with live progress. Your photo never touches a server, the network runs in this tab.",
+    "step3Status": "INFERENCE",
+    "step4K": "04",
+    "step4Title": "Export lossless",
+    "step4Desc": "Download full-resolution PNG or WebP files without watermarks, compression artifacts, or forced sign-ups.",
+    "step4Status": "SAVED",
+    "titleLead": "Four moves.",
+    "titleItalic": "Studio output."
+  },
+  "upscaleFaq": {
+    "titlePrefix": "Frequently",
+    "titleMiddle": "Asked",
+    "titleSuffix": "Questions",
+    "items": [
+      {
+        "q": "How does Pixelify upscale to 8K like resolution?",
+        "a": "A neural super-resolution network reconstructs your image tile by tile, directly on your GPU. Each pass adds real detail, edges, texture, faces, so a small photo comes out crisp at up to 16,384 × 16,384 pixels. 8K output is one tap, not a render farm."
+      },
+      {
+        "q": "Is my image uploaded to a cloud server?",
+        "a": "Never. The model runs inside your browser tab via WebGPU / WebAssembly. Your photo is processed on your own silicon and stays on your device. There is no queue, no bucket, and no one watching."
+      },
+      {
+        "q": "Do I need an account or credits?",
+        "a": "No sign-up, no email, no credit system. Open the page, drop an image, and upscale as many files as you want. Unlimited runs, forever free."
+      },
+      {
+        "q": "What can I export, and is there a watermark?",
+        "a": "Lossless PNG or WebP at the full upscaled resolution. No watermark, no quality cap, no daily limit. What you see in the preview is exactly what you download."
+      },
+      {
+        "q": "Will it work on my laptop or phone?",
+        "a": "Yes. On devices with WebGPU you get hardware acceleration. Everywhere else the engine falls back to WebAssembly automatically, so the studio works in any modern browser."
+      },
+      {
+        "q": "How fast is a 4× upscale?",
+        "a": "The Turbo engine finishes most images in under a second on a mid-range GPU. The studio-grade Alpha-Satoru pass takes a few seconds for maximum fidelity. Both run locally, so speed depends on your hardware, not a server queue."
+      }
+    ]
+  },
+  "bgRemove": {
+    "badge": "Free · On-Device · Private",
+    "title": "Background Remover",
+    "subtitle": "Cut out subjects from photos in seconds with studio precision. Hair strands, glass, and fuzzy edges survive cleanly, completely offline.",
+    "dropzoneTitle": "Drop an image to start",
+    "dropzoneSubtitle": "or browse from your files",
+    "dropzoneLimits": "PNG, JPG, WebP up to 20 MB",
+    "refineDiablo": "Refine with Diablo Ultra Precision",
+    "diabloActive": "Diablo Ultra Precision Active",
+    "brushErase": "Erase",
+    "brushRestore": "Restore",
+    "brushSize": "Size",
+    "brushFeather": "Feather",
+    "backgroundColor": "Background Color",
+    "transparent": "Transparent",
+    "customColor": "Custom Color",
+    "solids": "Default solid colors",
+    "gradients": "Default gradient colors",
+    "addPhoto": "Add Image Backdrop",
+    "aspectRatio": "Crop Ratio",
+    "textOverlay": "Add Text",
+    "downloadCutout": "Download PNG",
+    "tabCutout": "Cutout",
+    "tabBackdrop": "Backdrop",
+    "tabText": "Text",
+    "tabRefine": "Refine"
+  },
+  "bgSections": {
+    "marquee": [
+      "Chopper segmentation",
+      "WebGPU on-device",
+      "Zero uploads",
+      "Hair-level edges",
+      "Transparent PNG",
+      "No sign-up",
+      "Unlimited runs"
+    ],
+    "pipelineStep1K": "Drop",
+    "pipelineStep1Title": "Input in seconds",
+    "pipelineStep1Desc": "Drag an image onto the canvas or paste directly from your clipboard. Runs completely in memory.",
+    "pipelineStep2K": "Segment",
+    "pipelineStep2Title": "Neural bilateral matting",
+    "pipelineStep2Desc": "Chopper & Diablo detect edges, hair wisps, and complex shapes with sub-pixel alpha masks.",
+    "pipelineStep3K": "Ship",
+    "pipelineStep3Title": "Refine & export",
+    "pipelineStep3Desc": "Brush edges back, swap backgrounds, and add shadows. Then, save as a transparent PNG, WebP, or JPG in a single click.",
+    "lensLive": "Live · On-device",
+    "lensOriginal": "Original",
+    "lensCutout": "Cutout",
+    "faqItems": [
+      {
+        "q": "How do I remove a background for free?",
+        "a": "Open the Background Remover, drag your image into the upload area, and the AI cutout starts automatically. When it finishes, download the transparent PNG, no sign-up, no credits, no watermark."
+      },
+      {
+        "q": "What is the Diablo model and how does it differ from Chopper?",
+        "a": "Chopper is our ultra-fast default model optimized for rapid cutouts across all devices. Diablo is our premium high-precision neural model powered by a 1024×1024 input tensor and advanced edge matting, engineered specifically to preserve fine flyaway hair, pet fur, transparent glass, and intricate edges with zero halo artifacts."
+      },
+      {
+        "q": "When should I use Diablo instead of Chopper?",
+        "a": "Chopper is ideal for everyday e-commerce product photos, logos, and general cutouts where speed is paramount. Use Diablo when maximum detail is needed: studio portraits with complex hair, furry animals, semi-transparent fabrics, jewelry, or high-resolution marketing assets."
+      },
+      {
+        "q": "How do I activate the Diablo Ultra Precision model?",
+        "a": "Once your cutout is generated, you will see a 'Refine with Diablo Ultra Precision' option right inside the Cutout tools sidebar. Clicking it instantly switches to Diablo's high-definition matting pipeline. You can also re-process any image with Diablo whenever you need the highest fidelity."
+      },
+      {
+        "q": "Does Diablo run locally and work offline?",
+        "a": "Yes. Both Chopper and Diablo execute 100% on your device using WebGPU with automatic multi-threaded WebAssembly fallback. Once Diablo's neural weights are downloaded to your browser's local cache on first use, it runs completely offline without sending your photos to any cloud server."
+      },
+      {
+        "q": "Are my images uploaded to a server?",
+        "a": "No. The AI models run directly inside your browser through WebGPU or WebAssembly. Your photos never leave your device, which makes Pixelify completely safe for private, confidential, or client work."
+      },
+      {
+        "q": "Which formats can I use and export?",
+        "a": "Upload PNG, JPG, and WebP up to 20 MB. Export as transparent PNG for cutouts, WebP for the web with alpha kept, or JPG flattened onto a solid background."
+      },
+      {
+        "q": "Can I replace the removed background?",
+        "a": "Yes. Once the cutout is done, open the Background tab to place your subject on a transparent canvas, a solid or gradient color, or your own uploaded photo, then download the composite in one click."
+      },
+      {
+        "q": "Does it handle hair, fur and glass?",
+        "a": "The bilateral-reference architecture is trained specifically on fine boundaries. For standard photos, Chopper preserves edges cleanly; for intricate hair strands, wisps, and fur, the Diablo Ultra Precision model delivers studio-grade alpha transparency."
+      },
+      {
+        "q": "Why is the first image slower?",
+        "a": "The neural model downloads to your browser cache on first use. Every image after that reuses the cached weights instantly, so processing drops to just a few seconds on most hardware."
+      }
+    ],
+    "showcaseEyebrow": "Cutout Studio",
+    "showcaseTitleLead": "The background",
+    "showcaseTitleGone": "is gone.",
+    "showcaseTitleSubject": "The subject",
+    "showcaseTitleStays": "stays.",
+    "showcaseDesc": "Powered by a high-precision segmentation network running on your local GPU. Drop a frame and the cutout is done before a cloud service would have finished uploading.",
+    "shotProduct": "Product · 01",
+    "shotPortrait": "Portrait · 02",
+    "shotStudio": "Studio · 03",
+    "pipelineEyebrow": "The pipeline",
+    "pipelineTitleLead": "Three moves.",
+    "pipelineTitleItalic": "Absolute privacy.",
+    "pipelineDesc": "From drag-and-drop to finished cutout without a single byte leaving the machine.",
+    "pipelineHint": "subject locked · on-device",
+    "precisionEyebrow": "Edge precision",
+    "precisionTitleLead": "Zoom in.",
+    "precisionTitleItalic": "Judge yourself.",
+    "precisionDesc": "Drag the slider across the frame, the left side shows the original shot, the right shows the isolated subject. Your export keeps exactly what you see here.",
+    "statModel": "Model cached after first run",
+    "statMax": "Maximum upload per image",
+    "statFmt": "PNG · WebP · JPG exports",
+    "statHw": "Processed on your hardware",
+    "galleryEyebrow": "Try it live",
+    "galleryTitleLead": "Pick a frame.",
+    "galleryTitleItalic": "Watch it split.",
+    "galleryDesc": "Each row runs the exact network you'll use on your own files. Click an option below to start the cutout instantly on the canvas.",
+    "sample1Name": "Street Portrait",
+    "sample1Tag": "Portrait",
+    "sample2Name": "Studio Subject",
+    "sample2Tag": "Studio",
+    "sample3Name": "Wildlife Shot",
+    "sample3Tag": "Wildlife"
+  },
+  "footer": {
+    "slogan": "Experience liftoff",
+    "feedbackTitle": "Share Feedback & Contact",
+    "feedbackDesc": "Suggestions, issues or ideas? Reach out",
+    "productCol": "Product",
+    "resourcesCol": "Resources",
+    "companyCol": "Company",
+    "legalCol": "Legal",
+    "followCol": "Follow",
+    "upscaler": "AI Image Upscaler",
+    "bgRemover": "Background Remover",
+    "products": "Products & Features",
+    "docs": "Docs",
+    "blogs": "Blogs",
+    "faqs": "FAQs",
+    "sysReq": "System requirements",
+    "about": "About Pixelify",
+    "contact": "Contact",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "rights": "All rights reserved. Processed on-device."
+  },
+  "blogs": {
+    "title": "Blog & AI Guides",
+    "subtitle": "Articles on local AI, privacy, background removal, upscaling, WebGPU, and on-device processing.",
+    "searchPlaceholder": "Search articles by title, tag, or topic…",
+    "filterLang": "Language",
+    "all": "All",
+    "readTime": "min read",
+    "by": "By",
+    "shareArticle": "Share article",
+    "linkCopied": "Link copied",
+    "moreFrom": "More from Pixelify",
+    "backToBlogs": "Back to all articles",
+    "notFound": "Article not found",
+    "notFoundDesc": "The article you are looking for does not exist in this language."
+  },
+  "uploadArea": {
+    "upscaleTitle": "Upscale",
+    "upscaleDesc": "Upload your images to\n enhance their resolution and quality.",
+    "cutoutTitle": "Cutout",
+    "cutoutDesc": "Drop your images here to start cutout\nSelect PNG, JPG, or WebP files under 20MB.",
+    "uploadMedia": "Upload Media",
+    "processing": "Processing...",
+    "remove": "Remove"
+  },
+  "bgRemoverSection": {
+    "titlePrefix": "Precision Background Removal",
+    "titleSuffix": "with AI",
+    "item1TitleLead": "100% Free",
+    "item1TitleTail": "and unlimited.",
+    "item1Desc": "Remove backgrounds from portraits, product photos, and complex images in seconds. No tedious manual selection or paid credits required.",
+    "item2TitleLead": "On-Device Privacy",
+    "item2TitleTail": "with zero cloud uploads.",
+    "item2Desc": "Your images stay on your device while the AI processes them in your browser. Enjoy a more private workflow without uploading photos to a server.",
+    "item3TitleLead": "Custom Backdrops",
+    "item3TitleTail": "& full original resolution export.",
+    "item3Desc": "Download crisp transparent PNG cutouts or give your images a new background. Export at the original image dimensions, ready for websites, stores, and creative projects.",
+    "exploreButton": "Explore BG Remover"
+  },
+  "aiUpscalerSection": {
+    "titleLead": "Upscale images on your device",
+    "titleAccent": "with AI",
+    "desc": "Enlarge photos, anime, product images, portraits, and old pictures by 2x, 4x or 8x. AI Upscaler improves clarity and generates cleaner detail in a fast offline workflow.",
+    "exploreButton": "Explore AI Upscaler",
+    "aiDelegated": "AI Delegated"
+  },
+  "homeDemo": {
+    "badge": "Instant Demos",
+    "title": "Try sample assets with a single click",
+    "loading": "Loading…",
+    "bgRemoveType": "BG REMOVE",
+    "aiUpscaleType": "AI UPSCALE",
+    "samples": {
+      "sports": {
+        "name": "Sports",
+        "desc": "Extract subject with sub-pixel edge detection"
+      },
+      "anime": {
+        "name": "Anime Art",
+        "desc": "4x upscale with micro-texture enhancement"
+      },
+      "ocean": {
+        "name": "Ocean Life",
+        "desc": "Clean product cutout for commercial use"
+      },
+      "oldPhoto": {
+        "name": "Old Photo",
+        "desc": "Clean product cutout for commercial use"
+      }
+    },
+    "features": [
+      {
+        "title": "Background Remover",
+        "subtitle": "Isolate subjects with sub-pixel precision around transparent objects and fine hair strands.",
+        "badge": "Chopper AI",
+        "detailTitle": "Chopper Neural Segmentation",
+        "detailDesc": "Dual-path vision transformers generate smooth alpha matte masks directly in browser memory."
+      },
+      {
+        "title": "Background Remover",
+        "subtitle": "Isolate subjects with sub-pixel precision around transparent objects and fine hair strands.",
+        "badge": "Chopper AI",
+        "detailTitle": "Chopper Neural Segmentation",
+        "detailDesc": "Dual-path vision transformers generate smooth alpha matte masks directly in browser memory."
+      },
+      {
+        "title": "AI Upscaler",
+        "subtitle": "Reconstruct high-frequency textures and crisp edges up to 8K like resolution without artifacts.",
+        "badge": "8x Factor",
+        "detailTitle": "Vitality, Pixel-Dance & Alpha-Satoru",
+        "detailDesc": "Direct LiteRT execution utilizing WebGPU shaders for hardware-accelerated tensor math."
+      },
+      {
+        "title": "AI Upscaler",
+        "subtitle": "Zero cloud servers, zero external data uploads. Your images never leave your computer.",
+        "badge": "Local WASM",
+        "detailTitle": "Air-Gapped Client Security",
+        "detailDesc": "Complete offline capability powered by WASM SIMD and WebGPU."
+      }
+    ]
+  },
+  "homeWorkflow": {
+    "workspace": "PIXELIFY",
+    "workspaceSub": "/ WORKSPACE",
+    "privacyFirst": "PRIVACY FIRST",
+    "interactivePreview": "Interactive preview",
+    "exploreBefore": "Explore the workflow before opening a tool.",
+    "desktopExp": "Desktop experience",
+    "workflow": "Workflow",
+    "pauseDemo": "Pause demo",
+    "playDemo": "Play demo",
+    "nextWorkflow": "Next workflow",
+    "nextStep": "Next step",
+    "processing": "Processing",
+    "previewReady": "Preview ready",
+    "demoMode": "Demo mode",
+    "step0": "Add an image to get started",
+    "step1": "Configure",
+    "step2Bg": "Refining the subject edges",
+    "step2Upscale": "Enhancing image details",
+    "step3": "Your preview is ready",
+    "simpleWorkflow": "A simple, guided workflow",
+    "simpleWorkflowDesc": "This is a product preview. Open the tool to process your own image.",
+    "exploreSettings": "Explore settings",
+    "sampleImageLoaded": "Sample image loaded",
+    "enlargement": "Enlargement",
+    "featherEdges": "Feather edges",
+    "previewWorkflow": "Preview workflow",
+    "refiningSubjectBoundaries": "Refining subject boundaries",
+    "enhancingImageDetail": "Enhancing image detail",
+    "simulatedNotice": "Illustrative processing state — no image is being processed in this demo.",
+    "preparingPreview": "Preparing preview",
+    "simulated": "Simulated",
+    "previewState": "Preview state",
+    "enhancedPreview": "Enhanced preview",
+    "cutoutPreview": "Background cutout preview",
+    "previewNotice": "This is a visual walkthrough, not an exported result. Open the real tool to work with your image.",
+    "openUpscaler": "Open AI upscaler",
+    "openBgRemover": "Open background remover",
+    "demoOnly": "Demo only · no upload required",
+    "exploreInterface": "Use the steps above to explore the interface.",
+    "back": "Back",
+    "launchTool": "Launch tool",
+    "sessionDetails": "Session details",
+    "dimensions": "Dimensions",
+    "mode": "Mode",
+    "interactiveDemo": "Interactive demo",
+    "privacyByDesign": "Privacy by design",
+    "privacyByDesignDesc": "This walkthrough uses sample UI states only. Your real image is handled by the selected tool’s processing flow.",
+    "noAccountNeeded": "No account or file upload needed to explore this demo.",
+    "detailPreview": "DETAIL PREVIEW",
+    "flows": {
+      "upscale": {
+        "name": "Photo upscaler",
+        "description": "Enhance photo detail",
+        "steps": [
+          "Start with a photo you’d like to sharpen or enlarge.",
+          "Choose how much you want to enlarge the image.",
+          "The demo is simulating an on-device enhancement workflow.",
+          "Review the preview state, then open the real tool to process your image."
+        ]
+      },
+      "background": {
+        "name": "Background remover",
+        "description": "Create a clean cutout",
+        "steps": [
+          "Choose a portrait or image with a clear foreground subject.",
+          "Preview the cutout workflow and edge refinement options.",
+          "The demo is simulating foreground detection and mask refinement.",
+          "Review the preview state, then open the real tool to process your image."
+        ]
+      },
+      "anime": {
+        "name": "Anime upscaler",
+        "description": "Keep linework crisp",
+        "steps": [
+          "Start with an illustration or a compressed anime frame.",
+          "Choose an enlargement factor for the illustration.",
+          "The demo is simulating line and color detail enhancement.",
+          "Review the preview state, then open the real tool to process your image."
+        ]
+      },
+      "product": {
+        "name": "Product cutout",
+        "description": "Refine product edges",
+        "steps": [
+          "Start with a product image for a clean storefront cutout.",
+          "Preview edge refinement options for the product silhouette.",
+          "The demo is simulating object detection and edge cleanup.",
+          "Review the preview state, then open the real tool to process your image."
+        ]
+      }
+    },
+    "stepLabels": [
+      "Upload",
+      "Configure",
+      "Process",
+      "Review"
+    ]
+  },
+  "pixelifyStory": {
+    "words": [
+      "PIXELIFY",
+      "local",
+      "AI",
+      "for",
+      "your",
+      "images",
+      "upscale",
+      "restore",
+      "enhance",
+      "without",
+      "uploading",
+      "anything",
+      "to",
+      "the",
+      "cloud",
+      "your",
+      "pixels",
+      "stay",
+      "yours"
+    ]
+  },
+  "upscaleShowreel": {
+    "titleStraight": "Straight out of the",
+    "titleEngine": "engine.",
+    "subtitle": "No retouching. No Photoshop.",
+    "fashionPortrait": "Fashion Portrait",
+    "editorial": "Editorial",
+    "pets": "Pets",
+    "furLevel": "Fur-level",
+    "maxResolution": "LIKE MAX OUTPUT RESOLUTION",
+    "avianPortrait": "Avian portrait",
+    "featherGrade": "Feather-grade",
+    "officialPortrait": "Official portrait",
+    "photojournalism": "Photojournalism",
+    "product": "Product",
+    "studioQuality": "Studio-quality",
+    "iconicPoster": "Iconic Poster",
+    "printReady": "Print-Ready",
+    "movesCutout": "Moves to Finished Cutout",
+    "animeArt": "Anime Art",
+    "facesRestored": "Faces Restored",
+    "automotive": "Automotive",
+    "detailRecovery": "Detail Recovery",
+    "gaming": "Gaming",
+    "thumbnailReady": "Thumbnail-Ready",
+    "illustration": "Illustration",
+    "colorFidelity": "Color Fidelity"
+  },
+  "upscaleShowcase": {
+    "titlePixel": "Every pixel,",
+    "titleReimagined": "re-imagined.",
+    "subtitle": "Experience real 8x upscaling, rendered live on-device. Slide the lens to compare: the untouched original on the left, and Pixelify’s single-pass result on the right.",
+    "statMaxScale": "Max Scale",
+    "statPrivate": "Private & On-Device",
+    "statCloudLatency": "Cloud Latency",
+    "lensOriginal": "Original",
+    "lensUpscaled": "Upscaled",
+    "lensNext": "Next sample",
+    "pairCyberpunk": "Cyberpunk Portrait",
+    "pairCyberpunkMeta": "Tokyo neon, face detail restored",
+    "pairSneaker": "Vintage Sneaker",
+    "pairSneakerMeta": "Leather texture, stitch recovery",
+    "pairWatch": "High-End Chronograph",
+    "pairWatchMeta": "Brushed steel, dial text sharp",
+    "pairLandscape": "Mountain Vista",
+    "pairLandscapeMeta": "Foliage clarity, ridge edges"
+  },
+  "upscaleWorkspace": {
+    "headerTitle": "Upscale",
+    "headerSubtitle": "AI Resolution & Details",
+    "modelLabel": "Model",
+    "scaleFactor": "Scale factor",
+    "advancedSettings": "Advanced Settings",
+    "advanced": "Advanced",
+    "presets": "Presets",
+    "preset": "Preset",
+    "sharpness": "Sharpness",
+    "sharpnessDesc": "Controls how strongly fine edges and details are enhanced.",
+    "denoise": "Denoise",
+    "denoiseDesc": "Reduces noise, grain and compression artifacts.",
+    "faceEnhance": "Face enhancement",
+    "faceEnhanceDesc": "Controls the strength of facial detail restoration.",
+    "colorEnhance": "Color enhancement",
+    "colorEnhanceDesc": "Enhances color richness, vibrancy and overall color balance.",
+    "hdr": "HDR",
+    "hdrDesc": "Enhances dynamic range, highlights and shadow details.",
+    "brightness": "Brightness",
+    "brightnessDesc": "Adjusts the overall brightness of the image.",
+    "contrast": "Contrast",
+    "contrastDesc": "Controls the difference between light and dark areas.",
+    "btnUpscale": "Upscale",
+    "btnEnhancing": "Enhancing…",
+    "btnDownload": "Download",
+    "btnReEnhance": "Re-enhance",
+    "btnCancel": "Cancel",
+    "btnReset": "Reset",
+    "btnAdd": "Add",
+    "labelOriginal": "Original",
+    "labelEnhanced": "Enhanced",
+    "enhancedBadge": "Enhanced",
+    "enhancingBadge": "Enhancing...",
+    "loadingModel": "Loading AI model...",
+    "modelCacheNote": "The neural model downloads once, then runs from your browser cache.",
+    "enhancingImage": "Enhancing",
+    "neuralActive": "Neural Super-Resolution Active",
+    "popular": "Popular",
+    "modelVitalityDesc": "Fastest model, crisp clean edges.",
+    "modelPixelDanceDesc": "Max detail, up to 8K output.",
+    "modelAlphaSatoruDesc": "Natural detail for portraits & photos."
+  },
+  "modelLoading": {
+    "downloadingTitle": "Downloading AI models",
+    "leftBadge": "LEFT",
+    "extractingSubject": "Extracting Subject...",
+    "segmentingEdges": "Neural network segmenting edges...",
+    "analyzingContours": "Analyzing image contours & lighting...",
+    "loadingVisionWeights": "Loading vision model weights...",
+    "diabloEdgeMatting": "Diablo neural edge matting in progress...",
+    "segmentingSubject": "Neural network segmenting subject...",
+    "extractingHairFur": "Extracting fine hair, fur & edge transparency...",
+    "extractingCutout": "Extracting clean subject cutout...",
+    "refiningAlpha": "Refining sub-pixel alpha mask...",
+    "finalizingAlpha": "Finalizing alpha matte transparency...",
+    "renderingPng": "Rendering transparent PNG...",
+    "processingError": "Processing Error",
+    "errorDefault": "Could not remove background from this image.",
+    "retryBgRemoval": "↻ Retry Background Removal",
+    "cleanCutout": "✓ Clean Cutout",
+    "removingBg": "◆ Removing background…",
+    "waitCaption1": "Fetching the AI model, one time only...",
+    "waitCaption2": "Saving it in your browser so the next visit starts instantly...",
+    "waitCaption3": "Downloading AI files. This happens just once...",
+    "waitCaption4": "Warming up the AI engine...",
+    "waitCaption5": "Taking a close look at your photo...",
+    "waitCaption6": "Hold tight, the first pass is the slow one...",
+    "waitCaption7": "Getting every part of your image ready...",
+    "waitCaption8": "Quality first, so this takes a moment...",
+    "waitCaption9": "Adding crisp detail to every corner...",
+    "waitCaption10": "Sharpening fine textures...",
+    "waitCaption11": "Enhancing clarity pixel by pixel...",
+    "waitCaption12": "Rebuilding your photo in higher resolution...",
+    "waitCaption13": "Teaching your photo a few new tricks...",
+    "waitCaption14": "Bringing out natural, true to life colors...",
+    "waitCaption15": "Almost there, final polish underway...",
+    "waitCaption16": "Refining edges and small details...",
+    "waitCaption17": "Boosting sharpness and depth...",
+    "waitCaption18": "Giving every detail a last polish...",
+    "waitCaption19": "Finishing touches in progress...",
+    "waitCaption20": "Wrapping up, nearly done...",
+    "waitCaption21": "Making every detail count..."
+  },
+  "deviceNotice": {
+    "title": "A smoother experience on desktop",
+    "bgRemoveDesc": "Pixelify works on mobile, too! For potentially faster AI Image Background Removal, we recommend using a desktop or laptop.",
+    "upscaleDesc": "Pixelify works on mobile, too! For potentially faster AI Image Upscaling, we recommend using a desktop or laptop.",
+    "tip": "QUICK TIP",
+    "understand": "I understand"
+  },
+  "bgMarquee": [
+    "Chopper segmentation",
+    "WebGPU on-device",
+    "Zero uploads",
+    "Hair-level edges",
+    "Transparent PNG",
+    "No sign-up",
+    "Unlimited runs"
+  ]
+}

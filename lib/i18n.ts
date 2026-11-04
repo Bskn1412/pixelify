@@ -13,11 +13,14 @@ export interface LanguageOption {
  */
 export const SITE_LANGUAGES: LanguageOption[] = [
   { code: 'en', label: 'English', nativeLabel: 'English', short: 'EN', active: true },
-  { code: 'fr', label: 'French', nativeLabel: 'Français', short: 'FR', active: false },
-  { code: 'zh', label: 'Chinese', nativeLabel: '中文', short: 'ZH', active: false },
-  { code: 'ja', label: 'Japanese', nativeLabel: '日本語', short: 'JA', active: false },
-  { code: 'hi', label: 'Hindi', nativeLabel: 'हिन्दी', short: 'HI', active: false },
-  { code: 'ru', label: 'Russian', nativeLabel: 'Русский', short: 'RU', active: false },
+  { code: 'es', label: 'Spanish', nativeLabel: 'Español', short: 'ES', active: true },
+  { code: 'fr', label: 'French', nativeLabel: 'Français', short: 'FR', active: true },
+  { code: 'pt', label: 'Portuguese', nativeLabel: 'Português', short: 'PT', active: true },
+  { code: 'zh', label: 'Chinese', nativeLabel: '中文', short: 'ZH', active: true },
+  { code: 'ja', label: 'Japanese', nativeLabel: '日本語', short: 'JA', active: true },
+  { code: 'ko', label: 'Korean', nativeLabel: '한국어', short: 'KO', active: true },
+  { code: 'hi', label: 'Hindi', nativeLabel: 'हिन्दी', short: 'HI', active: true },
+  { code: 'ru', label: 'Russian', nativeLabel: 'Русский', short: 'RU', active: true },
 ];
 
 export const DEFAULT_LANGUAGE = 'en';

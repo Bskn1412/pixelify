@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { MODELS, buildPresetOptions } from "../lib/constants";
+import { useTranslation } from '@/locales';
 import type {
   ModelKey,
   Step,
@@ -155,6 +156,7 @@ function ModelDropdown({
   onChange,
   disabled,
 }: ModelDropdownProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -178,18 +180,18 @@ function ModelDropdown({
     vitality: {
       label: "Vitality",
       full: MODELS.vitality?.name || "Vitality",
-      desc: "Fastest model, crisp clean edges.",
+      desc: t.upscaleWorkspace?.modelVitalityDesc || "Fastest model, crisp clean edges.",
       popular: true,
     },
     'pixel-dance': {
       label: "Pixel-Dance",
       full: MODELS['pixel-dance']?.name || "Pixel-Dance",
-      desc: "Max detail, up to 8K output.",
+      desc: t.upscaleWorkspace?.modelPixelDanceDesc || "Max detail, up to 8K output.",
     },
     'alpha-satoru': {
       label: "Alpha-Satoru",
       full: MODELS['alpha-satoru']?.name || "Alpha-Satoru",
-      desc: "Natural detail for portraits & photos.",
+      desc: t.upscaleWorkspace?.modelAlphaSatoruDesc || "Natural detail for portraits & photos.",
     },
   };
 
@@ -239,7 +241,7 @@ function ModelDropdown({
         {/* RIGHT: POPULAR TAG (top right) + CHECK */}
         {meta.popular && (
           <span className="shrink-0 rounded-md bg-[#C7FF00]/15 px-1.5 py-0.5 text-[9.5px] font-bold text-[#C7FF00]">
-            Popular
+            {t.upscaleWorkspace?.popular || "Popular"}
           </span>
         )}
         {isSelected && <Check className="h-3.5 w-3.5 shrink-0 text-[#00FF85]" />}
@@ -291,7 +293,7 @@ function ModelDropdown({
 
         {MODEL_METADATA[selectedKey].popular && (
           <span className="shrink-0 rounded-md bg-[#C7FF00]/15 px-1.5 py-0.5 text-[9.5px] font-bold text-[#C7FF00]">
-            Popular
+            {t.upscaleWorkspace?.popular || "Popular"}
           </span>
         )}
 
@@ -342,6 +344,7 @@ export default function UpscaleWorkspace({
   onOpenMobileSidebar,
   onExitWorkspace,
 }: UpscaleWorkspaceProps) {
+  const { t } = useTranslation();
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [soundOn, setSoundOn] = useState(() => isSoundEnabled());
 
@@ -438,12 +441,12 @@ export default function UpscaleWorkspace({
         </span>
         {activeItem.status === "completed" && !!activeItem.result && (
           <span className="text-[11px] font-mono px-2.5 py-1 rounded-full bg-[#00FF85]/15 text-[#00FF85] border border-[#00FF85]/30 font-bold shrink-0">
-            ✓ Enhanced {activeItem?.options?.scale ? `${activeItem.options.scale}x` : ""}
+            ✓ {t.upscaleWorkspace?.enhancedBadge || "Enhanced"} {activeItem?.options?.scale ? `${activeItem.options.scale}x` : ""}
           </span>
         )}
         {activeItem.status === "processing" && (
           <span className="text-[11px] font-mono px-2.5 py-1 rounded-full bg-cyan-400/15 text-cyan-400 border border-cyan-400/30 font-bold shrink-0 animate-pulse">
-            ⚡ Enhancing...
+            ⚡ {t.upscaleWorkspace?.enhancingBadge || "Enhancing..."}
           </span>
         )}
       </div>
@@ -566,7 +569,7 @@ export default function UpscaleWorkspace({
         <div>
           <div className="flex items-center justify-between mb-2">
             <div className="text-xs font-medium text-white/50">
-              Preset
+              {t.upscaleWorkspace?.preset || "Preset"}
             </div>
             {options.preset && (
               <span className="rounded-full bg-[#00FF85]/10 border border-[#00FF85]/25 px-2 py-0.5 text-[10px] font-semibold text-[#00FF85]">
@@ -617,79 +620,79 @@ export default function UpscaleWorkspace({
       {/* Sliders with disabled={busy} and fixed tooltips.
           Moving a slider clears the active preset (custom tuning). */}
       <ParameterSlider
-        label="Sharpness"
+        label={t.upscaleWorkspace?.sharpness || "Sharpness"}
         value={options.sharpness ?? options.sharpenLevel ?? 50}
         min={0}
         max={100}
         disabled={busy}
         onChange={(value) => onOptionsChange(activeItem.id, { ...options, preset: undefined, sharpness: value, sharpenLevel: value, sharpen: true })}
-        info="Controls how strongly fine edges and details are enhanced."
+        info={t.upscaleWorkspace?.sharpnessDesc || "Controls how strongly fine edges and details are enhanced."}
       />
 
       <ParameterSlider
-        label="Denoise"
+        label={t.upscaleWorkspace?.denoise || "Denoise"}
         value={options.denoise ?? options.removeNoiseLevel ?? 50}
         min={0}
         max={100}
         disabled={busy}
         onChange={(value) => onOptionsChange(activeItem.id, { ...options, preset: undefined, denoise: value, removeNoiseLevel: value, removeNoise: true })}
-        info="Reduces noise, grain and compression artifacts."
+        info={t.upscaleWorkspace?.denoiseDesc || "Reduces noise, grain and compression artifacts."}
       />
 
       {model?.features?.faceRestore && (
         <ParameterSlider
-          label="Face enhancement"
+          label={t.upscaleWorkspace?.faceEnhance || "Face enhancement"}
           value={options.faceEnhancement ?? options.faceRestoreLevel ?? 50}
           min={0}
           max={100}
           disabled={busy}
           onChange={(value) => onOptionsChange(activeItem.id, { ...options, preset: undefined, faceEnhancement: value, faceRestoreLevel: value, faceRestore: true } as EnhancementOptions)}
-          info="Controls the strength of facial detail restoration."
+          info={t.upscaleWorkspace?.faceEnhanceDesc || "Controls the strength of facial detail restoration."}
         />
       )}
 
       {model?.features?.colorEnhance && (
         <ParameterSlider
-          label="Color enhancement"
+          label={t.upscaleWorkspace?.colorEnhance || "Color enhancement"}
           value={options.colorLevel ?? 50}
           min={0}
           max={100}
           disabled={busy}
           onChange={(value) => onOptionsChange(activeItem.id, { ...options, preset: undefined, colorLevel: value, colorEnhance: value !== 50 } as EnhancementOptions)}
-          info="Enhances color richness, vibrancy and overall color balance."
+          info={t.upscaleWorkspace?.colorEnhanceDesc || "Enhances color richness, vibrancy and overall color balance."}
         />
       )}
 
       {model?.features?.hdrBoost && (
         <ParameterSlider
-          label="HDR"
+          label={t.upscaleWorkspace?.hdr || "HDR"}
           value={options.hdrLevel ?? 50}
           min={0}
           max={100}
           disabled={busy}
           onChange={(value) => onOptionsChange(activeItem.id, { ...options, preset: undefined, hdrLevel: value, hdrBoost: value !== 50 } as EnhancementOptions)}
-          info="Enhances dynamic range, highlights and shadow details."
+          info={t.upscaleWorkspace?.hdrDesc || "Enhances dynamic range, highlights and shadow details."}
         />
       )}
 
       <ParameterSlider
-        label="Brightness"
+        label={t.upscaleWorkspace?.brightness || "Brightness"}
         value={options.brightness ?? 50}
         min={0}
         max={100}
         disabled={busy}
         onChange={(value) => onOptionsChange(activeItem.id, { ...options, preset: undefined, brightness: value } as EnhancementOptions)}
-        info="Adjusts the overall brightness of the image."
+        info={t.upscaleWorkspace?.brightnessDesc || "Adjusts the overall brightness of the image."}
       />
 
       <ParameterSlider
-        label="Contrast"
+        label={t.upscaleWorkspace?.contrast || "Contrast"}
         value={options.contrast ?? 50}
         min={0}
         max={100}
         disabled={busy}
         onChange={(value) => onOptionsChange(activeItem.id, { ...options, preset: undefined, contrast: value } as EnhancementOptions)}
-        info="Controls the difference between light and dark areas."
+        info={t.upscaleWorkspace?.contrastDesc || "Controls the difference between light and dark areas."}
       />
     </>
   );
@@ -726,7 +729,7 @@ export default function UpscaleWorkspace({
         }
       `}
     >
-      <span>Advanced Settings</span>
+      <span>{t.upscaleWorkspace?.advancedSettings || "Advanced Settings"}</span>
 
       <SlidersHorizontal
         className={`h-4 w-4 ${advancedOpen ? "text-[#00FF85]" : "text-white/60"}`}
@@ -755,7 +758,7 @@ export default function UpscaleWorkspace({
             "
           >
             <Download className="h-4 w-4" />
-            <span>Download</span>
+            <span>{t.upscaleWorkspace?.btnDownload || t.common.download || "Download"}</span>
           </button>
 
           <button
@@ -771,7 +774,7 @@ export default function UpscaleWorkspace({
             "
           >
             <RotateCcw className="h-4 w-4" />
-            <span>Re-enhance</span>
+            <span>{t.upscaleWorkspace?.btnReEnhance || "Re-enhance"}</span>
           </button>
         </div>
       ) : (
@@ -789,7 +792,7 @@ export default function UpscaleWorkspace({
             "
           >
             <ImageCircleIcon className="h-5 w-5 text-black" />
-            <span>{busy ? "Enhancing…" : `Upscale ${options.scale}x`}</span>
+            <span>{busy ? (t.upscaleWorkspace?.btnEnhancing || "Enhancing…") : `${t.upscaleWorkspace?.btnUpscale || t.uploadArea?.upscaleTitle || "Upscale"} ${options.scale}x`}</span>
           </button>
 
           {isProcessing && (
@@ -805,7 +808,7 @@ export default function UpscaleWorkspace({
               "
             >
               <X className="h-4 w-4" />
-              <span>Cancel</span>
+              <span>{t.upscaleWorkspace?.btnCancel || t.common.cancel || "Cancel"}</span>
             </button>
           )}
         </div>
@@ -921,12 +924,12 @@ export default function UpscaleWorkspace({
                   </div>
 
                   <div className="max-w-[240px] truncate text-sm font-bold tracking-wide text-white">
-                    Enhancing {activeItem.name}
+                    {t.upscaleWorkspace?.enhancingImage || "Enhancing"} {activeItem.name}
                   </div>
 
                   <div className="flex items-center gap-2 rounded-full border border-[#00FF85]/30 bg-[#00FF85]/10 px-3 py-1 text-[9px] font-semibold text-[#00FF85]">
                     <span className="h-1.5 w-1.5 animate-ping rounded-full bg-[#00FF85]" />
-                    <span>Neural Super-Resolution Active</span>
+                    <span>{t.upscaleWorkspace?.neuralActive || "Neural Super-Resolution Active"}</span>
                   </div>
                 </div>
               </div>
@@ -939,10 +942,10 @@ export default function UpscaleWorkspace({
                   <ModelLoader progress={modelProgress} />
                 </div>
                 <div className="text-sm font-bold tracking-wide text-white">
-                  Loading AI model...
+                  {t.upscaleWorkspace?.loadingModel || "Loading AI model..."}
                 </div>
                 <div className="max-w-[240px] text-center text-[11px] text-white/50">
-                  The neural model downloads once, then runs from your browser cache.
+                  {t.upscaleWorkspace?.modelCacheNote || "The neural model downloads once, then runs from your browser cache."}
                 </div>
               </div>
             )}
@@ -966,7 +969,7 @@ export default function UpscaleWorkspace({
                 {/* MODEL */}
                 <div className="shrink-0">
                   <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-white/50">
-                    Model
+                    {t.upscaleWorkspace?.modelLabel || "Model"}
                   </div>
 
                   <ModelDropdown
@@ -979,7 +982,7 @@ export default function UpscaleWorkspace({
                 {/* SCALE FACTOR */}
                 <div className="mt-4 shrink-0">
                   <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-white/50">
-                    Scale factor
+                    {t.upscaleWorkspace?.scaleFactor || "Scale factor"}
                   </div>
 
                   <div className="flex rounded-2xl border border-white/10 bg-white/[0.03] p-1.5">
@@ -1031,7 +1034,7 @@ export default function UpscaleWorkspace({
                 {/* HEADER ROW: label + Reset (matches the desktop panel header) */}
                 <div className="flex shrink-0 items-center justify-between pb-2">
                   <span className="text-xs font-semibold uppercase tracking-wider text-white/50">
-                    Advanced
+                    {t.upscaleWorkspace?.advanced || "Advanced"}
                   </span>
 
                   <button
@@ -1047,7 +1050,7 @@ export default function UpscaleWorkspace({
                     "
                   >
                     <RotateCcw className="h-3.5 w-3.5" />
-                    <span>Reset</span>
+                    <span>{t.upscaleWorkspace?.btnReset || t.common.reset || "Reset"}</span>
                   </button>
                 </div>
 
@@ -1146,7 +1149,7 @@ export default function UpscaleWorkspace({
                 </div>
 
                 <div className="max-w-[280px] truncate text-base font-bold tracking-wide text-white">
-                  Enhancing {activeItem.name}
+                  {t.upscaleWorkspace?.enhancingImage || "Enhancing"} {activeItem.name}
                 </div>
 
                 {/* Rotating status caption — band-matched to real progress */}
@@ -1157,7 +1160,7 @@ export default function UpscaleWorkspace({
 
                 <div className="flex items-center gap-2 rounded-full border border-[#00FF85]/30 bg-[#00FF85]/10 px-3.5 py-1 text-[10px] font-semibold text-[#00FF85]">
                   <span className="h-1.5 w-1.5 animate-ping rounded-full bg-[#00FF85]" />
-                  <span>Neural Super-Resolution Active</span>
+                  <span>{t.upscaleWorkspace?.neuralActive || "Neural Super-Resolution Active"}</span>
                 </div>
               </div>
             </div>
@@ -1170,10 +1173,10 @@ export default function UpscaleWorkspace({
                 <ModelLoader progress={modelProgress} />
               </div>
               <div className="text-sm font-bold tracking-wide text-white">
-                Loading AI model...
+                {t.upscaleWorkspace?.loadingModel || "Loading AI model..."}
               </div>
               <div className="max-w-[260px] text-center text-[11px] text-white/50">
-                The neural model downloads once, then runs from your browser cache.
+                {t.upscaleWorkspace?.modelCacheNote || "The neural model downloads once, then runs from your browser cache."}
               </div>
             </div>
           )}
@@ -1223,10 +1226,10 @@ export default function UpscaleWorkspace({
             </div>
             <div>
               <div className="text-base font-bold text-white tracking-wide">
-                Upscale
+                {t.upscaleWorkspace?.headerTitle || t.uploadArea?.upscaleTitle || "Upscale"}
               </div>
               <div className="text-[11px] text-white/45">
-                AI Resolution & Details
+                {t.upscaleWorkspace?.headerSubtitle || "AI Resolution & Details"}
               </div>
             </div>
           </div>
@@ -1286,7 +1289,7 @@ export default function UpscaleWorkspace({
               "
             >
               <RotateCcw className="h-3.5 w-3.5" />
-              <span>Reset</span>
+              <span>{t.upscaleWorkspace?.btnReset || t.common.reset || "Reset"}</span>
             </button>
           </div>
         </div>
@@ -1294,7 +1297,7 @@ export default function UpscaleWorkspace({
         {/* 2. MODEL SELECTION (Custom Dropdown with 1-line description) */}
         <div>
           <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-white/50">
-            Model
+            {t.upscaleWorkspace?.modelLabel || "Model"}
           </div>
 
           <ModelDropdown
@@ -1307,7 +1310,7 @@ export default function UpscaleWorkspace({
         {/* SCALE FACTOR */}
         <div>
           <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-white/50">
-            Scale factor
+            {t.upscaleWorkspace?.scaleFactor || "Scale factor"}
           </div>
 
           <div className="flex gap-2">
@@ -1373,7 +1376,7 @@ export default function UpscaleWorkspace({
           >
             <div className="flex items-center gap-2">
               <SlidersHorizontal className="h-4 w-4 text-[#00FF85]" />
-              <span>Advanced Settings</span>
+              <span>{t.upscaleWorkspace?.advancedSettings || "Advanced Settings"}</span>
             </div>
 
             <ChevronDown
@@ -1426,6 +1429,7 @@ function BeforeAfterSlider({
   isZoomed?: boolean;
   onStartPan?: (e: React.PointerEvent<HTMLDivElement>) => void;
 }) {
+  const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [pos, setPos] = useState(50);
   const draggingRef = useRef(false);
@@ -1589,12 +1593,12 @@ function BeforeAfterSlider({
 
       {/* ORIGINAL LABEL */}
       <div className="pointer-events-none absolute left-3 top-3 z-30 rounded-md bg-black/60 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
-        Original
+        {t.upscaleWorkspace?.labelOriginal || "Original"}
       </div>
 
       {/* ENHANCED LABEL */}
       <div className="pointer-events-none absolute right-3 top-3 z-30 rounded-md bg-black/60 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
-        Enhanced
+        {t.upscaleWorkspace?.labelEnhanced || "Enhanced"}
       </div>
 
       {/* =====================================================
@@ -1761,6 +1765,7 @@ function UploadStrip({
   onRemoveId,
   onAddFile,
 }: UploadStripProps) {
+  const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   /* ----------------------------------------------------------
@@ -1830,7 +1835,7 @@ function UploadStrip({
             +
           </span>
           <span className="mt-1 text-[10.5px] font-bold tracking-wider uppercase">
-            Add
+            {t.upscaleWorkspace?.btnAdd || "Add"}
           </span>
         </button>
 

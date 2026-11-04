@@ -1,4 +1,5 @@
 import '@/styles/model-loader.css';
+import { useTranslation } from '@/locales';
 
 interface LoaderProps {
   /**
@@ -12,6 +13,7 @@ interface LoaderProps {
 }
 
 const Loader = ({ progress, className, width }: LoaderProps) => {
+  const { t } = useTranslation();
   const determinate = typeof progress === "number";
   const pct = determinate
     ? Math.max(0, Math.min(100, progress as number))
@@ -22,7 +24,7 @@ const Loader = ({ progress, className, width }: LoaderProps) => {
       className={`ml-container ${className || ""}`}
       style={width ? { width } : undefined}
       role="status"
-      aria-label="Loading AI model"
+      aria-label={t.upscaleWorkspace?.loadingModel || "Loading AI model"}
     >
       <div
         className={`ml-bar${determinate ? " ml-bar--determinate" : ""}`}

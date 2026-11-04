@@ -15,6 +15,7 @@ import HomeDemo from './HomeDemo';
 import HomeWorkflowDemos from './HomeWorkflowDemos';
 import HomeVisitorCount from './HomeVisitorCount';
 import '@/styles/home.css';
+import { useTranslation } from '@/locales';
 interface HomePageProps {
   onLaunchUpscaler: () => void;
   onLaunchBGRemove: () => void;
@@ -28,6 +29,7 @@ export default function HomePage({
   onSelectSample,
   onTabChange,
 }: HomePageProps) {
+  const { t } = useTranslation();
   return (
     <div className="relative min-h-screen bg-[#050507] text-white">
 
@@ -56,13 +58,13 @@ export default function HomePage({
             className="text-center max-w-2xl mx-auto flex flex-col gap-3 px-2"
           >
             <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#00FF85]">
-              Choose Your Studio
+              {t.homeStudio.badge}
             </span>
             <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
-              AI Tools for Every Image
+              {t.homeStudio.title}
             </h2>
             <p className="text-xs sm:text-sm md:text-base text-neutral-400">
-              Pick the workstation built specifically for your image processing needs.
+              {t.homeStudio.subtitle}
             </p>
           </motion.div>
 

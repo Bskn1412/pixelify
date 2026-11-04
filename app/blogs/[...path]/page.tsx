@@ -13,13 +13,15 @@ export function generateStaticParams() {
     // /blogs/<slug> — English articles
     ...getAllPosts('en').map((post) => ({ path: [post.slug] })),
     // /blogs/<lang>/<slug> — translations (plus /blogs/en/<slug> for legacy links)
-    ...getAllPosts().flatMap((post) => {
-      const segments = [{ path: [post.lang, post.slug] }];
-      if (post.lang === 'en') {
-        segments.push({ path: ['en', post.slug] });
-      }
-      return segments;
-    }),
+    ...LANGUAGES.flatMap((l) =>
+      getAllPosts(l.code).flatMap((post) => {
+        const segments = [{ path: [post.lang, post.slug] }];
+        if (post.lang === 'en') {
+          segments.push({ path: ['en', post.slug] });
+        }
+        return segments;
+      })
+    ),
   ];
 }
 
@@ -65,7 +67,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
         description: `On-device AI articles in ${langLabel(lang)}: no cloud, no uploads, no tracking.`,
         url: `${SITE_URL}${langIndexHref(lang)}`,
         locale: lang,
-        images: [{ url: '/blogs/home-hero.jpg', alt: 'Pixelify blog cover' }],
+        images: [{ url: '/blogs/settings-engine.jpg', alt: 'Pixelify blog cover' }],
       },
     };
   }
@@ -75,7 +77,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     return { title: 'Article not found | Pixelify' };
   }
   const url = `${SITE_URL}${postPath(post)}`;
-  const siblings = getAllPosts().filter((p) => p.slug === post.slug);
+  const siblings = LANGUAGES.flatMap((l) => getAllPosts(l.code)).filter((p) => p.slug === post.slug);
   return {
     title: `${post.title} | Pixelify`,
     description: post.description,
@@ -121,7 +123,7 @@ export default function BlogCatchAll({ params }: Params) {
     return <NotFound />;
   }
 
-  const siblings = getAllPosts().filter((p) => p.slug === post.slug);
+  const siblings = LANGUAGES.flatMap((l) => getAllPosts(l.code)).filter((p) => p.slug === post.slug);
 
   return (
     <>

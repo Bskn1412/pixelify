@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { pickCaption } from '../lib/waitCaptions';
 import '@/styles/wait-caption.css';
+import { useTranslation } from '@/locales';
 
 interface WaitCaptionProps {
   /** Live job progress 0-100 (drives the caption band). */
@@ -24,6 +25,7 @@ export default function WaitCaption({
   isDownload = false,
   className = '',
 }: WaitCaptionProps) {
+  const { t } = useTranslation();
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
@@ -31,7 +33,7 @@ export default function WaitCaption({
     return () => window.clearInterval(id);
   }, []);
 
-  const caption = pickCaption(percent, isDownload, tick);
+  const caption = pickCaption(percent, isDownload, tick, t.modelLoading as unknown as Record<string, string>);
 
   return (
     <div className={`h-5 overflow-hidden ${className}`} aria-live="polite" aria-atomic="true">

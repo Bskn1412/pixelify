@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
+import { useTranslation } from '@/locales';
 
 interface HomeDemoProps {
   onSelectSample: (
@@ -86,9 +87,48 @@ const FEATURES_TABS = [
 export default function HomeDemo({
   onSelectSample,
 }: HomeDemoProps) {
+  const { t } = useTranslation();
   const [loadingSampleId, setLoadingSampleId] = useState<string | null>(null);
 
-  const handleSelect = async (sample: (typeof SAMPLES)[0]) => {
+  const sampleData = useMemo(() => [
+    {
+      id: 's1',
+      name: t.homeDemo?.samples?.sports?.name || 'Sports',
+      src: '/home/ronaldo.jpg',
+      type: 'bg_remove' as const,
+      description: t.homeDemo?.samples?.sports?.desc || 'Extract subject with sub-pixel edge detection',
+    },
+    {
+      id: 's2',
+      name: t.homeDemo?.samples?.anime?.name || 'Anime Art',
+      src: '/home/one-piece.jpg',
+      type: 'bg_remove' as const,
+      description: t.homeDemo?.samples?.anime?.desc || '4x upscale with micro-texture enhancement',
+    },
+    {
+      id: 's3',
+      name: t.homeDemo?.samples?.ocean?.name || 'Ocean Life',
+      src: '/home/turtle.jpeg',
+      type: 'upscale' as const,
+      description: t.homeDemo?.samples?.ocean?.desc || 'Clean product cutout for commercial use',
+    },
+    {
+      id: 's4',
+      name: t.homeDemo?.samples?.oldPhoto?.name || 'Old Photo',
+      src: '/home/mt-king.webp',
+      type: 'upscale' as const,
+      description: t.homeDemo?.samples?.oldPhoto?.desc || 'Clean product cutout for commercial use',
+    },
+  ], [t]);
+
+  const featuresTabs = useMemo(() => {
+    if (t.homeDemo?.features && t.homeDemo.features.length >= 4) {
+      return t.homeDemo.features;
+    }
+    return FEATURES_TABS;
+  }, [t]);
+
+  const handleSelect = async (sample: (typeof sampleData)[0]) => {
     if (loadingSampleId) return;
     setLoadingSampleId(sample.id);
     try {
@@ -112,11 +152,11 @@ export default function HomeDemo({
         {/* SECTION HEADING */}
         <div className="w-full">
           <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#A4D641]">
-            Instant Demos
+            {t.homeDemo?.badge || 'Instant Demos'}
           </span>
 
           <h2 className="mt-1 text-2xl font-black tracking-tight text-white sm:text-3xl lg:text-4xl">
-            Try sample assets with a single click
+            {t.homeDemo?.title || 'Try sample assets with a single click'}
           </h2>
         </div>
 
@@ -132,8 +172,8 @@ export default function HomeDemo({
         >
           {/* RESPONSIVE FOUR-COLUMN GRID */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4 lg:gap-6">
-            {SAMPLES.map((sample, idx) => {
-              const feature = FEATURES_TABS[idx];
+            {sampleData.map((sample, idx) => {
+              const feature = featuresTabs[idx] || FEATURES_TABS[idx];
               const popupOpensLeft = idx >= 2;
 
               return (
@@ -237,8 +277,8 @@ export default function HomeDemo({
                         "
                       >
                         {sample.type === 'bg_remove'
-                          ? 'BG REMOVE'
-                          : 'AI UPSCALE'}
+                          ? (t.homeDemo?.bgRemoveType || 'BG REMOVE')
+                          : (t.homeDemo?.aiUpscaleType || 'AI UPSCALE')}
                       </span>
 
                       <div className="ml-auto flex items-center">
@@ -257,7 +297,7 @@ export default function HomeDemo({
                           "
                         >
                           <span className="truncate">
-                            {loadingSampleId === sample.id ? 'Loading…' : sample.name}
+                            {loadingSampleId === sample.id ? (t.homeDemo?.loading || 'Loading…') : sample.name}
                           </span>
                         </div>
 

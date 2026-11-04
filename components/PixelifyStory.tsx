@@ -1,5 +1,6 @@
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useMemo } from "react";
 import gsap from "gsap";
+import { useTranslation } from "@/locales";
 
 /* --------------------------------------------------------------------------
    Cubic bezier solver from the original Camera Follow Captions specification.
@@ -157,7 +158,18 @@ export default function PixelifyStory({
   const stageRef = useRef<HTMLDivElement>(null);
   const worldRef = useRef<HTMLDivElement>(null);
 
-  const wordList = customWords || DEFAULT_WORDS;
+  const { t } = useTranslation();
+  const wordList = useMemo(() => {
+    if (customWords) return customWords;
+    const trans = t.pixelifyStory?.words;
+    if (Array.isArray(trans) && trans.length === DEFAULT_WORDS.length) {
+      return DEFAULT_WORDS.map((w, i) => ({
+        ...w,
+        text: trans[i],
+      }));
+    }
+    return DEFAULT_WORDS;
+  }, [customWords, t]);
 
   useLayoutEffect(() => {
     let timeline: gsap.core.Timeline | null = null;

@@ -10,8 +10,10 @@ import UpscaleJourney from '../upscaler/UpscaleJourney';
 import UpscaleFaq from '../upscaler/UpscaleFaq';
 import Footer from '../Footer';
 import { useApp } from '../AppProvider';
+import { useTranslation } from '@/locales';
 
 export default function UpscalerView() {
+  const { t } = useTranslation();
   const {
     navigateTo,
     step,
@@ -44,6 +46,8 @@ export default function UpscalerView() {
           fileName={items[0]?.name}
           fileSize={items[0]?.size}
           onClear={onClearAll}
+          title={t.uploadArea?.upscaleTitle || "Upscale"}
+          description={t.uploadArea?.upscaleDesc || "Upload your images to\n enhance their resolution and quality."}
           beforeImage="/upscaler/shoes.jpeg"
           afterImage="/upscaler/shoes.png"
           maxSizeMB={15}

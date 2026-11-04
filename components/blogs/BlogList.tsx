@@ -19,6 +19,7 @@ import BlogCard from './BlogCard';
 import Footer from '../Footer';
 import type { Post } from '../../data/posts';
 import { useApp } from '../AppProvider';
+import { useTranslation } from '../../locales';
 
 interface BlogListProps {
   onTabChange: (tab: ViewTab) => void;
@@ -42,13 +43,20 @@ export default function BlogList({ onTabChange, initialLang }: BlogListProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { currentLang, setCurrentLang } = useApp();
+  const { t } = useTranslation();
   const page = Number(searchParams.get('page')) || 1;
   const query = searchParams.get('q') || '';
-  // Scoped strictly to the selected language: top nav selection (currentLang), ?lang=, or page route
-  const effectiveLang = initialLang || searchParams.get('lang') || currentLang || 'en';
-  const langFilter = isSupportedLang(effectiveLang) ? effectiveLang : 'en';
+  // Scoped strictly to the selected language: top nav selection (currentLang), initialLang, or default 'en'
+  const effectiveLang = currentLang && isSupportedLang(currentLang) ? currentLang : (initialLang && isSupportedLang(initialLang) ? initialLang : 'en');
+  const langFilter = effectiveLang;
   const isMixed = false;
   const [input, setInput] = useState(query);
+
+  useEffect(() => {
+    if (initialLang && isSupportedLang(initialLang) && initialLang !== currentLang) {
+      setCurrentLang(initialLang);
+    }
+  }, [initialLang, currentLang, setCurrentLang]);
 
   useEffect(() => setInput(query), [query]);
 
@@ -112,13 +120,11 @@ export default function BlogList({ onTabChange, initialLang }: BlogListProps) {
       <header className="w-full border-b border-white/10 bg-[#08080B]">
         <div className="w-full px-4 pb-10 pt-8 sm:px-6 lg:px-10">
           <h1 className="max-w-4xl text-4xl font-black leading-[1.04] tracking-tight text-white sm:text-6xl">
-            Blog &amp; Guides
+            {t.blogs.title}
           </h1>
 
           <p className="mt-5 max-w-3xl text-[15px] leading-relaxed text-muted">
-            In-depth articles on local AI, privacy-first image processing, background removal,
-            super-resolution, WebGPU and how the site runs everything on-device: no cloud, no
-            uploads, no cross-site tracking.
+            {t.blogs.subtitle}
           </p>
 
           {/* SEARCH */}
@@ -136,42 +142,20 @@ export default function BlogList({ onTabChange, initialLang }: BlogListProps) {
                 setInput(e.target.value);
                 updateParam('q', e.target.value);
               }}
-              placeholder="Search articles, tags, topics…"
-              aria-label="Search the blog"
+              placeholder={t.blogs.searchPlaceholder}
+              aria-label={t.blogs.searchPlaceholder}
               className="w-full rounded-2xl border border-white/10 bg-[#0E0E12] py-3.5 pl-12 pr-4 text-sm text-white placeholder:text-white/35 focus:border-[#A4D641]/50 focus:outline-none focus:ring-2 focus:ring-[#A4D641]/20"
             />
           </div>
 
-          {/* LANGUAGE FILTER — shows only currently active language(s) */}
-          <div className="mt-5 flex flex-wrap items-center gap-2" role="group" aria-label="Filter articles by language">
-            <span className="mr-1 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">
-              Lang
+          {/* ACTIVE LANGUAGE INDICATOR (strictly matches top nav selection) */}
+          <div className="mt-5 flex items-center gap-2">
+            <span className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">
+              {t.blogs.filterLang}:
             </span>
-            {LANGUAGES.map((lang) => {
-              const active = langFilter === lang.code;
-              const count = getAllPosts(lang.code).length;
-              return (
-                <button
-                  key={lang.code}
-                  type="button"
-                  onClick={() => {
-                    updateParam('lang', lang.code);
-                    setCurrentLang(lang.code);
-                  }}
-                  aria-pressed={active}
-                  className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition ${
-                    active
-                      ? 'border-transparent bg-[#A4D641] font-bold text-[#0E0E12]'
-                      : 'border-white/15 bg-[#121218] text-white/70 hover:border-[#A4D641]/40 hover:text-white'
-                  }`}
-                >
-                  {lang.label}
-                  <span className={`font-mono text-[10px] ${active ? 'text-[#0E0E12]/60' : 'text-white/40'}`}>
-                    {count}
-                  </span>
-                </button>
-              );
-            })}
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-transparent bg-[#A4D641] px-3.5 py-1 text-[13px] font-bold text-[#0E0E12]">
+              {langLabel(langFilter)}
+            </span>
           </div>
         </div>
       </header>

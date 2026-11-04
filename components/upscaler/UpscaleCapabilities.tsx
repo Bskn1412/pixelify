@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import {
   Sparkles,
   Lock,
@@ -7,6 +7,7 @@ import {
   Wand2,
   ArrowUpRight,
 } from 'lucide-react';
+import { useTranslation } from '@/locales';
 
 /* ============================================================
    SECTION 3 — CAPABILITIES BENTO
@@ -143,6 +144,72 @@ const CELLS: BentoCell[] = [
 
 export const UpscaleCapabilities: React.FC = () => {
   const rootRef = useRef<HTMLElement>(null);
+  const { t } = useTranslation();
+
+  const cells: BentoCell[] = useMemo(() => [
+    {
+      id: 'detail',
+      icon: <Sparkles size={18} strokeWidth={2} />,
+      title: t.upscaleCapabilities.detailTitle,
+      desc: t.upscaleCapabilities.detailDesc,
+      span: 'uc-b-cell-a',
+      visual: (
+        <div className="uc-bento-visual">
+          <img src="/showcase/preview/aniimo_upscaled_4x.png" alt="Porsche upscaled with generative detail" loading="lazy" draggable={false} />
+        </div>
+      ),
+    },
+    {
+      id: 'speed',
+      icon: <Gauge size={18} strokeWidth={2} />,
+      title: t.upscaleCapabilities.speedTitle,
+      desc: t.upscaleCapabilities.speedDesc,
+      span: 'uc-b-cell-b',
+      visual: <Stat target={30} suffix="ms" label={t.upscaleCapabilities.speedLabel} />,
+    },
+    {
+      id: 'faces',
+      icon: <Wand2 size={18} strokeWidth={2} />,
+      title: t.upscaleCapabilities.facesTitle,
+      desc: t.upscaleCapabilities.facesDesc,
+      span: 'uc-b-cell-c',
+      visual: (
+        <div className="uc-bento-visual uc-bento-visual-tall">
+          <img src="/showcase/preview/magicEM_upscaled_4x.png" alt="Portrait with restored facial detail" loading="lazy" draggable={false} />
+        </div>
+      ),
+    },
+    {
+      id: 'privacy',
+      icon: <Lock size={18} strokeWidth={2} />,
+      title: t.upscaleCapabilities.privacyTitle,
+      desc: t.upscaleCapabilities.privacyDesc,
+      span: 'uc-b-cell-d',
+      visual: (
+        <div className="uc-pc" aria-hidden="true">
+          <div className="uc-pc-wave" />
+          <span className="uc-pc-lock"><Lock size={15} strokeWidth={2.2} /></span>
+          <span className="uc-pc-caption">{t.upscaleCapabilities.privacyBadge}</span>
+        </div>
+      ),
+    },
+    {
+      id: 'scale',
+      icon: <Layers size={18} strokeWidth={2} />,
+      title: t.upscaleCapabilities.scaleTitle,
+      desc: t.upscaleCapabilities.scaleDesc,
+      span: 'uc-b-cell-e',
+      visual: <Stat target={16384} label={t.upscaleCapabilities.scaleLabel} />,
+    },
+    {
+      id: 'control',
+      icon: <ArrowUpRight size={18} strokeWidth={2} />,
+      title: t.upscaleCapabilities.controlTitle,
+      desc: t.upscaleCapabilities.controlDesc,
+      span: 'uc-b-cell-f',
+      visual: <EnhancePanel />,
+    },
+  ], [t]);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -168,17 +235,18 @@ export const UpscaleCapabilities: React.FC = () => {
 
       <header className="uc-capab-head">
         <h2 className="uc-capab-title pb-reveal" style={{ '--rv-i': 1 } as React.CSSProperties}>
-          A studio-grade <span className='text-[#00FF88]'>toolkit,</span>
+          {t.upscaleCapabilities?.titleLead || "A studio-grade"}{' '}
+          <span className='text-[#00FF88]'>{t.upscaleCapabilities?.titleAccent || "toolkit,"}</span>
           <br />
-          <em>hiding in your browser tab.</em>
+          <em>{t.upscaleCapabilities?.titleTail || "hiding in your browser tab."}</em>
         </h2>
         <p className="uc-capab-sub pb-reveal" style={{ '--rv-i': 2 } as React.CSSProperties}>
-          A powerful suite of object isolation and resolution enhancement engines running entirely inside this tab.
+          {t.upscaleCapabilities?.subtitle || "A powerful suite of object isolation and resolution enhancement engines running entirely inside this tab."}
         </p>
       </header>
 
       <div className="uc-bento">
-        {CELLS.map((cell, i) => (
+        {cells.map((cell, i) => (
           <article
             key={cell.id}
             className={`uc-bento-card ${cell.span} pb-reveal`}

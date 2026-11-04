@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Plus } from 'lucide-react';
+import { useTranslation } from '@/locales';
 
 /* ============================================================
    BRAND FAQ — PIXELIFY UPSCALER (8K · NO CLOUD)
@@ -43,6 +44,8 @@ const FAQ_ITEMS: BrandFaqItem[] = [
 export const UpscaleFaq: React.FC = () => {
   const rootRef = useRef<HTMLElement>(null);
   const [openIdx, setOpenIdx] = useState<number | null>(0);
+  const { t } = useTranslation();
+  const faqItems = t.upscaleFaq?.items || FAQ_ITEMS;
 
   useEffect(() => {
     const root = rootRef.current;
@@ -72,7 +75,7 @@ export const UpscaleFaq: React.FC = () => {
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'FAQPage',
-            mainEntity: FAQ_ITEMS.map((f) => ({
+            mainEntity: faqItems.map((f) => ({
               '@type': 'Question',
               name: f.q,
               acceptedAnswer: { '@type': 'Answer', text: f.a },
@@ -87,13 +90,15 @@ export const UpscaleFaq: React.FC = () => {
         {/* ---------- TOP: centered header ---------- */}
         <header className="uc-faq-head">
           <h2 className="uc-faq-title pb-reveal" style={{ '--rv-i': 1 } as React.CSSProperties}>
-           <span className='text-[#00ff85]'>F</span>requently <span className='text-[#00ff85]'>A</span>sked <span className='text-[#00ff85]'>Q</span>uestions
+            <span className='text-[#00ff85]'>{t.upscaleFaq.titlePrefix}</span>{' '}
+            <span className='text-[#00ff85]'>{t.upscaleFaq.titleMiddle}</span>{' '}
+            {t.upscaleFaq.titleSuffix && <span className='text-[#00ff85]'>{t.upscaleFaq.titleSuffix}</span>}
           </h2>
         </header>
 
         {/* ---------- RIGHT: accordion ---------- */}
         <div className="uc-faq-list">
-          {FAQ_ITEMS.map((item, idx) => {
+          {faqItems.map((item, idx) => {
             const isOpen = openIdx === idx;
             return (
               <article

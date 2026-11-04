@@ -4,6 +4,7 @@ import { SplitText } from 'gsap/SplitText';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ThinkingOrb } from 'thinking-orbs';
 import { useApp } from './AppProvider';
+import { useTranslation } from '@/locales';
 
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
@@ -18,6 +19,7 @@ export default function PixelifyHero({
 }: PixelifyHeroProps) {
   const rootRef = useRef<HTMLElement>(null);
   const { warmup } = useApp();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const root = rootRef.current;
@@ -204,17 +206,17 @@ export default function PixelifyHero({
             <span className="hero-trio-row">
               <span className="hero-trio-wrap">
                 <span className="hero-serif-your dim-3">
-                  <span className="ht">YOUR</span>
+                  <span className="ht">{t.hero.your}</span>
                 </span>
                 <span className="hero-trio-stack">
                   <span className="hero-stack-item dim-2">
-                    <span className="ht">images</span>
+                    <span className="ht">{t.hero.images}</span>
                   </span>
                   <span className="hero-stack-item dim-2">
-                    <span className="ht">device</span>
+                    <span className="ht">{t.hero.device}</span>
                   </span>
                   <span className="hero-stack-item dim-2">
-                    <span className="ht">control</span>
+                    <span className="ht">{t.hero.control}</span>
                   </span>
                 </span>
               </span>
@@ -224,10 +226,10 @@ export default function PixelifyHero({
             <span className="line bright step-4">
               <span className="step-4-row" aria-hidden="true">
                 <span className="ht word-powered">
-                  powered
+                  {t.hero.powered}
                 </span>
                 <span className="ht">
-                  by
+                  {t.hero.by}
                 </span>
                 <span className="glow-wrap">
                   <ThinkingOrb
@@ -236,7 +238,7 @@ export default function PixelifyHero({
                   />
                 </span>
                 <span className="ht ai-token">
-                  Pixelify
+                  {t.hero.brand}
                 </span>
               </span>
             </span>
@@ -244,8 +246,7 @@ export default function PixelifyHero({
 
           {/* SUBTITLE */}
           <p className="sub">
-            Upscale, restore, and transform your images locally,
-            directly in your browser. No uploads. No cloud processing.
+            {t.hero.subtitle}
           </p>
 
           {/* ACTIONS */}
@@ -257,7 +258,7 @@ export default function PixelifyHero({
               onMouseEnter={() => warmup('bg_remove')}
               onTouchStart={() => warmup('bg_remove')}
             >
-              Launch BG Remover
+              {t.hero.launchBg}
               <span>↗</span>
             </button>
 
@@ -268,7 +269,7 @@ export default function PixelifyHero({
               onMouseEnter={() => warmup('upscaler')}
               onTouchStart={() => warmup('upscaler')}
             >
-              Launch AI Upscaler
+              {t.hero.launchUpscaler}
               <span>↗</span>
             </button>
 

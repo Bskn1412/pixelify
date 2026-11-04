@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { MousePointer2, Upload, Download, Cpu } from 'lucide-react';
+import { useTranslation } from '@/locales';
 
 /* ============================================================
    SECTION 4 — THE JOURNEY (sticky scroll)
@@ -86,6 +87,71 @@ const STEPS: JourneyStep[] = [
 export const UpscaleJourney: React.FC = () => {
   const rootRef = useRef<HTMLElement>(null);
   const [active, setActive] = useState(0);
+  const { t } = useTranslation();
+
+  const steps: JourneyStep[] = useMemo(() => [
+    {
+      id: 'upload',
+      k: t.upscaleJourney.step1K || '01',
+      icon: <Upload size={16} strokeWidth={2.2} />,
+      title: t.upscaleJourney.step1Title,
+      desc: t.upscaleJourney.step1Desc,
+      img: '/showcase/upscaleorg/gtaonline.png',
+      imgAlt: 'Original porsche photo being dropped in',
+      readout: t.upscaleJourney.step1Status || 'READY',
+      meter: [
+        { label: 'Input locked', pct: 100 },
+        { label: 'Model warm-up', pct: 12 },
+      ],
+    },
+    {
+      id: 'choose',
+      k: t.upscaleJourney.step2K || '02',
+      icon: <MousePointer2 size={16} strokeWidth={2.2} />,
+      title: t.upscaleJourney.step2Title,
+      desc: t.upscaleJourney.step2Desc,
+      img: '/showcase/preview/gtaonline_upscaled_4x.png',
+      imgAlt: 'Porsche mid-enhancement',
+      readout: t.upscaleJourney.step2Status || 'TUNING',
+      meter: [
+        { label: 'Input locked', pct: 100 },
+        { label: 'Model warm-up', pct: 100 },
+        { label: 'Pass selected · 4×', pct: 64 },
+      ],
+    },
+    {
+      id: 'process',
+      k: t.upscaleJourney.step3K || '03',
+      icon: <Cpu size={16} strokeWidth={2.2} />,
+      title: t.upscaleJourney.step3Title,
+      desc: t.upscaleJourney.step3Desc,
+      img: '/showcase/preview/gtaonline_upscaled_4x.png',
+      imgAlt: 'Porsche processing on device',
+      readout: t.upscaleJourney.step3Status || 'INFERENCE',
+      meter: [
+        { label: 'Input locked', pct: 100 },
+        { label: 'Model warm-up', pct: 100 },
+        { label: 'Pass selected · 4×', pct: 100 },
+        { label: 'WebGPU tiles', pct: 78 },
+      ],
+    },
+    {
+      id: 'export',
+      k: t.upscaleJourney.step4K || '04',
+      icon: <Download size={16} strokeWidth={2.2} />,
+      title: t.upscaleJourney.step4Title,
+      desc: t.upscaleJourney.step4Desc,
+      img: '/showcase/preview/gtaonline_upscaled_4x.png',
+      imgAlt: 'Porsche fully upscaled 4x',
+      readout: t.upscaleJourney.step4Status || 'SAVED',
+      meter: [
+        { label: 'Input locked', pct: 100 },
+        { label: 'Model warm-up', pct: 100 },
+        { label: 'Pass selected · 4×', pct: 100 },
+        { label: 'WebGPU tiles', pct: 100 },
+      ],
+    },
+  ], [t]);
 
   /* --- section reveal: the title uses .pb-reveal (opacity 0 until
      .pb-in lands on this root). Without this the headline stays
@@ -102,10 +168,6 @@ export const UpscaleJourney: React.FC = () => {
           }
         });
       },
-      /* threshold 0: this section is very tall (sticky pin + four
-         steps), so a percentage threshold would only fire after
-         hundreds of px of scrolling — reveal as soon as the top of
-         the section (where the title lives) enters the viewport */
       { threshold: 0, rootMargin: '0px 0px -12% 0px' }
     );
     io.observe(root);
@@ -127,12 +189,6 @@ export const UpscaleJourney: React.FC = () => {
           }
         });
       },
-      /* upper-middle band: each step activates as it rises past
-         60% of the viewport, so the LAST step is active well
-         before the sticky pin runs out of travel */
-      /* mid band: step activates as it crosses 55% of the viewport
-         height — early enough that the pinned visual (which holds
-         until the steps column ends) shows every step, incl. 04 */
       { rootMargin: '-25% 0px -25% 0px' }
     );
     sections.forEach((s) => io.observe(s));
@@ -140,7 +196,7 @@ export const UpscaleJourney: React.FC = () => {
     return () => io.disconnect();
   }, []);
 
-  const step = STEPS[active];
+  const step = steps[active] || steps[0];
 
   return (
     <section className="uj" ref={rootRef}>
@@ -148,9 +204,9 @@ export const UpscaleJourney: React.FC = () => {
         {/* ------------- HEADER ------------- */}
         <header className="uj-head">
           <h2 className="uj-title pb-reveal" style={{ '--rv-i': 1 } as React.CSSProperties}>
-            Four moves.
+            {t.upscaleJourney?.titleLead || "Four moves."}
             <br />
-            <em>Studio output.</em>
+            <em>{t.upscaleJourney?.titleItalic || "Studio output."}</em>
           </h2>
         </header>
 
@@ -179,7 +235,7 @@ export const UpscaleJourney: React.FC = () => {
 
           {/* ------------- RIGHT: steps ------------- */}
           <div className="uj-steps">
-            {STEPS.map((s, i) => (
+            {steps.map((s, i) => (
               <article
                 key={s.id}
                 data-idx={i}

@@ -1,0 +1,757 @@
+{
+  "common": {
+    "appName": "Pixelify",
+    "tagline": "私密、端侧本地运行的 AI 图像处理工具",
+    "loading": "加载中...",
+    "error": "发生错误",
+    "success": "成功",
+    "save": "保存",
+    "cancel": "取消",
+    "download": "下载",
+    "remove": "删除",
+    "clear": "清空",
+    "reset": "重置",
+    "back": "返回",
+    "next": "下一步",
+    "soon": "即将推出",
+    "active": "已启用",
+    "online": "在线",
+    "offline": "离线",
+    "reconnected": "在线",
+    "live": "实时",
+    "original": "原图",
+    "enhanced": "增强效果",
+    "cutout": "抠图结果"
+  },
+  "nav": {
+    "home": "首页",
+    "bgRemove": "抠图背景消除",
+    "upscaler": "AI 超分辨率",
+    "blogs": "技术博客",
+    "settingsTitle": "设置与偏好",
+    "processingEngines": "推理计算引擎",
+    "webgpuSupport": "WebGPU 硬件支持",
+    "checking": "检测中...",
+    "available": "可用",
+    "unavailable": "不可用",
+    "clearModels": "清理模型缓存",
+    "clearing": "清理中…",
+    "clearModelsDesc": "从当前浏览器中移除已下载的 AI 模型权重文件",
+    "learnWebgpu": "深入了解 WebGPU",
+    "selectLanguage": "选择界面语言"
+  },
+  "hero": {
+    "your": "你的",
+    "images": "图片",
+    "device": "设备",
+    "control": "掌控",
+    "powered": "技术",
+    "by": "源自",
+    "brand": "Pixelify",
+    "subtitle": "直接在浏览器内本地放大、修复并处理图像。无云端上传，无第三方追踪，全面守护隐私。",
+    "launchBg": "进入背景抠图",
+    "launchUpscaler": "进入超分辨率放大",
+    "scrollDown": "向下滚动浏览"
+  },
+  "homeStudio": {
+    "badge": "选择工作台",
+    "title": "满足各种图像需求的专业 AI 工具",
+    "subtitle": "选择专为您的图像处理需求量身定制的高性能工作台。"
+  },
+  "whyPixelify": {
+    "eyebrow": "PIXELIFY 的独特之处",
+    "titlePrefix": "为什么创作者与开发者青睐",
+    "subtitle": "企业级神经网络完全在您的浏览器内部运行。无需排队、无需积分额度，隐私零妥协。",
+    "zeroCloudTag": "零云端上传",
+    "zeroCloudBadge": "100% 隐私安全",
+    "zeroCloudTitle": "您的图片只属于您自己",
+    "zeroCloudDesc": "Pixelify 直接在您的本地浏览器内处理图片，文件绝对不会上传到外部服务器。",
+    "sandboxing": "客户端沙箱隔离：",
+    "sandboxingActive": "已激活",
+    "processedOnDevice": "设备本地端侧处理",
+    "webgpuTag": "WebGPU + WASM",
+    "webgpuBadge": "接近原生性能",
+    "webgpuTitle": "纯粹的硬件加速",
+    "webgpuDesc": "通过 LiteRT 与 WebGPU 直接调用 GPU 着色器，摆脱网络延迟，享受实时快速运算。",
+    "engineHardware": "硬件计算引擎：",
+    "engineParallelism": "GPU 核心并行运算",
+    "neuralTag": "Chopper 与 Vitality",
+    "neuralBadge": "8K 超清输出",
+    "neuralTitle": "前沿神经网络模型",
+    "neuralDesc": "基于数百万张高清图像训练，能够精准保留飘逸发丝、透明玻璃与微观纹理，告别塑料质感。",
+    "paywallTag": "无付费门槛",
+    "paywallBadge": "绝无水印",
+    "paywallTitle": "无限制生成",
+    "paywallDesc": "无需每月支付昂贵订阅费，没有限制额度。尽情处理并导出任意数量的抠图与放大文件。",
+    "offlineTag": "持久化缓存",
+    "offlineBadge": "支持离线运行",
+    "offlineTitle": "随心随时，即使飞行模式也能用",
+    "offlineDesc": "模型文件自动缓存在浏览器本地。首次加载后，即使断开网络连接也能正常运行。",
+    "proStudioTag": "专业创作画布",
+    "proStudioBadge": "支持批量",
+    "proStudioTitle": "交互式创作工作室",
+    "proStudioDesc": "支持分屏滑动对比、透明 Alpha 抠图、自定义背景替换以及无损 PNG/WebP 格式导出。",
+    "featureSubPixel": "亚像素级蒙版",
+    "featureScaling": "2x、4x、8x 任意缩放",
+    "featureFormats": "透明 PNG / WebP 导出",
+    "featureBatch": "批量拖拽上传处理",
+    "cloudTitle": "传统云端 AI 工具",
+    "cloudPoint1": "图片被上传至第三方服务器及云端数据日志中",
+    "cloudPoint2": "每月高达数百元的昂贵订阅费或严格的按次计费制",
+    "cloudPoint3": "免费用户被迫承受图像画质压缩并强制附带水印",
+    "localTitle": "Pixelify 本地浏览器端侧 AI",
+    "localPoint1": "100% 隐私保护，图像严格保留在本地浏览器内存中",
+    "localPoint2": "完全免费，无排队机制，支持无限制次数处理",
+    "localPoint3": "无损高清 PNG、WebP 及 JPG 文件原生导出",
+    "footerPill1": "本地优先的工作流",
+    "footerPill2": "专为快速便捷的日常修图场景打造"
+  },
+  "homeFaq": {
+    "titlePrefix": "常见",
+    "titleMiddle": "问题",
+    "titleSuffix": "解答",
+    "items": [
+      {
+        "q": "Pixelify 是如何在不上传图片到云端的情况下进行处理的？",
+        "a": "AI 模型直接借助 WebGPU 与 ONNX Runtime 在您的浏览器中运算，图片始终保存在您自己的设备上。"
+      },
+      {
+        "q": "Pixelify 真的完全免费且没有水印或强制订阅吗？",
+        "a": "是的：无订阅、无代币、无水印、无隐藏费用。打开即用，随时编辑与下载。"
+      },
+      {
+        "q": "可支持放大的最大分辨率与文件大小是多少？",
+        "a": "最高支持 40 MB 的文件以及高达 16K 分辨率（16,384 × 16,384 像素），仅受您设备物理内存的限制。"
+      },
+      {
+        "q": "在没有网络连接的情况下可以使用 Pixelify 吗？",
+        "a": "可以！首次运行后模型即会缓存在浏览器中，之后即使在断网甚至飞行模式下也可以离线处理。"
+      },
+      {
+        "q": "Chopper 抠图模型与普通的抠图工具相比有何优势？",
+        "a": "Chopper 专为保留毛发、宠物毛绒、半透明玻璃与细微边缘而设计，避免边缘粗糙与抠图生硬。"
+      },
+      {
+        "q": "Pixelify 支持在手机和平板上使用吗？",
+        "a": "支持！Pixelify 在支持 WebGPU 或具备 WASM 后备支持的主流移动端浏览器中均可流畅运行。"
+      },
+      {
+        "q": "我的私人生活照和商业机密设计资产安全吗？",
+        "a": "绝对安全。数据全程保存在本地内存中，即使是网站访问计数器也无法读取您正在处理的文件。"
+      },
+      {
+        "q": "如果需要清理浏览器存储，如何删除下载的模型？",
+        "a": "点击右上角齿轮进入设置，选择“清理模型缓存”即可单独清空 AI 模型权重，无需重置整个浏览器。"
+      }
+    ]
+  },
+  "upscaler": {
+    "badge": "端侧神经超分辨率算法",
+    "title": "AI 图像超分辨率放大",
+    "subtitle": "将低清照片与插画无损放大至 16K，清晰重现细节。100% 在本地显卡 GPU 上运算：无上传，零追踪。",
+    "dropzoneTitle": "拖拽图像至此处开始放大",
+    "dropzoneSubtitle": "或从您的设备选择文件",
+    "dropzoneLimits": "支持最大 15 MB 的 PNG、JPG、WebP",
+    "modelSelection": "选择放大模型",
+    "scaleFactor": "放大倍数",
+    "faceEnhance": "人脸高清修复",
+    "faceEnhanceDesc": "精准修复面部轮廓、眼部细节与自然皮肤纹理",
+    "denoise": "图像降噪",
+    "sharpen": "细节锐化",
+    "enhanceButton": "开始超分放大",
+    "processing": "正在放大中…",
+    "downloadButton": "下载高清放大图像",
+    "beforeAfter": "原图 / 增强对比",
+    "clearAll": "清空全部",
+    "original": "原图",
+    "upscaled": "放大后"
+  },
+  "upscaleCapabilities": {
+    "title": "为极致高保真画质而生",
+    "subtitle": "一系列强大的主体隔离与分辨率增强算法，完全在当前标签页内高速运行。",
+    "detailTitle": "生成式细节增强引擎",
+    "detailDesc": "边缘感知重构技术智能补全发丝、衣物纹理与金属高光，而非粗暴拉伸像素。",
+    "speedTitle": "WebGPU 极速硬件通道",
+    "speedDesc": "硬件级着色器并行运算，搭配 WASM 容灾，毫秒级极速完成推理。",
+    "speedLabel": "中端 GPU 上的极速推理耗时",
+    "facesTitle": "人像面部深度修复",
+    "facesDesc": "专为人像摄影打造，重新唤醒被压缩破坏的睫毛、眼神光与细腻肤质。",
+    "privacyTitle": "无任何数据离开浏览器",
+    "privacyDesc": "每一帧画面均在您本机的硅芯片上计算完成，无队列排队，无需注册，无水印。",
+    "privacyBadge": "仅在当前设备运行",
+    "scaleTitle": "支持 2× 至 16K 画布输出",
+    "scaleDesc": "切片拼接管线支持将图像扩展至 16,384 像素，绝不会导致网页崩溃崩溃卡死。",
+    "scaleLabel": "最大画布边长像素",
+    "controlTitle": "每张图片独立参数调节",
+    "controlDesc": "在批量作业中，每张图片均可单独设置模型、倍率、降噪与锐化强度。",
+    "titleLead": "工作室级",
+    "titleAccent": "专业工具箱，",
+    "titleTail": "就藏在您的浏览器标签页中。"
+  },
+  "upscaleJourney": {
+    "title": "处理流程与体验",
+    "subtitle": "从低分辨率缩略图到印刷级画质，只需三步轻量化操作。",
+    "step1K": "01",
+    "step1Title": "放入任意图片",
+    "step1Desc": "将 PNG、JPG 或 WebP 拖入画布，或直接使用 Ctrl+V 粘贴剪贴板截图。",
+    "step1Status": "准备就绪",
+    "step2K": "02",
+    "step2Title": "挑选适合的 AI 模型",
+    "step2Desc": "日常快速处理选择 Vitality，极致画质选择 Pixel-Dance 或 Alpha-Satoru。",
+    "step2Status": "微调参数",
+    "step3K": "03",
+    "step3Title": "实时见证重构过程",
+    "step3Desc": "切片数据流在 GPU 中并行处理并显示实时进度，图片无需经过任何外部服务器。",
+    "step3Status": "模型推理中",
+    "step4K": "04",
+    "step4Title": "无损格式导出",
+    "step4Desc": "直接下载全分辨率 PNG 或 WebP 文件，没有水印，没有强制压缩。",
+    "step4Status": "已保存",
+    "titleLead": "四步流程。",
+    "titleItalic": "影棚级品质。"
+  },
+  "upscaleFaq": {
+    "titlePrefix": "常见",
+    "titleMiddle": "问题",
+    "titleSuffix": "解答",
+    "items": [
+      {
+        "q": "Pixelify 是如何实现媲美 8K 的超高分辨率的？",
+        "a": "神经网络超分管线在您的 GPU 上以切片形式逐块重构图像，补充真实质感与边缘细节，最高可生成 16,384 × 16,384 像素的超清大图。"
+      },
+      {
+        "q": "我的图片会被上传到任何云端服务器吗？",
+        "a": "绝不。模型直接利用 WebGPU / WebAssembly 在您的浏览器标签页内执行，全程在您自己的硬件上处理。"
+      },
+      {
+        "q": "我需要注册账号或充值购买点数吗？",
+        "a": "完全不需要。无需登录邮箱，无需购买积分，打开网页即可无限次免费使用。"
+      },
+      {
+        "q": "我可以导出哪些格式？会有水印吗？",
+        "a": "支持以全尺寸导出无损 PNG 或 WebP 格式，绝无任何水印，也没有每日使用次数上限。"
+      },
+      {
+        "q": "能在我的普通笔记本或手机上正常运行吗？",
+        "a": "可以。配备支持 WebGPU 的设备将享受全速硬件加速；其余环境会自动退回至 WASM 模式兼容运行。"
+      },
+      {
+        "q": "进行一次 4 倍放大需要多长时间？",
+        "a": "在主流中端独显或集显上，Turbo 极速引擎通常在 1 秒左右即可完成整张图片的增强。"
+      }
+    ]
+  },
+  "bgRemove": {
+    "badge": "免费 · 本地端侧 · 隐私安全",
+    "title": "智能背景消除与抠图",
+    "subtitle": "几秒内精准抠出主体。发丝细节、玻璃透明度与精细边缘均能完美保留，全过程支持离线运行。",
+    "dropzoneTitle": "拖入图片以开始抠图",
+    "dropzoneSubtitle": "或从本地浏览文件",
+    "dropzoneLimits": "支持最大 20 MB 的 PNG、JPG、WebP",
+    "refineDiablo": "启用 Diablo 极致精度精修",
+    "diabloActive": "Diablo 极致精度模式已激活",
+    "brushErase": "擦除",
+    "brushRestore": "恢复",
+    "brushSize": "画笔粗细",
+    "brushFeather": "边缘羽化",
+    "backgroundColor": "背景颜色",
+    "transparent": "透明背景",
+    "customColor": "自定义拾色",
+    "solids": "默认纯色预设",
+    "gradients": "默认渐变色预设",
+    "addPhoto": "添加图片作为背景",
+    "aspectRatio": "裁剪比例",
+    "textOverlay": "添加文本水印/标签",
+    "downloadCutout": "下载透明 PNG",
+    "tabCutout": "抠图主体",
+    "tabBackdrop": "替换背景",
+    "tabText": "文字排版",
+    "tabRefine": "边缘精修"
+  },
+  "bgSections": {
+    "marquee": [
+      "Chopper 智能分割",
+      "端侧 WebGPU 运算",
+      "零云端上传",
+      "发丝级细腻边缘",
+      "透明 PNG 导出",
+      "无需注册登录",
+      "无限制永久免费"
+    ],
+    "pipelineStep1K": "放入",
+    "pipelineStep1Title": "秒级加载",
+    "pipelineStep1Desc": "直接拖入照片或粘贴剪贴板截图，全在本地内存中流畅加载。",
+    "pipelineStep2K": "分割",
+    "pipelineStep2Title": "双边神经抠图",
+    "pipelineStep2Desc": "Chopper 与 Diablo 自动识别边缘轮廓与飘逸发丝，生成亚像素蒙版。",
+    "pipelineStep3K": "导出",
+    "pipelineStep3Title": "精修并下载",
+    "pipelineStep3Desc": "自由擦除修补、更换背景底色或阴影，一键保存为透明 PNG、WebP 或 JPG。",
+    "lensLive": "实时 · 本地运行",
+    "lensOriginal": "原图",
+    "lensCutout": "抠图",
+    "faqItems": [
+      {
+        "q": "如何完全免费地抠图去除背景？",
+        "a": "打开背景消除工作台，将图片拖入上传区域，AI 将自动进行智能识别与抠图。完成后直接下载透明 PNG，无需注册、无水印。"
+      },
+      {
+        "q": "什么是 Diablo 模型？它与 Chopper 有何区别？",
+        "a": "Chopper 是针对所有设备进行优化的高速默认模型，出图极快。Diablo 则是配备 1024×1024 输入张量与先进双边边缘重构的高精度旗舰模型，专门用于保留复杂发丝、宠物绒毛、透明玻璃等精细边缘，避免光晕伪影。"
+      },
+      {
+        "q": "我应该在什么时候选用 Diablo 模型？",
+        "a": "普通电商产品图、商业标识和日常拍摄使用 Chopper 即可快速完成。需要处理复杂发丝的人像摄影、毛茸茸的宠物、婚纱透明薄纱或珠宝时，强烈推荐使用 Diablo。"
+      },
+      {
+        "q": "如何开启 Diablo 极致精度模型？",
+        "a": "生成初次抠图后，在左侧工具栏点击“启用 Diablo 极致精度精修”按钮，即可自动使用 Diablo 的高保真管线重新计算。"
+      },
+      {
+        "q": "Diablo 模型是否也在本地运行并支持离线使用？",
+        "a": "是的。Chopper 与 Diablo 均 100% 在您的本地设备通过 WebGPU 和 WebAssembly 运行，初次加载缓存后即可离线使用。"
+      },
+      {
+        "q": "我的图片会被上传到任何服务器吗？",
+        "a": "绝不会。所有图像均保存在浏览器本地，非常适合处理个人证件照和商业客户保密项目。"
+      },
+      {
+        "q": "支持哪些输入格式与导出格式？",
+        "a": "支持上传不超过 20 MB 的 PNG、JPG、WebP 格式；可导出透明 PNG、保留 Alpha 的 WebP 或带纯色底的 JPG。"
+      },
+      {
+        "q": "抠出人物后可以更换新背景吗？",
+        "a": "可以！在“替换背景”标签页中，您可以选择透明背景、纯色、潮流渐变色，也可以上传自己的风景照片作为底图。"
+      },
+      {
+        "q": "对于散乱发丝和半透明玻璃能处理好吗？",
+        "a": "能！标准图片使用 Chopper 即可保持整洁利落，而 Diablo 模型能呈现出摄影棚级的半透明边缘过渡。"
+      },
+      {
+        "q": "为什么第一次处理某张图片时会有短暂加载？",
+        "a": "首次使用时模型需要从网络下载并写入浏览器的本地缓存。下载完毕后，后续处理通常只需几秒钟。"
+      }
+    ],
+    "showcaseEyebrow": "抠图工作室",
+    "showcaseTitleLead": "杂乱背景",
+    "showcaseTitleGone": "消失无踪。",
+    "showcaseTitleSubject": "焦点主体",
+    "showcaseTitleStays": "完美保留。",
+    "showcaseDesc": "由本地 GPU 上运行的高精度神经分割网络强力驱动。拖入图片即可完成抠图，耗时甚至低于云端工具的上传时间。",
+    "shotProduct": "商品图 · 01",
+    "shotPortrait": "人像图 · 02",
+    "shotStudio": "影棚图 · 03",
+    "pipelineEyebrow": "工作流程",
+    "pipelineTitleLead": "三步到位。",
+    "pipelineTitleItalic": "绝对隐私。",
+    "pipelineDesc": "从拖拽放入到完成抠图，没有任何一个字节离开您的电脑设备。",
+    "pipelineHint": "主体锁定 · 端侧运行",
+    "precisionEyebrow": "边缘发丝级精度",
+    "precisionTitleLead": "放大观察。",
+    "precisionTitleItalic": "眼见为实。",
+    "precisionDesc": "拖动滑块对比左右：左侧为原始照片，右侧为剥离后的主体。下载时与您看到的效果分毫不差。",
+    "statModel": "首次使用后本地永久缓存",
+    "statMax": "单张图片最大支持容量",
+    "statFmt": "PNG · WebP · JPG 导出支持",
+    "statHw": "全程在您自己的硬件上处理",
+    "galleryEyebrow": "即刻实时体验",
+    "galleryTitleLead": "任选样张。",
+    "galleryTitleItalic": "见证奇迹。",
+    "galleryDesc": "每一行都运行着与您个人文件完全相同的端侧神经网络。点击下方任意项立即在画布上体验。",
+    "sample1Name": "街头人像",
+    "sample1Tag": "肖像",
+    "sample2Name": "影棚模特",
+    "sample2Tag": "摄影",
+    "sample3Name": "野生动物",
+    "sample3Tag": "自然"
+  },
+  "footer": {
+    "slogan": "体验端侧 AI 的极速起飞",
+    "feedbackTitle": "意见反馈与商务联系",
+    "feedbackDesc": "有功能建议或合作想法？欢迎随时交流",
+    "productCol": "产品矩阵",
+    "resourcesCol": "开发资源",
+    "companyCol": "关于我们",
+    "legalCol": "法律与条款",
+    "followCol": "关注动态",
+    "upscaler": "AI 图像超分辨率",
+    "bgRemover": "智能抠图去背景",
+    "products": "产品功能特性",
+    "docs": "技术文档",
+    "blogs": "技术博客",
+    "faqs": "常见问题",
+    "sysReq": "系统配置要求",
+    "about": "关于 Pixelify",
+    "contact": "联系我们",
+    "privacy": "隐私保护政策",
+    "terms": "用户服务条款",
+    "rights": "版权所有。图像完全在设备本地处理。"
+  },
+  "blogs": {
+    "title": "技术博客与 AI 指南",
+    "subtitle": "探索端侧 AI、隐私防护、图像超分、智能抠图以及 WebGPU 的深度实战经验。",
+    "searchPlaceholder": "按标题、标签或关键字搜索技术文章…",
+    "filterLang": "文章语言",
+    "all": "全部",
+    "readTime": "分钟阅读",
+    "by": "作者",
+    "shareArticle": "分享文章",
+    "linkCopied": "链接已复制",
+    "moreFrom": "更多精选文章",
+    "backToBlogs": "返回博客列表",
+    "notFound": "未找到文章",
+    "notFoundDesc": "您所寻找的文章暂未在此语言版本中提供。"
+  },
+  "uploadArea": {
+    "upscaleTitle": "超分辨率增强",
+    "upscaleDesc": "上传您的图片以\n提升其分辨率与画质。",
+    "cutoutTitle": "抠图",
+    "cutoutDesc": "将图片拖放至此处开始抠图\n支持小于 20MB 的 PNG、JPG 或 WebP 文件。",
+    "uploadMedia": "上传媒体文件",
+    "processing": "处理中...",
+    "remove": "移除"
+  },
+  "bgRemoverSection": {
+    "titlePrefix": "高精度智能背景去除",
+    "titleSuffix": "AI 驱动",
+    "item1TitleLead": "100% 免费",
+    "item1TitleTail": "且无任何限制。",
+    "item1Desc": "几秒内即可去除人像、商品和复杂图片的背景。无需繁琐的手动套索，无需购买点数积分。",
+    "item2TitleLead": "本地端侧隐私",
+    "item2TitleTail": "零云端上传。",
+    "item2Desc": "AI 完全在您的浏览器中处理图片，文件始终保留在您的本地设备上，绝不上载到远程服务器。",
+    "item3TitleLead": "自定义背景",
+    "item3TitleTail": "与原画质高分辨率导出。",
+    "item3Desc": "下载清晰锐利的透明 PNG 抠图，或为图片替换全新背景。完整保留原始尺寸导出，随心用于电商和设计。",
+    "exploreButton": "体验背景去除"
+  },
+  "aiUpscalerSection": {
+    "titleLead": "在您的设备上通过 AI",
+    "titleAccent": "超分辨率放大图片",
+    "desc": "将照片、动漫、商品图、人像和老旧照片放大 2x、4x 或 8x。AI Upscaler 带来卓越的清晰度与更纯净的细节，全程离线高速运行。",
+    "exploreButton": "体验 AI 图片放大",
+    "aiDelegated": "AI 算法分派"
+  },
+  "homeDemo": {
+    "badge": "即时演示",
+    "title": "一键体验示例资产",
+    "loading": "加载中…",
+    "bgRemoveType": "背景去除",
+    "aiUpscaleType": "AI 放大",
+    "samples": {
+      "sports": {
+        "name": "体育运动",
+        "desc": "通过亚像素边缘检测精确分离主体"
+      },
+      "anime": {
+        "name": "动漫插画",
+        "desc": "4倍超分辨率并增强微纹理"
+      },
+      "ocean": {
+        "name": "海洋生物",
+        "desc": "高质量商用级主体抠图"
+      },
+      "oldPhoto": {
+        "name": "历史旧照",
+        "desc": "高质量商用级主体抠图"
+      }
+    },
+    "features": [
+      {
+        "title": "背景去除工具",
+        "subtitle": "以亚像素级精度隔离发丝与透明物体边缘。",
+        "badge": "Chopper AI",
+        "detailTitle": "Chopper 神经分割网络",
+        "detailDesc": "双路径视觉 Transformer 直接在浏览器内存中生成丝滑阿尔法遮罩。"
+      },
+      {
+        "title": "背景去除工具",
+        "subtitle": "以亚像素级精度隔离发丝与透明物体边缘。",
+        "badge": "Chopper AI",
+        "detailTitle": "Chopper 神经分割网络",
+        "detailDesc": "双路径视觉 Transformer 直接在浏览器内存中生成丝滑阿尔法遮罩。"
+      },
+      {
+        "title": "AI 超分辨率放大",
+        "subtitle": "重建高频纹理与清晰边缘，最高可达 8K 级分辨率且无涂抹瑕疵。",
+        "badge": "8倍放大",
+        "detailTitle": "Vitality、Pixel-Dance 与 Alpha-Satoru",
+        "detailDesc": "利用 WebGPU 着色器直接执行 LiteRT，实现硬件加速张量计算。"
+      },
+      {
+        "title": "AI 超分辨率放大",
+        "subtitle": "零云端服务器，零外部数据上传，您的图片绝不离开计算机。",
+        "badge": "本地 WASM",
+        "detailTitle": "端侧完全隔离安全",
+        "detailDesc": "由 WASM SIMD 和 WebGPU 强力驱动的完整离线处理能力。"
+      }
+    ]
+  },
+  "homeWorkflow": {
+    "workspace": "PIXELIFY",
+    "workspaceSub": "/ 工作区",
+    "privacyFirst": "隐私第一",
+    "interactivePreview": "交互式预览",
+    "exploreBefore": "打开工具前先探索工作流。",
+    "desktopExp": "桌面级体验",
+    "workflow": "工作流程",
+    "pauseDemo": "暂停演示",
+    "playDemo": "播放演示",
+    "nextWorkflow": "下一个工作流",
+    "nextStep": "下一步",
+    "processing": "处理中",
+    "previewReady": "预览已就绪",
+    "demoMode": "演示模式",
+    "step0": "添加图片以开始",
+    "step1": "配置参数",
+    "step2Bg": "正在细化主体边缘",
+    "step2Upscale": "正在增强图像细节",
+    "step3": "您的预览已就绪",
+    "simpleWorkflow": "简单直观的引导流程",
+    "simpleWorkflowDesc": "这是功能流程展示，打开实际工具即可处理您自己的图片。",
+    "exploreSettings": "查看设置",
+    "sampleImageLoaded": "示例图片已载入",
+    "enlargement": "放大倍数",
+    "featherEdges": "羽化边缘",
+    "previewWorkflow": "预览工作流",
+    "refiningSubjectBoundaries": "正在细化主体轮廓边界",
+    "enhancingImageDetail": "正在增强图片高频细节",
+    "simulatedNotice": "此为流程模拟状态 — 演示中未上传处理任何真实图片。",
+    "preparingPreview": "正在准备预览",
+    "simulated": "模拟",
+    "previewState": "预览状态",
+    "enhancedPreview": "增强后预览",
+    "cutoutPreview": "抠图效果预览",
+    "previewNotice": "这仅为视觉效果展示，并非导出文件。打开工具即可处理真实图片。",
+    "openUpscaler": "打开 AI 超分工具",
+    "openBgRemover": "打开背景去除工具",
+    "demoOnly": "纯演示 · 无需上传",
+    "exploreInterface": "点击上方步骤以探索界面功能。",
+    "back": "上一步",
+    "launchTool": "启动工具",
+    "sessionDetails": "会话详情",
+    "dimensions": "分辨率尺寸",
+    "mode": "运行模式",
+    "interactiveDemo": "交互式演示",
+    "privacyByDesign": "原生隐私设计",
+    "privacyByDesignDesc": "此演示仅使用示例 UI 状态，您的真实图片将全程在本地工具中处理。",
+    "noAccountNeeded": "无需注册登录或上传文件即可自由体验。",
+    "detailPreview": "细节预览",
+    "flows": {
+      "upscale": {
+        "name": "照片画质放大",
+        "description": "提升照片细节与锐度",
+        "steps": [
+          "从需要变清晰或放大的照片开始。",
+          "选择想要放大的倍数尺寸。",
+          "演示正在模拟端侧无损增强工作流。",
+          "查看预览状态，然后打开工具开始处理。"
+        ]
+      },
+      "background": {
+        "name": "智能背景去除",
+        "description": "创建干净利落的主体抠图",
+        "steps": [
+          "选择主体明确的人物或商品肖像。",
+          "预览抠图流程与边缘精细化选项。",
+          "演示正在模拟前景识别与阿尔法遮罩生成。",
+          "查看预览状态，然后打开工具开始处理。"
+        ]
+      },
+      "anime": {
+        "name": "动漫二次元放大",
+        "description": "保持线条清晰锐利不模糊",
+        "steps": [
+          "从插画或低清动漫截图开始。",
+          "为二次元画作选择适当的放大倍率。",
+          "演示正在模拟线条重绘与色彩强化。",
+          "查看预览状态，然后打开工具开始处理。"
+        ]
+      },
+      "product": {
+        "name": "电商商品抠图",
+        "description": "精细修整商品轮廓边缘",
+        "steps": [
+          "从商品图片开始制作纯净的白底或透明底图。",
+          "预览商品轮廓的平滑度与羽化选项。",
+          "演示正在模拟物体识别与毛边清理。",
+          "查看预览状态，然后打开工具开始处理。"
+        ]
+      }
+    },
+    "stepLabels": [
+      "上传",
+      "配置",
+      "处理",
+      "预览"
+    ]
+  },
+  "pixelifyStory": {
+    "words": [
+      "PIXELIFY",
+      "本地",
+      "AI",
+      "专为",
+      "您的",
+      "图片",
+      "放大",
+      "修复",
+      "画质增强",
+      "无需",
+      "上传",
+      "任何内容",
+      "到",
+      "云端",
+      "您的",
+      "像素",
+      "完全",
+      "归您所有"
+    ]
+  },
+  "upscaleShowreel": {
+    "titleStraight": "直接来自",
+    "titleEngine": "引擎输出。",
+    "subtitle": "无需修图。无需 Photoshop。",
+    "fashionPortrait": "时尚人像",
+    "editorial": "社论大片",
+    "pets": "萌宠",
+    "furLevel": "发丝级别",
+    "maxResolution": "如同最高输出分辨率",
+    "avianPortrait": "飞鸟肖像",
+    "featherGrade": "羽毛级精细度",
+    "officialPortrait": "官方肖像",
+    "photojournalism": "新闻摄影",
+    "product": "商业静物",
+    "studioQuality": "影棚级品质",
+    "iconicPoster": "标志性海报",
+    "printReady": "印刷级品质",
+    "movesCutout": "完成抠图的简易步骤",
+    "animeArt": "动漫艺术",
+    "facesRestored": "人脸高清重塑",
+    "automotive": "汽车工业",
+    "detailRecovery": "细节精细恢复",
+    "gaming": "游戏画面",
+    "thumbnailReady": "封面缩略图就绪",
+    "illustration": "精美插画",
+    "colorFidelity": "色彩高度保真"
+  },
+  "upscaleShowcase": {
+    "titlePixel": "重塑每一个",
+    "titleReimagined": "像素。",
+    "subtitle": "体验真正的 8x 超分辨率放大，全部在您的设备本地实时渲染。滑动透镜对比：左侧为原始图像，右侧为 Pixelify 单次处理的高清成果。",
+    "statMaxScale": "最大放大倍数",
+    "statPrivate": "私密 & 设备本地运行",
+    "statCloudLatency": "云端延迟",
+    "lensOriginal": "原图",
+    "lensUpscaled": "超清重塑",
+    "lensNext": "下一张示例",
+    "pairCyberpunk": "赛博朋克肖像",
+    "pairCyberpunkMeta": "东京霓虹，人脸细节精细重塑",
+    "pairSneaker": "复古运动鞋",
+    "pairSneakerMeta": "皮革纹理与缝线恢复",
+    "pairWatch": "高端腕表",
+    "pairWatchMeta": "拉丝钢纹，表盘刻度分明",
+    "pairLandscape": "山川远景",
+    "pairLandscapeMeta": "林木枝叶分明，山脊锐利清晰"
+  },
+  "upscaleWorkspace": {
+    "headerTitle": "Upscale",
+    "headerSubtitle": "AI 分辨率与细节增强",
+    "modelLabel": "模型",
+    "scaleFactor": "放大倍数",
+    "advancedSettings": "高级设置",
+    "advanced": "高级选项",
+    "presets": "预设风格",
+    "preset": "预设",
+    "sharpness": "锐度",
+    "sharpnessDesc": "控制边缘和微小细节的锐利增强程度。",
+    "denoise": "降噪",
+    "denoiseDesc": "减少噪点、颗粒和压缩失真。",
+    "faceEnhance": "人脸增强",
+    "faceEnhanceDesc": "控制人脸五官与皮肤细节的重塑强度。",
+    "colorEnhance": "色彩增强",
+    "colorEnhanceDesc": "增强画面的色彩饱和度、鲜艳度与整体平衡。",
+    "hdr": "HDR 高动态",
+    "hdrDesc": "提升动态范围，优化高光与阴影细节。",
+    "brightness": "亮度",
+    "brightnessDesc": "调整画面的整体明暗程度。",
+    "contrast": "对比度",
+    "contrastDesc": "控制画面明暗区域之间的反差。",
+    "btnUpscale": "开始超分",
+    "btnEnhancing": "正在处理…",
+    "btnDownload": "下载结果",
+    "btnReEnhance": "重新处理",
+    "btnCancel": "取消",
+    "btnReset": "重置",
+    "btnAdd": "添加",
+    "labelOriginal": "原图",
+    "labelEnhanced": "超清结果",
+    "enhancedBadge": "处理完成",
+    "enhancingBadge": "正在处理...",
+    "loadingModel": "正在加载 AI 模型...",
+    "modelCacheNote": "神经模型仅需下载一次，随后均直接从浏览器本地缓存运行。",
+    "enhancingImage": "正在增强",
+    "neuralActive": "神经超分辨率引擎运行中",
+    "popular": "最常用",
+    "modelVitalityDesc": "速度最快，边缘干净清晰。",
+    "modelPixelDanceDesc": "极致细节，支持最高 8K 输出。",
+    "modelAlphaSatoruDesc": "人像和真实照片的自然细节再现。"
+  },
+  "modelLoading": {
+    "downloadingTitle": "正在下载 AI 模型",
+    "leftBadge": "剩余",
+    "extractingSubject": "正在提取主体...",
+    "segmentingEdges": "神经网络正在精准分割边缘...",
+    "analyzingContours": "正在分析图像轮廓与光影...",
+    "loadingVisionWeights": "正在加载视觉模型权重...",
+    "diabloEdgeMatting": "Diablo 神经网络正在精细抠图...",
+    "segmentingSubject": "神经网络正在分离前景主体...",
+    "extractingHairFur": "正在提取精细发丝、动物毛发与半透明区域...",
+    "extractingCutout": "正在生成干净的主体抠图...",
+    "refiningAlpha": "正在亚像素级优化 Alpha 透明遮罩...",
+    "finalizingAlpha": "正在完成边缘过渡与透明通道...",
+    "renderingPng": "正在渲染透明 PNG 图像...",
+    "processingError": "处理遇到问题",
+    "errorDefault": "未能成功移除该图像的背景。",
+    "retryBgRemoval": "↻ 重新尝试抠图",
+    "cleanCutout": "✓ 完美抠图",
+    "removingBg": "◆ 正在去除背景…",
+    "waitCaption1": "仅需一次下载 AI 模型文件...",
+    "waitCaption2": "保存在浏览器中，下次打开即刻秒开...",
+    "waitCaption3": "正在下载模型文件，仅此一次...",
+    "waitCaption4": "正在启动 AI 神经引擎...",
+    "waitCaption5": "正在深度分析您的照片...",
+    "waitCaption6": "稍候片刻，首次计算耗时略长...",
+    "waitCaption7": "正在准备图像的每个计算单元...",
+    "waitCaption8": "品质优先，请稍候片刻...",
+    "waitCaption9": "正在为画面各角落注入高清细节...",
+    "waitCaption10": "正在锐化微观纹理...",
+    "waitCaption11": "逐像素提升画面清晰度...",
+    "waitCaption12": "正在以超高分辨率重构图像...",
+    "waitCaption13": "AI 神经模型正在深度重塑...",
+    "waitCaption14": "还原真实自然的生动色彩...",
+    "waitCaption15": "即将完成，正在进行最终润色...",
+    "waitCaption16": "正在优化边缘与细小纹理...",
+    "waitCaption17": "正在增强画面的锐度与景深...",
+    "waitCaption18": "进行最后的细节抛光...",
+    "waitCaption19": "最后润色中...",
+    "waitCaption20": "马上呈现，即将完成...",
+    "waitCaption21": "让每一个像素绽放精彩..."
+  },
+  "deviceNotice": {
+    "title": "桌面端体验更佳",
+    "bgRemoveDesc": "Pixelify 在移动设备上也能顺畅使用！如需体验更极致迅速的 AI 抠图性能，建议在桌面电脑或笔记本上运行。",
+    "upscaleDesc": "Pixelify 在移动端同样可用！如需更高速的 AI 超分辨率放大，推荐使用台式机或笔记本电脑。",
+    "tip": "温馨提示",
+    "understand": "我知道了"
+  },
+  "bgMarquee": [
+    "Chopper 智能分割",
+    "WebGPU 本地加速",
+    "零文件上传",
+    "发丝级边缘精度",
+    "透明 PNG 格式",
+    "无需登录注册",
+    "无限次数运行"
+  ]
+}

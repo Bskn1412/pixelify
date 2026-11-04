@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Crop as CropIcon } from 'lucide-react';
 import ModelLoader from './upscaler/ModelLoader';
+import { useTranslation } from '@/locales';
 import FabricImageEditor, {
   FabricEditMode,
   FabricCropRatio,
@@ -133,6 +134,7 @@ export default function BGComparator({
   onArtboardSizeChange,
   onRetry,
 }: BGComparatorProps) {
+  const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const artboardRef = useRef<HTMLDivElement | null>(null);
   const [split, setSplit] = useState(50);
@@ -1009,9 +1011,9 @@ export default function BGComparator({
               ⚠️
             </div>
             <div className="relative z-10 max-w-sm">
-              <h4 className="text-xl font-bold text-white mb-1.5 tracking-tight">Processing Error</h4>
+              <h4 className="text-xl font-bold text-white mb-1.5 tracking-tight">{t.modelLoading?.processingError || "Processing Error"}</h4>
               <p className="text-xs text-neutral-300 font-mono mb-4 leading-relaxed">
-                {job.message || 'Could not remove background from this image.'}
+                {job.message || t.modelLoading?.errorDefault || 'Could not remove background from this image.'}
               </p>
               {onRetry && (
                 <button
@@ -1019,7 +1021,7 @@ export default function BGComparator({
                   onClick={onRetry}
                   className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#00FF85] to-emerald-400 text-black font-bold text-xs tracking-wide shadow-lg shadow-[#00FF85]/20 hover:brightness-110 transition active:scale-95 cursor-pointer"
                 >
-                  ↻ Retry Background Removal
+                  {t.modelLoading?.retryBgRemoval || "↻ Retry Background Removal"}
                 </button>
               )}
             </div>
@@ -1054,9 +1056,9 @@ export default function BGComparator({
             </div>
 
             <div className="relative z-10 max-w-sm">
-              <h4 className="text-xl font-black text-white mb-1 tracking-tight">Extracting Subject...</h4>
+              <h4 className="text-xl font-black text-white mb-1 tracking-tight">{t.modelLoading?.extractingSubject || "Extracting Subject..."}</h4>
               <p className="text-xs text-neutral-400 font-mono">
-                {job.message || 'Neural network segmenting edges...'}
+                {job.message || t.modelLoading?.segmentingEdges || 'Neural network segmenting edges...'}
               </p>
             </div>
 

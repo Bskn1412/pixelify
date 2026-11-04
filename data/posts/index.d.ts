@@ -6,7 +6,7 @@ export type Block =
   | { type: 'quote'; text: string; cite?: string }
   | { type: 'callout'; title: string; text: string };
 
-export type LangCode = 'en' | 'fr' | 'zh' | 'ja' | 'hi' | 'ru';
+export type LangCode = 'en' | 'es' | 'fr' | 'pt' | 'zh' | 'ja' | 'ko' | 'hi' | 'ru';
 
 export interface Language {
   code: LangCode;

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   ArrowRight,
@@ -18,6 +18,7 @@ import {
   SlidersHorizontal,
   Wand2,
 } from "lucide-react";
+import { useTranslation } from "@/locales";
 
 type Flow = "upscale" | "background" | "anime" | "product";
 type FlowConfig = {
@@ -111,30 +112,84 @@ export default function HomeWorkflowDemos({
   onLaunchUpscaler: () => void;
   onLaunchBGRemove: () => void;
 }) {
+  const { t } = useTranslation();
   const [flow, setFlow] = useState<Flow>("upscale");
   const [step, setStep] = useState(0);
   const [playing, setPlaying] = useState(true);
   const [scale, setScale] = useState("2×");
   const [feather, setFeather] = useState(true);
   const reducedMotion = useReducedMotion();
-  const config = FLOWS.find((item) => item.id === flow)!;
+
+  const flows: FlowConfig[] = useMemo(() => [
+    {
+      id: "upscale",
+      name: t.homeWorkflow?.flows?.upscale?.name || "Photo upscaler",
+      description: t.homeWorkflow?.flows?.upscale?.description || "Enhance photo detail",
+      accent: "#7ce7b2",
+      icon: Wand2,
+      file: "summer-campaign.jpg",
+      dimensions: "1280 × 960 px",
+      size: "2.4 MB · JPG",
+    },
+    {
+      id: "background",
+      name: t.homeWorkflow?.flows?.background?.name || "Background remover",
+      description: t.homeWorkflow?.flows?.background?.description || "Create a clean cutout",
+      accent: "#8bd7e8",
+      icon: ScanLine,
+      file: "portrait-photo.jpg",
+      dimensions: "1600 × 1200 px",
+      size: "1.8 MB · JPG",
+    },
+    {
+      id: "anime",
+      name: t.homeWorkflow?.flows?.anime?.name || "Anime upscaler",
+      description: t.homeWorkflow?.flows?.anime?.description || "Keep linework crisp",
+      accent: "#c5b4ff",
+      icon: ImagePlus,
+      file: "anime-frame.jpg",
+      dimensions: "720 × 480 px",
+      size: "940 KB · JPG",
+    },
+    {
+      id: "product",
+      name: t.homeWorkflow?.flows?.product?.name || "Product cutout",
+      description: t.homeWorkflow?.flows?.product?.description || "Refine product edges",
+      accent: "#f1c78e",
+      icon: ScanLine,
+      file: "product-shot.jpg",
+      dimensions: "1400 × 1400 px",
+      size: "2.1 MB · JPG",
+    },
+  ], [t]);
+
+  const steps = useMemo(() => t.homeWorkflow?.stepLabels || STEPS, [t]);
+
+  const copy: Record<Flow, string[]> = useMemo(() => ({
+    upscale: t.homeWorkflow?.flows?.upscale?.steps || COPY.upscale,
+    background: t.homeWorkflow?.flows?.background?.steps || COPY.background,
+    anime: t.homeWorkflow?.flows?.anime?.steps || COPY.anime,
+    product: t.homeWorkflow?.flows?.product?.steps || COPY.product,
+  }), [t]);
+
+  const config = flows.find((item) => item.id === flow) || flows[0];
   const Icon = config.icon;
 
   useEffect(() => {
     if (!playing || reducedMotion) return;
     const timer = window.setTimeout(() => {
-      if (step < STEPS.length - 1) {
+      if (step < steps.length - 1) {
         setStep(step + 1);
         return;
       }
 
-      const currentFlowIndex = FLOWS.findIndex((item) => item.id === flow);
-      const nextFlow = FLOWS[(currentFlowIndex + 1) % FLOWS.length].id;
+      const currentFlowIndex = flows.findIndex((item) => item.id === flow);
+      const nextFlow = flows[(currentFlowIndex + 1) % flows.length].id;
       setFlow(nextFlow);
       setStep(0);
-    }, step === 2 ? 3200 : step === STEPS.length - 1 ? 6000 : 4000);
+    }, step === 2 ? 3200 : step === steps.length - 1 ? 6000 : 4000);
     return () => window.clearTimeout(timer);
-  }, [playing, reducedMotion, step, flow]);
+  }, [playing, reducedMotion, step, flow, flows, steps]);
 
   const selectFlow = (next: Flow) => {
     setFlow(next);
@@ -143,18 +198,18 @@ export default function HomeWorkflowDemos({
   };
 
   const goToStep = (next: number) => {
-    setStep(Math.max(0, Math.min(STEPS.length - 1, next)));
+    setStep(Math.max(0, Math.min(steps.length - 1, next)));
   };
 
   const advanceToNextFlow = () => {
-    const currentFlowIndex = FLOWS.findIndex((item) => item.id === flow);
-    setFlow(FLOWS[(currentFlowIndex + 1) % FLOWS.length].id);
+    const currentFlowIndex = flows.findIndex((item) => item.id === flow);
+    setFlow(flows[(currentFlowIndex + 1) % flows.length].id);
     setStep(0);
   };
 
   const handlePlayback = () => {
     if (reducedMotion) {
-      if (step < STEPS.length - 1) goToStep(step + 1);
+      if (step < steps.length - 1) goToStep(step + 1);
       else advanceToNextFlow();
       return;
     }
@@ -168,14 +223,14 @@ export default function HomeWorkflowDemos({
 
   const title =
     step === 0
-      ? "Add an image to get started"
+      ? (t.homeWorkflow?.step0 || "Add an image to get started")
       : step === 1
-        ? `Configure ${config.name.toLowerCase()}`
+        ? `${t.homeWorkflow?.step1 || "Configure"} ${config.name.toLowerCase()}`
         : step === 2
           ? flow === "background" || flow === "product"
-            ? "Refining the subject edges"
-            : "Enhancing image details"
-          : "Your preview is ready";
+            ? (t.homeWorkflow?.step2Bg || "Refining the subject edges")
+            : (t.homeWorkflow?.step2Upscale || "Enhancing image details")
+          : (t.homeWorkflow?.step3 || "Your preview is ready");
 
   return (
     <section id="home-workflow-demo" className="w-full" aria-label="Pixelify workflow demo">
@@ -193,12 +248,12 @@ export default function HomeWorkflowDemos({
             </div>
             <span className="hidden h-5 w-px bg-white/10 sm:block" />
             <div className="truncate text-[11px] font-semibold tracking-[0.17em] text-white/75">
-              PIXELIFY <span className="font-normal text-white/35">/ WORKSPACE</span>
+              {t.homeWorkflow?.workspace || "PIXELIFY"} <span className="font-normal text-white/35">{t.homeWorkflow?.workspaceSub || "/ WORKSPACE"}</span>
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-2 rounded-full border border-emerald-300/15 bg-emerald-300/[0.06] px-2.5 py-1.5 text-[10px] font-medium tracking-wide text-emerald-200/90 sm:text-[11px]">
             <ShieldCheck size={13} />
-            <span>PRIVACY FIRST</span>
+            <span>{t.homeWorkflow?.privacyFirst || "PRIVACY FIRST"}</span>
           </div>
         </header>
 
@@ -206,15 +261,15 @@ export default function HomeWorkflowDemos({
         <div className="border-b border-white/[0.07] px-4 py-4 sm:px-6 sm:py-5">
           <div className="mb-3 flex items-center justify-between gap-3">
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/35">Interactive preview</p>
-              <p className="mt-1 text-sm text-white/65">Explore the workflow before opening a tool.</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/35">{t.homeWorkflow?.interactivePreview || "Interactive preview"}</p>
+              <p className="mt-1 text-sm text-white/65">{t.homeWorkflow?.exploreBefore || "Explore the workflow before opening a tool."}</p>
             </div>
             <span className="hidden items-center gap-1.5 text-[11px] text-white/35 md:flex">
-              <Monitor size={13} /> Desktop experience
+              <Monitor size={13} /> {t.homeWorkflow?.desktopExp || "Desktop experience"}
             </span>
           </div>
           <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
-            {FLOWS.map((item) => {
+            {flows.map((item) => {
               const ItemIcon = item.icon;
               const active = item.id === flow;
               return (
@@ -252,20 +307,20 @@ export default function HomeWorkflowDemos({
         <div className="grid gap-5 border-b border-white/[0.07] px-4 py-5 sm:px-6 lg:grid-cols-[1fr_0.95fr] lg:items-center lg:gap-8 lg:py-6">
           <div>
             <div className="mb-4 flex items-center justify-between gap-3">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.19em] text-white/35">Workflow</span>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.19em] text-white/35">{t.homeWorkflow?.workflow || "Workflow"}</span>
               <button
                 type="button"
                 onClick={handlePlayback}
                 className="inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1.5 text-[11px] text-white/60 transition hover:border-white/20 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
-                aria-label={reducedMotion ? step === STEPS.length - 1 ? "Go to next workflow" : "Go to next step" : playing ? "Pause automatic demo" : "Play automatic demo"}
+                aria-label={reducedMotion ? step === steps.length - 1 ? (t.homeWorkflow?.nextWorkflow || "Go to next workflow") : (t.homeWorkflow?.nextStep || "Go to next step") : playing ? (t.homeWorkflow?.pauseDemo || "Pause automatic demo") : (t.homeWorkflow?.playDemo || "Play automatic demo")}
               >
                 {reducedMotion ? <ChevronRight size={12} /> : playing ? <Pause size={12} /> : <Play size={12} />}
-                {reducedMotion ? step === STEPS.length - 1 ? "Next workflow" : "Next step" : playing ? "Pause demo" : "Play demo"}
+                {reducedMotion ? step === steps.length - 1 ? (t.homeWorkflow?.nextWorkflow || "Next workflow") : (t.homeWorkflow?.nextStep || "Next step") : playing ? (t.homeWorkflow?.pauseDemo || "Pause demo") : (t.homeWorkflow?.playDemo || "Play demo")}
               </button>
             </div>
             <div className="relative grid grid-cols-4 gap-2">
               <div className="absolute left-3 right-3 top-[13px] h-px bg-white/10" />
-              {STEPS.map((label, index) => {
+              {steps.map((label, index) => {
                 const active = step === index;
                 const complete = step > index;
                 return (
@@ -306,9 +361,9 @@ export default function HomeWorkflowDemos({
             >
               <div className="mb-2 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.16em]" style={{ color: config.accent }}>
                 <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: config.accent }} />
-                Step 0{step + 1} <span className="text-white/20">/</span> {STEPS[step]}
+                Step 0{step + 1} <span className="text-white/20">/</span> {steps[step] || STEPS[step]}
               </div>
-              <p className="text-sm leading-6 text-white/70">{COPY[flow][step]}</p>
+              <p className="text-sm leading-6 text-white/70">{copy[flow][step]}</p>
             </motion.div>
           </AnimatePresence>
         </div>
@@ -325,7 +380,7 @@ export default function HomeWorkflowDemos({
               </div>
               <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/[0.09] bg-white/[0.025] px-2.5 py-1.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-white/45">
                 <span className={`h-1.5 w-1.5 rounded-full ${step === 2 ? "animate-pulse bg-amber-300" : "bg-emerald-300"}`} />
-                {step === 2 ? "Processing" : step === 3 ? "Preview ready" : "Demo mode"}
+                {step === 2 ? (t.homeWorkflow?.processing || "Processing") : step === 3 ? (t.homeWorkflow?.previewReady || "Preview ready") : (t.homeWorkflow?.demoMode || "Demo mode")}
               </span>
             </div>
 
@@ -348,10 +403,10 @@ export default function HomeWorkflowDemos({
                       <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-white/65">
                         <ImagePlus size={23} strokeWidth={1.5} />
                       </span>
-                      <p className="text-sm font-medium text-white/85">A simple, guided workflow</p>
-                      <p className="mt-2 text-xs leading-5 text-white/40">This is a product preview. Open the tool to process your own image.</p>
+                      <p className="text-sm font-medium text-white/85">{t.homeWorkflow?.simpleWorkflow || "A simple, guided workflow"}</p>
+                      <p className="mt-2 text-xs leading-5 text-white/40">{t.homeWorkflow?.simpleWorkflowDesc || "This is a product preview. Open the tool to process your own image."}</p>
                       <button type="button" onClick={() => goToStep(1)} className="mt-5 inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-xs font-semibold text-[#101411] transition hover:bg-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70">
-                        Explore settings <ArrowRight size={13} />
+                        {t.homeWorkflow?.exploreSettings || "Explore settings"} <ArrowRight size={13} />
                       </button>
                     </div>
                   )}
@@ -361,13 +416,13 @@ export default function HomeWorkflowDemos({
                       <Artwork flow={flow} accent={config.accent} />
                       <div className="min-w-0">
                         <span className="mb-2 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.13em]" style={{ color: config.accent }}>
-                          <Check size={12} /> Sample image loaded
+                          <Check size={12} /> {t.homeWorkflow?.sampleImageLoaded || "Sample image loaded"}
                         </span>
                         <p className="break-words text-sm font-medium text-white/85">{config.file}</p>
                         <p className="mt-1 text-xs text-white/40">{config.dimensions} · {config.size}</p>
                         {isUpscaler(flow) ? (
                           <div className="mt-5">
-                            <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.13em] text-white/40">Enlargement</label>
+                            <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.13em] text-white/40">{t.homeWorkflow?.enlargement || "Enlargement"}</label>
                             <div className="grid grid-cols-3 gap-2">
                               {["2×", "4×", "8×"].map((value) => (
                                 <button key={value} type="button" onClick={() => setScale(value)} aria-pressed={scale === value} className={`rounded-lg border py-2 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 ${scale === value ? "border-white/25 bg-white/[0.09] text-white" : "border-white/[0.08] bg-black/10 text-white/45 hover:text-white/75"}`}>
@@ -378,12 +433,12 @@ export default function HomeWorkflowDemos({
                           </div>
                         ) : (
                           <button type="button" onClick={() => setFeather((value) => !value)} aria-pressed={feather} className="mt-5 flex w-full items-center justify-between rounded-lg border border-white/[0.08] bg-black/10 px-3 py-2.5 text-xs text-white/60 hover:text-white/85">
-                            <span className="flex items-center gap-2"><SlidersHorizontal size={13} /> Feather edges</span>
+                            <span className="flex items-center gap-2"><SlidersHorizontal size={13} /> {t.homeWorkflow?.featherEdges || "Feather edges"}</span>
                             <span className={`h-4 w-7 rounded-full p-0.5 transition ${feather ? "bg-emerald-300/80" : "bg-white/20"}`}><span className={`block h-3 w-3 rounded-full bg-[#0b0e0d] transition-transform ${feather ? "translate-x-3" : ""}`} /></span>
                           </button>
                         )}
                         <button type="button" onClick={() => goToStep(2)} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-semibold text-[#0b1510] transition hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60" style={{ backgroundColor: config.accent }}>
-                          Preview workflow <ArrowRight size={13} />
+                          {t.homeWorkflow?.previewWorkflow || "Preview workflow"} <ArrowRight size={13} />
                         </button>
                       </div>
                     </div>
@@ -395,12 +450,12 @@ export default function HomeWorkflowDemos({
                         <Icon size={25} strokeWidth={1.5} />
                         <motion.span className="absolute -inset-1 rounded-[19px] border" style={{ borderColor: `${config.accent}66` }} animate={reducedMotion ? undefined : { opacity: [0.2, 0.8, 0.2], scale: [0.98, 1.04, 0.98] }} transition={{ duration: 2, repeat: Infinity }} />
                       </div>
-                      <p className="text-sm font-medium text-white/85">{flow === "background" || flow === "product" ? "Refining subject boundaries" : "Enhancing image detail"}</p>
-                      <p className="mt-2 text-xs leading-5 text-white/40">Illustrative processing state — no image is being processed in this demo.</p>
+                      <p className="text-sm font-medium text-white/85">{flow === "background" || flow === "product" ? (t.homeWorkflow?.refiningSubjectBoundaries || "Refining subject boundaries") : (t.homeWorkflow?.enhancingImageDetail || "Enhancing image detail")}</p>
+                      <p className="mt-2 text-xs leading-5 text-white/40">{t.homeWorkflow?.simulatedNotice || "Illustrative processing state — no image is being processed in this demo."}</p>
                       <div className="mt-5 h-1 w-full overflow-hidden rounded-full bg-white/[0.08]">
                         <motion.div className="h-full rounded-full" style={{ backgroundColor: config.accent }} initial={{ width: "6%" }} animate={{ width: "88%" }} transition={{ duration: 3.1, ease: "easeInOut" }} />
                       </div>
-                      <div className="mt-2 flex w-full justify-between text-[10px] text-white/30"><span>Preparing preview</span><span>Simulated</span></div>
+                      <div className="mt-2 flex w-full justify-between text-[10px] text-white/30"><span>{t.homeWorkflow?.preparingPreview || "Preparing preview"}</span><span>{t.homeWorkflow?.simulated || "Simulated"}</span></div>
                     </div>
                   )}
 
@@ -408,11 +463,11 @@ export default function HomeWorkflowDemos({
                     <div className="grid w-full max-w-[500px] items-center gap-5 sm:grid-cols-[1fr_1fr]">
                       <Artwork flow={flow} accent={config.accent} />
                       <div>
-                        <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.13em] text-emerald-200"><CircleCheck size={13} /> Preview state</span>
-                        <p className="mt-2 text-sm font-medium text-white/85">{isUpscaler(flow) ? `Enhanced preview · ${scale}` : "Background cutout preview"}</p>
-                        <p className="mt-2 text-xs leading-5 text-white/40">This is a visual walkthrough, not an exported result. Open the real tool to work with your image.</p>
+                        <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.13em] text-emerald-200"><CircleCheck size={13} /> {t.homeWorkflow?.previewState || "Preview state"}</span>
+                        <p className="mt-2 text-sm font-medium text-white/85">{isUpscaler(flow) ? `${t.homeWorkflow?.enhancedPreview || "Enhanced preview"} · ${scale}` : (t.homeWorkflow?.cutoutPreview || "Background cutout preview")}</p>
+                        <p className="mt-2 text-xs leading-5 text-white/40">{t.homeWorkflow?.previewNotice || "This is a visual walkthrough, not an exported result. Open the real tool to work with your image."}</p>
                         <button type="button" onClick={openTool} className="mt-5 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-xs font-semibold text-[#0b1510] transition hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60" style={{ backgroundColor: config.accent }}>
-                          Open {isUpscaler(flow) ? "AI upscaler" : "background remover"} <ArrowRight size={13} />
+                          {isUpscaler(flow) ? (t.homeWorkflow?.openUpscaler || "Open AI upscaler") : (t.homeWorkflow?.openBgRemover || "Open background remover")} <ArrowRight size={13} />
                         </button>
                       </div>
                     </div>
@@ -420,22 +475,22 @@ export default function HomeWorkflowDemos({
                 </motion.div>
               </AnimatePresence>
               <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between gap-3 text-[10px] text-white/30">
-                <span className="flex items-center gap-1.5"><LockKeyhole size={11} /> Demo only · no upload required</span>
+                <span className="flex items-center gap-1.5"><LockKeyhole size={11} /> {t.homeWorkflow?.demoOnly || "Demo only · no upload required"}</span>
                 <span>{String(step + 1).padStart(2, "0")} / 04</span>
               </div>
             </div>
 
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-              <span className="text-[11px] text-white/35">Use the steps above to explore the interface.</span>
+              <span className="text-[11px] text-white/35">{t.homeWorkflow?.exploreInterface || "Use the steps above to explore the interface."}</span>
               <div className="flex items-center gap-2">
-                <button type="button" onClick={() => goToStep(Math.max(0, step - 1))} disabled={step === 0} className="rounded-lg border border-white/10 px-3 py-2 text-[11px] text-white/55 transition hover:text-white disabled:cursor-not-allowed disabled:opacity-25">Back</button>
+                <button type="button" onClick={() => goToStep(Math.max(0, step - 1))} disabled={step === 0} className="rounded-lg border border-white/10 px-3 py-2 text-[11px] text-white/55 transition hover:text-white disabled:cursor-not-allowed disabled:opacity-25">{t.homeWorkflow?.back || "Back"}</button>
                 {step < 3 ? (
                   <button type="button" onClick={() => goToStep(step + 1)} className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.06] px-3 py-2 text-[11px] font-medium text-white/80 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50">
-                    Next step <ArrowRight size={12} />
+                    {t.homeWorkflow?.nextStep || "Next step"} <ArrowRight size={12} />
                   </button>
                 ) : (
                   <button type="button" onClick={openTool} className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.06] px-3 py-2 text-[11px] font-medium text-white/80 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50">
-                    Launch tool <ArrowRight size={12} />
+                    {t.homeWorkflow?.launchTool || "Launch tool"} <ArrowRight size={12} />
                   </button>
                 )}
               </div>
@@ -445,7 +500,7 @@ export default function HomeWorkflowDemos({
           {/* Context panel replaces the duplicated tool picker */}
           <aside className="border-t border-white/[0.07] bg-[#0e1210] p-4 sm:p-6 lg:border-l lg:border-t-0 lg:p-5">
             <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.17em] text-white/35">
-              <SlidersHorizontal size={13} /> Session details
+              <SlidersHorizontal size={13} /> {t.homeWorkflow?.sessionDetails || "Session details"}
             </div>
             <div className="mt-4 rounded-xl border border-white/[0.07] bg-white/[0.025] p-4">
               <div className="flex items-start gap-3">
@@ -459,19 +514,19 @@ export default function HomeWorkflowDemos({
               </div>
               <div className="my-4 h-px bg-white/[0.07]" />
               <dl className="space-y-3 text-xs">
-                <div className="flex items-center justify-between gap-3"><dt className="text-white/35">Dimensions</dt><dd className="text-right text-white/65">{config.dimensions}</dd></div>
-                <div className="flex items-center justify-between gap-3"><dt className="text-white/35">Workflow</dt><dd className="text-right text-white/65">{config.name}</dd></div>
-                <div className="flex items-center justify-between gap-3"><dt className="text-white/35">Mode</dt><dd className="text-right text-white/65">Interactive demo</dd></div>
+                <div className="flex items-center justify-between gap-3"><dt className="text-white/35">{t.homeWorkflow?.dimensions || "Dimensions"}</dt><dd className="text-right text-white/65">{config.dimensions}</dd></div>
+                <div className="flex items-center justify-between gap-3"><dt className="text-white/35">{t.homeWorkflow?.workflow || "Workflow"}</dt><dd className="text-right text-white/65">{config.name}</dd></div>
+                <div className="flex items-center justify-between gap-3"><dt className="text-white/35">{t.homeWorkflow?.mode || "Mode"}</dt><dd className="text-right text-white/65">{t.homeWorkflow?.interactiveDemo || "Interactive demo"}</dd></div>
               </dl>
             </div>
             <div className="mt-3 rounded-xl border border-emerald-200/10 bg-emerald-200/[0.035] p-4">
-              <div className="flex items-center gap-2 text-xs font-medium text-emerald-100/85"><ShieldCheck size={14} /> Privacy by design</div>
-              <p className="mt-2 text-[11px] leading-5 text-white/40">This walkthrough uses sample UI states only. Your real image is handled by the selected tool’s processing flow.</p>
+              <div className="flex items-center gap-2 text-xs font-medium text-emerald-100/85"><ShieldCheck size={14} /> {t.homeWorkflow?.privacyByDesign || "Privacy by design"}</div>
+              <p className="mt-2 text-[11px] leading-5 text-white/40">{t.homeWorkflow?.privacyByDesignDesc || "This walkthrough uses sample UI states only. Your real image is handled by the selected tool’s processing flow."}</p>
             </div>
             <button type="button" onClick={openTool} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-xs font-semibold text-[#0b100d] transition hover:bg-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">
-              Open {isUpscaler(flow) ? "AI upscaler" : "background remover"} <ArrowRight size={14} />
+              {isUpscaler(flow) ? (t.homeWorkflow?.openUpscaler || "Open AI upscaler") : (t.homeWorkflow?.openBgRemover || "Open background remover")} <ArrowRight size={14} />
             </button>
-            <p className="mt-3 text-center text-[10px] leading-4 text-white/25">No account or file upload needed to explore this demo.</p>
+            <p className="mt-3 text-center text-[10px] leading-4 text-white/25">{t.homeWorkflow?.noAccountNeeded || "No account or file upload needed to explore this demo."}</p>
           </aside>
         </div>
       </div>

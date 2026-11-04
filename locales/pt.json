@@ -1,0 +1,757 @@
+{
+  "common": {
+    "appName": "Pixelify",
+    "tagline": "Processamento de imagens por IA privado e no dispositivo",
+    "loading": "Carregando...",
+    "error": "Ocorreu um erro",
+    "success": "Sucesso",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "download": "Baixar",
+    "remove": "Remover",
+    "clear": "Limpar",
+    "reset": "Redefinir",
+    "back": "Voltar",
+    "next": "Próximo",
+    "soon": "Em breve",
+    "active": "Ativo",
+    "online": "Online",
+    "offline": "Offline",
+    "reconnected": "Online",
+    "live": "Ao vivo",
+    "original": "Original",
+    "enhanced": "Aprimorada",
+    "cutout": "Recorte"
+  },
+  "nav": {
+    "home": "Início",
+    "bgRemove": "Removedor de Fundo",
+    "upscaler": "Upscaler IA",
+    "blogs": "Blogs",
+    "settingsTitle": "Configurações e Preferências",
+    "processingEngines": "Motores de processamento",
+    "webgpuSupport": "Suporte a WebGPU",
+    "checking": "Verificando...",
+    "available": "Disponível",
+    "unavailable": "Indisponível",
+    "clearModels": "Limpar modelos",
+    "clearing": "Limpando…",
+    "clearModelsDesc": "Remover modelos de IA baixados neste navegador",
+    "learnWebgpu": "Saiba mais sobre WebGPU",
+    "selectLanguage": "Selecionar idioma"
+  },
+  "hero": {
+    "your": "SUAS",
+    "images": "imagens",
+    "device": "dispositivo",
+    "control": "controle",
+    "powered": "com",
+    "by": "tecnologia",
+    "brand": "Pixelify",
+    "subtitle": "Amplie, restaure e transforme suas fotos localmente no navegador. Sem uploads na nuvem nem processamento externo.",
+    "launchBg": "Abrir Removedor de Fundo",
+    "launchUpscaler": "Abrir Upscaler IA",
+    "scrollDown": "Rolar para baixo"
+  },
+  "homeStudio": {
+    "badge": "Escolha seu estúdio",
+    "title": "Ferramentas de IA para cada imagem",
+    "subtitle": "Escolha a estação de trabalho criada especificamente para suas necessidades de edição."
+  },
+  "whyPixelify": {
+    "eyebrow": "O DIFERENCIAL DO PIXELIFY",
+    "titlePrefix": "Por que criadores e engenheiros escolhem",
+    "subtitle": "Redes neurais profissionais executadas 100% no seu navegador. Sem filas na nuvem, sem taxas e com privacidade total.",
+    "zeroCloudTag": "Zero upload na nuvem",
+    "zeroCloudBadge": "100% Privado",
+    "zeroCloudTitle": "Suas imagens continuam suas.",
+    "zeroCloudDesc": "O Pixelify processa suas fotos diretamente no navegador. Os arquivos nunca saem do seu computador ou celular.",
+    "sandboxing": "Isolamento no cliente:",
+    "sandboxingActive": "Ativo",
+    "processedOnDevice": "Processado no dispositivo",
+    "webgpuTag": "WebGPU + WASM",
+    "webgpuBadge": "Quase nativo",
+    "webgpuTitle": "Aceleração de hardware pura",
+    "webgpuDesc": "Shaders diretos na GPU via LiteRT e WebGPU eliminam a latência da nuvem para processamento instantâneo.",
+    "engineHardware": "Motor de hardware:",
+    "engineParallelism": "Paralelismo de núcleos da GPU",
+    "neuralTag": "Chopper & Vitality",
+    "neuralBadge": "Resolução 8K",
+    "neuralTitle": "Modelos neurais de última geração",
+    "neuralDesc": "Treinados em milhões de fotos em alta resolução para preservar fios de cabelo soltos, vidros e texturas sem aspecto plástico.",
+    "paywallTag": "Sem assinaturas",
+    "paywallBadge": "Zero marcas d'água",
+    "paywallTitle": "Gerações ilimitadas",
+    "paywallDesc": "Sem mensalidades de R$ 200 nem pacotes de créditos limitados. Gere quantos recortes e ampliações desejar.",
+    "offlineTag": "Cache persistente",
+    "offlineBadge": "Funciona offline",
+    "offlineTitle": "Em qualquer lugar, até no modo avião",
+    "offlineDesc": "Os pesos dos modelos são salvos no cache do navegador. Após carregar a primeira vez, edite sem conexão à internet.",
+    "proStudioTag": "Estúdio profissional",
+    "proStudioBadge": "Pronto para lotes",
+    "proStudioTitle": "Estúdio criativo interativo",
+    "proStudioDesc": "Controles deslizantes de comparação em tela dividida, fundos personalizados e exportações PNG/WebP sem perda.",
+    "featureSubPixel": "Máscara sub-pixel",
+    "featureScaling": "Escala 2x, 4x, 8x",
+    "featureFormats": "PNG / WebP transparente",
+    "featureBatch": "Arrastar e soltar em lote",
+    "cloudTitle": "Ferramentas tradicionais de IA na nuvem",
+    "cloudPoint1": "Imagens enviadas a servidores de terceiros e registradas em logs",
+    "cloudPoint2": "Assinaturas mensais caras ou limites restritivos de créditos",
+    "cloudPoint3": "Downloads compactados com marcas d'água forçadas em contas gratuitas",
+    "localTitle": "IA local do Pixelify no navegador",
+    "localPoint1": "100% privado, as fotos permanecem estritamente na memória RAM do seu navegador",
+    "localPoint2": "Totalmente gratuito, com processamento ilimitado e sem filas de espera",
+    "localPoint3": "Downloads sem perdas em PNG, WebP e JPG com fidelidade máxima",
+    "footerPill1": "Fluxo de trabalho local em primeiro lugar",
+    "footerPill2": "Criado para tarefas diárias de edição com rapidez"
+  },
+  "homeFaq": {
+    "titlePrefix": "Perguntas",
+    "titleMiddle": "Frequentes",
+    "titleSuffix": "",
+    "items": [
+      {
+        "q": "Como o Pixelify processa imagens sem enviar para servidores na nuvem?",
+        "a": "A IA é executada no seu próprio navegador via WebGPU e ONNX Runtime, mantendo suas fotos guardadas no seu dispositivo."
+      },
+      {
+        "q": "O Pixelify é realmente 100% gratuito, sem marcas d'água nem assinaturas?",
+        "a": "Sim: sem assinaturas, compras de créditos, marcas d'água ou bloqueios inesperados. É só abrir, editar e baixar."
+      },
+      {
+        "q": "Qual é a resolução máxima e o tamanho de imagem permitido?",
+        "a": "Você pode ampliar imagens de até 40 MB e até 16K de resolução (16.384 × 16.384 px), dependendo da memória do seu computador."
+      },
+      {
+        "q": "Posso usar o Pixelify sem conexão à internet?",
+        "a": "Sim. Uma vez que o modelo de IA seja baixado no navegador, você pode processar fotos totalmente offline."
+      },
+      {
+        "q": "Como o Chopper se compara a outros removedores de fundo?",
+        "a": "O Chopper foi projetado para manter detalhes difíceis como pelos de animais, cabelos finos e bordas sem recortes duros."
+      },
+      {
+        "q": "O Pixelify funciona em celulares e tablets?",
+        "a": "Sim! O Pixelify funciona em navegadores móveis compatíveis com WebGPU ou com o motor secundário WebAssembly."
+      },
+      {
+        "q": "Minhas fotos pessoais e arquivos de clientes estão seguros?",
+        "a": "Absolutamente. O processamento é 100% local e nada é enviado para servidores."
+      },
+      {
+        "q": "Como faço para apagar os modelos baixados e liberar espaço?",
+        "a": "Abra as Configurações e clique em «Limpar modelos» para liberar o armazenamento sem limpar os outros dados do navegador."
+      }
+    ]
+  },
+  "upscaler": {
+    "badge": "Super-resolução neural no dispositivo",
+    "title": "Upscaler de Imagens com IA",
+    "subtitle": "Amplie fotos e ilustrações até 16K com nitidez impressionante. Executado 100% na GPU do seu aparelho via WebGPU: sem uploads nem rastreamento.",
+    "dropzoneTitle": "Arraste a imagem aqui para ampliar",
+    "dropzoneSubtitle": "ou escolha do seu dispositivo",
+    "dropzoneLimits": "PNG, JPG, WebP de até 15 MB",
+    "modelSelection": "Modelo de ampliação",
+    "scaleFactor": "Fator de escala",
+    "faceEnhance": "Restauração facial",
+    "faceEnhanceDesc": "Restaura clareza facial, olhos e textura natural da pele",
+    "denoise": "Redução de ruído",
+    "sharpen": "Nitidez",
+    "enhanceButton": "Ampliar imagem",
+    "processing": "Ampliando…",
+    "downloadButton": "Baixar imagem ampliada",
+    "beforeAfter": "Antes / Depois",
+    "clearAll": "Limpar tudo",
+    "original": "Original",
+    "upscaled": "Ampliada"
+  },
+  "upscaleCapabilities": {
+    "title": "Desenvolvido para fidelidade máxima",
+    "subtitle": "Um poderoso pacote de ferramentas de isolamento de objetos e aumento de resolução rodando diretamente nesta aba.",
+    "detailTitle": "Motor de detalhe generativo",
+    "detailDesc": "A reconstrução com preservação de bordas restaura tecidos, pele e reflexos metálicos com precisão.",
+    "speedTitle": "Velocidade máxima com WebGPU",
+    "speedDesc": "Inferência acelerada por hardware com suporte automático a WASM em milissegundos.",
+    "speedLabel": "em GPU intermediária",
+    "facesTitle": "Restauração de rostos",
+    "facesDesc": "Camada inteligente que recupera olhos, cílios e tons de pele desgastados pela compressão.",
+    "privacyTitle": "Nada sai do navegador",
+    "privacyDesc": "Seus arquivos são processados diretamente no seu chip. Sem filas, sem contas e sem marcas d'água.",
+    "privacyBadge": "somente neste dispositivo",
+    "scaleTitle": "Saída de 2× até 16K",
+    "scaleDesc": "Processamento por blocos que amplia imagens até 16.384 px sem travar a aba do navegador.",
+    "scaleLabel": "px de borda máxima de tela",
+    "controlTitle": "Controle individual",
+    "controlDesc": "Modelo, escala, redução de ruído e nitidez personalizados para cada foto do lote.",
+    "titleLead": "Um conjunto de estúdio,",
+    "titleAccent": "profissional,",
+    "titleTail": "escondido na aba do seu navegador."
+  },
+  "upscaleJourney": {
+    "title": "Como funciona",
+    "subtitle": "De uma foto pequena para uma imagem pronta para impressão em poucos cliques.",
+    "step1K": "01",
+    "step1Title": "Envie qualquer foto",
+    "step1Desc": "Arraste um arquivo PNG, JPG ou WebP para o estúdio ou cole diretamente da área de transferência com Ctrl+V.",
+    "step1Status": "PRONTO",
+    "step2K": "02",
+    "step2Title": "Escolha o modelo",
+    "step2Desc": "Vitality para passes rápidos, ou Pixel-Dance e Alpha-Satoru para máxima nitidez.",
+    "step2Status": "AJUSTANDO",
+    "step3K": "03",
+    "step3Title": "Veja a IA trabalhar",
+    "step3Desc": "Os blocos da imagem são reconstruídos na GPU com progresso em tempo real.",
+    "step3Status": "PROCESSANDO",
+    "step4K": "04",
+    "step4Title": "Exporte sem perdas",
+    "step4Desc": "Baixe arquivos na resolução total sem marcas d'água ou compressões agressivas.",
+    "step4Status": "SALVO",
+    "titleLead": "Quatro passos.",
+    "titleItalic": "Qualidade de estúdio."
+  },
+  "upscaleFaq": {
+    "titlePrefix": "Perguntas",
+    "titleMiddle": "Frequentes",
+    "titleSuffix": "",
+    "items": [
+      {
+        "q": "Como o Pixelify alcança resolução similar a 8K?",
+        "a": "Uma rede neural de super-resolução processa sua imagem bloco por bloco diretamente na sua GPU, adicionando definição real até 16.384 × 16.384 pixels."
+      },
+      {
+        "q": "Minha foto é enviada para algum servidor na nuvem?",
+        "a": "Nunca. O modelo executa 100% no seu navegador via WebGPU / WebAssembly, usando seu próprio processador."
+      },
+      {
+        "q": "Preciso criar uma conta ou comprar créditos?",
+        "a": "Não. Sem cadastros, e-mails ou cobranças. Abra o site e amplie quantas imagens precisar."
+      },
+      {
+        "q": "Quais formatos posso exportar e há marca d'água?",
+        "a": "Você pode baixar em PNG ou WebP sem perdas na resolução completa e sem nenhuma marca d'água."
+      },
+      {
+        "q": "Funciona no meu notebook ou celular?",
+        "a": "Sim. Dispositivos com WebGPU contam com aceleração de hardware nativa, e os demais utilizam WebAssembly automaticamente."
+      },
+      {
+        "q": "Quanto tempo demora uma ampliação em 4×?",
+        "a": "O motor Turbo processa a maioria das imagens em menos de um segundo em GPUs modernas."
+      }
+    ]
+  },
+  "bgRemove": {
+    "badge": "Gratuito · No dispositivo · Privado",
+    "title": "Removedor de Fundo",
+    "subtitle": "Recorte objetos e pessoas em segundos com precisão profissional. Cabelos, vidros e detalhes finos são preservados offline.",
+    "dropzoneTitle": "Solte uma imagem para começar",
+    "dropzoneSubtitle": "ou procure nos seus arquivos",
+    "dropzoneLimits": "PNG, JPG, WebP de até 20 MB",
+    "refineDiablo": "Refinar com Diablo Ultra Precisão",
+    "diabloActive": "Diablo Ultra Precisão ativo",
+    "brushErase": "Apagar",
+    "brushRestore": "Restaurar",
+    "brushSize": "Tamanho",
+    "brushFeather": "Suavização",
+    "backgroundColor": "Cor de fundo",
+    "transparent": "Transparente",
+    "customColor": "Cor personalizada",
+    "solids": "Cores sólidas padrão",
+    "gradients": "Cores em degradê padrão",
+    "addPhoto": "Adicionar foto de fundo",
+    "aspectRatio": "Proporção de corte",
+    "textOverlay": "Adicionar texto",
+    "downloadCutout": "Baixar PNG",
+    "tabCutout": "Recorte",
+    "tabBackdrop": "Fundo",
+    "tabText": "Texto",
+    "tabRefine": "Refinar"
+  },
+  "bgSections": {
+    "marquee": [
+      "Segmentação Chopper",
+      "WebGPU no dispositivo",
+      "Zero uploads",
+      "Bordas no nível do cabelo",
+      "PNG transparente",
+      "Sem cadastro",
+      "Uso ilimitado"
+    ],
+    "pipelineStep1K": "Enviar",
+    "pipelineStep1Title": "Entrada em segundos",
+    "pipelineStep1Desc": "Arraste uma foto ou cole da área de transferência. Processamento instantâneo em memória RAM.",
+    "pipelineStep2K": "Segmentar",
+    "pipelineStep2Title": "Matting bilateral neural",
+    "pipelineStep2Desc": "Chopper e Diablo detectam fios finos e formas complexas com máscaras sub-pixel.",
+    "pipelineStep3K": "Exportar",
+    "pipelineStep3Title": "Refine e salve",
+    "pipelineStep3Desc": "Retoque detalhes, alterne cenários e baixe em PNG transparente, WebP ou JPG com um clique.",
+    "lensLive": "Ao vivo · No dispositivo",
+    "lensOriginal": "Original",
+    "lensCutout": "Recorte",
+    "faqItems": [
+      {
+        "q": "Como remover um fundo de graça?",
+        "a": "Abra o Removedor de Fundo, arraste sua foto e o recorte de IA iniciará de forma automática. Baixe seu PNG transparente sem marcas d'água."
+      },
+      {
+        "q": "O que é o modelo Diablo e qual a diferença para o Chopper?",
+        "a": "Chopper é o nosso modelo rápido para recortes ágeis em qualquer aparelho. Diablo é o nosso modelo de precisão máxima com matriz de 1024×1024 treinado para cabelos finos, pelos e vidros transparentes sem bordas borradas."
+      },
+      {
+        "q": "Quando devo usar o Diablo no lugar do Chopper?",
+        "a": "Chopper é excelente para produtos, logotipos e fotos em geral. Use Diablo quando precisar de máxima fidelidade em retratos de estúdio ou animais felpudos."
+      },
+      {
+        "q": "Como ativar o modelo Diablo Ultra Precisão?",
+        "a": "Após o recorte inicial, clique na opção «Refinar com Diablo Ultra Precisão» nas ferramentas de recorte para obter detalhes de estúdio."
+      },
+      {
+        "q": "O Diablo funciona de forma local e offline?",
+        "a": "Sim. Chopper e Diablo executam 100% no seu aparelho via WebGPU e WebAssembly, funcionando sem internet após o primeiro uso."
+      },
+      {
+        "q": "Minhas imagens são enviadas para algum servidor?",
+        "a": "Não. Suas imagens nunca saem do seu navegador, garantindo privacidade para arquivos pessoais e comerciais."
+      },
+      {
+        "q": "Quais formatos são aceitos para upload e download?",
+        "a": "Arquivos PNG, JPG e WebP de até 20 MB. Exporte em PNG transparente, WebP ou JPG com fundo plano."
+      },
+      {
+        "q": "Posso trocar o fundo por outra foto ou cor?",
+        "a": "Sim. Acesse a aba Fundo para aplicar cores sólidas, degradês modernos ou fazer upload de fotos personalizadas."
+      },
+      {
+        "q": "O recorte preserva fios de cabelo soltos e vidros?",
+        "a": "Sim. O modelo padrão Chopper cuida dos contornos com limpeza e o Diablo oferece transparências de nível profissional."
+      },
+      {
+        "q": "Por que a primeira foto demora um pouco mais?",
+        "a": "Os pesos do modelo neural são baixados para o cache do seu navegador na primeira vez. As imagens seguintes processam em poucos segundos."
+      }
+    ],
+    "showcaseEyebrow": "Estúdio de Recorte",
+    "showcaseTitleLead": "O fundo",
+    "showcaseTitleGone": "desaparece.",
+    "showcaseTitleSubject": "O sujeito",
+    "showcaseTitleStays": "permanece.",
+    "showcaseDesc": "Equipado com uma rede neural de alta precisão executada na sua GPU local. Solte a imagem e o recorte é concluído antes que a nuvem termine o upload.",
+    "shotProduct": "Produto · 01",
+    "shotPortrait": "Retrato · 02",
+    "shotStudio": "Estúdio · 03",
+    "pipelineEyebrow": "O fluxo",
+    "pipelineTitleLead": "Três movimentos.",
+    "pipelineTitleItalic": "Privacidade absoluta.",
+    "pipelineDesc": "Do arrastar e soltar ao recorte final sem que nenhum byte saia da sua máquina.",
+    "pipelineHint": "sujeito bloqueado · no dispositivo",
+    "precisionEyebrow": "Precisão de bordas",
+    "precisionTitleLead": "Dê zoom.",
+    "precisionTitleItalic": "Julgue você mesmo.",
+    "precisionDesc": "Arraste o controle deslizante: a esquerda mostra a foto original e a direita o sujeito isolado. O download preserva exatamente o que você vê.",
+    "statModel": "Modelo em cache após o 1º uso",
+    "statMax": "Envio máximo por imagem",
+    "statFmt": "Exportação PNG · WebP · JPG",
+    "statHw": "Processado no seu hardware",
+    "galleryEyebrow": "Teste ao vivo",
+    "galleryTitleLead": "Escolha uma imagem.",
+    "galleryTitleItalic": "Veja separar.",
+    "galleryDesc": "Cada linha executa a mesma rede neural usada nos seus arquivos. Clique abaixo para iniciar o recorte instantaneamente.",
+    "sample1Name": "Retrato Urbano",
+    "sample1Tag": "Retrato",
+    "sample2Name": "Sujeito de Estúdio",
+    "sample2Tag": "Estúdio",
+    "sample3Name": "Vida Selvagem",
+    "sample3Tag": "Natureza"
+  },
+  "footer": {
+    "slogan": "Experimente a decolagem",
+    "feedbackTitle": "Feedback e Contato",
+    "feedbackDesc": "Dúvidas ou sugestões? Fale com a gente",
+    "productCol": "Produto",
+    "resourcesCol": "Recursos",
+    "companyCol": "Empresa",
+    "legalCol": "Legal",
+    "followCol": "Seguir",
+    "upscaler": "Upscaler de Imagens IA",
+    "bgRemover": "Removedor de Fundo",
+    "products": "Recursos e Produtos",
+    "docs": "Documentação",
+    "blogs": "Blogs",
+    "faqs": "Perguntas Frequentes",
+    "sysReq": "Requisitos do Sistema",
+    "about": "Sobre o Pixelify",
+    "contact": "Contato",
+    "privacy": "Política de Privacidade",
+    "terms": "Termos de Uso",
+    "rights": "Todos os direitos reservados. Processado no dispositivo."
+  },
+  "blogs": {
+    "title": "Blog e Guias de IA",
+    "subtitle": "Artigos sobre IA local, privacidade, remoção de fundo, upscaling e WebGPU.",
+    "searchPlaceholder": "Pesquisar por título, tag ou tema…",
+    "filterLang": "Idioma",
+    "all": "Todos",
+    "readTime": "min de leitura",
+    "by": "Por",
+    "shareArticle": "Compartilhar artigo",
+    "linkCopied": "Link copiado",
+    "moreFrom": "Mais do Pixelify",
+    "backToBlogs": "Voltar aos artigos",
+    "notFound": "Artigo não encontrado",
+    "notFoundDesc": "O artigo solicitado não está disponível neste idioma."
+  },
+  "uploadArea": {
+    "upscaleTitle": "Aprimorar",
+    "upscaleDesc": "Envie suas imagens para\n melhorar a resolução e qualidade.",
+    "cutoutTitle": "Recorte",
+    "cutoutDesc": "Arraste suas imagens aqui para iniciar o recorte\nSelecione arquivos PNG, JPG ou WebP com menos de 20MB.",
+    "uploadMedia": "Enviar mídia",
+    "processing": "Processando...",
+    "remove": "Remover"
+  },
+  "bgRemoverSection": {
+    "titlePrefix": "Remoção precisa de fundo",
+    "titleSuffix": "com IA",
+    "item1TitleLead": "100% Gratuito",
+    "item1TitleTail": "e ilimitado.",
+    "item1Desc": "Remova fundos de retratos, fotos de produtos e imagens complexas em segundos. Sem seleções manuais tediosas ou créditos pagos.",
+    "item2TitleLead": "Privacidade no dispositivo",
+    "item2TitleTail": "com zero uploads para a nuvem.",
+    "item2Desc": "Suas imagens ficam no seu dispositivo enquanto a IA processa no seu navegador. Um fluxo de trabalho privado sem enviar fotos para servidores.",
+    "item3TitleLead": "Fundos personalizados",
+    "item3TitleTail": "e exportação na resolução original.",
+    "item3Desc": "Baixe recortes PNG nítidos e transparentes ou adicione um novo fundo. Exporte nas dimensões originais, prontas para lojas e projetos.",
+    "exploreButton": "Explorar Removedor de Fundo"
+  },
+  "aiUpscalerSection": {
+    "titleLead": "Aprimore imagens no seu dispositivo",
+    "titleAccent": "com IA",
+    "desc": "Amplie fotos, animes, produtos, retratos e fotos antigas em 2x, 4x ou 8x. O AI Upscaler melhora a nitidez e gera detalhes limpos sem depender de servidores.",
+    "exploreButton": "Explorar AI Upscaler",
+    "aiDelegated": "Delegado por IA"
+  },
+  "homeDemo": {
+    "badge": "Demonstrações instantâneas",
+    "title": "Experimente amostras com um único clique",
+    "loading": "Carregando…",
+    "bgRemoveType": "REMOVER FUNDO",
+    "aiUpscaleType": "UPSCALE IA",
+    "samples": {
+      "sports": {
+        "name": "Esportes",
+        "desc": "Extrai o sujeito com detecção de bordas sub-pixel"
+      },
+      "anime": {
+        "name": "Arte Anime",
+        "desc": "Upscale 4x com aprimoramento de microtexturas"
+      },
+      "ocean": {
+        "name": "Vida Marinha",
+        "desc": "Recorte nítido de produto para uso comercial"
+      },
+      "oldPhoto": {
+        "name": "Foto Antiga",
+        "desc": "Recorte nítido de produto para uso comercial"
+      }
+    },
+    "features": [
+      {
+        "title": "Removedor de fundo",
+        "subtitle": "Isole sujeitos com precisão sub-pixel ao redor de vidros transparentes e fios de cabelo.",
+        "badge": "Chopper AI",
+        "detailTitle": "Segmentação neural Chopper",
+        "detailDesc": "Transformadores visuais duplos geram máscaras suaves diretamente na memória do navegador."
+      },
+      {
+        "title": "Removedor de fundo",
+        "subtitle": "Isole sujeitos com precisão sub-pixel ao redor de vidros transparentes e fios de cabelo.",
+        "badge": "Chopper AI",
+        "detailTitle": "Segmentação neural Chopper",
+        "detailDesc": "Transformadores visuais duplos geram máscaras suaves diretamente na memória do navegador."
+      },
+      {
+        "title": "AI Upscaler",
+        "subtitle": "Reconstrua texturas de alta frequência e bordas nítidas até resolução 8K sem artefatos.",
+        "badge": "Fator 8x",
+        "detailTitle": "Vitality, Pixel-Dance e Alpha-Satoru",
+        "detailDesc": "Execução direta no LiteRT utilizando shaders WebGPU para cálculo tensorial acelerado por hardware."
+      },
+      {
+        "title": "AI Upscaler",
+        "subtitle": "Zero servidores na nuvem, zero uploads externos. Suas imagens nunca saem do seu computador.",
+        "badge": "WASM Local",
+        "detailTitle": "Segurança de cliente isolada",
+        "detailDesc": "Capacidade totalmente offline alimentada por WASM SIMD e WebGPU."
+      }
+    ]
+  },
+  "homeWorkflow": {
+    "workspace": "PIXELIFY",
+    "workspaceSub": "/ WORKSPACE",
+    "privacyFirst": "PRIVACIDADE EM PRIMEIRO LUGAR",
+    "interactivePreview": "Prévia interativa",
+    "exploreBefore": "Explore o fluxo de trabalho antes de abrir uma ferramenta.",
+    "desktopExp": "Experiência desktop",
+    "workflow": "Fluxo de trabalho",
+    "pauseDemo": "Pausar demo",
+    "playDemo": "Iniciar demo",
+    "nextWorkflow": "Próximo fluxo",
+    "nextStep": "Próximo passo",
+    "processing": "Processando",
+    "previewReady": "Prévia pronta",
+    "demoMode": "Modo demo",
+    "step0": "Adicione uma imagem para começar",
+    "step1": "Configurar",
+    "step2Bg": "Refinando as bordas do sujeito",
+    "step2Upscale": "Aprimorando detalhes da imagem",
+    "step3": "Sua prévia está pronta",
+    "simpleWorkflow": "Um fluxo simples e guiado",
+    "simpleWorkflowDesc": "Esta é uma prévia do produto. Abra a ferramenta para processar sua própria imagem.",
+    "exploreSettings": "Explorar ajustes",
+    "sampleImageLoaded": "Imagem de amostra carregada",
+    "enlargement": "Ampliação",
+    "featherEdges": "Suavizar bordas",
+    "previewWorkflow": "Visualizar fluxo",
+    "refiningSubjectBoundaries": "Refinando os limites do sujeito",
+    "enhancingImageDetail": "Aprimorando os detalhes da imagem",
+    "simulatedNotice": "Estado ilustrativo — nenhuma imagem real é processada nesta demo.",
+    "preparingPreview": "Preparando prévia",
+    "simulated": "Simulado",
+    "previewState": "Estado da prévia",
+    "enhancedPreview": "Prévia aprimorada",
+    "cutoutPreview": "Prévia do recorte",
+    "previewNotice": "Este é um passo a passo visual, não um resultado final. Abra a ferramenta real para trabalhar com sua imagem.",
+    "openUpscaler": "Abrir AI Upscaler",
+    "openBgRemover": "Abrir Removedor de Fundo",
+    "demoOnly": "Apenas demo · sem necessidade de envio",
+    "exploreInterface": "Use as etapas acima para explorar a interface.",
+    "back": "Voltar",
+    "launchTool": "Iniciar ferramenta",
+    "sessionDetails": "Detalhes da sessão",
+    "dimensions": "Dimensões",
+    "mode": "Modo",
+    "interactiveDemo": "Demo interativa",
+    "privacyByDesign": "Privacidade por design",
+    "privacyByDesignDesc": "Este tour usa apenas estados de amostra. Sua imagem real é processada localmente na ferramenta.",
+    "noAccountNeeded": "Sem necessidade de conta ou upload de arquivos para testar.",
+    "detailPreview": "PRÉVIA DE DETALHES",
+    "flows": {
+      "upscale": {
+        "name": "Upscaler de fotos",
+        "description": "Melhore o detalhe das fotos",
+        "steps": [
+          "Comece com uma foto que deseja nitidez ou ampliação.",
+          "Escolha o quanto deseja ampliar a imagem.",
+          "A demo simula o fluxo de aprimoramento no dispositivo.",
+          "Verifique a prévia e abra a ferramenta real para processar."
+        ]
+      },
+      "background": {
+        "name": "Removedor de fundo",
+        "description": "Crie um recorte limpo",
+        "steps": [
+          "Escolha um retrato ou foto com um sujeito principal nítido.",
+          "Veja a prévia do recorte e as opções de borda.",
+          "A demo simula a detecção de primeiro plano e a máscara refinada.",
+          "Verifique a prévia e abra a ferramenta real para processar."
+        ]
+      },
+      "anime": {
+        "name": "Upscaler de anime",
+        "description": "Mantenha traços nítidos",
+        "steps": [
+          "Comece com uma ilustração ou quadro de anime comprimido.",
+          "Escolha um fator de ampliação para a imagem.",
+          "A demo simula o realce de linhas e saturação de cores.",
+          "Verifique a prévia e abra a ferramenta real para processar."
+        ]
+      },
+      "product": {
+        "name": "Recorte de produto",
+        "description": "Refine as bordas do produto",
+        "steps": [
+          "Comece com a foto de um produto para obter um recorte de loja.",
+          "Veja as opções de refinamento da silhueta do produto.",
+          "A demo simula a detecção de objetos e limpeza de bordas.",
+          "Verifique a prévia e abra a ferramenta real para processar."
+        ]
+      }
+    },
+    "stepLabels": [
+      "Enviar",
+      "Configurar",
+      "Processar",
+      "Revisar"
+    ]
+  },
+  "pixelifyStory": {
+    "words": [
+      "PIXELIFY",
+      "IA",
+      "local",
+      "para",
+      "suas",
+      "imagens",
+      "amplie",
+      "restaure",
+      "aprimore",
+      "sem",
+      "enviar",
+      "nada",
+      "para",
+      "nuvem",
+      "seus",
+      "pixels",
+      "são",
+      "seus"
+    ]
+  },
+  "upscaleShowreel": {
+    "titleStraight": "Direto do",
+    "titleEngine": "motor.",
+    "subtitle": "Sem retoques. Sem Photoshop.",
+    "fashionPortrait": "Retrato de Moda",
+    "editorial": "Editorial",
+    "pets": "Animais",
+    "furLevel": "Nível de pelo",
+    "maxResolution": "RESOLUÇÃO MÁXIMA DE SAÍDA",
+    "avianPortrait": "Retrato de pássaro",
+    "featherGrade": "Pena em detalhes",
+    "officialPortrait": "Retrato oficial",
+    "photojournalism": "Fotojornalismo",
+    "product": "Produto",
+    "studioQuality": "Qualidade de estúdio",
+    "iconicPoster": "Pôster Icônico",
+    "printReady": "Pronto para impressão",
+    "movesCutout": "Passos para o recorte final",
+    "animeArt": "Arte Anime",
+    "facesRestored": "Rostos restaurados",
+    "automotive": "Automotivo",
+    "detailRecovery": "Recuperação de detalhes",
+    "gaming": "Jogos",
+    "thumbnailReady": "Pronto para miniatura",
+    "illustration": "Ilustração",
+    "colorFidelity": "Fidelidade de cores"
+  },
+  "upscaleShowcase": {
+    "titlePixel": "Cada pixel,",
+    "titleReimagined": "reinventado.",
+    "subtitle": "Experimente um upscaling real de 8x processado localmente no seu dispositivo. Deslize a lente para comparar: o original intocado à esquerda e o resultado do Pixelify à direita.",
+    "statMaxScale": "Escala Máxima",
+    "statPrivate": "Privado e no Dispositivo",
+    "statCloudLatency": "Latência na Nuvem",
+    "lensOriginal": "Original",
+    "lensUpscaled": "Aprimorado",
+    "lensNext": "Próxima amostra",
+    "pairCyberpunk": "Retrato Cyberpunk",
+    "pairCyberpunkMeta": "Neon de Tóquio, rosto restaurado",
+    "pairSneaker": "Tênis Vintage",
+    "pairSneakerMeta": "Textura de couro, costuras recuperadas",
+    "pairWatch": "Cronógrafo de Luxo",
+    "pairWatchMeta": "Aço escovado, mostrador nítido",
+    "pairLandscape": "Vista da Montanha",
+    "pairLandscapeMeta": "Folhagem nítida, cristas definidas"
+  },
+  "upscaleWorkspace": {
+    "headerTitle": "Upscale",
+    "headerSubtitle": "Resolução e detalhes com IA",
+    "modelLabel": "Modelo",
+    "scaleFactor": "Fator de escala",
+    "advancedSettings": "Configurações avançadas",
+    "advanced": "Avançado",
+    "presets": "Predefinições",
+    "preset": "Predefinição",
+    "sharpness": "Nitidez",
+    "sharpnessDesc": "Controla a intensidade do realce de bordas e detalhes finos.",
+    "denoise": "Redução de ruído",
+    "denoiseDesc": "Reduz granulação, ruído e artefatos de compressão.",
+    "faceEnhance": "Aprimoramento facial",
+    "faceEnhanceDesc": "Controla a restauração de detalhes faciais.",
+    "colorEnhance": "Aprimoramento de cor",
+    "colorEnhanceDesc": "Realça a riqueza, vivacidade e equilíbrio das cores.",
+    "hdr": "HDR",
+    "hdrDesc": "Melhora o alcance dinâmico, realces e sombras.",
+    "brightness": "Brilho",
+    "brightnessDesc": "Ajusta a luminosidade geral da imagem.",
+    "contrast": "Contraste",
+    "contrastDesc": "Controla a diferença entre áreas claras e escuras.",
+    "btnUpscale": "Aprimorar",
+    "btnEnhancing": "Aprimorando…",
+    "btnDownload": "Baixar",
+    "btnReEnhance": "Reaprimorar",
+    "btnCancel": "Cancelar",
+    "btnReset": "Redefinir",
+    "btnAdd": "Adicionar",
+    "labelOriginal": "Original",
+    "labelEnhanced": "Aprimorado",
+    "enhancedBadge": "Aprimorado",
+    "enhancingBadge": "Aprimorando...",
+    "loadingModel": "Carregando modelo de IA...",
+    "modelCacheNote": "O modelo neural é baixado uma única vez e executa a partir do cache do navegador.",
+    "enhancingImage": "Aprimorando",
+    "neuralActive": "Super-Resolução Neural Ativa",
+    "popular": "Popular",
+    "modelVitalityDesc": "Modelo mais rápido, bordas nítidas e limpas.",
+    "modelPixelDanceDesc": "Detalhe máximo, saída de até 8K.",
+    "modelAlphaSatoruDesc": "Detalhes naturais para retratos e fotografias."
+  },
+  "modelLoading": {
+    "downloadingTitle": "Baixando modelos de IA",
+    "leftBadge": "RESTANTES",
+    "extractingSubject": "Extraindo o assunto...",
+    "segmentingEdges": "Rede neural recortando bordas...",
+    "analyzingContours": "Analisando contornos e iluminação...",
+    "loadingVisionWeights": "Carregando pesos do modelo de visão...",
+    "diabloEdgeMatting": "Matização neural Diablo em andamento...",
+    "segmentingSubject": "Rede neural segmentando o elemento principal...",
+    "extractingHairFur": "Extraindo fios de cabelo, pelos e transparências...",
+    "extractingCutout": "Gerando recorte limpo e preciso...",
+    "refiningAlpha": "Refinando máscara alfa em nível subpixel...",
+    "finalizingAlpha": "Finalizando transparência do canal alfa...",
+    "renderingPng": "Renderizando PNG transparente...",
+    "processingError": "Erro de processamento",
+    "errorDefault": "Não foi possível remover o fundo desta imagem.",
+    "retryBgRemoval": "↻ Tentar novamente remoção de fundo",
+    "cleanCutout": "✓ Recorte limpo",
+    "removingBg": "◆ Removendo fundo…",
+    "waitCaption1": "Baixando o modelo de IA uma única vez...",
+    "waitCaption2": "Salvando no navegador para inicialização instantânea...",
+    "waitCaption3": "Baixando arquivos da IA. Acontece apenas uma vez...",
+    "waitCaption4": "Aquecendo o motor neural...",
+    "waitCaption5": "Examinando sua fotografia em detalhes...",
+    "waitCaption6": "Aguarde, o primeiro passe leva um momento...",
+    "waitCaption7": "Preparando cada seção da imagem...",
+    "waitCaption8": "Qualidade em primeiro lugar...",
+    "waitCaption9": "Adicionando nitidez a cada canto...",
+    "waitCaption10": "Apurando texturas finas...",
+    "waitCaption11": "Aprimorando a clareza pixel por pixel...",
+    "waitCaption12": "Reconstruindo a foto em alta resolução...",
+    "waitCaption13": "Processando camadas neurais...",
+    "waitCaption14": "Trazendo cores naturais e vibrantes...",
+    "waitCaption15": "Quase pronto, polimento final em andamento...",
+    "waitCaption16": "Refinando bordas e detalhes pequenos...",
+    "waitCaption17": "Elevando a nitidez e profundidade...",
+    "waitCaption18": "Aplicando o último polimento de detalhes...",
+    "waitCaption19": "Toques finais em progresso...",
+    "waitCaption20": "Quase lá, finalizando...",
+    "waitCaption21": "Valorizando cada pixel..."
+  },
+  "deviceNotice": {
+    "title": "Experiência mais fluida no desktop",
+    "bgRemoveDesc": "O Pixelify também funciona em celulares! Para uma remoção de fundo ainda mais ágil, recomendamos um computador ou notebook.",
+    "upscaleDesc": "O Pixelify também funciona em celulares! Para um upscaling com IA mais rápido, recomendamos um computador ou notebook.",
+    "tip": "DICA RÁPIDA",
+    "understand": "Entendi"
+  },
+  "bgMarquee": [
+    "Segmentação Chopper",
+    "WebGPU no dispositivo",
+    "Zero uploads",
+    "Bordas nível fio de cabelo",
+    "PNG transparente",
+    "Sem cadastro",
+    "Execuções ilimitadas"
+  ]
+}

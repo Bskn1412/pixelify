@@ -36,16 +36,40 @@
  */
 
 import { POSTS_EN } from './posts_en';
+import { POSTS_ES } from './posts_es';
+import { POSTS_FR } from './posts_fr';
+import { POSTS_PT } from './posts_pt';
+import { POSTS_ZH } from './posts_zh';
+import { POSTS_JA } from './posts_ja';
+import { POSTS_KO } from './posts_ko';
+import { POSTS_HI } from './posts_hi';
+import { POSTS_RU } from './posts_ru';
 
 /** Supported UI languages, in display order. `code` is the URL segment. */
 export const LANGUAGES = [
   { code: 'en', label: 'English', short: 'EN' },
+  { code: 'es', label: 'Español', short: 'ES' },
+  { code: 'fr', label: 'Français', short: 'FR' },
+  { code: 'hi', label: 'हिन्दी', short: 'HI' },
+  { code: 'ja', label: '日本語', short: 'JA' },
+  { code: 'ko', label: '한국어', short: 'KO' },
+  { code: 'pt', label: 'Português', short: 'PT' }, 
+  { code: 'ru', label: 'Русский', short: 'RU' },
+  { code: 'zh', label: '中文', short: 'ZH' }, 
 ];
 
 export const DEFAULT_LANG = 'en';
 
 const SOURCES = {
   en: POSTS_EN,
+  es: POSTS_ES,
+  fr: POSTS_FR,
+  pt: POSTS_PT,
+  zh: POSTS_ZH,
+  ja: POSTS_JA,
+  ko: POSTS_KO,
+  hi: POSTS_HI,
+  ru: POSTS_RU,
 };
 
 export function isSupportedLang(code) {
@@ -79,52 +103,13 @@ const POSTS_BY_LANG = Object.fromEntries(
 );
 
 /**
- * The mixed feed.
- *
- * Every language ships the same slugs in the same date order, so
- * round-robining ACROSS LANGUAGES (en, fr, zh, ja, hi, ru, en, …) lands all
- * six translations of one article on the same page — the grid fills up with
- * the same post repeated in different languages.
- *
- * Round-robin across SLUGS instead: each round emits every article exactly
- * once, and the language slot is shifted by the article's index so
- * consecutive cards differ in both article and language. A translation is
- * then a full round away from its sibling instead of sitting next to it.
- */
-const MIXED = (() => {
-  const groups = [];
-  const groupIndex = new Map();
-  for (const { code } of LANGUAGES) {
-    for (const post of POSTS_BY_LANG[code]) {
-      let index = groupIndex.get(post.slug);
-      if (index === undefined) {
-        index = groups.length;
-        groupIndex.set(post.slug, index);
-        groups.push([]);
-      }
-      groups[index].push(post);
-    }
-  }
-  const rounds = groups.reduce((max, group) => Math.max(max, group.length), 0);
-  const feed = [];
-  for (let round = 0; round < rounds; round++) {
-    for (let i = 0; i < groups.length; i++) {
-      const group = groups[i];
-      if (round < group.length) feed.push(group[(round + i) % group.length]);
-    }
-  }
-  return feed;
-})();
-
-/**
  * Posts for the feed.
- *   getAllPosts()        → all languages, mixed
- *   getAllPosts('fr')    → only French, newest-first
- *   getAllPosts('all')   → same as no argument
+ * Strictly scoped to the specified language (defaults to 'en').
+ * Never mixes languages.
  */
-export function getAllPosts(lang) {
-  if (!lang || lang === 'all') return MIXED;
-  return POSTS_BY_LANG[lang] || [];
+export function getAllPosts(lang = DEFAULT_LANG) {
+  const targetLang = isSupportedLang(lang) ? lang : DEFAULT_LANG;
+  return POSTS_BY_LANG[targetLang] || [];
 }
 
 export const POSTS_PER_PAGE = 6;

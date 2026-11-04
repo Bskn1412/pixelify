@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback, useLayoutEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useLayoutEffect, useMemo } from 'react';
 import { Menu, Trash2, WifiOff, Wifi, Cpu, Gauge, ExternalLink, Globe, ChevronDown, Check } from 'lucide-react';
 import type { ViewTab, ThemeMode } from '../types';
 import type { ModelDownloadItem } from '../types';
@@ -7,7 +7,9 @@ import Logo from './Logo';
 import ModelDownloadIndicator from './ModelDownloadIndicator';
 import { useApp } from './AppProvider';
 import { SITE_LANGUAGES } from '../lib/i18n';
+import { useTranslation } from '../locales';
 import Link from 'next/link';
+import { useRouter, usePathname } from 'next/navigation';
 
 type Engine = 'webgpu' | 'wasm' | null;
 
@@ -92,6 +94,64 @@ export default function Navbar({
   justReconnected = false,
 }: NavbarProps) {
   const { warmup, isMobileSidebarOpen: ctxMobileOpen, currentLang, setCurrentLang } = useApp();
+  const { t } = useTranslation();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleLanguageChange = useCallback((newLang: string) => {
+    setCurrentLang(newLang);
+    setIsLangOpen(false);
+
+    if (pathname && pathname.startsWith('/blogs')) {
+      const rawSegments = pathname.replace(/^\/blogs\/?/, '').split('/').filter(Boolean);
+      // Case 1: Blog index (/blogs or /blogs/)
+      if (rawSegments.length === 0) {
+        if (newLang === 'en') {
+          router.push('/blogs');
+        } else {
+          router.push(`/blogs/${newLang}`);
+        }
+        return;
+      }
+
+      // Case 2: One segment: could be a language index (e.g. 'es') or an English article slug (e.g. 'enable_webgpu_guide_b5c9e8')
+      if (rawSegments.length === 1) {
+        const seg = rawSegments[0];
+        const isLangIndex = SITE_LANGUAGES.some((l) => l.code === seg);
+        if (isLangIndex) {
+          if (newLang === 'en') {
+            router.push('/blogs');
+          } else {
+            router.push(`/blogs/${newLang}`);
+          }
+        } else {
+          if (newLang === 'en') {
+            router.push(`/blogs/${seg}`);
+          } else {
+            router.push(`/blogs/${newLang}/${seg}`);
+          }
+        }
+        return;
+      }
+
+      // Case 3: Two segments: [lang, slug] e.g. ['es', 'enable_webgpu_guide_b5c9e8']
+      if (rawSegments.length >= 2) {
+        const slug = rawSegments[1];
+        if (newLang === 'en') {
+          router.push(`/blogs/${slug}`);
+        } else {
+          router.push(`/blogs/${newLang}/${slug}`);
+        }
+        return;
+      }
+    }
+  }, [pathname, router, setCurrentLang]);
+
+  const desktopNavItems: { tab: ViewTab; label: string; warmup?: boolean }[] = useMemo(() => [
+    { tab: 'home', label: t.nav.home },
+    { tab: 'bg_remove', label: t.nav.bgRemove, warmup: true },
+    { tab: 'upscaler', label: t.nav.upscaler, warmup: true },
+  ], [t.nav.home, t.nav.bgRemove, t.nav.upscaler]);
   const isMobileMenuOpen = isMobileSidebarOpen || ctxMobileOpen || false;
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
@@ -200,6 +260,10 @@ export default function Navbar({
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, [pillTab, measureActivePill]);
+
+  useEffect(() => {
+    measureActivePill(pillTab);
+  }, [currentLang, measureActivePill, pillTab]);
 
   // Close dropdowns on click outside
   useEffect(() => {
@@ -330,7 +394,7 @@ export default function Navbar({
             className="pointer-events-auto hidden md:flex absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 h-11 bg-white/10 border border-white/20 rounded-full p-1 items-center gap-1 backdrop-blur-xl shadow-xl will-change-transform"
           >
             {/* BASE LAYER (clickable buttons with light text) */}
-            {DESKTOP_NAV_ITEMS.map(({ tab, label, warmup: needsWarmup }) => (
+            {desktopNavItems.map(({ tab, label, warmup: needsWarmup }) => (
               <button
                 key={tab}
                 ref={(el) => { navBtnRefs.current[tab] = el; }}
@@ -358,7 +422,7 @@ export default function Navbar({
                   transition: activePillStyle.transition,
                 }}
               >
-                {DESKTOP_NAV_ITEMS.map(({ tab, label }) => (
+                {desktopNavItems.map(({ tab, label }) => (
                   <span
                     key={tab}
                     className="h-full px-5 rounded-full text-sm font-semibold flex items-center justify-center whitespace-nowrap text-black select-none"
@@ -416,16 +480,16 @@ export default function Navbar({
               <div className="absolute right-0 mt-2.5 w-72 rounded-2xl bg-[#121218]/95 backdrop-blur-xl border border-white/15 p-3 shadow-2xl z-50 animate-fade-in flex flex-col gap-2">
                 <div>
                   <div className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-violet-200/70">
-                    <Cpu size={12} /> Processing engines <span className="ml-auto h-px flex-1 bg-gradient-to-r from-violet-300/20 to-transparent" />
+                    <Cpu size={12} /> {t.nav.processingEngines} <span className="ml-auto h-px flex-1 bg-gradient-to-r from-violet-300/20 to-transparent" />
                   </div>
                   <div className="space-y-1 rounded-xl border border-white/[0.07] bg-black/25 px-2.5 py-2">
-                    <div className="settings-row-enter engine-row-shell" style={{ animationDelay: '55ms' }}><EngineRow label="Upscaler" engine={upscalerEngine} /></div>
-                    <div className="settings-row-enter engine-row-shell" style={{ animationDelay: '105ms' }}><EngineRow label="BG Remover" engine={bgEngine} /></div>
+                    <div className="settings-row-enter engine-row-shell" style={{ animationDelay: '55ms' }}><EngineRow label={t.nav.upscaler} engine={upscalerEngine} /></div>
+                    <div className="settings-row-enter engine-row-shell" style={{ animationDelay: '105ms' }}><EngineRow label={t.nav.bgRemove} engine={bgEngine} /></div>
                   </div>
                   <div className="settings-row-enter mt-1.5 flex items-center justify-between rounded-xl border border-violet-200/[0.13] bg-gradient-to-r from-violet-300/[0.08] via-white/[0.035] to-teal-200/[0.06] px-2.5 py-1.5" style={{ animationDelay: '155ms' }}>
-                    <span className="flex items-center gap-1.5 text-[11px] font-medium text-white/70"><Gauge size={13} className="text-violet-200/70" />WebGPU support</span>
+                    <span className="flex items-center gap-1.5 text-[11px] font-medium text-white/70"><Gauge size={13} className="text-violet-200/70" />{t.nav.webgpuSupport}</span>
                     <span className={`text-[10px] font-semibold ${webgpuAvailable === null ? 'text-white/40' : webgpuAvailable ? 'text-emerald-300' : 'text-sky-300'}`}>
-                      {webgpuAvailable === null ? 'Checking' : webgpuAvailable ? 'Available' : 'Unavailable'}
+                      {webgpuAvailable === null ? t.nav.checking : webgpuAvailable ? t.nav.available : t.nav.unavailable}
                     </span>
                   </div>
                   <p className="mt-1.5 px-0.5 text-[9.5px] leading-relaxed text-white/35">{modelStatus}</p>
@@ -437,27 +501,27 @@ export default function Navbar({
                     onClick={onClearModelCache}
                     disabled={isClearingModelCache || !canClearModelCache}
                     className="flex items-center justify-center gap-1.5 rounded-xl border border-white/[0.08] bg-white/[0.04] px-2 py-2 text-center text-[11px] font-medium text-white/70 hover:bg-white/[0.08] hover:text-white transition-colors disabled:cursor-not-allowed disabled:opacity-40"
-                    title="Remove downloaded AI models from this browser"
+                    title={t.nav.clearModelsDesc}
                   >
                     <Trash2 size={13} className="shrink-0 text-white/50" />
-                    <span className="truncate">{isClearingModelCache ? 'Clearing…' : 'Clear models'}</span>
+                    <span className="truncate">{isClearingModelCache ? t.nav.clearing : t.nav.clearModels}</span>
                   </button>
                   <Link
                     href={"/blogs/enable_webgpu_guide_b5c9e8"}
                     onClick={()=>setIsSettingsOpen(false)}
                     className="flex items-center justify-center gap-1.5 rounded-xl border border-violet-400/20 bg-violet-400/[0.07] px-2 py-2 text-center text-[11px] font-medium text-violet-200 hover:bg-violet-400/[0.14] hover:text-violet-100 transition-colors"
-                    title="Learn how to enable WebGPU in your browser"
+                    title={t.nav.learnWebgpu}
                   >
                     <ExternalLink size={13} className="shrink-0 text-violet-300" />
-                    <span className="truncate">Learn about WebGPU</span>
+                    <span className="truncate">{t.nav.learnWebgpu}</span>
                   </Link>
                 </div>
               </div>
             )}
             </div>
 
-            {/* LANGUAGE SELECTOR PILL BUTTON */}
-            <div className="relative" ref={langRef}>
+            {/* LANGUAGE SELECTOR PILL BUTTON (Desktop/tablet >= md only; mobile uses drawer buttons) */}
+            <div className="relative hidden md:block" ref={langRef}>
               <button
                 type="button"
                 onClick={() => {
@@ -482,6 +546,9 @@ export default function Navbar({
               {/* LANGUAGE DROPDOWN MENU */}
               {isLangOpen && (
                 <div className="absolute right-0 mt-2.5 w-48 rounded-2xl bg-[#121218]/95 backdrop-blur-xl border border-white/15 p-1.5 shadow-2xl z-50 animate-fade-in flex flex-col gap-0.5">
+                  <div className="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40">
+                    {t.nav.selectLanguage}
+                  </div>
                   {SITE_LANGUAGES.map((lang) => {
                     const isSelected = (currentLang || 'en') === lang.code;
                     return (
@@ -491,8 +558,7 @@ export default function Navbar({
                         disabled={!lang.active}
                         onClick={() => {
                           if (lang.active) {
-                            setCurrentLang(lang.code);
-                            setIsLangOpen(false);
+                            handleLanguageChange(lang.code);
                           }
                         }}
                         className={`flex items-center justify-between w-full px-2.5 py-2 rounded-xl text-xs transition-colors ${
@@ -503,17 +569,24 @@ export default function Navbar({
                             : 'text-white/30 cursor-not-allowed opacity-50'
                         }`}
                       >
-                        <div className="flex items-center gap-2">
-                          <span className="mt-1 font-mono text-[11px] font-bold text-white/50">{lang.short}</span>
-                          <span>{lang.nativeLabel}</span>
+                        <div className="flex items-center gap-2 min-w-0">
+                         
+                          <span className="truncate">{lang.nativeLabel}</span>
+                        
                         </div>
-                        {isSelected ? (
-                          <Check size={14} className="text-[#00ff85]" />
-                        ) : !lang.active ? (
-                          <span className="text-[9px] font-medium tracking-wide px-1.5 py-0.5 rounded bg-white/5 text-white/40">
-                            Soon
+                        <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                          <span className="font-mono text-[10.5px] font-bold text-white/50">
+                            {lang.short}
                           </span>
-                        ) : null}
+                           <div className="w-4 h-4 flex items-center justify-center shrink-0">
+                            {isSelected && <Check size={14} className="text-[#00ff85]" />}
+                          </div>
+                          {!lang.active && (
+                            <span className="text-[9px] font-medium tracking-wide px-1.5 py-0.5 rounded bg-white/5 text-white/40">
+                              {t.common.soon}
+                            </span>
+                          )}
+                        </div>
                       </button>
                     );
                   })}

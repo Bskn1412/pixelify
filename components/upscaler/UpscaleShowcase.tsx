@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { useTranslation } from '@/locales';
 
 /* ============================================================
    BRAND COLOR SYSTEM  (white · green · black · gray)
@@ -120,7 +121,9 @@ function useReveal<T extends HTMLElement>() {
 const CompareLens: React.FC<{
   pair: ShowcasePair;
   onNext: () => void;
-}> = ({ pair, onNext }) => {
+  originalLabel?: string;
+  upscaledLabel?: string;
+}> = ({ pair, onNext, originalLabel = 'BEFORE', upscaledLabel = 'AFTER' }) => {
   const [pos, setPos] = useState(50);
   const posRef = useRef(50);
   const frameRef = useRef<HTMLDivElement>(null);
@@ -382,8 +385,8 @@ const CompareLens: React.FC<{
       </span>
 
       {/* corner tags */}
-      <span className={`uc-tag uc-tag-before ${pos >= 85 ? 'is-active' : ''}`}>BEFORE</span>
-      <span className={`uc-tag uc-tag-after ${pos <= 15 ? 'is-active' : ''}`}>AFTER</span>
+      <span className={`uc-tag uc-tag-before ${pos >= 85 ? 'is-active' : ''}`}>{originalLabel}</span>
+      <span className={`uc-tag uc-tag-after ${pos <= 15 ? 'is-active' : ''}`}>{upscaledLabel}</span>
     </div>
   );
 };
@@ -394,7 +397,14 @@ const CompareLens: React.FC<{
    ============================================================ */
 export const UpscaleShowcase: React.FC = () => {
   const rootRef = useReveal<HTMLDivElement>();
+  const { t } = useTranslation();
   const [active, setActive] = useState(1); // default: Porsche (portrait, dramatic)
+
+  const heroStats = useMemo(() => [
+    { value: '8x', label: t.upscaleShowcase?.statMaxScale || 'Max Scale' },
+    { value: '100%', label: t.upscaleShowcase?.statPrivate || 'Private & On-Device' },
+    { value: '0s', label: t.upscaleShowcase?.statCloudLatency || 'Cloud Latency' },
+  ], [t.upscaleShowcase]);
 
   const handleNext = useCallback(() => {
     setActive((a) => (a + 1) % PAIRS.length);
@@ -444,23 +454,28 @@ export const UpscaleShowcase: React.FC = () => {
         <div className="uc-showcase-center">
 
           <h1 className="uc-title pb-reveal" style={{ '--rv-i': 1 } as React.CSSProperties}>
-            Every pixel,
+            {t.upscaleShowcase?.titlePixel || "Every pixel,"}
             <br />
-            <em>re-imagined.</em>
+            <em>{t.upscaleShowcase?.titleReimagined || "re-imagined."}</em>
           </h1>
 
           <p className="uc-subtitle pb-reveal" style={{ '--rv-i': 2 } as React.CSSProperties}>
-            Experience real 8x upscaling, rendered live on-device.
-            Slide the lens to compare: the untouched original on the left, and Pixelify’s single-pass result on the right.
+            {t.upscaleShowcase?.subtitle || "Experience real 8x upscaling, rendered live on-device. Slide the lens to compare: the untouched original on the left, and Pixelify’s single-pass result on the right."}
           </p>
 
           <div className="pb-reveal uc-lens-wrap" style={{ '--rv-i': 3 } as React.CSSProperties}>
-            <CompareLens key={PAIRS[active].id} pair={PAIRS[active]} onNext={handleNext} />
+            <CompareLens
+              key={PAIRS[active].id}
+              pair={PAIRS[active]}
+              onNext={handleNext}
+              originalLabel={t.upscaleShowcase?.lensOriginal || "Original"}
+              upscaledLabel={t.upscaleShowcase?.lensUpscaled || "Upscaled"}
+            />
           </div>
 
           {/* stat pills */}
           <div className="uc-stats pb-reveal" style={{ '--rv-i': 4 } as React.CSSProperties}>
-            {HERO_STATS.map((s) => (
+            {heroStats.map((s) => (
               <div key={s.label} className="uc-stat">
                 <span className="uc-stat-value">{s.value}</span>
                 <span className="uc-stat-label">{s.label}</span>
