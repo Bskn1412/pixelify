@@ -208,7 +208,11 @@
     "step4Desc": "워터마크나 화질 손실 없이 고해상도 PNG 또는 WebP 파일로 저장하세요.",
     "step4Status": "저장 완료",
     "titleLead": "단 4단계.",
-    "titleItalic": "스튜디오급 완성도."
+    "titleItalic": "스튜디오급 완성도.",
+    "meterInputLocked": "입력 고정됨",
+    "meterModelWarmup": "모델 워밍업",
+    "meterPassSelected": "패스 선택됨 · 4×",
+    "meterWebgpuTiles": "WebGPU 타일 연산"
   },
   "upscaleFaq": {
     "titlePrefix": "자주",
@@ -409,7 +413,8 @@
     "cutoutDesc": "여기에 이미지를 드롭하여 누끼 따기를 시작하세요\n20MB 미만의 PNG, JPG, WebP 파일 지원.",
     "uploadMedia": "미디어 업로드",
     "processing": "처리 중...",
-    "remove": "제거"
+    "remove": "제거",
+    "pasteHint": "PNG, JPEG, WEBP · 최대 {maxSizeMB}MB · Ctrl + V로 붙여넣기"
   },
   "bgRemoverSection": {
     "titlePrefix": "AI 기반 초정밀",
@@ -592,16 +597,21 @@
       "로컬",
       "AI",
       "당신의",
-      "이미지를 위한",
+      "이미지를",
+      "위해",
       "업스케일",
       "복원",
-      "화질 개선",
-      "클라우드에",
-      "업로드하지 않고",
-      "모든",
-      "픽셀은",
+      "향상",
+      "완전히",
+      "없이",
+      "업로드",
+      "어디든",
+      "저",
+      "클라우드",
       "당신의",
-      "소유로"
+      "픽셀",
+      "영원히",
+      "당신의것"
     ]
   },
   "upscaleShowreel": {
@@ -749,5 +759,25 @@
     "투명 PNG 저장",
     "가입 없이 즉시 사용",
     "무제한 무료 실행"
-  ]
+  ],
+  "testimonials": {
+    "eyebrow": "입소문난 성능",
+    "titlePrefix": "디지털 아티스트, 스튜디오, ",
+    "titleAccent": "개발자 모두가 신뢰하는 도구",
+    "description": "실제 크리에이터들이 클라우드 구독 모델을 버리고 브라우저 내 빠르고 안전한 온디바이스 뉴럴 프로세싱을 선택한 이유를 확인해 보세요."
+  },
+  "modelStatus": {
+    "standardMode": "표준 모드: {reason}",
+    "downloadingBg": "배경 제거 모델 다운로드 중 ({pct}%)",
+    "preparingBg": "배경 제거 모델 준비 중",
+    "checkingGraphics": "그래픽 어댑터 확인 중",
+    "bgPreloadFailed": "배경 모델 사전 로드 실패; 사용 시 다시 시도합니다",
+    "preparingUpscaler": "업스케일러 모델 준비 중",
+    "preparingUpscalerPct": "업스케일러 모델 준비 중 ({pct}%)",
+    "upscalerPreloadFailed": "업스케일러 사전 로드 실패; 사용 시 다시 시도합니다",
+    "modelsReady": "기본 AI 모델이 준비되었습니다",
+    "upscalerReady": "업스케일러 준비 완료; 기타 모델은 사용 시 로드됩니다",
+    "modelsCleared": "모델이 삭제되었습니다; 필요 시 다시 다운로드됩니다",
+    "preparingBackground": "백그라운드에서 AI 모델 준비 중"
+  }
 }

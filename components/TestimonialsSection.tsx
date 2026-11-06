@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Quote, Star } from 'lucide-react';
+import { useTranslation } from '@/locales';
 
 /**
  * Replace the sample review copy and names below with real, permissioned feedback
@@ -87,20 +88,24 @@ export default function TestimonialsSection() {
     window.setTimeout(updateArrows, 400);
   };
 
+  const { t } = useTranslation();
+
   return (
     <section className="pixelify-testimonials-wrap w-full overflow-hidden my-4 sm:my-8">
       <div className="pixelify-testimonials-panel w-full overflow-hidden rounded-[28px] sm:rounded-[44px] bg-white px-5 py-8 sm:px-8 sm:py-10 lg:px-12 lg:py-12 shadow-[0_30px_100px_rgba(0,0,0,0.7)]">
         <div className="mx-auto flex max-w-7xl flex-col gap-7 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-2xl">
-            <span className="pixelify-testimonial-eyebrow">THE WORD IS OUT</span>
+            <span className="pixelify-testimonial-eyebrow">
+              {t.testimonials?.eyebrow || 'THE WORD IS OUT'}
+            </span>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-neutral-950 leading-[1.12]">
-              Loved by digital artists,{' '}
+              {t.testimonials?.titlePrefix || 'Loved by digital artists, '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-emerald-500 to-[#00C86A]">
-                studios & developers
+                {t.testimonials?.titleAccent || 'studios & developers'}
               </span>
             </h2>
             <p className="text-sm sm:text-base text-neutral-600 leading-relaxed mt-2">
-              Real creators sharing why they ditched cloud subscription models for fast, private in-browser neural processing.
+              {t.testimonials?.description || 'Real creators sharing why they ditched cloud subscription models for fast, private in-browser neural processing.'}
             </p>
           </div>
         </div>

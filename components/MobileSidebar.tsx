@@ -64,44 +64,43 @@ export default function MobileSidebar({
     setCurrentLang(newLang);
     onClose();
 
-    if (pathname && pathname.startsWith('/blogs')) {
+    if (!pathname) return;
+
+    if (pathname.startsWith('/blogs')) {
       const rawSegments = pathname.replace(/^\/blogs\/?/, '').split('/').filter(Boolean);
       if (rawSegments.length === 0) {
-        if (newLang === 'en') {
-          router.push('/blogs');
-        } else {
-          router.push(`/blogs/${newLang}`);
-        }
+        router.push(newLang === 'en' ? '/blogs/' : `/blogs/${newLang}/`);
         return;
       }
       if (rawSegments.length === 1) {
         const seg = rawSegments[0];
         const isLangIndex = SITE_LANGUAGES.some((l) => l.code === seg);
         if (isLangIndex) {
-          if (newLang === 'en') {
-            router.push('/blogs');
-          } else {
-            router.push(`/blogs/${newLang}`);
-          }
+          router.push(newLang === 'en' ? '/blogs/' : `/blogs/${newLang}/`);
         } else {
-          if (newLang === 'en') {
-            router.push(`/blogs/${seg}`);
-          } else {
-            router.push(`/blogs/${newLang}/${seg}`);
-          }
+          router.push(newLang === 'en' ? `/blogs/${seg}/` : `/blogs/${newLang}/${seg}/`);
         }
         return;
       }
       if (rawSegments.length >= 2) {
         const slug = rawSegments[1];
-        if (newLang === 'en') {
-          router.push(`/blogs/${slug}`);
-        } else {
-          router.push(`/blogs/${newLang}/${slug}`);
-        }
+        router.push(newLang === 'en' ? `/blogs/${slug}/` : `/blogs/${newLang}/${slug}/`);
         return;
       }
     }
+
+    // General route handling across the entire site
+    const cleanPath = pathname.replace(/^\//, '').replace(/\/$/, '');
+    const segments = cleanPath.split('/').filter(Boolean);
+
+    // If first segment is an existing language code, strip it
+    if (segments.length > 0 && SITE_LANGUAGES.some((l) => l.code === segments[0])) {
+      segments.shift();
+    }
+
+    const restPath = segments.join('/');
+    const target = restPath ? `/${newLang}/${restPath}/` : `/${newLang}/`;
+    router.push(target);
   }, [pathname, router, setCurrentLang, onClose]);
   const navItems = [
     { tab: 'home' as ViewTab, label: t.nav.home, Icon: Home },

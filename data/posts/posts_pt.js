@@ -4,6 +4,123 @@
  */
 export const POSTS_PT = [
 {
+  "slug": "pixelify_privacy_first_a7f3d9",
+  "title": "Pixelify: Por que criamos um editor de imagens que nunca vê suas fotos",
+  "description": "Todas as outras ferramentas de imagem pedem seu upload primeiro e prometem privacidade depois. O Pixelify foi projetado de forma oposta: a IA é executada na aba do seu navegador, para que suas fotos nunca saiam do dispositivo.",
+  "tags": [
+    "Privacidade",
+    "IA Local",
+    "Produto"
+  ],
+  "date": "2026-11-06",
+  "author": "A equipe Pixelify",
+  "cover": "/blogs/story-page.jpg",
+  "coverAlt": "Página de história do Pixelify mostrando as palavras PIXELIFY IA LOCAL PARA SUAS",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "Você tem uma foto que quer aprimorar. Talvez seja uma captura de tela que não fica boa numa apresentação, um retrato de família escaneado dos anos noventa ou uma foto de produto com fundo poluído. Você pesquisa \"ampliar imagem com IA\" na web, clica no primeiro resultado gratuito e faz o upload. Em questão de segundos, a foto está em um servidor desconhecido, de uma empresa que você nunca ouviu falar, sob termos que você não leu. Nesse exato momento, a foto deixou de ser totalmente sua."
+    },
+    {
+      "type": "p",
+      "text": "Não precisa ser assim. O Pixelify foi construído com base em uma ideia direta e firme: processamento de imagem é matemática, e matemática pode rodar no seu próprio computador. Quando o processamento ocorre na aba do seu navegador, a \"privacidade\" deixa de ser um parágrafo em um termo de uso e passa a ser uma propriedade técnica da arquitetura. Não há etapa de upload porque não há servidor remoto para o qual enviar nada. A foto que você solta na página é a mesma que é aprimorada, sem nunca trafegar pela internet."
+    },
+    {
+      "type": "h2",
+      "text": "O hábito de fazer upload é uma decisão de privacidade que você nunca tomou de propósito"
+    },
+    {
+      "type": "p",
+      "text": "Ferramentas gratuitas na nuvem não são gratuitas porque a computação é barata. Elas são gratuitas porque seus uploads são subsidiados por outros interesses: publicidade direcionada, enriquecimento de bancos de dados, treinamento de modelos de terceiros ou captação de usuários para monetização futura. Nada disso é teoria. Termos de serviço que exigem direitos amplos para processar e armazenar dados derivados do conteúdo enviado são padrão de mercado, e \"dados criptografados em trânsito\" não garantem nada sobre o que acontece após o arquivo chegar ao destino."
+    },
+    {
+      "type": "p",
+      "text": "Há também um custo silencioso nos metadados. Uma foto guarda hora, modelo da câmera e, com frequência, localização GPS exata. Pode conter rostos de terceiros, documentos confidenciais sobre uma mesa ao fundo, anotações de trabalho ou crianças sem consentimento para alimentar modelos de IA. A maioria das pessoas sabe que um documento de identidade é sensível, mas poucos percebem que uma foto casual da tela de um notebook pode expor uma chave de API aberta no terminal."
+    },
+    {
+      "type": "ul",
+      "items": [
+        "Um upload é uma cópia, e cópias duram além da sua sessão. \"Apagamos os arquivos em 24 horas\" é apenas uma promessa, não uma garantia técnica verificável.",
+        "Servidores sofrem invasões e vazamentos. O vazamento que importa é aquele em que suas imagens originais foram mantidas para \"melhorar o serviço\".",
+        "Excluir conta e excluir dados são processos distintos. Um revoga seu login; o outro muitas vezes sequer existe nos bastidores.",
+        "Uma ferramenta que recebe suas fotos pode ser intimada judicialmente, auditada ou vendida. Uma ferramenta que nunca as recebe não pode ser forçada a entregar o que não tem."
+      ]
+    },
+    {
+      "type": "h2",
+      "text": "O Pixelify inverte a lógica do fluxo"
+    },
+    {
+      "type": "p",
+      "text": "Na nuvem, sua foto é a entrada para o programa de outra pessoa. No Pixelify, o programa é a entrada para o seu dispositivo. Ao abrir o upscaler ou o removedor de fundo, seu navegador faz o download da rede neural em si — os pesos matemáticos do modelo — e os armazena localmente no cache do navegador. A partir daí, cada imagem é processada e reconstruída na sua própria memória e GPU, sob seu controle total."
+    },
+    {
+      "type": "img",
+      "src": "/blogs/home-hero.jpg",
+      "alt": "Hero da página inicial do Pixelify com a frase Amplie, restaure e transforme suas imagens localmente",
+      "caption": "A promessa clara: processamento local, sem uploads e sem nuvem."
+    },
+    {
+      "type": "p",
+      "text": "Isso não é jogada de marketing. Abra o inspetor de rede do navegador enquanto o Pixelify processa uma imagem e comprove: o único tráfego existente é o carregamento da página e o download inicial dos modelos. Arraste uma imagem, amplie, baixe o resultado: os bytes da sua imagem permanecem na aba. Você pode desligar o Wi-Fi após abrir a página e as ferramentas continuam funcionando normalmente. Esse é o teste definitivo de privacidade."
+    },
+    {
+      "type": "h2",
+      "text": "Privacidade é a base que destrava todos os outros benefícios"
+    },
+    {
+      "type": "p",
+      "text": "O processamento local muda radicalmente a experiência de uso. Não há filas de espera, pois não há servidor compartilhado com outros usuários; sua GPU trabalha exclusivamente para você. Não há lentidão de upload: uma foto de 4 MB que demoraria para subir em uma rede móvel começa a ser processada no instante em que você solta o arquivo. E não há compressão forçada para JPEG genérico para economizar largura de banda do servidor; você recebe exatamente o arquivo na qualidade escolhida."
+    },
+    {
+      "type": "p",
+      "text": "A latência se acumula rapidamente. Uma ferramenta em nuvem gasta segundos no upload, na fila, no processamento e no download. Uma ferramenta local gasta tempo apenas no processamento — e em hardware moderno com WebGPU acelerada, o processamento costuma ser a etapa mais veloz. Para uma foto isolada, a sensação é de resposta imediata. Para um lote de cinquenta imagens, é a diferença entre terminar seu trabalho com folga ou desistir por frustração."
+    },
+    {
+      "type": "callout",
+      "title": "O teste offline",
+      "text": "Abra o Pixelify e desligue sua conexão com a internet. Todos os recursos continuam funcionando perfeitamente. Esse teste simples separa ferramentas locais autênticas de promessas vazias com muito mais precisão do que qualquer página de política de privacidade."
+    },
+    {
+      "type": "h2",
+      "text": "O que \"executar localmente\" significa na prática"
+    },
+    {
+      "type": "p",
+      "text": "Transparência técnica é fundamental. Redes neurais são essencialmente arquivos com milhões de matrizes de números. Seu navegador baixa esse arquivo uma vez, assim como carrega os arquivos de um jogo online, e o armazena no cache local. Quando você processa uma foto, o navegador direciona os pixels através dessas matrizes usando seu hardware gráfico. Em dispositivos compatíveis com WebGPU, essa carga pesada roda direto na GPU, gerando resultados em segundos."
+    },
+    {
+      "type": "p",
+      "text": "O que nunca acontece: sua imagem não é enviada para lugar nenhum, nenhuma cópia é salva em servidores externos e nenhum registro sobre o conteúdo é mantido. O modelo é um conjunto estático de instruções que roda igualmente para todos, sem canais para transmitir dados externamente. Em computadores sem GPU moderna, o sistema recorre automaticamente ao WebAssembly na CPU para garantir compatibilidade."
+    },
+    {
+      "type": "h2",
+      "text": "Os compromissos que assumimos conscientemente"
+    },
+    {
+      "type": "p",
+      "text": "Priorizar o processamento local traz concessões reais, e reconhecê-las faz parte do nosso compromisso. Na primeira visita, o usuário precisa aguardar o download dos pesos do modelo (geralmente algumas dezenas de megabytes). A velocidade depende do hardware do usuário: um celular antigo será mais lento que um computador com placa de vídeo dedicada. Imagens muito grandes dependem da memória RAM disponível no seu aparelho. E atualizações de modelos exigem uma nova versão da aplicação."
+    },
+    {
+      "type": "p",
+      "text": "Aceitamos essas condições porque a alternativa troca uma pequena espera inicial por uma exposição permanente da privacidade do usuário, e porque a capacidade dos computadores evolui ano após ano. Hoje os navegadores acessam aceleração gráfica antes restrita a softwares profissionais pesados. Cada avanço de hardware torna as ferramentas locais mais rápidas, enquanto ferramentas em nuvem continuarão sempre limitadas pela velocidade da sua conexão."
+    },
+    {
+      "type": "h2",
+      "text": "Para quem o Pixelify foi pensado"
+    },
+    {
+      "type": "p",
+      "text": "Fotógrafos que tratam trabalhos de clientes sob contratos de confidencialidade (NDA). Agências que produzem materiais de campanhas antes do lançamento oficial. Jornalistas que editam imagens de fontes protegidas. Pais e professores que aprimoram fotos escolares de crianças. E qualquer pessoa que já tenha hesitado antes de clicar no botão de upload com um receio intuitivo. Esse receio é justificado. O Pixelify existe para que você nunca mais precise se preocupar com isso."
+    },
+    {
+      "type": "p",
+      "text": "Essa é toda a nossa filosofia. Não prometemos que \"seus dados estão seguros conosco\"; nós garantimos que \"seus dados simplesmente não estão conosco\". Não precisamos de termos de uso complexos porque não guardamos arquivos seus. Solte uma foto na página, veja o aprimoramento em tempo real, baixe o resultado e feche a aba sabendo que a imagem nunca saiu da sua sala. Em 2026 isso não deveria ser exceção. Construímos o Pixelify porque ainda é."
+    }
+  ]
+},
+
+{
   "slug": "enable_webgpu_guide_b5c9e8",
   "title": "Ativar o WebGPU: A mudança de dois minutos que torna a IA no navegador muito mais rápida",
   "description": "O WebGPU permite que a IA executada no navegador use seu chip gráfico em vez da CPU, frequentemente de 5 a 10 vezes mais rápido. Um guia passo a passo por navegador para ativá-lo e confirmar que funcionou usando o indicador de motor nas configurações.",

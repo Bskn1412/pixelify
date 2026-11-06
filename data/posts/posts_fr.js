@@ -4,6 +4,102 @@
  */
 export const POSTS_FR = [
 {
+    slug: 'pixelify_privacy_first_a7f3d9',
+    title: 'Pixelify : Pourquoi nous avons créé un éditeur d\'images qui ne voit jamais vos photos',
+    description:
+      'Tous les autres outils d\'image exigent d\'abord votre envoi et promettent la confidentialité plus tard. Pixelify a été conçu à l\'opposé : l\'IA s\'exécute dans l\'onglet de votre navigateur, de sorte que vos photos ne quittent jamais votre appareil.',
+    tags: ['Confidentialité', 'IA Locale', 'Produit'],
+    date: '2026-11-06',
+    author: 'L\'équipe Pixelify',
+    cover: '/blogs/story-page.jpg',
+    coverAlt: 'Page d\'histoire Pixelify montrant les mots PIXELIFY LOCAL AI FOR YOUR',
+    blocks: [
+      {
+        type: 'p',
+        text: 'Vous avez une photo que vous souhaitez corriger. Il s\'agit peut-être d\'une capture d\'écran qui ne rendra pas bien dans une présentation, d\'un portrait de famille scanné des années quatre-vingt-dix, ou d\'une photo de produit avec un arrière-plan encombré. Vous tapez donc « améliorer image » dans un moteur de recherche, cliquez sur le premier résultat gratuit et lancez le téléversement. En quelques secondes, la photo se retrouve sur un serveur dont vous n\'avez jamais entendu parler, appartenant à une entreprise que vous ne connaissez pas, sous une politique de confidentialité que vous n\'avez pas lue. C\'est le moment exact où la photo a cessé de vous appartenir entièrement.',
+      },
+      {
+        type: 'p',
+        text: 'Cela n\'a pas besoin de se passer ainsi. Pixelify a été conçu sur une idée simple et obstinée : le traitement d\'image est de l\'arithmétique, et l\'arithmétique peut s\'effectuer sur votre propre machine. Lorsque le traitement a lieu dans l\'onglet de votre navigateur, la « confidentialité » cesse d\'être un paragraphe dans un document juridique pour devenir une propriété intrinsèque du système. Il n\'y a pas d\'étape de téléversement car il n\'y a aucun serveur vers lequel envoyer des données. La photo que vous avez glissée dans la page est la même que celle qui est améliorée, sans jamais effectuer le moindre voyage sur le réseau.',
+      },
+      { type: 'h2', text: 'L\'habitude du téléversement est une décision de confidentialité que vous n\'avez jamais prise' },
+      {
+        type: 'p',
+        text: 'Les outils d\'image gratuits sur le cloud ne sont pas gratuits parce que le calcul ne coûte rien. Ils sont gratuits parce que vos envois sont subventionnés par autre chose : la publicité, l\'enrichissement de données, l\'entraînement de modèles ou la simple acquisition d\'une base d\'utilisateurs à monétiser plus tard. Rien de tout cela n\'est hypothétique. Les clauses des conditions d\'utilisation qui réclament de larges droits pour traiter, stocker et dériver des données à partir de contenus téléversés sont la norme dans le secteur, et la mention « vos données sont chiffrées en transit » ne vous dit absolument rien sur ce qui se passe une fois qu\'elles sont arrivées sur le serveur.',
+      },
+      {
+        type: 'p',
+        text: 'Il existe un second coût, plus silencieux. Une photo est un ensemble de métadonnées. L\'heure à laquelle elle a été prise, l\'appareil utilisé, parfois les coordonnées géographiques exactes. Elle peut contenir des visages, des documents laissés sur un bureau en arrière-plan, un tableau blanc avec des notes internes, ou un enfant qui ne peut pas consentir à devenir une donnée d\'entraînement. Les gens comprennent intuitivement qu\'un scan de passeport est sensible. Moins de personnes réalisent qu\'une simple photo d\'un écran d\'ordinateur portable peut faire fuiter une clé d\'API encore visible dans une fenêtre de terminal.',
+      },
+      {
+        type: 'ul',
+        items: [
+          'Un téléversement est une copie, et les copies survivent à votre session. « Nous supprimons les fichiers après 24 heures » est une promesse, pas un mécanisme technique.',
+          'Les serveurs subissent des violations de données. La violation qui importe est celle où vos photos originales et non éditées ont été conservées « pour améliorer le service ».',
+          'La suppression de compte et la suppression de données sont deux processus distincts. L\'un supprime vos identifiants ; l\'autre n\'est souvent pas implémenté du tout.',
+          'Un outil qui doit recevoir votre photo peut être contraint, assigné en justice ou vendu. Un outil qui ne la reçoit jamais ne le peut pas.',
+        ],
+      },
+      { type: 'h2', text: 'Pixelify inverse le pipeline' },
+      {
+        type: 'p',
+        text: 'Dans un pipeline cloud, votre photo sert d\'entrée au programme de quelqu\'un d\'autre. Dans Pixelify, le programme sert d\'entrée à votre appareil. Lorsque vous ouvrez l\'outil d\'agrandissement ou de suppression d\'arrière-plan, votre navigateur télécharge le réseau neuronal lui-même — les mathématiques réelles qui exécutent le travail — et le stocke localement en cache. À partir de ce moment, chaque image que vous traitez est multipliée, segmentée et reconstruite dans votre propre mémoire, par votre propre processeur, sous votre contrôle exclusif.',
+      },
+      {
+        type: 'img',
+        src: '/blogs/home-hero.jpg',
+        alt: 'Page d\'accueil Pixelify avec le slogan Agrandissez, restaurez et transformez vos images localement',
+        caption: 'La promesse affichée : traitement local, pas de téléversements, pas de cloud.',
+      },
+      {
+        type: 'p',
+        text: 'Il ne s\'agit pas d\'une réinterprétation marketing du traitement cloud avec un plus joli logo. Ouvrez l\'inspecteur réseau de votre navigateur pendant que Pixelify traite une image et observez vous-même : le seul trafic réside dans le chargement initial de la page et le téléchargement unique des fichiers du réseau. Glissez une image, agrandissez-la, téléchargez le résultat, et les octets de votre photo restent strictement à l\'intérieur de l\'onglet. Vous pouvez vous déconnecter du Wi-Fi après le chargement de la page et les outils continueront de fonctionner. C\'est le test auquel échouent la plupart des outils soi-disant « confidentiels ».',
+      },
+      { type: 'h2', text: 'La confidentialité n\'est pas le seul avantage ; c\'est l\'élément déclencheur' },
+      {
+        type: 'p',
+        text: 'Le traitement local modifie l\'économie globale de l\'expérience utilisateur, et les utilisateurs remarquent les effets secondaires avant même de réaliser le gain de confidentialité. Il n\'y a pas de file d\'attente, car il n\'y a pas de serveur partagé ; votre GPU est le seul exécutant, et il travaille exclusivement pour vous. Il n\'y a pas d\'attente de téléversement : une photo de 4 Mo qui prendrait du temps à être envoyée via une connexion mobile commence à être traitée dès l\'instant où vous la déposez. Il n\'y a aucune étape de re-compression où un serveur écrase votre fichier en un JPEG générique pour économiser de la bande passante ; vous obtenez exactement la résolution et le format demandés.',
+      },
+      {
+        type: 'p',
+        text: 'La latence s\'accumule. Un outil cloud passe des secondes à envoyer les données, des secondes à attendre dans une file d\'attente derrière d\'autres utilisateurs, des secondes à traiter et des secondes à télécharger. Un outil local consacre ces mêmes secondes uniquement au traitement, et sur un ordinateur portable moderne avec l\'accélération matérielle activée, le « traitement » est souvent la plus courte des quatre étapes. Pour une seule photo, la différence ressemble à de la réactivité. Pour un lot de cinquante photos de produits, c\'est la différence entre terminer avant le déjeuner ou abandonner l\'onglet.',
+      },
+      {
+        type: 'callout',
+        title: 'Le test hors-ligne',
+        text: 'Chargez Pixelify une fois, puis coupez votre connexion réseau. Toutes les fonctionnalités fonctionnent toujours. Ce simple test sépare le traitement local de la comédie de la confidentialité de manière bien plus fiable que n\'importe quelle page de politique.',
+      },
+      { type: 'h2', text: 'Ce que signifie réellement « s\'exécute localement » : la version honnête' },
+      {
+        type: 'p',
+        text: 'L\'honnêteté importe plus que le battage médiatique, voici donc ce qui se passe réellement. Les réseaux neuronaux sont de grands fichiers de nombres. Votre navigateur récupère ce fichier une fois, de la même manière qu\'il chargerait des ressources pour un jeu vidéo, et le conserve en cache pour que les visites ultérieures ne le re-téléchargent pas. Lorsque vous traitez une image, le navigateur fait passer vos pixels à travers ces chiffres en utilisant votre matériel graphique. Sur les machines prenant en charge les API modernes de calcul GPU, les opérations lourdes s\'exécutent sur la puce graphique — la même puce qui affiche les jeux —, c\'est pourquoi les résultats apparaissent en quelques secondes plutôt qu\'en quelques minutes.',
+      },
+      {
+        type: 'p',
+        text: 'Ce qui ne se produit pas : votre photo n\'est envoyée nulle part, aucune copie n\'est conservée et rien concernant votre image n\'est enregistré dans un journal de données. Le « modèle » dans cette architecture ne vous voit jamais ; c\'est un ensemble fixe d\'instructions qui s\'exécute de la même manière pour tout le monde, et il n\'a aucun canal pour transmettre vos données vers l\'extérieur. Cette architecture garantit également une dégradation progressive : sur du matériel plus ancien, l\'outil bascule sur un calcul CPU plus lent au lieu de refuser de fonctionner.',
+      },
+      { type: 'h2', text: 'Les compromis que nous avons acceptés volontairement' },
+      {
+        type: 'p',
+        text: 'Une conception axée sur le local comporte de vrais coûts, et prétendre le contraire trahirait tout le principe. Les nouveaux utilisateurs doivent attendre pendant le téléchargement des fichiers réseau — généralement quelques dizaines de mégaoctets — avant d\'obtenir leur premier résultat. La vitesse de traitement dépend entièrement de votre matériel : un téléphone vieux de cinq ans sera plus lent qu\'un ordinateur de bureau équipé d\'un GPU dédié, car il n\'y a aucun serveur distant auquel emprunter de la puissance. Les très grandes images sont limitées par la mémoire de votre appareil plutôt que par celle d\'un centre de données. Et les outils cloud peuvent déployer un nouveau réseau du jour au lendemain ; nous en déployons un lorsqu\'il est testé et intégré.',
+      },
+      {
+        type: 'p',
+        text: 'Nous avons accepté ces coûts parce que l\'alternative échange un inconvénient de temps d\'attente contre une exposition illimitée de la vie privée, et parce que l\'écart matériel se réduit chaque année. Les navigateurs exploitent désormais le calcul GPU qui était exclusif aux applications de bureau il y a cinq ans. Les téléphones intègrent aujourd\'hui plus de capacité de calcul neuronal que les ordinateurs portables d\'il y a deux ans. Toutes les tendances matérielles indiquent que l\'option locale devient plus rapide, tandis que la vitesse de l\'option cloud reste limitée par la bande passante de votre connexion.',
+      },
+      { type: 'h2', text: 'À qui s\'adresse réellement cet outil' },
+      {
+        type: 'p',
+        text: 'Aux photographes retouchant le travail de leurs clients sous accord de confidentialité. Aux agences gérant des photos de produits non encore révélés. Aux journalistes traitant des images provenant de sources confidentielles. Aux enseignants et parents améliorant les photos d\'école des enfants. À toute personne ayant déjà hésité devant une zone de téléversement avec un pressentiment difficile à formuler. Cette hésitation est rationnelle. Pixelify est conçu pour que cette hésitation ne soit plus jamais nécessaire — non pas parce que nous vous demandons une confiance aveugle, mais parce qu\'il n\'y a tout simplement plus rien à devoir confier.',
+      },
+      {
+        type: 'p',
+        text: 'Voilà toute la philosophie du produit. Pas « vos données sont en sécurité chez nous », mais « vos données ne sont pas chez nous ». Pas une meilleure politique de confidentialité, mais l\'absence totale de besoin d\'une politique. Glissez une image dans la page, regardez-la s\'améliorer, téléchargez-la, fermez l\'onglet et sachez que l\'histoire de cette photo n\'a jamais quitté la pièce où elle a été prise. En 2026, cela ne devrait plus sembler radical. Nous avons créé Pixelify parce que c\'est pourtant encore le cas.',
+      },
+    ],
+  },
+
+{
   "slug": "enable_webgpu_guide_b5c9e8",
   "title": "Activer WebGPU : Le changement de deux minutes qui accélère considérablement l'IA dans le navigateur",
   "description": "WebGPU permet à l'IA basée sur navigateur de s'exécuter sur votre puce graphique plutôt que sur votre CPU, souvent 5 à 10 fois plus vite. Un guide navigateur par navigateur pour l'activer, plus comment confirmer son fonctionnement via le badge du moteur dans les paramètres.",

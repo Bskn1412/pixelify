@@ -581,7 +581,9 @@ export default function UploadArea({
                 text-white/20
               "
             >
-              PNG, JPEG, WEBP · up to {maxSizeMB}MB · Ctrl + V to paste
+              {t.uploadArea?.pasteHint
+                ? t.uploadArea.pasteHint.replace('{maxSizeMB}', String(maxSizeMB))
+                : `PNG, JPEG, WEBP · up to ${maxSizeMB}MB · Ctrl + V to paste`}
             </p>
           )}
         </div>

@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { getAllPosts, postPath, LANGUAGES } from '@/data/posts';
+import { SITE_LANGUAGES } from '@/lib/i18n';
 import { SITE_URL } from '@/lib/seo';
 
 export const dynamic = 'force-static';
@@ -15,6 +16,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/privacy/',
     '/terms/',
     '/story/',
+    '/contact/',
+    '/docs/',
   ];
 
   const staticEntries: MetadataRoute.Sitemap = staticRoutes.map((path) => ({
@@ -23,6 +26,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: path === '' ? 'weekly' : 'monthly',
     priority: path === '' ? 1 : path.startsWith('/upscaler') || path.startsWith('/bg_remove') || path.startsWith('/blogs') ? 0.9 : 0.5,
   }));
+
+  // Localized routes for all pages: /<lang>/, /<lang>/upscaler/, etc.
+  const localizedEntries: MetadataRoute.Sitemap = SITE_LANGUAGES.flatMap((lang) =>
+    staticRoutes.map((path) => ({
+      url: `${SITE_URL}/${lang.code}${path ? path : '/'}`,
+      lastModified: new Date(),
+      changeFrequency: path === '' ? 'weekly' : 'monthly',
+      priority: path === '' ? 0.9 : 0.7,
+    }))
+  );
 
   // Localized blog index pages: /blogs/<lang>/
   const langIndexEntries: MetadataRoute.Sitemap = LANGUAGES.map((lang) => ({
@@ -39,5 +52,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticEntries, ...langIndexEntries, ...postEntries];
+  return [...staticEntries, ...localizedEntries, ...langIndexEntries, ...postEntries];
 }

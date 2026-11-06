@@ -1,8 +1,11 @@
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { MessageSquare, ArrowRight } from 'lucide-react';
 import type { ViewTab } from '../types';
 import { useTranslation } from '../locales';
+import { useApp } from './AppProvider';
+import { SITE_LANGUAGES } from '../lib/i18n';
 
 interface FooterProps {
   onTabChange: (tab: ViewTab) => void;
@@ -10,6 +13,34 @@ interface FooterProps {
 
 export default function Footer({ onTabChange }: FooterProps) {
   const { t } = useTranslation();
+  const { currentLang } = useApp();
+  const pathname = usePathname();
+
+  const getLangHref = (path: string) => {
+    let clean = path.replace(/^\//, '');
+    let hash = '';
+    const hashIndex = clean.indexOf('#');
+    if (hashIndex !== -1) {
+      hash = clean.slice(hashIndex);
+      clean = clean.slice(0, hashIndex);
+    }
+
+    let prefix = '';
+    if (pathname) {
+      const segs = pathname.replace(/^\//, '').split('/').filter(Boolean);
+      if (segs[0] && SITE_LANGUAGES.some((l) => l.code === segs[0])) {
+        prefix = `/${segs[0]}`;
+      }
+    }
+    if (!prefix && currentLang && currentLang !== 'en') {
+      prefix = `/${currentLang}`;
+    }
+
+    if (clean === '') {
+      return prefix ? `${prefix}/${hash}` : `/${hash}`;
+    }
+    return prefix ? `${prefix}/${clean}/${hash}` : `/${clean}/${hash}`;
+  };
 
   return (
     <footer className="w-full border-t border-white/10 pt-8 sm:pt-10 pb-8 sm:pb-10 bg-neutral-950/80 backdrop-blur-2xl relative z-10 select-none">
@@ -26,7 +57,7 @@ export default function Footer({ onTabChange }: FooterProps) {
             {/* CONTACT & FEEDBACK CALLOUT */}
             <div className="pt-1 sm:pt-2">
               <Link
-                href="/contact"
+                href={getLangHref('/contact')}
                 className="group flex items-center justify-between gap-3 p-2.5 sm:p-3 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] hover:border-white/25 transition-all duration-300 shadow-sm hover:shadow-[0_0_20px_rgba(255,255,255,0.06)] max-w-sm"
               >
                 <div className="flex items-center gap-3 min-w-0">
@@ -55,25 +86,25 @@ export default function Footer({ onTabChange }: FooterProps) {
               <h3 className="mb-0.5 text-[11px] font-bold uppercase tracking-wider text-white">{t.footer.productCol}</h3>
               <button onClick={() => onTabChange('upscaler')} className="text-left text-muted transition hover:text-white">{t.footer.upscaler}</button>
               <button onClick={() => onTabChange('bg_remove')} className="text-left text-muted transition hover:text-white">{t.footer.bgRemover}</button>
-              <Link href="/products" className="text-muted transition hover:text-white">{t.footer.products}</Link>
+              <Link href={getLangHref('/products')} className="text-muted transition hover:text-white">{t.footer.products}</Link>
             </nav>
 
             <nav aria-label="Resources links" className="flex flex-col items-start gap-2.5">
               <h3 className="mb-0.5 text-[11px] font-bold uppercase tracking-wider text-white">{t.footer.resourcesCol}</h3>
-              <Link href="/docs" className="text-muted transition hover:text-white">{t.footer.docs}</Link>
+              <Link href={getLangHref('/docs')} className="text-muted transition hover:text-white">{t.footer.docs}</Link>
               <button onClick={() => onTabChange('blogs')} className="text-left text-muted transition hover:text-white">{t.footer.blogs}</button>
-              <Link href="/#home-faq" className="text-muted transition hover:text-white">{t.footer.faqs}</Link>
-              <Link href="/products#requirements" className="text-muted transition hover:text-white">{t.footer.sysReq}</Link>
+              <Link href={getLangHref('/#home-faq')} className="text-muted transition hover:text-white">{t.footer.faqs}</Link>
+              <Link href={getLangHref('/products#requirements')} className="text-muted transition hover:text-white">{t.footer.sysReq}</Link>
             </nav>
 
             <nav aria-label="Company and legal links" className="flex flex-col items-start gap-2.5">
               <h3 className="mb-0.5 text-[11px] font-bold uppercase tracking-wider text-white">{t.footer.companyCol}</h3>
-              <Link href="/about" className="text-muted transition hover:text-white">{t.footer.about}</Link>
-              <Link href="/contact" className="text-muted transition hover:text-white">{t.footer.contact}</Link>
+              <Link href={getLangHref('/about')} className="text-muted transition hover:text-white">{t.footer.about}</Link>
+              <Link href={getLangHref('/contact')} className="text-muted transition hover:text-white">{t.footer.contact}</Link>
               <div className="mt-3 flex flex-col items-start gap-2.5 border-t border-white/10 pt-3">
                 <h4 className="text-[10px] font-bold uppercase tracking-wider text-white">{t.footer.legalCol}</h4>
-                <Link href="/privacy" className="text-muted transition hover:text-white">{t.footer.privacy}</Link>
-                <Link href="/terms" className="text-muted transition hover:text-white">{t.footer.terms}</Link>
+                <Link href={getLangHref('/privacy')} className="text-muted transition hover:text-white">{t.footer.privacy}</Link>
+                <Link href={getLangHref('/terms')} className="text-muted transition hover:text-white">{t.footer.terms}</Link>
               </div>
             </nav>
 

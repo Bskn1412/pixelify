@@ -89,6 +89,11 @@ export const UpscaleJourney: React.FC = () => {
   const [active, setActive] = useState(0);
   const { t } = useTranslation();
 
+  const meterInputLocked = t.upscaleJourney?.meterInputLocked || 'Input locked';
+  const meterModelWarmup = t.upscaleJourney?.meterModelWarmup || 'Model warm-up';
+  const meterPassSelected = t.upscaleJourney?.meterPassSelected || 'Pass selected · 4×';
+  const meterWebgpuTiles = t.upscaleJourney?.meterWebgpuTiles || 'WebGPU tiles';
+
   const steps: JourneyStep[] = useMemo(() => [
     {
       id: 'upload',
@@ -100,8 +105,8 @@ export const UpscaleJourney: React.FC = () => {
       imgAlt: 'Original porsche photo being dropped in',
       readout: t.upscaleJourney.step1Status || 'READY',
       meter: [
-        { label: 'Input locked', pct: 100 },
-        { label: 'Model warm-up', pct: 12 },
+        { label: meterInputLocked, pct: 100 },
+        { label: meterModelWarmup, pct: 12 },
       ],
     },
     {
@@ -114,9 +119,9 @@ export const UpscaleJourney: React.FC = () => {
       imgAlt: 'Porsche mid-enhancement',
       readout: t.upscaleJourney.step2Status || 'TUNING',
       meter: [
-        { label: 'Input locked', pct: 100 },
-        { label: 'Model warm-up', pct: 100 },
-        { label: 'Pass selected · 4×', pct: 64 },
+        { label: meterInputLocked, pct: 100 },
+        { label: meterModelWarmup, pct: 100 },
+        { label: meterPassSelected, pct: 64 },
       ],
     },
     {
@@ -129,10 +134,10 @@ export const UpscaleJourney: React.FC = () => {
       imgAlt: 'Porsche processing on device',
       readout: t.upscaleJourney.step3Status || 'INFERENCE',
       meter: [
-        { label: 'Input locked', pct: 100 },
-        { label: 'Model warm-up', pct: 100 },
-        { label: 'Pass selected · 4×', pct: 100 },
-        { label: 'WebGPU tiles', pct: 78 },
+        { label: meterInputLocked, pct: 100 },
+        { label: meterModelWarmup, pct: 100 },
+        { label: meterPassSelected, pct: 100 },
+        { label: meterWebgpuTiles, pct: 78 },
       ],
     },
     {
@@ -145,13 +150,13 @@ export const UpscaleJourney: React.FC = () => {
       imgAlt: 'Porsche fully upscaled 4x',
       readout: t.upscaleJourney.step4Status || 'SAVED',
       meter: [
-        { label: 'Input locked', pct: 100 },
-        { label: 'Model warm-up', pct: 100 },
-        { label: 'Pass selected · 4×', pct: 100 },
-        { label: 'WebGPU tiles', pct: 100 },
+        { label: meterInputLocked, pct: 100 },
+        { label: meterModelWarmup, pct: 100 },
+        { label: meterPassSelected, pct: 100 },
+        { label: meterWebgpuTiles, pct: 100 },
       ],
     },
-  ], [t]);
+  ], [t, meterInputLocked, meterModelWarmup, meterPassSelected, meterWebgpuTiles]);
 
   /* --- section reveal: the title uses .pb-reveal (opacity 0 until
      .pb-in lands on this root). Without this the headline stays

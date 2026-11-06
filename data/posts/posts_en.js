@@ -4,6 +4,102 @@
  */
 export const POSTS_EN = [
 {
+    slug: 'pixelify_privacy_first_a7f3d9',
+    title: 'Pixelify: Why We Built an Image Editor That Never Sees Your Photos',
+    description:
+      'Every other image tool wants your upload first and promises privacy later. Pixelify was designed the opposite way: the AI runs inside your browser tab, so your photos never leave the device in the first place.',
+    tags: ['Privacy', 'Local AI', 'Product'],
+    date: '2026-11-06',
+    author: 'The Pixelify Team',
+    cover: '/blogs/story-page.jpg',
+    coverAlt: 'Pixelify story page showing the words PIXELIFY LOCAL AI FOR YOUR',
+    blocks: [
+      {
+        type: 'p',
+        text: 'You have a photo you want to fix. Maybe it is a screenshot that will not look right in a slide deck, a scanned family portrait from the nineties, or a product shot with a cluttered background. So you type "upscale image" into a search engine, click the first free result, and hit upload. Within seconds the photo is on a server you have never heard of, owned by a company you have never heard of, under a privacy policy you did not read. That is the moment the photo stopped being entirely yours.',
+      },
+      {
+        type: 'p',
+        text: 'It does not have to work that way. Pixelify was built on a single, stubborn idea: image processing is arithmetic, and arithmetic can happen on your machine. When the processing happens in your browser tab, "privacy" stops being a paragraph in a policy document and becomes a property of the system. There is no upload step because there is nothing to upload to. The photo you dropped into the page is the same photo that gets enhanced, and it never takes a trip across the network to do it.',
+      },
+      { type: 'h2', text: 'The upload habit is a privacy decision you never made' },
+      {
+        type: 'p',
+        text: 'Free cloud image tools are not free because the compute is cheap. They are free because your uploads are subsidized by something else: advertising, data enrichment, model training, or simple acquisition of a user base that can be monetized later. None of that is hypothetical. Terms-of-service clauses that claim broad rights to process, store, and derive data from uploaded content are standard boilerplate across the industry, and "your data is encrypted in transit" tells you nothing about what happens after it lands.',
+      },
+      {
+        type: 'p',
+        text: 'There is a second, quieter cost. A photo is metadata. The time it was taken, the device it was taken on, sometimes the coordinates it was taken at. It can contain faces, documents left on a desk in the background, a whiteboard with internal notes, or a child who cannot consent to becoming training data. People intuitively understand that a passport scan is sensitive. Fewer people realize that a casual photo of a laptop screen can leak an API key that is still visible in a terminal window.',
+      },
+      {
+        type: 'ul',
+        items: [
+          'An upload is a copy, and copies outlive your session. "We delete files after 24 hours" is a promise, not a mechanism.',
+          'Servers get breached. The breach that matters is the one where your original, unedited photos were retained "to improve the service."',
+          'Account deletion and data deletion are different processes. One removes your login; the other is often not implemented at all.',
+          'A tool that must receive your photo can be compelled, subpoenaed, or sold. A tool that never receives it cannot.',
+        ],
+      },
+      { type: 'h2', text: 'Pixelify inverts the pipeline' },
+      {
+        type: 'p',
+        text: 'In a cloud pipeline, your photo is the input to someone else\'s program. In Pixelify, the program is the input to your device. When you open the upscaler or the background remover, your browser downloads the neural network itself, the actual math that does the work, and caches it locally. From that point on, every image you process is multiplied, segmented, and reconstructed in your own memory, by your own processor, under your own control.',
+      },
+      {
+        type: 'img',
+        src: '/blogs/home-hero.jpg',
+        alt: 'Pixelify home page hero with the tagline Upscale, restore, and transform your images locally',
+        caption: 'The promise on the tin: local processing, no uploads, no cloud.',
+      },
+      {
+        type: 'p',
+        text: 'This is not a marketing reinterpretation of cloud processing with a nicer logo. Open your browser\'s network inspector while Pixelify processes an image and watch it yourself: the only traffic is the initial page load and the one-time download of the network files. Drop an image in, upscale it, download the result, and the bytes of your photo stay inside the tab. You can disconnect from Wi-Fi after the page loads and the tools keep working. That is the test most "private" tools fail.',
+      },
+      { type: 'h2', text: 'Privacy is not the only benefit; it is the enabling one' },
+      {
+        type: 'p',
+        text: 'Local processing changes the economics of the whole experience, and users notice the side effects before they notice the privacy. There is no queue, because there is no shared server to queue at; your GPU is the only worker, and it works exclusively for you. There is no upload wait: a 4 MB photo that would take time to send over a mobile connection starts processing the instant you drop it. There is no re-compression step where a server flattens your file into a generic JPEG to save bandwidth; you get the resolution and format you asked for.',
+      },
+      {
+        type: 'p',
+        text: 'Latency compounds. A cloud tool spends seconds uploading, seconds waiting in a queue behind other users, seconds processing, and seconds downloading. A local tool spends those same seconds processing, and on a modern laptop with hardware acceleration enabled, "processing" is often the shortest of the four. For a single photo, the difference feels like snappiness. For a batch of fifty product shots, it is the difference between finishing before lunch and abandoning the tab.',
+      },
+      {
+        type: 'callout',
+        title: 'The offline test',
+        text: 'Load Pixelify once, then turn off your network. Every feature still works. That single test separates local processing from privacy theatre more reliably than any policy page.',
+      },
+      { type: 'h2', text: 'What "runs locally" actually means: the honest version' },
+      {
+        type: 'p',
+        text: 'Honesty matters more than hype here, so here is what is really happening. Neural networks are large files of numbers. Your browser fetches that file once, the same way it fetches a video game asset, and stores it in a cache so repeat visits do not redownload it. When you process an image, the browser feeds your pixels through those numbers using your graphics hardware. On machines that support modern GPU compute APIs, the heavy math runs on the graphics chip, the same chip that renders games, which is why results appear in seconds rather than minutes.',
+      },
+      {
+        type: 'p',
+        text: 'What does not happen: your photo is not sent anywhere, no copy is kept, and nothing about your image is logged. The "model" in this story never sees you; it is a fixed set of instructions that runs the same way for everyone, and it has no channel to phone home with your data. This architecture also means the tool degrades gracefully: on older hardware it falls back to slower CPU computation instead of refusing to work.',
+      },
+      { type: 'h2', text: 'The trade-offs we accepted on purpose' },
+      {
+        type: 'p',
+        text: 'A local-first design has real costs, and pretending otherwise would betray the whole premise. First-visit users wait while the network files download, typically tens of megabytes, before their first result. Processing speed depends on hardware: a five-year-old phone will be slower than a desktop with a discrete GPU, because there is no remote server to borrow speed from. Very large images are constrained by your device\'s memory rather than a data center\'s. And cloud tools can ship a new network overnight; we ship one when it is tested and bundled.',
+      },
+      {
+        type: 'p',
+        text: 'We accepted those costs because the alternative trades a waiting-time inconvenience for an unbounded privacy exposure, and because the hardware gap closes every year. Browsers now expose GPU compute that was exclusive to desktop apps five years ago. Phones ship with more neural compute than laptops did two years ago. Every hardware trend points toward the local option getting faster, while the cloud option\'s speed is capped by how much bandwidth your connection can afford.',
+      },
+      { type: 'h2', text: 'Who this is actually for' },
+      {
+        type: 'p',
+        text: 'Photographers retouching client work under NDAs. Agencies handling unreleased product shots. Journalists processing images from sources. Teachers and parents enhancing school photos of children. Anyone who has ever hesitated over an upload box with a gut feeling they could not quite articulate. That hesitation is rational. Pixelify is built so the hesitation is never needed again, not because we asked you to trust us harder, but because there is simply nothing left to trust.',
+      },
+      {
+        type: 'p',
+        text: 'That is the whole product philosophy. Not "your data is safe with us," but "your data is not with us." Not a better policy, but no policy needed. Drop an image into the page, watch it get better, download it, close the tab, and know that the story of that photo never left the room it was taken in. In 2026 that should not feel radical. We built Pixelify because it still does.',
+      },
+    ],
+  },
+
+{
   "slug": "enable_webgpu_guide_b5c9e8",
   "title": "Enable WebGPU: The Two-Minute Change That Makes Browser AI Much Faster",
   "description": "WebGPU lets browser-based AI run on your graphics chip instead of your CPU, often 5–10× faster. A browser-by-browser guide to turning it on, plus how to confirm it worked using the engine badge in settings.",

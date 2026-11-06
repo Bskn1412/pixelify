@@ -81,7 +81,7 @@ export const DEFAULT_WORDS: WordConfig[] = [
   { text: "images", accent: true, pos: "right" },
 
   // 2. "next upscale word below your untill word without"
-  { text: "upscale", accent: true, pos: "below", relativeTo: "your" },
+  { text: "upscale", accent: true, pos: "below", relativeTo: 4 },
   { text: "restore", accent: false, pos: "below" },
   { text: "enhance", accent: true, pos: "below" },
   { text: "without", accent: false, pos: "below" },
@@ -90,15 +90,15 @@ export const DEFAULT_WORDS: WordConfig[] = [
   { text: "uploading", accent: false, pos: "right" },
 
   // 4. "next words(anything, to, the, cloud) below the word without, but the cloud as one line like after word the right side of it word cloud."
-  { text: "anything", accent: true, pos: "below", relativeTo: "without" },
+  { text: "anything", accent: true, pos: "below", relativeTo: 9 },
   { text: "to", accent: false, pos: "below" },
   { text: "the", accent: false, pos: "below" },
   { text: "cloud", accent: true, pos: "right" },
 
   // 5. "next words goes below the cloud, (your, pixels) one right to other like after word your right side of it word pixels and words stay and yours one below one."
-  { text: "your", accent: false, pos: "below", relativeTo: "the" },
+  { text: "your", accent: false, pos: "below", relativeTo: 13 },
   { text: "pixels", accent: true, pos: "right" },
-  { text: "stay", accent: false, pos: "below", relativeTo: "your" },
+  { text: "stay", accent: false, pos: "below", relativeTo: 15 },
   { text: "yours", accent: true, pos: "below" },
 ];
 

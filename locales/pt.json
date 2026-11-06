@@ -208,7 +208,11 @@
     "step4Desc": "Baixe arquivos na resolução total sem marcas d'água ou compressões agressivas.",
     "step4Status": "SALVO",
     "titleLead": "Quatro passos.",
-    "titleItalic": "Qualidade de estúdio."
+    "titleItalic": "Qualidade de estúdio.",
+    "meterInputLocked": "Entrada fixada",
+    "meterModelWarmup": "Aquecimento do modelo",
+    "meterPassSelected": "Passagem selecionada · 4×",
+    "meterWebgpuTiles": "Tiles WebGPU"
   },
   "upscaleFaq": {
     "titlePrefix": "Perguntas",
@@ -409,7 +413,8 @@
     "cutoutDesc": "Arraste suas imagens aqui para iniciar o recorte\nSelecione arquivos PNG, JPG ou WebP com menos de 20MB.",
     "uploadMedia": "Enviar mídia",
     "processing": "Processando...",
-    "remove": "Remover"
+    "remove": "Remover",
+    "pasteHint": "PNG, JPEG, WEBP · até {maxSizeMB}MB · Ctrl + V para colar"
   },
   "bgRemoverSection": {
     "titlePrefix": "Remoção precisa de fundo",
@@ -601,6 +606,7 @@
       "enviar",
       "nada",
       "para",
+      "a",
       "nuvem",
       "seus",
       "pixels",
@@ -753,5 +759,25 @@
     "PNG transparente",
     "Sem cadastro",
     "Execuções ilimitadas"
-  ]
+  ],
+  "testimonials": {
+    "eyebrow": "A VOZ JÁ CORREU",
+    "titlePrefix": "Amado por artistas digitais, ",
+    "titleAccent": "estúdios e desenvolvedores",
+    "description": "Criadores reais compartilhando por que abandonaram assinaturas em nuvem por um processamento neural rápido e privado no navegador."
+  },
+  "modelStatus": {
+    "standardMode": "Modo padrão: {reason}",
+    "downloadingBg": "Baixando modelo de remoção de fundo ({pct}%)",
+    "preparingBg": "Preparando modelo de remoção de fundo",
+    "checkingGraphics": "Verificando adaptador gráfico",
+    "bgPreloadFailed": "Falha no pré-carregamento do modelo; tentará novamente ao usar",
+    "preparingUpscaler": "Preparando modelo de upscaler",
+    "preparingUpscalerPct": "Preparando modelo de upscaler ({pct}%)",
+    "upscalerPreloadFailed": "Falha no pré-carregamento do upscaler; tentará novamente ao usar",
+    "modelsReady": "Modelos de IA padrão estão prontos no navegador",
+    "upscalerReady": "Modelo upscaler pronto; outros modelos carregam ao usar",
+    "modelsCleared": "Modelos limpos; serão baixados novamente quando necessários",
+    "preparingBackground": "Preparando modelos de IA em segundo plano"
+  }
 }

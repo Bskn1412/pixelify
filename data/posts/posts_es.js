@@ -4,6 +4,123 @@
  */
 export const POSTS_ES = [
 {
+  "slug": "pixelify_privacy_first_a7f3d9",
+  "title": "Pixelify: Por qué creamos un editor de imágenes que nunca ve tus fotos",
+  "description": "Todas las demás herramientas de imagen exigen primero tu subida y prometen privacidad después. Pixelify se diseñó de forma opuesta: la IA se ejecuta dentro de la pestaña de tu navegador, por lo que tus fotos nunca salen de tu dispositivo.",
+  "tags": [
+    "Privacidad",
+    "IA Local",
+    "Producto"
+  ],
+  "date": "2026-11-06",
+  "author": "El equipo de Pixelify",
+  "cover": "/blogs/story-page.jpg",
+  "coverAlt": "Página de historia de Pixelify mostrando las palabras PIXELIFY IA LOCAL PARA TUS",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "Tienes una foto que quieres retocar. Tal vez sea una captura de pantalla que no encaja bien en una presentación, un retrato familiar escaneado de los años noventa o la foto de un producto con un fondo desordenado. Buscas \"escalar imagen con IA\" en la web, haces clic en el primer resultado gratuito y pulsas subir. En cuestión de segundos, la foto está en un servidor del que nunca has oído hablar, propiedad de una empresa que no conoces, bajo una política de privacidad que no leíste. En ese instante, la foto dejó de ser completamente tuya."
+    },
+    {
+      "type": "p",
+      "text": "No tiene por qué ser así. Pixelify se construyó sobre una idea simple y firme: el procesamiento de imágenes es matemática, y la matemática puede ejecutarse en tu propio equipo. Cuando el procesamiento ocurre dentro de la pestaña de tu navegador, la \"privacidad\" deja de ser un párrafo en un documento legal y se convierte en una propiedad técnica del sistema. No hay paso de subida porque no hay ningún servidor al que subir nada. La foto que arrastras a la página es la misma que se mejora, y nunca viaja por la red para lograrlo."
+    },
+    {
+      "type": "h2",
+      "text": "El hábito de subir archivos es una decisión de privacidad que nunca tomaste conscientemente"
+    },
+    {
+      "type": "p",
+      "text": "Las herramientas gratuitas en la nube no son gratuitas porque el procesamiento sea barato. Son gratuitas porque tus subidas están subvencionadas por otra cosa: publicidad, enriquecimiento de datos, entrenamiento de modelos o captación de una base de usuarios monetizable en el futuro. Nada de esto es hipotético. Las cláusulas de términos de servicio que reclaman amplios derechos para procesar, almacenar y derivar datos del contenido subido son comunes en la industria, y que \"tus datos estén cifrados en tránsito\" no te dice nada sobre lo que ocurre cuando llegan al servidor."
+    },
+    {
+      "type": "p",
+      "text": "Hay un segundo costo más silencioso. Una foto contiene metadatos: la hora a la que se tomó, el dispositivo utilizado, a menudo las coordenadas geográficas exactas. Puede contener rostros, documentos olvidados en un escritorio al fondo, una pizarra con notas internas o un menor que no puede consentir convertirse en datos de entrenamiento. La gente comprende intuitivamente que un pasaporte es sensible; pocos se dan cuenta de que una foto casual de una pantalla puede filtrar una clave de API visible en una consola de comandos."
+    },
+    {
+      "type": "ul",
+      "items": [
+        "Una subida es una copia, y las copias sobreviven a tu sesión. \"Borramos los archivos tras 24 horas\" es una promesa, no un mecanismo técnico verificable.",
+        "Los servidores sufren brechas de seguridad. La brecha peligrosa es aquella donde tus fotos originales y sin editar quedaron archivadas para \"mejorar el servicio\".",
+        "La eliminación de cuentas y la eliminación de datos son procesos distintos. Uno borra tu acceso; el otro a menudo ni siquiera está implementado.",
+        "Una herramienta que recibe tus fotos puede ser intervenida, requerida judicialmente o vendida a terceros. Una herramienta que nunca las recibe es inmune a todo ello."
+      ]
+    },
+    {
+      "type": "h2",
+      "text": "Pixelify invierte el flujo de trabajo"
+    },
+    {
+      "type": "p",
+      "text": "En una arquitectura en la nube, tu foto es la entrada para el programa de otra persona. En Pixelify, el programa es la entrada para tu propio dispositivo. Cuando abres el escalador o el eliminador de fondos, tu navegador descarga la red neuronal en sí —los algoritmos matemáticos que hacen el trabajo— y la almacena localmente en caché. A partir de ese momento, cada imagen que procesas se multiplica, segmenta y reconstruye en tu propia memoria RAM y GPU, bajo tu control exclusivo."
+    },
+    {
+      "type": "img",
+      "src": "/blogs/home-hero.jpg",
+      "alt": "Portada de Pixelify con el lema Escala, restaura y transforma tus imágenes localmente",
+      "caption": "Nuestra promesa fundamental: procesamiento 100% local, sin subidas, sin servidores en la nube."
+    },
+    {
+      "type": "p",
+      "text": "Esto no es una reinterpretación de marketing con un logotipo bonito. Abre el inspector de red de tu navegador mientras Pixelify procesa una imagen y compruébalo tú mismo: el único tráfico es la carga inicial de la página y la descarga de los pesos del modelo. Arrastra una imagen, escálala, descarga el resultado: los bytes de tu foto nunca abandonan la pestaña. Puedes desconectar el Wi-Fi tras cargar la web y las herramientas siguen funcionando perfectamente. Esa es la prueba que la mayoría de herramientas \"privadas\" no superan."
+    },
+    {
+      "type": "h2",
+      "text": "La privacidad no es la única ventaja; es la que hace posible todo lo demás"
+    },
+    {
+      "type": "p",
+      "text": "El procesamiento local transforma por completo la agilidad del servicio. No hay colas de espera, porque no hay un servidor compartido con otros usuarios; tu GPU trabaja exclusivamente para ti. No hay tiempos muertos de subida: una foto de 4 MB que tardaría segundos en enviarse mediante una conexión móvil empieza a procesarse en el instante exacto en que la sueltas. No hay recompresión destructiva donde un servidor reduce tu archivo a un JPEG genérico para ahorrar ancho de banda; obtienes exactamente la resolución y formato solicitados."
+    },
+    {
+      "type": "p",
+      "text": "La latencia se acumula. Una herramienta en la nube gasta segundos subiendo, segundos en cola, segundos procesando y segundos descargando. Una herramienta local invierte esos mismos segundos exclusivamente en procesamiento; y en un equipo moderno con aceleración por hardware WebGPU, el procesamiento suele ser el paso más rápido. Para una sola foto, la diferencia es agilidad instantánea. Para un lote de cincuenta fotos de catálogo, es la diferencia entre terminar antes del almuerzo o abandonar la pestaña por frustración."
+    },
+    {
+      "type": "callout",
+      "title": "La prueba offline",
+      "text": "Carga Pixelify una vez y desconecta internet. Todas las funciones siguen operativas. Esta sencilla prueba distingue el procesamiento verdaderamente local del teatro de la privacidad con mucha más fiabilidad que cualquier página de políticas."
+    },
+    {
+      "type": "h2",
+      "text": "Qué significa realmente \"ejecutarse localmente\": la explicación honesta"
+    },
+    {
+      "type": "p",
+      "text": "La honestidad es más valiosa que las promesas vacías, así que explicamos con precisión lo que sucede. Las redes neuronales son archivos con millones de coeficientes matemáticos. Tu navegador descarga ese archivo una sola vez, igual que descarga un recurso multimedia, y lo guarda en su caché local. Cuando editas una foto, el navegador pasa tus píxeles a través de esas matrices numéricas utilizando tu hardware gráfico. En dispositivos compatibles con WebGPU, este cálculo intensivo se ejecuta directamente en la GPU, permitiendo resultados en cuestión de segundos."
+    },
+    {
+      "type": "p",
+      "text": "Lo que nunca ocurre: tu foto no se transmite a ningún lugar, no se almacena ninguna copia y no se registra ninguna huella de tus imágenes. El modelo nunca te identifica; es un conjunto fijo de instrucciones que se ejecuta de forma idéntica para todos, sin canales para enviar datos al exterior. Además, la arquitectura se adapta con elegancia: en equipos más antiguos recurre a WebAssembly (CPU) en lugar de negarse a funcionar."
+    },
+    {
+      "type": "h2",
+      "text": "Los compromisos que aceptamos deliberadamente"
+    },
+    {
+      "type": "p",
+      "text": "Un diseño enfocado en lo local implica retos reales, y fingir lo contrario iría en contra de nuestros principios. En la primera visita, los usuarios esperan mientras se descargan los archivos del modelo (generalmente unas decenas de megabytes). La velocidad depende de tu equipo: un teléfono de hace cinco años será más lento que un ordenador con tarjeta gráfica dedicada. Las imágenes gigantes están limitadas por la memoria de tu dispositivo y no por la de un centro de datos. Y mientras los servicios cloud actualizan modelos de un día para otro, nosotros los lanzamos cuando están rigurosamente probados y optimizados."
+    },
+    {
+      "type": "p",
+      "text": "Aceptamos estos compromisos porque la alternativa cambia una pequeña espera inicial por una exposición de privacidad ilimitada en el tiempo, y porque la brecha de hardware se reduce cada año. Los navegadores actuales ofrecen capacidades de cómputo gráfico que hace cinco años eran exclusivas del software de escritorio nativo. La evolución del hardware beneficia al enfoque local haciéndolo cada vez más rápido, mientras que el modelo en la nube siempre estará limitado por el ancho de banda."
+    },
+    {
+      "type": "h2",
+      "text": "Para quién está pensado realmente"
+    },
+    {
+      "type": "p",
+      "text": "Fotógrafos que editan material bajo acuerdos de confidencialidad (NDA). Agencias que manejan imágenes de productos antes de su lanzamiento oficial. Periodistas que procesan fotografías de fuentes sensibles. Profesores y familias que mejoran fotos escolares de sus hijos. Y cualquier persona que alguna vez haya dudado frente al botón de subir una foto con una corazonada incómoda. Esa duda es racional. Pixelify fue creado para que esa duda nunca vuelva a ser necesaria."
+    },
+    {
+      "type": "p",
+      "text": "Esa es toda nuestra filosofía de producto. No se trata de decirte \"tus datos están seguros con nosotros\", sino \"nosotros no tenemos tus datos\". No es tener una mejor política, sino no necesitar ninguna. Suelta una imagen en la página, observa cómo mejora, descárgala, cierra la pestaña y ten la certeza absoluta de que la historia de esa foto nunca salió del lugar donde fue tomada. En 2026 esto no debería parecer radical. Construimos Pixelify porque todavía lo es."
+    }
+  ]
+},
+
+{
   "slug": "enable_webgpu_guide_b5c9e8",
   "title": "Habilitar WebGPU: El cambio de dos minutos que acelera enormemente la IA en el navegador",
   "description": "WebGPU permite que la IA basada en navegador se ejecute en tu chip gráfico en lugar de la CPU, a menudo 5–10× más rápido. Una guía paso a paso por navegador para activarlo, más cómo verificar que funcione usando el indicador de motor en la configuración.",

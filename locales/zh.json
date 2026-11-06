@@ -208,7 +208,11 @@
     "step4Desc": "直接下载全分辨率 PNG 或 WebP 文件，没有水印，没有强制压缩。",
     "step4Status": "已保存",
     "titleLead": "四步流程。",
-    "titleItalic": "影棚级品质。"
+    "titleItalic": "影棚级品质。",
+    "meterInputLocked": "输入已就绪",
+    "meterModelWarmup": "模型预热中",
+    "meterPassSelected": "选定轮次 · 4×",
+    "meterWebgpuTiles": "WebGPU 分块运算"
   },
   "upscaleFaq": {
     "titlePrefix": "常见",
@@ -409,7 +413,8 @@
     "cutoutDesc": "将图片拖放至此处开始抠图\n支持小于 20MB 的 PNG、JPG 或 WebP 文件。",
     "uploadMedia": "上传媒体文件",
     "processing": "处理中...",
-    "remove": "移除"
+    "remove": "移除",
+    "pasteHint": "PNG、JPEG、WEBP · 最大 {maxSizeMB}MB · 支持 Ctrl + V 粘贴"
   },
   "bgRemoverSection": {
     "titlePrefix": "高精度智能背景去除",
@@ -596,16 +601,17 @@
       "图片",
       "放大",
       "修复",
-      "画质增强",
+      "增强",
+      "完全",
       "无需",
       "上传",
-      "任何内容",
       "到",
+      "那",
       "云端",
       "您的",
       "像素",
-      "完全",
-      "归您所有"
+      "始终",
+      "归您"
     ]
   },
   "upscaleShowreel": {
@@ -753,5 +759,25 @@
     "透明 PNG 格式",
     "无需登录注册",
     "无限次数运行"
-  ]
+  ],
+  "testimonials": {
+    "eyebrow": "有口皆碑",
+    "titlePrefix": "深受数字艺术家、",
+    "titleAccent": "工作室与开发者的喜爱",
+    "description": "真实创作者分享他们为何放弃云端订阅，转向快速、私密的浏览器端神经网络本地处理。"
+  },
+  "modelStatus": {
+    "standardMode": "标准模式：{reason}",
+    "downloadingBg": "正在下载抠图模型 ({pct}%)",
+    "preparingBg": "正在准备抠图模型",
+    "checkingGraphics": "正在检查图形显卡",
+    "bgPreloadFailed": "抠图模型预加载失败，使用时将重试",
+    "preparingUpscaler": "正在准备超分放大模型",
+    "preparingUpscalerPct": "正在准备超分放大模型 ({pct}%)",
+    "upscalerPreloadFailed": "超分模型预加载失败，使用时将重试",
+    "modelsReady": "默认 AI 模型已就绪",
+    "upscalerReady": "超分模型就绪，其他模型在使用时加载",
+    "modelsCleared": "模型缓存已清理，需要时将重新下载",
+    "preparingBackground": "正在后台准备 AI 模型"
+  }
 }

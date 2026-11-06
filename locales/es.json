@@ -208,7 +208,11 @@
     "step4Desc": "Descarga archivos en resolución completa sin marcas de agua ni compresión forzada.",
     "step4Status": "GUARDADO",
     "titleLead": "Cuatro pasos.",
-    "titleItalic": "Salida de estudio."
+    "titleItalic": "Salida de estudio.",
+    "meterInputLocked": "Entrada bloqueada",
+    "meterModelWarmup": "Calentamiento del modelo",
+    "meterPassSelected": "Pase seleccionado · 4×",
+    "meterWebgpuTiles": "Teselas WebGPU"
   },
   "upscaleFaq": {
     "titlePrefix": "Preguntas",
@@ -409,7 +413,8 @@
     "cutoutDesc": "Arrastra tus imágenes aquí para comenzar el recorte\nSelecciona archivos PNG, JPG o WebP de menos de 20MB.",
     "uploadMedia": "Subir archivo",
     "processing": "Procesando...",
-    "remove": "Eliminar"
+    "remove": "Eliminar",
+    "pasteHint": "PNG, JPEG, WEBP · hasta {maxSizeMB}MB · Ctrl + V para pegar"
   },
   "bgRemoverSection": {
     "titlePrefix": "Eliminación precisa de fondos",
@@ -754,5 +759,25 @@
     "PNG transparente",
     "Sin registro",
     "Usos ilimitados"
-  ]
+  ],
+  "testimonials": {
+    "eyebrow": "SE CORRE LA VOZ",
+    "titlePrefix": "Amado por artistas digitales, ",
+    "titleAccent": "estudios y desarrolladores",
+    "description": "Creadores reales que comparten por qué abandonaron las suscripciones en la nube por un procesamiento neuronal rápido y privado en el navegador."
+  },
+  "modelStatus": {
+    "standardMode": "Modo estándar: {reason}",
+    "downloadingBg": "Descargando modelo de eliminación de fondos ({pct}%)",
+    "preparingBg": "Preparando modelo de eliminación de fondos",
+    "checkingGraphics": "Comprobando adaptador gráfico",
+    "bgPreloadFailed": "Error al precargar modelo de fondos; reintentará al usarse",
+    "preparingUpscaler": "Preparando modelo de escalado",
+    "preparingUpscalerPct": "Preparando modelo de escalado ({pct}%)",
+    "upscalerPreloadFailed": "Error al precargar escalador; reintentará al usarse",
+    "modelsReady": "Los modelos de IA predeterminados están listos",
+    "upscalerReady": "Modelo de escalado listo; otros modelos cargan al usarse",
+    "modelsCleared": "Modelos eliminados; se descargarán de nuevo cuando se necesiten",
+    "preparingBackground": "Preparando modelos de IA en segundo plano"
+  }
 }

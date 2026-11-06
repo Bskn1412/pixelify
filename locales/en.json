@@ -208,7 +208,11 @@
     "step4Desc": "Download full-resolution PNG or WebP files without watermarks, compression artifacts, or forced sign-ups.",
     "step4Status": "SAVED",
     "titleLead": "Four moves.",
-    "titleItalic": "Studio output."
+    "titleItalic": "Studio output.",
+    "meterInputLocked": "Input locked",
+    "meterModelWarmup": "Model warm-up",
+    "meterPassSelected": "Pass selected · 4×",
+    "meterWebgpuTiles": "WebGPU tiles"
   },
   "upscaleFaq": {
     "titlePrefix": "Frequently",
@@ -409,7 +413,8 @@
     "cutoutDesc": "Drop your images here to start cutout\nSelect PNG, JPG, or WebP files under 20MB.",
     "uploadMedia": "Upload Media",
     "processing": "Processing...",
-    "remove": "Remove"
+    "remove": "Remove",
+    "pasteHint": "PNG, JPEG, WEBP · up to {maxSizeMB}MB · Ctrl + V to paste"
   },
   "bgRemoverSection": {
     "titlePrefix": "Precision Background Removal",
@@ -754,5 +759,25 @@
     "Transparent PNG",
     "No sign-up",
     "Unlimited runs"
-  ]
+  ],
+  "testimonials": {
+    "eyebrow": "THE WORD IS OUT",
+    "titlePrefix": "Loved by digital artists, ",
+    "titleAccent": "studios & developers",
+    "description": "Real creators sharing why they ditched cloud subscription models for fast, private in-browser neural processing."
+  },
+  "modelStatus": {
+    "standardMode": "Standard mode: {reason}",
+    "downloadingBg": "Downloading background-removal model ({pct}%)",
+    "preparingBg": "Preparing background-removal model",
+    "checkingGraphics": "Checking graphics adapter",
+    "bgPreloadFailed": "Background model preload failed; it will retry when used",
+    "preparingUpscaler": "Preparing upscaler model",
+    "preparingUpscalerPct": "Preparing upscaler model ({pct}%)",
+    "upscalerPreloadFailed": "Upscaler model preload failed; it will retry when used",
+    "modelsReady": "Default AI models are ready in this browser",
+    "upscalerReady": "Upscaler model ready; other models load when used",
+    "modelsCleared": "Models cleared; they will download again when needed",
+    "preparingBackground": "Preparing AI models in the background"
+  }
 }

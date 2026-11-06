@@ -208,7 +208,11 @@
     "step4Desc": "透かしなし、圧縮劣化なしのフル解像度 PNG または WebP をダウンロードします。",
     "step4Status": "保存完了",
     "titleLead": "わずか4つのステップ。",
-    "titleItalic": "スタジオ級の仕上がり。"
+    "titleItalic": "スタジオ級の仕上がり。",
+    "meterInputLocked": "入力固定完了",
+    "meterModelWarmup": "モデルウォームアップ",
+    "meterPassSelected": "選択パス · 4×",
+    "meterWebgpuTiles": "WebGPUタイル処理"
   },
   "upscaleFaq": {
     "titlePrefix": "よくある",
@@ -409,7 +413,8 @@
     "cutoutDesc": "ここに画像をドロップして切り抜きを開始\n20MB未満のPNG、JPG、WebPファイルを選択。",
     "uploadMedia": "メディアをアップロード",
     "processing": "処理中...",
-    "remove": "削除"
+    "remove": "削除",
+    "pasteHint": "PNG, JPEG, WEBP · 最大 {maxSizeMB}MB · Ctrl + V で貼り付け"
   },
   "bgRemoverSection": {
     "titlePrefix": "AIによる高精度な",
@@ -592,16 +597,21 @@
       "ローカル",
       "AI",
       "あなたの",
-      "画像のために",
-      "高画質化",
-      "復元",
-      "ディテール向上",
-      "クラウドへ",
-      "一切アップロードなし",
-      "あなたの大切な",
-      "ピクセルは",
+      "画像に",
+      "高画質",
+      "拡大",
+      "修復",
+      "向上",
+      "完全に",
+      "不要",
+      "アップロード",
+      "先の",
+      "あの",
+      "クラウド",
       "あなたの",
-      "手元に"
+      "ピクセル",
+      "ずっと",
+      "あなたのもの"
     ]
   },
   "upscaleShowreel": {
@@ -749,5 +759,25 @@
     "透過PNG保存",
     "登録不要",
     "無制限実行"
-  ]
+  ],
+  "testimonials": {
+    "eyebrow": "口コミで話題に",
+    "titlePrefix": "デジタルアーティスト、スタジオ、",
+    "titleAccent": "開発者に愛用されています",
+    "description": "クラウドのサブスクリプションをやめ、ブラウザ内での高速かつプライベートなニューラル処理を選んだ本物のクリエイターたちの声。"
+  },
+  "modelStatus": {
+    "standardMode": "標準モード: {reason}",
+    "downloadingBg": "背景削除モデルをダウンロード中 ({pct}%)",
+    "preparingBg": "背景削除モデルを準備中",
+    "checkingGraphics": "グラフィックスアダプターを確認中",
+    "bgPreloadFailed": "背景モデルの事前読み込みに失敗しました。使用時に再試行します",
+    "preparingUpscaler": "アップスケーラーモデルを準備中",
+    "preparingUpscalerPct": "アップスケーラーモデルを準備中 ({pct}%)",
+    "upscalerPreloadFailed": "アップスケーラーの事前読み込みに失敗しました。使用時に再試行します",
+    "modelsReady": "デフォルトのAIモデルが準備完了しました",
+    "upscalerReady": "アップスケーラー準備完了。他のモデルは使用時に読み込まれます",
+    "modelsCleared": "モデルを消去しました。必要時に再ダウンロードされます",
+    "preparingBackground": "バックグラウンドでAIモデルを準備中"
+  }
 }

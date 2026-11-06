@@ -41,7 +41,8 @@ import {
   requestNotificationPermission,
   sendDesktopNotification,
 } from '../utils/notifications';
-import { DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY } from '../lib/i18n';
+import { DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY, SITE_LANGUAGES } from '../lib/i18n';
+import { getDictionary } from '../locales';
 import ScrollToTopButton from './ScrollToTopButton';
 
 const STORAGE_KEY = 'pixelify_upscaler_history_2026'; // legacy, no longer written
@@ -119,7 +120,13 @@ export default function AppProvider({ children }: { children: React.ReactNode })
   const router = useRouter();
 
   const getActiveTab = useCallback((): ViewTab => {
-    const path = pathname.replace(/^\//, '').replace(/\/$/, '');
+    let path = pathname.replace(/^\//, '').replace(/\/$/, '');
+    const parts = path.split('/').filter(Boolean);
+    if (parts.length > 0 && SITE_LANGUAGES.some((l) => l.code === parts[0])) {
+      parts.shift();
+      path = parts.join('/');
+    }
+
     if (path === '') {
       return 'home';
     }
@@ -151,6 +158,17 @@ export default function AppProvider({ children }: { children: React.ReactNode })
   // Global language state
   const [currentLang, setCurrentLangState] = useState<string>(() => {
     if (typeof window === 'undefined') return DEFAULT_LANGUAGE;
+    const path = window.location.pathname;
+    const segments = path.replace(/^\//, '').split('/').filter(Boolean);
+    if (segments.length > 0 && SITE_LANGUAGES.some((l) => l.code === segments[0])) {
+      return segments[0];
+    }
+    if (path.startsWith('/blogs/')) {
+      const blogSeg = segments[1];
+      if (blogSeg && SITE_LANGUAGES.some((l) => l.code === blogSeg)) {
+        return blogSeg;
+      }
+    }
     return localStorage.getItem(LANGUAGE_STORAGE_KEY) || DEFAULT_LANGUAGE;
   });
 
@@ -161,6 +179,31 @@ export default function AppProvider({ children }: { children: React.ReactNode })
       document.cookie = `${LANGUAGE_STORAGE_KEY}=${lang}; path=/; max-age=31536000; SameSite=Lax`;
     }
   }, []);
+
+  // Sync currentLang whenever pathname contains a language prefix
+  useEffect(() => {
+    if (!pathname) return;
+    const segments = pathname.replace(/^\//, '').split('/').filter(Boolean);
+    const firstSegment = segments[0];
+    if (firstSegment && SITE_LANGUAGES.some((l) => l.code === firstSegment)) {
+      if (currentLang !== firstSegment) {
+        setCurrentLangState(firstSegment);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(LANGUAGE_STORAGE_KEY, firstSegment);
+        }
+      }
+    } else if (pathname.startsWith('/blogs/')) {
+      const blogSeg = segments[1];
+      if (blogSeg && SITE_LANGUAGES.some((l) => l.code === blogSeg)) {
+        if (currentLang !== blogSeg) {
+          setCurrentLangState(blogSeg);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(LANGUAGE_STORAGE_KEY, blogSeg);
+          }
+        }
+      }
+    }
+  }, [pathname, currentLang]);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const isSelectingSampleRef = useRef(false);
@@ -182,15 +225,37 @@ export default function AppProvider({ children }: { children: React.ReactNode })
     });
   }, []);
 
-  // Sync state with client-side navigation & force top scroll
+  // Sync state with client-side navigation & force top scroll with language prefix preservation
   const navigateTo = useCallback(
     (tab: ViewTab) => {
-      const targetPath = tab === 'home' ? '/' : `/${tab}`;
+      let langPrefix = '';
+      if (pathname) {
+        const segments = pathname.replace(/^\//, '').split('/').filter(Boolean);
+        if (segments.length > 0 && SITE_LANGUAGES.some((l) => l.code === segments[0])) {
+          langPrefix = `/${segments[0]}`;
+        }
+      }
+      if (!langPrefix && currentLang && currentLang !== DEFAULT_LANGUAGE) {
+        langPrefix = `/${currentLang}`;
+      } else if (!langPrefix && currentLang === DEFAULT_LANGUAGE && pathname && pathname.startsWith('/en/')) {
+        langPrefix = '/en';
+      }
+
+      let targetPath = '';
+      if (tab === 'home') {
+        targetPath = langPrefix ? `${langPrefix}/` : '/';
+      } else if (tab === 'blogs') {
+        const langCode = langPrefix ? langPrefix.replace('/', '') : (currentLang || DEFAULT_LANGUAGE);
+        targetPath = langCode === 'en' ? '/blogs/' : `/blogs/${langCode}/`;
+      } else {
+        targetPath = langPrefix ? `${langPrefix}/${tab}/` : `/${tab}/`;
+      }
+
       scrollToTop();
       router.push(targetPath);
       scrollToTop();
     },
-    [router, scrollToTop]
+    [router, scrollToTop, pathname, currentLang]
   );
 
   // Automatically scroll to top whenever route changes (Home <-> BG <-> Upscaler, etc.)
@@ -1056,27 +1121,32 @@ export default function AppProvider({ children }: { children: React.ReactNode })
     }
   }, [addToast, addUpscaleFile, handleBGFiles, navigateTo, scrollToTop]);
 
+  const dict = useMemo(() => getDictionary(currentLang), [currentLang]);
+  const ms = dict.modelStatus;
+
   const modelStatus = bgFallbackReason && bgEngine === 'wasm'
-    ? `Standard mode: ${bgFallbackReason.slice(0, 110)}`
+    ? (ms?.standardMode ? ms.standardMode.replace('{reason}', bgFallbackReason.slice(0, 110)) : `Standard mode: ${bgFallbackReason.slice(0, 110)}`)
     : bgModelPhase === 'downloading'
-      ? `Downloading background-removal model (${Math.round(bgModelProgress)}%)`
+      ? (ms?.downloadingBg ? ms.downloadingBg.replace('{pct}', String(Math.round(bgModelProgress))) : `Downloading background-removal model (${Math.round(bgModelProgress)}%)`)
       : bgModelPhase === 'preparing'
-        ? 'Preparing background-removal model'
+        ? (ms?.preparingBg || 'Preparing background-removal model')
         : bgModelPhase === 'detecting'
-          ? 'Checking graphics adapter'
+          ? (ms?.checkingGraphics || 'Checking graphics adapter')
           : bgModelPhase === 'error'
-            ? 'Background model preload failed; it will retry when used'
+            ? (ms?.bgPreloadFailed || 'Background model preload failed; it will retry when used')
             : modelLoading
-              ? `Preparing upscaler model${modelProgress === null ? '' : ` (${Math.round(modelProgress)}%)`}`
+              ? (modelProgress === null
+                  ? (ms?.preparingUpscaler || 'Preparing upscaler model')
+                  : (ms?.preparingUpscalerPct ? ms.preparingUpscalerPct.replace('{pct}', String(Math.round(modelProgress))) : `Preparing upscaler model (${Math.round(modelProgress)}%)`))
               : upscalerPreloadError && !execEngine
-                ? 'Upscaler model preload failed; it will retry when used'
+                ? (ms?.upscalerPreloadFailed || 'Upscaler model preload failed; it will retry when used')
                 : bgModelPhase === 'ready' && execEngine
-                  ? 'Default AI models are ready in this browser'
+                  ? (ms?.modelsReady || 'Default AI models are ready in this browser')
                   : modelsCleared && execEngine
-                    ? 'Upscaler model ready; other models load when used'
+                    ? (ms?.upscalerReady || 'Upscaler model ready; other models load when used')
                     : modelsCleared
-                      ? 'Models cleared; they will download again when needed'
-                      : 'Preparing AI models in the background';
+                      ? (ms?.modelsCleared || 'Models cleared; they will download again when needed')
+                      : (ms?.preparingBackground || 'Preparing AI models in the background');
   const canClearModelCache = !bgJobs.some((job) => job.status === 'loading' || job.status === 'processing')
     && !items.some((item) => item.status === 'processing')
     && !isClearingModelCache;

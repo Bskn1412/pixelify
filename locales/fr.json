@@ -208,7 +208,11 @@
     "step4Desc": "Téléchargez vos images en pleine résolution, sans filigrane ni inscription forcée.",
     "step4Status": "ENREGISTRÉ",
     "titleLead": "Quatre étapes.",
-    "titleItalic": "Rendu studio."
+    "titleItalic": "Rendu studio.",
+    "meterInputLocked": "Entrée verrouillée",
+    "meterModelWarmup": "Préchauffage du modèle",
+    "meterPassSelected": "Passe sélectionnée · 4×",
+    "meterWebgpuTiles": "Tuiles WebGPU"
   },
   "upscaleFaq": {
     "titlePrefix": "Questions",
@@ -409,7 +413,8 @@
     "cutoutDesc": "Déposez vos images ici pour commencer le détourage\nFichiers PNG, JPG ou WebP de moins de 20Mo.",
     "uploadMedia": "Télécharger un média",
     "processing": "Traitement...",
-    "remove": "Supprimer"
+    "remove": "Supprimer",
+    "pasteHint": "PNG, JPEG, WEBP · jusqu'à {maxSizeMB}Mo · Ctrl + V pour coller"
   },
   "bgRemoverSection": {
     "titlePrefix": "Suppression précise d'arrière-plan",
@@ -599,6 +604,7 @@
       "sublimer",
       "sans",
       "téléverser",
+      "rien",
       "vers",
       "le",
       "cloud",
@@ -753,5 +759,25 @@
     "PNG transparent",
     "Sans inscription",
     "Exécutions illimitées"
-  ]
+  ],
+  "testimonials": {
+    "eyebrow": "LE MOT EST DIT",
+    "titlePrefix": "Adoré par les artistes numériques, ",
+    "titleAccent": "les studios et les développeurs",
+    "description": "De vrais créateurs expliquent pourquoi ils ont délaissé les abonnements cloud pour un traitement neuronal rapide et confidentiel dans le navigateur."
+  },
+  "modelStatus": {
+    "standardMode": "Mode standard : {reason}",
+    "downloadingBg": "Téléchargement du modèle de suppression d'arrière-plan ({pct}%)",
+    "preparingBg": "Préparation du modèle de suppression d'arrière-plan",
+    "checkingGraphics": "Vérification de la carte graphique",
+    "bgPreloadFailed": "Échec du préchargement de fond ; nouvel essai à l'utilisation",
+    "preparingUpscaler": "Préparation du modèle d'agrandissement",
+    "preparingUpscalerPct": "Préparation du modèle d'agrandissement ({pct}%)",
+    "upscalerPreloadFailed": "Échec du préchargement de l'agrandisseur ; nouvel essai à l'utilisation",
+    "modelsReady": "Les modèles d'IA par défaut sont prêts dans ce navigateur",
+    "upscalerReady": "Modèle d'agrandissement prêt ; les autres chargeront à l'usage",
+    "modelsCleared": "Modèles effacés ; ils seront re-téléchargés si nécessaire",
+    "preparingBackground": "Préparation des modèles d'IA en arrière-plan"
+  }
 }
