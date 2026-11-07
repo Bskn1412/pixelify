@@ -4,6 +4,90 @@
  */
 export const POSTS_EN = [
 {
+    slug: 'data_harvesting_warning_a9e5b7',
+    title: 'What Happens to Your Photos After You Hit "Upload"',
+    description:
+      'Free image tools monetize uploads in ways most users never see: retention clauses, derived data, model training, breach exposure. A practical guide to reading the fine print and designing it out of your life.',
+    tags: ['Privacy', 'Security', 'Industry'],
+    date: '2026-11-07',
+    author: 'The Pixelify Team',
+    cover: '/blogs/home-hero.jpg',
+    coverAlt: 'Pixelify hero page emphasizing local processing and no cloud uploads',
+    blocks: [
+      {
+        type: 'p',
+        text: 'The arrangement looks fair on the surface: you get a powerful tool for free, and in exchange you hand over an image. You imagine a machine processing the file and forgetting it, the way a photocopier forgets. That mental model is wrong in almost every particular, and the distance between what people assume and what actually happens is where the risk lives. This piece is about that distance: what uploaded images become downstream, and how to evaluate any tool in under five minutes.',
+      },
+      { type: 'h2', text: 'The business model hiding behind "free"' },
+      {
+        type: 'p',
+        text: 'Compute costs money. Server capacity, bandwidth, and model inference all have invoices, and a tool that processes images for millions of users without charging them is being paid by someone else. The candidates are uncomfortable: advertising that needs behavioral data, data brokerage where uploads feed sold audience segments, model training where your imagery becomes product capability, or simple user acquisition (grow the base now, monetize it after the acquisition).',
+      },
+      {
+        type: 'p',
+        text: 'The terms of service usually say the quiet part with ordinary words. Broad grants to "use, copy, modify, and create derivative works from content you upload" are not drafting enthusiasm; they are the legal foundation for training, redistribution into datasets, and product analytics. "Aggregated and anonymized data" clauses cover behavioral extraction from interaction logs, meaning which images you process, how often, and at what sizes. And "we may retain content to improve our services" is the training clause in its most literal form.',
+      },
+      { type: 'h2', text: 'What an uploaded image actually is' },
+      {
+        type: 'p',
+        text: 'People assess risk by the picture they see. The correct object of assessment is the file. A photo carries EXIF metadata: the device model, the exact timestamp, sometimes GPS coordinates, a log of where you were and when attached to the visual content itself. Beyond metadata, the pixels themselves leak: documents visible on a desk, screens left in frame, whiteboards, badges and lanyards, reflections in mirrors and windows, the faces of people who never consented to anything.',
+      },
+      {
+        type: 'ul',
+        items: [
+          'EXIF metadata: device, timestamp, and often precise location, harvested automatically on upload.',
+          'Background intelligence: desks, screens, documents, and badges readable at modern resolutions.',
+          'Third parties in frame: every face in a group photo is a person whose data you just shared.',
+          'Content signals: what you edit, how often, and at what size builds a behavioral profile.',
+        ],
+      },
+      { type: 'h2', text: 'Retention: the promise that outlives the session' },
+      {
+        type: 'p',
+        text: 'A deletion promise is a process executed by humans on a schedule, not a property of the system. "Deleted after 24 hours" describes intended behavior, and the file lived somewhere for those 24 hours, long enough for a breach, a subpoena, an internal export, or an acquisition to take an interest. Backups complicate everything: a deleted row in a production database can persist for weeks in snapshots nobody remembers. The only file that cannot leak, be subpoenaed, or be acquired is the file that was never sent.',
+      },
+      { type: 'h2', text: 'The breach math nobody runs' },
+      {
+        type: 'p',
+        text: 'Assume any service holding your images will eventually expose them, not out of malice, but because the industry\'s base rate says so. Then ask the question that matters: what is the worst realistic outcome? For a vacation photo, nothing. For the family scan of an elderly relative\'s documents, identity theft exposure. For a client\'s unreleased product, a contractual breach with real damages. For medical or legal imagery, harm that cannot be undone at any price. The upload decision is not "photo versus no photo." It is a specific worst case, weighed honestly.',
+      },
+      { type: 'h2', text: 'The five-minute audit' },
+      {
+        type: 'p',
+        text: 'You do not need a lawyer to evaluate a tool, though reading the actual policy beats reading the summary. Four questions get you most of the way, and all of them have observable answers. The goal is not perfect certainty; it is pattern recognition across the services you use daily.',
+      },
+      {
+        type: 'ol',
+        items: [
+          'What does the policy claim over uploaded content? Broad derivative-work and training grants are a red flag; explicit no-training, no-retention commitments are the green one.',
+          'What is the stated retention period, and is deletion described as automatic or manual? Automatic and immediate is meaningfully different from "we may retain."',
+          'Where does processing happen? A policy that never mentions where computation runs is usually telling you it runs on their servers.',
+          'Is there a business model visible that does not require your data? Pricing that plausibly covers costs is the simplest signal that your uploads are not the product.',
+        ],
+      },
+      { type: 'h2', text: 'Defensive habits that work regardless' },
+      {
+        type: 'p',
+        text: 'Some precautions are worth taking universally, because they cost nothing and transfer no trust. Strip metadata before sharing any image: most platforms already do this on posting, but direct uploads to arbitrary services rarely do, and a two-second strip removes the location log entirely. Crop before uploading: if the tool only needs the subject, the background never has to be transmitted. And keep a hard category rule: certain image types simply do not go into web forms at all, no matter how reputable the form looks.',
+      },
+      {
+        type: 'callout',
+        title: 'The category rule',
+        text: 'Medical imagery, legal documents, unreleased work, minors\' photos, and anything you would not show a stranger at a bus stop: these never get uploaded to free tools. This rule alone eliminates most of the realistic worst cases.',
+      },
+      { type: 'h2', text: 'The structural answer: remove the upload step entirely' },
+      {
+        type: 'p',
+        text: 'All of the advice above is mitigation, reducing exposure within an architecture that requires exposure. The structural alternative is an architecture that does not. When processing runs on your own device, there is no upload to audit, no retention clause to parse, no breach to survive, and no training pipeline to decline. The file stays where it was created, and the capability still gets used.',
+      },
+      {
+        type: 'p',
+        text: 'This is not a utopian position; it is an engineering one. The same GPU that renders your screen can run the networks that process images, and browser technology has reached the point where that capability ships to everyone, automatically, on hardware they already own. The industry\'s default is to move your data to the computation. The better default moves the computation to your data, and in 2026 that better default is not a research demo. It is a button, on this site, running on your machine, right now.',
+      },
+    ],
+  },
+
+{
     slug: 'pixelify_privacy_first_a7f3d9',
     title: 'Pixelify: Why We Built an Image Editor That Never Sees Your Photos',
     description:

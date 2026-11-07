@@ -216,7 +216,7 @@ const MODEL_ID = 'studioludens/birefnet-lite-512';
 const GPU_PROBE_TIMEOUT_MS = 3500;
 
 /* ============================================================
-   DIABLO — BEN2-family ultra-precision matting network.
+   DIABLO - Studio ultra-precision matting network.
    Runs as a raw ONNX model through onnxruntime-web from CDN.
    Pinned to the exact ORT snapshot transformers.js 4.2.0 ships
    with, so both runtimes share the same engine generation.
@@ -441,7 +441,7 @@ async function disposeChopper(): Promise<void> {
 /**
  * Create WebGPU first, but never treat the probe as proof that this model works.
  * A failed WebGPU pipeline initialization is retried on WASM before giving up.
- * NOTE: deliberately does NOT modify preferredEngine — the engine intent is set
+ * NOTE: deliberately does NOT modify preferredEngine - the engine intent is set
  * once in getRemover() so late-breaking WebGPU faults still classify correctly.
  */
 async function createResilientPipeline(preferred: Engine): Promise<any> {
@@ -574,7 +574,7 @@ async function loadInputBlob(url: string): Promise<Blob> {
 }
 
 /* ============================================================
-   DIABLO runtime (raw ORT session over BEN2 ONNX weights)
+   DIABLO runtime (raw ORT session over Studio 1024 ONNX weights)
    ============================================================ */
 
 let ortModulePromise: Promise<any> | null = null;
@@ -675,7 +675,7 @@ async function getDiabloModelSource(): Promise<DiabloModelSource> {
     const chunks: Uint8Array[] = [];
     let received = 0;
     let lastReported = -1;
-    for (;;) {
+    for (; ;) {
       const { done, value } = await reader.read();
       if (done) break;
       chunks.push(value);
@@ -718,7 +718,7 @@ async function getDiabloModelSource(): Promise<DiabloModelSource> {
         }));
       }
       console.log(`[Diablo Model] 💾 Successfully saved Diablo weights into Cache API ("${DIABLO_MODEL_CACHE}")`);
-    } catch { /* storage full or blocked — cache is best-effort */ }
+    } catch { /* storage full or blocked - cache is best-effort */ }
   }
 
   const ab = await downloadedBlob.arrayBuffer();
@@ -940,8 +940,8 @@ async function runDiabloSession(session: any, inputBlob: Blob): Promise<Blob> {
   const maskData = new Float32Array(rawMask);
 
   // Release intermediate GPU/WASM tensor buffers from RAM
-  try { inputTensor?.dispose?.(); } catch {}
-  try { output[outName]?.dispose?.(); } catch {}
+  try { inputTensor?.dispose?.(); } catch { }
+  try { output[outName]?.dispose?.(); } catch { }
 
   console.log(`[Diablo Model] 🎭 Segmentation mask generated in ${inferMs}ms (${maskData.length} floats). Compositing transparent PNG at original resolution (${bitmap.width}x${bitmap.height}px)...`);
 
@@ -1131,7 +1131,7 @@ async function handleMessage(data: WorkerMessage): Promise<void> {
         throw new Error('The background-removal model returned an unsupported output.');
       }
       const blob: Blob = await output.toBlob('image/png');
-      try { (output as any).dispose?.(); } catch {}
+      try { (output as any).dispose?.(); } catch { }
       if (!blob || blob.size === 0) throw new Error('Background removal produced an empty image.');
       post({
         type: 'DONE',
@@ -1146,7 +1146,7 @@ async function handleMessage(data: WorkerMessage): Promise<void> {
       const message = errorMessage(error);
       // Classify engine faults the old worker's way: ANY suspicious WebGPU fault
       // (device lost, OrtRun buffer mapping failure, async buffer invalidation
-      // surfacing even during toBlob) must escalate to a main-thread restart —
+      // surfacing even during toBlob) must escalate to a main-thread restart -
       // terminate this worker, recreate with forceWasm, and replay pending jobs.
       // Note webgpuTouched covers "the webgpu pipeline already produced this
       // output object" cases like a failed output.toBlob() after inference.

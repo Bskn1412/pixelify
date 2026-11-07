@@ -91,7 +91,7 @@ html.light .bg-white\/10:hover {
 }
 
 /* ==========================================================
-   BLOG — editorial serif typeface (Medium-style article body)
+   BLOG - editorial serif typeface (Medium-style article body)
    ========================================================== */
 .blog-serif,
 .blog-serif p,
@@ -261,6 +261,7 @@ html.light .gradient-text {
     background-repeat: no-repeat;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='6' viewBox='0 0 8 6' fill='%23a1a1aa'><polygon points='4,0 8,6 0,6'/></svg>");
 }
+
 ::-webkit-scrollbar-button:single-button:vertical:decrement:hover {
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='6' viewBox='0 0 8 6' fill='%23ffffff'><polygon points='4,0 8,6 0,6'/></svg>");
 }
@@ -273,6 +274,7 @@ html.light .gradient-text {
     background-repeat: no-repeat;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='6' viewBox='0 0 8 6' fill='%23a1a1aa'><polygon points='4,6 8,0 0,0'/></svg>");
 }
+
 ::-webkit-scrollbar-button:single-button:vertical:increment:hover {
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='6' viewBox='0 0 8 6' fill='%23ffffff'><polygon points='4,6 8,0 0,0'/></svg>");
 }
@@ -286,6 +288,7 @@ html.light .gradient-text {
     background-repeat: no-repeat;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='8' viewBox='0 0 6 8' fill='%23a1a1aa'><polygon points='0,4 6,0 6,8'/></svg>");
 }
+
 ::-webkit-scrollbar-button:single-button:horizontal:decrement:hover {
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='8' viewBox='0 0 6 8' fill='%23ffffff'><polygon points='0,4 6,0 6,8'/></svg>");
 }
@@ -298,6 +301,7 @@ html.light .gradient-text {
     background-repeat: no-repeat;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='8' viewBox='0 0 6 8' fill='%23a1a1aa'><polygon points='6,4 0,0 0,8'/></svg>");
 }
+
 ::-webkit-scrollbar-button:single-button:horizontal:increment:hover {
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='8' viewBox='0 0 6 8' fill='%23ffffff'><polygon points='6,4 0,0 0,8'/></svg>");
 }
@@ -308,6 +312,7 @@ html.light .gradient-text {
     width: 0;
     height: 0;
 }
+
 .scrollbar-none {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -1207,7 +1212,7 @@ html.light .gradient-text {
 
 
 /* ==========================================================================
-   RESPONSIVE — TABLET
+   RESPONSIVE - TABLET
    ========================================================================== */
 
 @media (max-width: 1100px) {
@@ -1247,7 +1252,7 @@ html.light .gradient-text {
 
 
 /* ==========================================================================
-   RESPONSIVE — MOBILE
+   RESPONSIVE - MOBILE
    ========================================================================== */
 
 @media (max-width: 768px) {
@@ -1263,12 +1268,16 @@ html.light .gradient-text {
         /* 3. Control Object Fit */
         object-fit: cover;
         /* 4. Control Position */
-        top: 15%;                          /* Distance from top */
+        top: 15%;
+        /* Distance from top */
         left: 50%;
-        transform: translate(-50%, 0);     /* Horizontally centered */
+        transform: translate(-50%, 0);
+        /* Horizontally centered */
     }
-       .hero-video-wrap {
-        height: 55vh;   /* Limit video wrapper height */
+
+    .hero-video-wrap {
+        height: 55vh;
+        /* Limit video wrapper height */
         bottom: auto;
     }
 
@@ -1568,6 +1577,7 @@ html.light .gradient-text {
 /* Shorter frame on phones: the word composition is wide, so a tall frame
    leaves large empty bands above and below the animated text. */
 @media (max-width: 768px) {
+
     [data-composition-id="caption-camera-follow"],
     .cf-root,
     .pixelify-story {
@@ -1612,9 +1622,9 @@ html.light .gradient-text {
    ============================================================ */
 
 :root {
-  --pixelify-main-header-height: 80px;
-  --bgremove-toolbar-height: 56px;
-  --bgremove-settings-width: 430px;
+    --pixelify-main-header-height: 80px;
+    --bgremove-toolbar-height: 56px;
+    --bgremove-settings-width: 430px;
 }
 
 
@@ -1631,30 +1641,29 @@ html.light .gradient-text {
  */
 
 .bgremove-workspace-grid {
-  width: 100%;
+    width: 100%;
 
-  display: grid;
+    display: grid;
 
-  grid-template-columns:
-    minmax(0, 1fr)
-    var(--bgremove-settings-width);
+    grid-template-columns:
+        minmax(0, 1fr) var(--bgremove-settings-width);
 
-  gap: 20px;
+    gap: 20px;
 
-  align-items: start;
+    align-items: start;
 
-  /*
+    /*
    * Space for the fixed editor toolbar.
    */
-  /* padding-top:
+    /* padding-top:
     calc(
       var(--bgremove-toolbar-height) + 12px
     ); */
 
-  padding-left: 0;
-  padding-right: 0;
+    padding-left: 0;
+    padding-right: 0;
 
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 
@@ -1663,17 +1672,17 @@ html.light .gradient-text {
    ============================================================ */
 
 .bgremove-canvas-column {
-  min-width: 0;
+    min-width: 0;
 
-  width: 100%;
+    width: 100%;
 
-  display: flex;
+    display: flex;
 
-  flex-direction: column;
+    flex-direction: column;
 
-  align-items: stretch;
+    align-items: stretch;
 
-  gap: 16px;
+    gap: 16px;
 }
 
 
@@ -1685,8 +1694,8 @@ html.light .gradient-text {
    CANVAS
    ============================================================ */
 
-.bgremove-canvas-column > .w-full {
-  width: 100%;
+.bgremove-canvas-column>.w-full {
+    width: 100%;
 }
 
 
@@ -1696,7 +1705,7 @@ html.light .gradient-text {
  */
 
 .bgremove-canvas-column canvas {
-  max-width: 100%;
+    max-width: 100%;
 }
 
 
@@ -1705,29 +1714,25 @@ html.light .gradient-text {
    ============================================================ */
 
 .bgremove-settings-column {
-  width: 100%;
+    width: 100%;
 
-  min-width: 0;
+    min-width: 0;
 
-  position: sticky;
+    position: sticky;
 
-  /*
+    /*
    * Main header + editor toolbar + small breathing space.
    */
-  top:
-    calc(
-      var(--pixelify-main-header-height) +
-      var(--bgremove-toolbar-height) +
-      12px
-    );
+    top:
+        calc(var(--pixelify-main-header-height) + var(--bgremove-toolbar-height) + 12px);
 
-  align-self: start;
+    align-self: start;
 
-  display: flex;
+    display: flex;
 
-  flex-direction: column;
+    flex-direction: column;
 
-  gap: 8px;
+    gap: 8px;
 }
 
 
@@ -1736,138 +1741,129 @@ html.light .gradient-text {
  * the viewport.
  */
 
-.bgremove-settings-column > div {
-  max-height:
-    calc(
-      100vh -
-      var(--pixelify-main-header-height) -
-      var(--bgremove-toolbar-height) -
-      28px
-    );
+.bgremove-settings-column>div {
+    max-height:
+        calc(100vh - var(--pixelify-main-header-height) - var(--bgremove-toolbar-height) - 28px);
 }
 
 
 /* ============================================================
-   RESPONSIVE — LARGE DESKTOP
+   RESPONSIVE - LARGE DESKTOP
    ============================================================ */
 
 @media (min-width: 1440px) {
-  .bgremove-workspace-grid {
-    grid-template-columns:
-      minmax(0, 1fr)
-      450px;
+    .bgremove-workspace-grid {
+        grid-template-columns:
+            minmax(0, 1fr) 450px;
 
-    gap: 24px;
-  }
+        gap: 24px;
+    }
 }
 
 
 /* ============================================================
-   RESPONSIVE — LAPTOP
+   RESPONSIVE - LAPTOP
    ============================================================ */
 
 @media (min-width: 1024px) and (max-width: 1439px) {
-  :root {
-    --bgremove-settings-width: 380px;
-  }
+    :root {
+        --bgremove-settings-width: 380px;
+    }
 
-  .bgremove-workspace-grid {
-    grid-template-columns:
-      minmax(0, 1fr)
-      380px;
+    .bgremove-workspace-grid {
+        grid-template-columns:
+            minmax(0, 1fr) 380px;
 
-    gap: 16px;
-  }
+        gap: 16px;
+    }
 }
 
 
 /* ============================================================
-   RESPONSIVE — TABLET
+   RESPONSIVE - TABLET
    ============================================================ */
 
 @media (min-width: 768px) and (max-width: 1023px) {
-  :root {
-    --bgremove-toolbar-height: 56px;
-  }
+    :root {
+        --bgremove-toolbar-height: 56px;
+    }
 
-  .bgremove-editor-toolbar {
-    width: min(calc(100vw - 24px), 940px);
-  }
+    .bgremove-editor-toolbar {
+        width: min(calc(100vw - 24px), 940px);
+    }
 
-  .bgremove-workspace-grid {
-    grid-template-columns: 1fr;
+    .bgremove-workspace-grid {
+        grid-template-columns: 1fr;
 
-    gap: 18px;
+        gap: 18px;
 
-    padding-top:
-      calc(
-        var(--bgremove-toolbar-height) + 12px
-      );
-  }
+        padding-top:
+            calc(var(--bgremove-toolbar-height) + 12px);
+    }
 
-  .bgremove-settings-column {
-    position: relative;
+    .bgremove-settings-column {
+        position: relative;
 
-    top: auto;
+        top: auto;
 
-    width: 100%;
-  }
+        width: 100%;
+    }
 
-  .bgremove-settings-column > div {
-    max-height: none;
-  }
+    .bgremove-settings-column>div {
+        max-height: none;
+    }
 }
 
 
 /* ============================================================
-   RESPONSIVE — MOBILE
+   RESPONSIVE - MOBILE
    ============================================================ */
 
 @media (max-width: 767px) {
-  :root {
-    --pixelify-main-header-height: 64px;
-    --bgremove-toolbar-height: 52px;
-  }
+    :root {
+        --pixelify-main-header-height: 64px;
+        --bgremove-toolbar-height: 52px;
+    }
 
-  .bgremove-editor-toolbar {
-    top: var(--pixelify-main-header-height);
+    .bgremove-editor-toolbar {
+        top: var(--pixelify-main-header-height);
 
-    width: calc(100vw - 16px);
+        width: calc(100vw - 16px);
 
-    min-height: var(--bgremove-toolbar-height);
+        min-height: var(--bgremove-toolbar-height);
 
-    padding: 4px 8px;
+        padding: 4px 8px;
 
-    border-radius: 9999px;
-  }
+        border-radius: 9999px;
+    }
 
-  .bgremove-workspace-grid {
-    grid-template-columns: 1fr;
+    .bgremove-workspace-grid {
+        grid-template-columns: 1fr;
 
-    width: 100%;
+        width: 100%;
 
-    gap: 14px;
+        gap: 14px;
 
-    padding-top: 0;
-  }
+        padding-top: 0;
+    }
 
-  .bgremove-canvas-column {
-    width: 100%;
+    .bgremove-canvas-column {
+        width: 100%;
 
-    gap: 10px;
-  }
+        gap: 10px;
+    }
 
-  .bgremove-settings-column {
-    position: relative;
+    .bgremove-settings-column {
+        position: relative;
 
-    top: auto;
+        top: auto;
 
-    width: 100%;
-  }
+        width: 100%;
+    }
 
-  .bgremove-settings-column > div {
-    max-height: none;
-  }
+    .bgremove-settings-column>div {
+        max-height: none;
+    }
 }
 
 
@@ -1876,16 +1872,16 @@ html.light .gradient-text {
    ============================================================ */
 
 @media (max-width: 480px) {
-  .bgremove-editor-toolbar {
-    width: calc(100vw - 8px);
+    .bgremove-editor-toolbar {
+        width: calc(100vw - 8px);
 
-    padding-left: 6px;
-    padding-right: 6px;
-  }
+        padding-left: 6px;
+        padding-right: 6px;
+    }
 
-  .bgremove-workspace-grid {
-    gap: 10px;
-  }
+    .bgremove-workspace-grid {
+        gap: 10px;
+    }
 }
 
 
@@ -1896,7 +1892,7 @@ html.light .gradient-text {
 .bgremove-workspace-grid,
 .bgremove-canvas-column,
 .bgremove-settings-column {
-  box-sizing: border-box;
+    box-sizing: border-box;
 
-  max-width: 100%;
+    max-width: 100%;
 }

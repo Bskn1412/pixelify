@@ -451,7 +451,7 @@ export default function HomeWorkflowDemos({
                         <motion.span className="absolute -inset-1 rounded-[19px] border" style={{ borderColor: `${config.accent}66` }} animate={reducedMotion ? undefined : { opacity: [0.2, 0.8, 0.2], scale: [0.98, 1.04, 0.98] }} transition={{ duration: 2, repeat: Infinity }} />
                       </div>
                       <p className="text-sm font-medium text-white/85">{flow === "background" || flow === "product" ? (t.homeWorkflow?.refiningSubjectBoundaries || "Refining subject boundaries") : (t.homeWorkflow?.enhancingImageDetail || "Enhancing image detail")}</p>
-                      <p className="mt-2 text-xs leading-5 text-white/40">{t.homeWorkflow?.simulatedNotice || "Illustrative processing state — no image is being processed in this demo."}</p>
+                      <p className="mt-2 text-xs leading-5 text-white/40">{t.homeWorkflow?.simulatedNotice || "Illustrative processing state - no image is being processed in this demo."}</p>
                       <div className="mt-5 h-1 w-full overflow-hidden rounded-full bg-white/[0.08]">
                         <motion.div className="h-full rounded-full" style={{ backgroundColor: config.accent }} initial={{ width: "6%" }} animate={{ width: "88%" }} transition={{ duration: 3.1, ease: "easeInOut" }} />
                       </div>

@@ -123,7 +123,7 @@ export default function BlogPost({ slug, lang, onTabChange }: BlogPostProps) {
   return (
     <div className="w-full bg-[#0A0A0A]">
       {/* ============================================================
-         ARTICLE HEADER — centered 720px column, Medium-style
+         ARTICLE HEADER - centered 720px column, Medium-style
          tags → title → author row → action bar → hero image
          ============================================================ */}
       <header className="w-full">
@@ -135,7 +135,7 @@ export default function BlogPost({ slug, lang, onTabChange }: BlogPostProps) {
             ))}
           </div>
 
-          {/* TITLE — bold sans, tight leading */}
+          {/* TITLE - bold sans, tight leading */}
           <h1 className="mt-7 text-[30px] font-bold leading-[1.16] tracking-[-0.02em] text-white sm:text-[42px]">
             {post.title}
           </h1>
@@ -169,7 +169,7 @@ export default function BlogPost({ slug, lang, onTabChange }: BlogPostProps) {
           </div>
         </div>
 
-        {/* HERO IMAGE — wider than the text column, plain (no card chrome) */}
+        {/* HERO IMAGE - wider than the text column, plain (no card chrome) */}
         <div className="mx-auto w-full max-w-[908px] px-4 sm:px-6">
           <img
             src={post.cover}
@@ -181,7 +181,7 @@ export default function BlogPost({ slug, lang, onTabChange }: BlogPostProps) {
       </header>
 
       {/* ============================================================
-         ARTICLE BODY — 720px column
+         ARTICLE BODY - 720px column
          ============================================================ */}
       <article className="w-full px-4 sm:px-6">
         <div className="mx-auto w-full max-w-[720px] pb-16 pt-12">
@@ -190,7 +190,7 @@ export default function BlogPost({ slug, lang, onTabChange }: BlogPostProps) {
       </article>
 
       {/* ============================================================
-         FOOT MATTER — tags, then author card, inside the same column
+         FOOT MATTER - tags, then author card, inside the same column
          ============================================================ */}
       <div className="mx-auto w-full max-w-[720px] px-4 pb-16 sm:px-6">
         {/* TAGS (bottom, same pill style as the reference) */}

@@ -384,12 +384,11 @@
     "docs": "技术文档",
     "blogs": "技术博客",
     "faqs": "常见问题",
-    "sysReq": "系统配置要求",
     "about": "关于 Pixelify",
     "contact": "联系我们",
     "privacy": "隐私保护政策",
     "terms": "用户服务条款",
-    "rights": "版权所有。图像完全在设备本地处理。"
+    "rights": "© 2026 Pixelify Inc. 版权所有，保留一切权利。"
   },
   "blogs": {
     "title": "技术博客与 AI 指南",
@@ -521,7 +520,7 @@
     "previewWorkflow": "预览工作流",
     "refiningSubjectBoundaries": "正在细化主体轮廓边界",
     "enhancingImageDetail": "正在增强图片高频细节",
-    "simulatedNotice": "此为流程模拟状态 — 演示中未上传处理任何真实图片。",
+    "simulatedNotice": "此为流程模拟状态 - 演示中未上传处理任何真实图片。",
     "preparingPreview": "正在准备预览",
     "simulated": "模拟",
     "previewState": "预览状态",

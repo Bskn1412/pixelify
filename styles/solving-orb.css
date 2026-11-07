@@ -1,5 +1,5 @@
 /* ============================================================
-   SolvingOrb / OrbProgressRing — companion styles
+   SolvingOrb / OrbProgressRing - companion styles
    Layout: SVG ring fills the root, orb centered in the hole.
    ============================================================ */
 
@@ -27,8 +27,15 @@
 
 /* --- Track: subtle breathing pulse, phase-locked via --opr-dur --- */
 @keyframes opr-track-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
 }
 
 .opr-root .opr-track {
@@ -41,10 +48,12 @@
     stroke-dasharray: 0 100;
     stroke-dashoffset: 0;
   }
+
   45% {
     stroke-dasharray: 55 100;
     stroke-dashoffset: -18;
   }
+
   100% {
     stroke-dasharray: 8 100;
     stroke-dashoffset: -100;
@@ -62,6 +71,7 @@
 
 /* Respect reduced-motion users: freeze animation, keep state readable. */
 @media (prefers-reduced-motion: reduce) {
+
   .opr-root .opr-track,
   .opr-root .opr-progress {
     animation: none;

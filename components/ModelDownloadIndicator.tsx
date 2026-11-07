@@ -57,7 +57,7 @@ export default function ModelDownloadIndicator({ items }: { items: ModelDownload
       </button>
 
       {open && items.length > 0 && (
-        <div className="absolute right-0 mt-3 w-72 rounded-2xl bg-[#121218] border border-white/15 p-3.5 shadow-2xl z-50 animate-fade-in flex flex-col gap-3">
+        <div className="absolute left-0 sm:left-auto sm:right-0 mt-3 w-72 max-w-[calc(100vw-4.5rem)] sm:max-w-none rounded-2xl bg-[#121218] border border-white/15 p-3.5 shadow-2xl z-50 animate-fade-in flex flex-col gap-3">
           <div className="px-1 py-0.5 border-b border-white/10 flex items-center justify-between gap-2 text-xs font-bold text-white pb-2">
             <span>{t.modelLoading?.downloadingTitle || "Downloading AI models"}</span>
             <span className="font-mono text-[10px] font-bold text-[#00FF85]">

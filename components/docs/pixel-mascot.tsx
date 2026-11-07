@@ -47,6 +47,7 @@ export function PixelMascot({ pageKey, searching = false }: { pageKey: string; s
     }
     const pageMood: Record<string, Mood> = {
       "/docs": "happy",
+      "/overview": "happy",
       "/docs/getting-started": "curious",
       "/docs/background-remover": "wow",
       "/docs/ai-upscaler": "love",

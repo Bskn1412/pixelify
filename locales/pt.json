@@ -384,12 +384,11 @@
     "docs": "Documentação",
     "blogs": "Blogs",
     "faqs": "Perguntas Frequentes",
-    "sysReq": "Requisitos do Sistema",
     "about": "Sobre o Pixelify",
     "contact": "Contato",
     "privacy": "Política de Privacidade",
     "terms": "Termos de Uso",
-    "rights": "Todos os direitos reservados. Processado no dispositivo."
+    "rights": "© 2026 Pixelify Inc. Todos os direitos reservados."
   },
   "blogs": {
     "title": "Blog e Guias de IA",
@@ -521,7 +520,7 @@
     "previewWorkflow": "Visualizar fluxo",
     "refiningSubjectBoundaries": "Refinando os limites do sujeito",
     "enhancingImageDetail": "Aprimorando os detalhes da imagem",
-    "simulatedNotice": "Estado ilustrativo — nenhuma imagem real é processada nesta demo.",
+    "simulatedNotice": "Estado ilustrativo - nenhuma imagem real é processada nesta demo.",
     "preparingPreview": "Preparando prévia",
     "simulated": "Simulado",
     "previewState": "Estado da prévia",

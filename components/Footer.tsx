@@ -94,14 +94,13 @@ export default function Footer({ onTabChange }: FooterProps) {
               <Link href={getLangHref('/docs')} className="text-muted transition hover:text-white">{t.footer.docs}</Link>
               <button onClick={() => onTabChange('blogs')} className="text-left text-muted transition hover:text-white">{t.footer.blogs}</button>
               <Link href={getLangHref('/#home-faq')} className="text-muted transition hover:text-white">{t.footer.faqs}</Link>
-              <Link href={getLangHref('/products#requirements')} className="text-muted transition hover:text-white">{t.footer.sysReq}</Link>
             </nav>
 
             <nav aria-label="Company and legal links" className="flex flex-col items-start gap-2.5">
               <h3 className="mb-0.5 text-[11px] font-bold uppercase tracking-wider text-white">{t.footer.companyCol}</h3>
               <Link href={getLangHref('/about')} className="text-muted transition hover:text-white">{t.footer.about}</Link>
               <Link href={getLangHref('/contact')} className="text-muted transition hover:text-white">{t.footer.contact}</Link>
-              <div className="mt-3 flex flex-col items-start gap-2.5 border-t border-white/10 pt-3">
+              <div className="mt-3 flex flex-col items-start gap-2.5 pt-3">
                 <h4 className="text-[10px] font-bold uppercase tracking-wider text-white">{t.footer.legalCol}</h4>
                 <Link href={getLangHref('/privacy')} className="text-muted transition hover:text-white">{t.footer.privacy}</Link>
                 <Link href={getLangHref('/terms')} className="text-muted transition hover:text-white">{t.footer.terms}</Link>
@@ -135,7 +134,6 @@ export default function Footer({ onTabChange }: FooterProps) {
           </div>
 
         </div>
-
       </div>
     </footer>
   );

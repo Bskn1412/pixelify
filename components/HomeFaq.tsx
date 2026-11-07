@@ -12,19 +12,19 @@ interface FaqItem {
 const FAQ_ITEMS: FaqItem[] = [
   {
     q: 'How does Pixelify process images without uploading to cloud servers?',
-    a: 'The AI runs right in your browser using WebGPU and ONNX Runtime, so your images stay on your device—not on someone else’s server.',
+    a: 'The AI runs right in your browser using WebGPU and ONNX Runtime, so your images stay on your device, not on someone else’s server.',
   },
   {
     q: 'Is Pixelify really 100% free with no watermarks or subscriptions?',
-    a: 'Yes—no subscriptions, credits, watermarks, or surprise paywalls; just upload, edit, and download.',
+    a: 'Yes - no subscriptions, credits, watermarks, or surprise paywalls; just upload, edit, and download.',
   },
   {
     q: 'What is the maximum resolution and image size I can upscale?',
-    a: 'Upscale images up to 40 MB and 16K resolution (16,384 × 16,384 px)—your device’s memory is the only real boss here.',
+    a: 'Upscale images up to 40 MB and 16K resolution (16,384 x 16,384 px) - your device’s memory is the only real boss here.',
   },
   {
     q: 'Can I use Pixelify offline without an active internet connection?',
-    a: 'Once the AI models are cached, you can process images offline—perfect for flights, commutes, or Wi-Fi that decided to take a day off.',
+    a: 'Once the AI models are cached, you can process images offline - perfect for flights, commutes, or Wi-Fi that decided to take a day off.',
   },
   {
     q: 'How does Chopper compare to standard background removers?',
@@ -40,7 +40,7 @@ const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: 'How do I clear downloaded models if I need to free up browser storage?',
-    a: 'Open Settings and select “Clear downloaded models”—a quick cleanup without having to clear your entire browser cache.',
+    a: 'Open Settings and select “Clear downloaded models”, a quick cleanup without having to clear your entire browser cache.',
   },
 ];
 

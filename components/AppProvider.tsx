@@ -137,7 +137,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
       return 'blogs' as ViewTab;
     }
     // Static pages (privacy, about, products, terms, story, ...) have no
-    // navbar item of their own — nothing should show as highlighted.
+    // navbar item of their own - nothing should show as highlighted.
     return 'static';
   }, [pathname]);
 
@@ -294,7 +294,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
   const { runtimeRef, execEngine, sessionRef, isLoading: modelLoading, modelProgress, initLiteRT, loadModel, unloadModel } = useLiteRT();
   const { upscale } = useUpscale({ runtimeRef, sessionRef });
 
-  // LIVE ENGINE STATE — what each tool's pipeline is ACTUALLY running on right now.
+  // LIVE ENGINE STATE - what each tool's pipeline is ACTUALLY running on right now.
   const [bgEngine, setBgEngine] = useState<'wasm' | 'webgpu' | null>(null);
   const [bgWebgpuAvailable, setBgWebgpuAvailable] = useState<boolean>(false);
   const [webgpuAvailable, setWebgpuAvailable] = useState<boolean | null>(null);
@@ -305,7 +305,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
   const [upscalerPreloadError, setUpscalerPreloadError] = useState(false);
   const [modelsCleared, setModelsCleared] = useState(false);
   const [isClearingModelCache, setIsClearingModelCache] = useState(false);
-  // Name of the upscaler model currently loading — labels the navbar badge.
+  // Name of the upscaler model currently loading - labels the navbar badge.
   const [upscalerActiveName, setUpscalerActiveName] = useState(MODELS.vitality.name);
   const [upscalerActiveKey, setUpscalerActiveKey] = useState<ModelKey>('vitality');
   // First-time preload queue: the other upscaler models that still need to
@@ -474,7 +474,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
       setBgWebgpuAvailable(state.webgpuAvailable);
       // Cached heavyweight weights report a single 100% "progress" tick per
       // file, which would make the badge flicker on/off between files.
-      // A real transfer passes through sub-95% values first — only then
+      // A real transfer passes through sub-95% values first - only then
       // do we surface the row, and keep it up until the phase changes.
       if (state.phase === 'downloading') {
         if (state.progress > 0 && state.progress < 95) bgRealDownloadRef.current = true;
@@ -639,7 +639,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
     (tab: ViewTab) => {
       try {
         if (tab === 'upscaler') {
-          // Idle preload already covers all models — don't double-load.
+          // Idle preload already covers all models - don't double-load.
           if (!sessionRef.current && !modelLoading) {
             void (async () => {
               try {
@@ -664,12 +664,12 @@ export default function AppProvider({ children }: { children: React.ReactNode })
      ---------------------------------------------------------- */
   const modelDownloads = useMemo<ModelDownloadItem[]>(() => {
     const out: ModelDownloadItem[] = [];
-    // Only real transfers (progress events) surface — runtime init or
+    // Only real transfers (progress events) surface - runtime init or
     // session-compile of already-cached models must NOT flash the badge.
     if (modelLoading && modelProgress !== null) {
       out.push({ id: 'upscaler', name: upscalerActiveName, progress: Math.round(modelProgress) });
     }
-    // Cached Chopper reports a 100% progress tick — that's not a download;
+    // Cached Chopper reports a 100% progress tick - that's not a download;
     // bgDownloadActive goes true only once a real <95% transfer tick lands.
     if (bgModelPhase === 'downloading' && bgDownloadActive) {
       out.push({
@@ -755,7 +755,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
         )
       );
       setActiveUpscalerModel(key);
-      // User picked a model manually — stop racing the background preload
+      // User picked a model manually - stop racing the background preload
       // and drop its pending badge rows.
       preloadCancelledRef.current = true;
       setUpscalerPreloadQueue([]);
@@ -777,7 +777,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
   }, []);
 
   /* ----------------------------------------------------------
-     RESET SETTINGS (Per image) — back to the model's default preset
+     RESET SETTINGS (Per image) - back to the model's default preset
      ---------------------------------------------------------- */
   const handleResetItemSettings = useCallback((id: string) => {
     setItems((prev) =>
@@ -822,7 +822,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
       primeAudio();
       requestNotificationPermission().catch(() => { });
 
-      // A rerun replaces the previous result — drop its object URL first.
+      // A rerun replaces the previous result - drop its object URL first.
       if (item.result?.blobUrl) URL.revokeObjectURL(item.result.blobUrl);
       setItems((prev) =>
         prev.map((i) =>
@@ -979,7 +979,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
   }, [items]);
 
   /* ----------------------------------------------------------
-     EXIT WORKSPACE (mobile X / desktop close) — back to upload.
+     EXIT WORKSPACE (mobile X / desktop close) - back to upload.
      ---------------------------------------------------------- */
   const handleExitWorkspace = useCallback(() => {
     setStep('upload');
@@ -1136,8 +1136,8 @@ export default function AppProvider({ children }: { children: React.ReactNode })
             ? (ms?.bgPreloadFailed || 'Background model preload failed; it will retry when used')
             : modelLoading
               ? (modelProgress === null
-                  ? (ms?.preparingUpscaler || 'Preparing upscaler model')
-                  : (ms?.preparingUpscalerPct ? ms.preparingUpscalerPct.replace('{pct}', String(Math.round(modelProgress))) : `Preparing upscaler model (${Math.round(modelProgress)}%)`))
+                ? (ms?.preparingUpscaler || 'Preparing upscaler model')
+                : (ms?.preparingUpscalerPct ? ms.preparingUpscalerPct.replace('{pct}', String(Math.round(modelProgress))) : `Preparing upscaler model (${Math.round(modelProgress)}%)`))
               : upscalerPreloadError && !execEngine
                 ? (ms?.upscalerPreloadFailed || 'Upscaler model preload failed; it will retry when used')
                 : bgModelPhase === 'ready' && execEngine
@@ -1248,50 +1248,54 @@ export default function AppProvider({ children }: { children: React.ReactNode })
           }}
         />
 
-        {/* STICKY NAVBAR — hides on mobile while the upscaler workspace owns the screen */}
-        <Navbar
-          activeTab={activeTab}
-          onTabChange={navigateTo}
-          modelDownloads={modelDownloads}
-          upscalerEngine={execEngine}
-          bgEngine={bgEngine}
-          webgpuAvailable={webgpuAvailable ?? (bgWebgpuAvailable ? true : null)}
-          modelStatus={modelStatus}
-          isClearingModelCache={isClearingModelCache}
-          canClearModelCache={canClearModelCache}
-          onClearModelCache={handleClearModelCache}
-          onOpenMobileSidebar={onOpenMobileSidebar}
-          isMobileSidebarOpen={isMobileNavOpen}
-          mobileHidden={mobileHidden}
-          isOnline={isOnline}
-          justReconnected={justReconnected}
-        />
+        {/* STICKY NAVBAR - hides on mobile while the upscaler workspace owns the screen, and hidden on docs/overview routes */}
+        {!(pathname === '/docs' || pathname?.startsWith('/docs/') || pathname === '/overview' || pathname?.startsWith('/overview/') || /^\/[a-z]{2}\/(docs|overview)(\/|$)/.test(pathname || '')) && (
+          <Navbar
+            activeTab={activeTab}
+            onTabChange={navigateTo}
+            modelDownloads={modelDownloads}
+            upscalerEngine={execEngine}
+            bgEngine={bgEngine}
+            webgpuAvailable={webgpuAvailable ?? (bgWebgpuAvailable ? true : null)}
+            modelStatus={modelStatus}
+            isClearingModelCache={isClearingModelCache}
+            canClearModelCache={canClearModelCache}
+            onClearModelCache={handleClearModelCache}
+            onOpenMobileSidebar={onOpenMobileSidebar}
+            isMobileSidebarOpen={isMobileNavOpen}
+            mobileHidden={mobileHidden}
+            isOnline={isOnline}
+            justReconnected={justReconnected}
+          />
+        )}
 
         {/* MOBILE NAVIGATION SIDEBAR (replaces the old bottom nav on < md) */}
-        <MobileSidebar
-          open={isMobileNavOpen}
-          onClose={() => setIsMobileNavOpen(false)}
-          activeTab={activeTab}
-          onTabChange={(tab) => {
-            setIsMobileNavOpen(false);
-            navigateTo(tab);
-          }}
-          upscalerEngine={execEngine}
-          bgEngine={bgEngine}
-          webgpuAvailable={webgpuAvailable ?? (bgWebgpuAvailable ? true : null)}
-          modelStatus={modelStatus}
-          isClearingModelCache={isClearingModelCache}
-          canClearModelCache={canClearModelCache}
-          onClearModelCache={handleClearModelCache}
-          isOnline={isOnline}
-        />
+        {!(pathname === '/docs' || pathname?.startsWith('/docs/') || pathname === '/overview' || pathname?.startsWith('/overview/') || /^\/[a-z]{2}\/(docs|overview)(\/|$)/.test(pathname || '')) && (
+          <MobileSidebar
+            open={isMobileNavOpen}
+            onClose={() => setIsMobileNavOpen(false)}
+            activeTab={activeTab}
+            onTabChange={(tab) => {
+              setIsMobileNavOpen(false);
+              navigateTo(tab);
+            }}
+            upscalerEngine={execEngine}
+            bgEngine={bgEngine}
+            webgpuAvailable={webgpuAvailable ?? (bgWebgpuAvailable ? true : null)}
+            modelStatus={modelStatus}
+            isClearingModelCache={isClearingModelCache}
+            canClearModelCache={canClearModelCache}
+            onClearModelCache={handleClearModelCache}
+            isOnline={isOnline}
+          />
+        )}
 
         {/* MAIN CONTENT AREA */}
         <main className="flex-1 w-full mx-auto transition-all duration-300 w-full max-w-none p-0">
           {children}
         </main>
 
-        {/* SCROLL TO TOP — Only for browsing pages (Home, Blogs), STOPPED on editing workspaces where it blocks design features */}
+        {/* SCROLL TO TOP - Only for browsing pages (Home, Blogs), STOPPED on editing workspaces where it blocks design features */}
         {activeTab !== 'bg_remove' && (activeTab !== 'upscaler' || step === 'upload') && (
           <ScrollToTopButton />
         )}

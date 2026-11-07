@@ -4,7 +4,7 @@ import type { ViewTab } from '../../types';
 import Footer from '../Footer';
 
 /* --------------------------------------------------------------------------
-   PageShell — shared chrome for the static pages (About, Products, Privacy,
+   PageShell - shared chrome for the static pages (About, Products, Privacy,
    Terms). Keeps one header style, one section rhythm, one doc-title effect
    and the site footer, so the four pages cannot drift apart visually.
 -------------------------------------------------------------------------- */
@@ -48,7 +48,7 @@ export default function PageShell({
   return (
     <div className="w-full">
       {/* ============================================================
-          PAGE HEADER — same rhythm as the blog index
+          PAGE HEADER - same rhythm as the blog index
       ============================================================ */}
       <header className="w-full border-b border-white/10 bg-[#08080B]">
         <div className="w-full px-4 pb-10 pt-8 sm:px-6 lg:px-10">
@@ -102,7 +102,7 @@ export default function PageShell({
 }
 
 /* --------------------------------------------------------------------------
-   Section — numbered section with an anchor, used by every static page
+   Section - numbered section with an anchor, used by every static page
 -------------------------------------------------------------------------- */
 
 export function Section({
@@ -154,7 +154,7 @@ export function UL({ items }: { items: ReactNode[] }) {
   );
 }
 
-/** Highlighted callout box — used for the "bottom line" facts. */
+/** Highlighted callout box - used for the "bottom line" facts. */
 export function Callout({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="rounded-2xl border border-[#A4D641]/25 bg-[#A4D641]/[0.06] p-5">

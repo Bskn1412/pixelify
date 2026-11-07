@@ -10,7 +10,7 @@ import {
 import { useTranslation } from '@/locales';
 
 /* ============================================================
-   SECTION 3 — CAPABILITIES BENTO
+   SECTION 3 - CAPABILITIES BENTO
    "Core HR solutions" reference: big centered statement, then
    a masonry bento of cards that mix real imagery + live
    micro-visuals instead of emoji grids.

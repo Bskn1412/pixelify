@@ -29,14 +29,13 @@ export default function BlogCard({ post }: BlogCardProps) {
 
       {/* BODY */}
       <div className="flex flex-1 flex-col p-5 sm:p-6">
-        {/* LANGUAGE + TAGS — coarse uppercase sans chips */}
+        {/* LANGUAGE + TAGS - coarse uppercase sans chips */}
         <div className="flex flex-wrap gap-1.5">
           <span
-            className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ${
-              post.lang === 'en'
+            className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ${post.lang === 'en'
                 ? 'border-white/10 bg-white/5 text-white/55'
                 : 'border-[#A4D641]/45 bg-[#A4D641]/10 text-[#A4D641]'
-            }`}
+              }`}
             title={`${post.lang.toUpperCase()} article`}
           >
             {langShort(post.lang)}

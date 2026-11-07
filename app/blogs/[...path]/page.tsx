@@ -8,11 +8,11 @@ import { SITE_URL } from '@/lib/seo';
 
 export function generateStaticParams() {
   return [
-    // /blogs/<lang> — localized index pages (plus /blogs/en/ as a permalink)
+    // /blogs/<lang> - localized index pages (plus /blogs/en/ as a permalink)
     ...LANGUAGES.map((lang) => ({ path: [lang.code] })),
-    // /blogs/<slug> — English articles
+    // /blogs/<slug> - English articles
     ...getAllPosts('en').map((post) => ({ path: [post.slug] })),
-    // /blogs/<lang>/<slug> — translations (plus /blogs/en/<slug> for legacy links)
+    // /blogs/<lang>/<slug> - translations (plus /blogs/en/<slug> for legacy links)
     ...LANGUAGES.flatMap((l) =>
       getAllPosts(l.code).flatMap((post) => {
         const segments = [{ path: [post.lang, post.slug] }];
@@ -33,7 +33,7 @@ type Resolved =
 
 function resolve(params: { path: string[] }): Resolved {
   const { path } = params;
-  // /blogs/<lang> — a localized index page
+  // /blogs/<lang> - a localized index page
   if (path.length === 1 && isSupportedLang(path[0])) {
     return { post: null, lang: path[0], path, langIndex: path[0] };
   }

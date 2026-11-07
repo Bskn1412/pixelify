@@ -1,5 +1,5 @@
 /**
- * Blog post registry — the single place to manage all posts.
+ * Blog post registry - the single place to manage all posts.
  *
  * Post content lives in one file per language:
  *   ./posts_en.js, ./posts_fr.js, ./posts_zh.js,
@@ -14,9 +14,9 @@
  *   1. Append a {slug, title, description, tags, date, author, cover,
  *      coverAlt, blocks} object to the post list(s) in ./posts_*.js.
  *      The SAME slug must be used in every language that has a translation
- *      (skip languages you don't translate — they simply won't show it).
+ *      (skip languages you don't translate - they simply won't show it).
  *   2. To add a NEW LANGUAGE, import its file below, register it in
- *      LANGUAGES and in SOURCES. That's it — list page, pagination,
+ *      LANGUAGES and in SOURCES. That's it - list page, pagination,
  *      search, language filter, related-posts and the article route all
  *      pick it up automatically.
  *
@@ -53,9 +53,9 @@ export const LANGUAGES = [
   { code: 'hi', label: 'हिन्दी', short: 'HI' },
   { code: 'ja', label: '日本語', short: 'JA' },
   { code: 'ko', label: '한국어', short: 'KO' },
-  { code: 'pt', label: 'Português', short: 'PT' }, 
+  { code: 'pt', label: 'Português', short: 'PT' },
   { code: 'ru', label: 'Русский', short: 'RU' },
-  { code: 'zh', label: '中文', short: 'ZH' }, 
+  { code: 'zh', label: '中文', short: 'ZH' },
 ];
 
 export const DEFAULT_LANG = 'en';
@@ -182,7 +182,7 @@ export function getAllTags(lang) {
     .sort((a, b) => a.tag.localeCompare(b.tag));
 }
 
-/** Plain-text version of a post's blocks — used for word counts / read time. */
+/** Plain-text version of a post's blocks - used for word counts / read time. */
 export function postPlainText(post) {
   return post.blocks
     .map((b) => {

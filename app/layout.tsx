@@ -13,7 +13,7 @@ import '@/styles/bgremove-sections.css';
 import '@/styles/home.css';
 import { Analytics } from "@vercel/analytics/next";
 
-import '@/styles/pixelify-docs.css';
+import '@/styles/docs.css';
 
 const SITE_URL = 'https://pixelify.me';
 
@@ -141,7 +141,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        {/* Resource hints — browsers honour them wherever they appear; React hoists <meta>/<link> metadata tags to the head when possible */}
+        {/* Resource hints - browsers honour them wherever they appear; React hoists <meta>/<link> metadata tags to the head when possible */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossOrigin="anonymous" />

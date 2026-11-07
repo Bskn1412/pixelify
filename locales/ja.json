@@ -384,12 +384,11 @@
     "docs": "ドキュメント",
     "blogs": "技術ブログ",
     "faqs": "よくある質問",
-    "sysReq": "動作環境",
     "about": "Pixelify について",
     "contact": "お問い合わせ",
     "privacy": "プライバシーポリシー",
     "terms": "利用規約",
-    "rights": "All rights reserved. 端末内オンデバイス処理。"
+    "rights": "© 2026 Pixelify Inc. 無断転載を禁じます。"
   },
   "blogs": {
     "title": "ブログ＆AI ガイド",

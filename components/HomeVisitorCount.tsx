@@ -64,7 +64,7 @@ export default function HomeVisitorCount() {
     return () => window.removeEventListener('keydown', closeOnEscape);
   }, [open]);
 
-  const formattedCount = count?.toLocaleString() ?? (loading ? '…' : '—');
+  const formattedCount = count?.toLocaleString() ?? (loading ? '…' : '-');
 
   return (
     <aside className="fixed right-0 top-1/2 z-[80] -translate-y-1/2">

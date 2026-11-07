@@ -1,4 +1,4 @@
-import { DocsHome } from "@/components/pixelify-docs/docs-home";
+import { DocsHome } from "@/components/docs/docs-home";
 import { SITE_LANGUAGES } from '@/lib/i18n';
 
 export function generateStaticParams() {
@@ -6,11 +6,10 @@ export function generateStaticParams() {
 }
 
 export const metadata = {
-  title: "Pixelify Docs — Learn, create, and get more from Pixelify",
+  title: "Pixelify Docs - Overview",
   description: "Guides, tutorials, and answers for Pixelify's browser-based AI image tools.",
 };
 
 export default function LocalizedDocsPage() {
   return <DocsHome />;
 }
-

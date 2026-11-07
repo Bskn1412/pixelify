@@ -1,5 +1,5 @@
 /* ============================================================
-   PIXELIFY — 404 PAGE
+   PIXELIFY - 404 PAGE
    ============================================================ */
 
 .not-found-page {
@@ -15,11 +15,9 @@
   justify-content: center;
 
   background:
-    radial-gradient(
-      circle at 50% 42%,
+    radial-gradient(circle at 50% 42%,
       rgba(40, 255, 150, 0.045),
-      transparent 30%
-    ),
+      transparent 30%),
     #050607;
 
   color: white;
@@ -41,32 +39,24 @@
   opacity: 0.28;
 
   background-image:
-    linear-gradient(
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px,
+      transparent 1px),
+    linear-gradient(90deg,
       rgba(255, 255, 255, 0.025) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.025) 1px,
-      transparent 1px
-    );
+      transparent 1px);
 
   background-size:
     48px 48px;
 
   mask-image:
-    radial-gradient(
-      ellipse at center,
+    radial-gradient(ellipse at center,
       black 0%,
-      transparent 75%
-    );
+      transparent 75%);
 
   -webkit-mask-image:
-    radial-gradient(
-      ellipse at center,
+    radial-gradient(ellipse at center,
       black 0%,
-      transparent 75%
-    );
+      transparent 75%);
 }
 
 
@@ -116,9 +106,7 @@
   width: min(900px, 100%);
 
   padding:
-    80px
-    24px
-    50px;
+    80px 24px 50px;
 
   display: flex;
   flex-direction: column;
@@ -170,10 +158,7 @@
     0 0 8px rgba(0, 255, 133, 0.8);
 
   animation:
-    not-found-status-blink
-    1.8s
-    ease-in-out
-    infinite;
+    not-found-status-blink 1.8s ease-in-out infinite;
 }
 
 .not-found-eyebrow-line {
@@ -208,9 +193,7 @@
   transform: scale(0.92);
 
   filter:
-    drop-shadow(
-      0 20px 30px rgba(0, 0, 0, 0.35)
-    );
+    drop-shadow(0 20px 30px rgba(0, 0, 0, 0.35));
 }
 
 .ghost-body {
@@ -244,10 +227,7 @@
     "an1 an2 an3 an5 an6 an8 an9 an9 an11 an12 an14 an15 an17 an18";
 
   animation:
-    ghost-float
-    2.8s
-    cubic-bezier(.65, 0, .35, 1)
-    infinite;
+    ghost-float 2.8s cubic-bezier(.65, 0, .35, 1) infinite;
 }
 
 
@@ -394,6 +374,7 @@
 
 
 @keyframes ghost-flicker-a {
+
   0%,
   49% {
     background: #ff3b30;
@@ -406,6 +387,7 @@
 }
 
 @keyframes ghost-flicker-b {
+
   0%,
   49% {
     background: transparent;
@@ -482,10 +464,7 @@
   background: #665cff;
 
   animation:
-    ghost-eyes-movement
-    3s
-    ease-in-out
-    infinite;
+    ghost-eyes-movement 3s ease-in-out infinite;
 }
 
 .ghost-pupil-right {
@@ -495,6 +474,7 @@
 
 
 @keyframes ghost-eyes-movement {
+
   0%,
   49% {
     transform: translateX(0);
@@ -534,28 +514,24 @@
   filter: blur(20px);
 
   animation:
-    ghost-shadow-movement
-    2.8s
-    ease-in-out
-    infinite;
+    ghost-shadow-movement 2.8s ease-in-out infinite;
 }
 
 
 @keyframes ghost-shadow-movement {
+
   0%,
   49% {
     opacity: 0.45;
     transform:
-      rotateX(80deg)
-      scale(0.92);
+      rotateX(80deg) scale(0.92);
   }
 
   50%,
   100% {
     opacity: 0.18;
     transform:
-      rotateX(80deg)
-      scale(1.05);
+      rotateX(80deg) scale(1.05);
   }
 }
 
@@ -565,6 +541,7 @@
    ============================================================ */
 
 @keyframes ghost-float {
+
   0%,
   100% {
     transform: translateY(0);
@@ -603,20 +580,16 @@
   color: transparent;
 
   background:
-    linear-gradient(
-      180deg,
+    linear-gradient(180deg,
       #ffffff 0%,
       #d8d8d8 45%,
-      #707070 100%
-    );
+      #707070 100%);
 
   background-clip: text;
   -webkit-background-clip: text;
 
   filter:
-    drop-shadow(
-      0 12px 30px rgba(0, 0, 0, 0.5)
-    );
+    drop-shadow(0 12px 30px rgba(0, 0, 0, 0.5));
 }
 
 
@@ -760,8 +733,7 @@
 }
 
 
-.not-found-home-button:hover
-.not-found-home-icon {
+.not-found-home-button:hover .not-found-home-icon {
   transform: translateX(-3px);
 }
 
@@ -817,6 +789,7 @@
 
 
 @keyframes not-found-status-blink {
+
   0%,
   100% {
     opacity: 0.35;
@@ -835,9 +808,7 @@
 @media (max-width: 640px) {
   .not-found-content {
     padding:
-      50px
-      18px
-      35px;
+      50px 18px 35px;
   }
 
   .ghost-wrapper {
@@ -907,6 +878,7 @@
    ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
+
   .ghost-body,
   .ghost-shadow,
   .ghost-pupil,

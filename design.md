@@ -78,26 +78,26 @@ litert-upscaler/
 
 ```
 App (state owner)
-├── Header                    — Logo, privacy badge, backend badge
-├── StepIndicator             — 4-step workflow progress
-├── UploadArea                — Drop zone / file picker
-├── ErrorMessage              — Error display + dismiss
-├── ImageComparison           — Side-by-side cards + slider
-├── ControlPanel              — Model select, scale, buttons
-├── ModelInfoPanel            — Collapsible model details
-├── ProgressCard              — Processing progress
-├── StatsBar                  — Result stats pills
-└── Footer                    — Attribution
+├── Header                    - Logo, privacy badge, backend badge
+├── StepIndicator             - 4-step workflow progress
+├── UploadArea                - Drop zone / file picker
+├── ErrorMessage              - Error display + dismiss
+├── ImageComparison           - Side-by-side cards + slider
+├── ControlPanel              - Model select, scale, buttons
+├── ModelInfoPanel            - Collapsible model details
+├── ProgressCard              - Processing progress
+├── StatsBar                  - Result stats pills
+└── Footer                    - Attribution
 ```
 
 ### State Management (App.tsx)
 
 ```
 step: 'upload' | 'config' | 'processing' | 'result'
-image: ImageData | null       — file, url, img, width, height, name, size
+image: ImageData | null       - file, url, img, width, height, name, size
 modelKey: 'vitality' | 'pixel-dance' | 'alpha-satoru'
-scale: number                 — 2 | 4 | 8
-result: UpscaleResult | null  — rgba, width, height, time
+scale: number                 - 2 | 4 | 8
+result: UpscaleResult | null  - rgba, width, height, time
 error: string | null
 isProcessing: boolean
 progress: { percent: number, text: string }
@@ -166,7 +166,7 @@ progress: { percent: number, text: string }
 
 ### Progress
 - Shimmer-animated gradient progress bar
-- Descriptive phase text: "Reading image...", "Pass 1/3 — upscaling luminance...", "Merging color channels...", etc.
+- Descriptive phase text: "Reading image...", "Pass 1/3 - upscaling luminance...", "Merging color channels...", etc.
 - Spinning loader icon during processing
 
 ### Download
@@ -264,18 +264,18 @@ export function detectBackend(): 'webgpu' | 'wasm' {
 
 ```
 User drops file → UploadArea.onFile()
-  → useImageFile.handleFile()    — reads file, creates Image, validates
-  → setImageData(...)            — triggers re-render
-  → App effect fires             — setStep('config'), loadModel(modelKey)
-  → useONNX.loadModel()          — create ONNX InferenceSession
+  → useImageFile.handleFile()    - reads file, creates Image, validates
+  → setImageData(...)            - triggers re-render
+  → App effect fires             - setStep('config'), loadModel(modelKey)
+  → useONNX.loadModel()          - create ONNX InferenceSession
 
 User clicks "Upscale" → ControlPanel.onUpscale()
   → setStep('processing')
   → useUpscale.upscale(img, modelKey, scale, onProgress)
     → extractRGB() or extractYCbCr()
     → for each pass:
-        → runPass()              — tiled inference loop
-        → onProgress()           — updates ProgressCard
+        → runPass()              - tiled inference loop
+        → onProgress()           - updates ProgressCard
     → rgbaFromTensor() or mergeToRgba()
   → setResult({ rgba, width, height, time })
   → setStep('result')

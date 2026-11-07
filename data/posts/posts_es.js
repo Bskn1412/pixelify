@@ -4,6 +4,114 @@
  */
 export const POSTS_ES = [
 {
+  "slug": "data_harvesting_warning_a9e5b7",
+  "title": "Qué le ocurre a tus fotos después de pulsar \"Subir\"",
+  "description": "Las herramientas gratuitas monetizan las fotos de formas que la mayoría no percibe: cláusulas de retención, datos derivados, entrenamiento de IA y riesgo de filtraciones. Una guía práctica para leer la letra pequeña y eliminar este riesgo.",
+  "tags": [
+    "Privacidad",
+    "Seguridad",
+    "Industria"
+  ],
+  "date": "2026-11-07",
+  "author": "El equipo de Pixelify",
+  "cover": "/blogs/home-hero.jpg",
+  "coverAlt": "Página principal de Pixelify destacando el procesamiento local sin subidas a la nube",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "El acuerdo parece justo a simple vista: obtienes una herramienta potente gratis y, a cambio, entregas una imagen. Te imaginas una máquina procesando el archivo y olvidándolo de inmediato, como lo haría una fotocopiadora. Ese modelo mental es erróneo en casi todos los detalles, y en esa distancia entre lo que se asume y lo que ocurre en realidad es donde reside el riesgo. Este artículo trata sobre esa distancia: en qué se transforman las imágenes subidas y cómo evaluar cualquier herramienta en menos de cinco minutos."
+    },
+    {
+      "type": "h2",
+      "text": "El modelo de negocio detrás de lo \"gratuito\""
+    },
+    {
+      "type": "p",
+      "text": "El cómputo cuesta dinero. La capacidad de los servidores, el ancho de banda y la inferencia de modelos generan facturas reales, y una herramienta que procesa imágenes para millones de usuarios sin cobrarles está siendo financiada por alguien más. Las opciones son incómodas: publicidad que necesita datos de comportamiento, corredores de datos donde tus subidas alimentan perfiles comerciales, entrenamiento de modelos donde tus fotos mejoran el producto de otros o captación de usuarios para monetizarlos tras una venta corporativa."
+    },
+    {
+      "type": "p",
+      "text": "Los términos de servicio suelen admitir todo esto con palabras ordinarias. Cláusulas amplias para \"usar, copiar, modificar y crear obras derivadas del contenido subido\" no son entusiasmo legal; son la base jurídica para el entrenamiento de modelos, la redistribución en conjuntos de datos y la analítica de producto. Las cláusulas de \"datos agregados y anonimizados\" abarcan la extracción de hábitos a partir de tus registros (qué imágenes editas, con qué frecuencia y en qué resoluciones). Y \"podemos retener contenido para mejorar el servicio\" es la cláusula de entrenamiento en su sentido más literal."
+    },
+    {
+      "type": "h2",
+      "text": "Qué es realmente una imagen subida"
+    },
+    {
+      "type": "p",
+      "text": "La gente evalúa el riesgo únicamente por lo que ve en la fotografía. El objeto real de evaluación debe ser el archivo completo. Una foto incluye metadatos EXIF: el modelo de dispositivo, la fecha y hora exactas y, frecuentemente, coordenadas GPS: un registro de dónde estabas y cuándo, adherido al contenido visual. Más allá de los metadatos, los propios píxeles filtran información: documentos visibles en una mesa, pantallas de fondo, pizarras, tarjetas de identificación, reflejos en espejos o ventanas y rostros de personas que nunca consintieron ser compartidas."
+    },
+    {
+      "type": "ul",
+      "items": [
+        "Metadatos EXIF: dispositivo, hora y ubicación a menudo exacta, recopilados automáticamente al subir.",
+        "Información contextual de fondo: escritorios, pantallas, documentos y acreditaciones legibles en resoluciones modernas.",
+        "Terceros en el encuadre: cada rostro en una foto grupal es una persona cuyos datos acabas de compartir sin su consentimiento.",
+        "Patrones de comportamiento: qué editas, con qué frecuencia y en qué resoluciones conforma un perfil de uso completo."
+      ]
+    },
+    {
+      "type": "h2",
+      "text": "Retención: la promesa que sobrevive a tu sesión"
+    },
+    {
+      "type": "p",
+      "text": "Una promesa de eliminación es un proceso manual o programado por humanos, no una propiedad intrínseca del sistema. \"Eliminado tras 24 horas\" describe una intención de comportamiento; durante esas 24 horas el archivo estuvo en algún servidor, tiempo suficiente para una filtración, una orden judicial, una copia interna o una venta de la empresa. Las copias de seguridad lo complican todo: un registro eliminado de la base de datos puede persistir durante semanas en respaldos que nadie recuerda. El único archivo que no puede filtrarse, ser reclamado judicialmente o ser transferido a terceros es el que nunca se envió."
+    },
+    {
+      "type": "h2",
+      "text": "El cálculo de filtraciones que nadie hace"
+    },
+    {
+      "type": "p",
+      "text": "Asume que cualquier servicio que almacene tus imágenes tarde o temprano sufrirá una filtración, no por mala fe, sino por mera probabilidad estadística en la industria. Hazte la pregunta decisiva: ¿cuál es el peor escenario realista? Para una foto de vacaciones, nada grave. Para el documento escaneado de un familiar, riesgo de robo de identidad. Para el diseño inédito de un cliente, un incumplimiento de contrato con daños reales. Para imágenes médicas o legales, un perjuicio irreparable. La decisión de subir un archivo no es \"foto frente a no foto\", sino asumir un riesgo máximo con total lucidez."
+    },
+    {
+      "type": "h2",
+      "text": "La auditoría en cinco minutos"
+    },
+    {
+      "type": "p",
+      "text": "No necesitas un abogado para evaluar una herramienta; basta con leer la política real en vez de los lemas promocionales. Cuatro preguntas prácticas te dan casi todas las respuestas necesarias. El objetivo no es la certeza absoluta, sino identificar patrones claros en los servicios que usas a diario."
+    },
+    {
+      "type": "ol",
+      "items": [
+        "¿Qué derechos exige la política sobre el contenido subido? Las licencias amplias para crear obras derivadas y entrenar IA son una alerta roja; el compromiso explícito de no retención ni entrenamiento es la señal verde.",
+        "¿Cuál es el periodo de retención declarado y el borrado es automático? Un borrado automático e inmediato es radicalmente diferente a \"podemos retener contenido\".",
+        "¿Dónde se realiza el procesamiento? Una política que oculta dónde se ejecutan los cálculos suele indicar que todo se envía a sus propios servidores.",
+        "¿Existe un modelo de negocio visible que no dependa de tus datos? Precios claros que cubran los costes son la mejor prueba de que tus fotos no son el producto."
+      ]
+    },
+    {
+      "type": "h2",
+      "text": "Hábitos defensivos que funcionan en cualquier caso"
+    },
+    {
+      "type": "p",
+      "text": "Hay precauciones que merece la pena adoptar siempre, porque no cuestan nada y no exigen confiar en nadie. Limpia los metadatos antes de compartir cualquier foto: un borrado rápido elimina el registro de ubicación por completo. Recorta antes de subir: si la herramienta solo necesita un objeto, el fondo nunca debe transmitirse. Y mantén una regla estricta por categorías: ciertos tipos de imágenes simplemente jamás deben subirse a formularios web."
+    },
+    {
+      "type": "callout",
+      "title": "La regla de exclusión",
+      "text": "Imágenes médicas, documentos legales, proyectos no publicados, fotos de menores y cualquier cosa que no mostrarías a un desconocido en la calle: nunca las subas a herramientas gratuitas en la nube. Esta simple regla elimina la inmensa mayoría de los peores escenarios."
+    },
+    {
+      "type": "h2",
+      "text": "La solución estructural: eliminar el paso de subida por completo"
+    },
+    {
+      "type": "p",
+      "text": "Todos los consejos anteriores son medidas paliativas que reducen la exposición dentro de una arquitectura que exige exponerse. La alternativa estructural es una arquitectura que no lo requiera. Cuando el procesamiento se ejecuta en tu propio equipo, no hay subida que auditar, ni cláusula de retención que interpretar, ni filtración que temer, ni canal de entrenamiento que rechazar. El archivo se queda donde nació y la herramienta cumple su función."
+    },
+    {
+      "type": "p",
+      "text": "Esto no es una utopía; es una realidad de ingeniería de software. La misma tarjeta gráfica que dibuja tu pantalla puede ejecutar las redes neuronales que procesan imágenes, y los navegadores actuales ya ofrecen esa capacidad a todo el mundo sin necesidad de instalaciones complejas. El estándar de la industria ha sido enviar tus datos hacia el procesamiento. El estándar superior es llevar el procesamiento hacia tus datos. En 2026, esto ya no es un experimento de laboratorio: es un botón, en este sitio web, ejecutándose en tu ordenador ahora mismo."
+    }
+  ]
+},
+
+{
   "slug": "pixelify_privacy_first_a7f3d9",
   "title": "Pixelify: Por qué creamos un editor de imágenes que nunca ve tus fotos",
   "description": "Todas las demás herramientas de imagen exigen primero tu subida y prometen privacidad después. Pixelify se diseñó de forma opuesta: la IA se ejecuta dentro de la pestaña de tu navegador, por lo que tus fotos nunca salen de tu dispositivo.",
@@ -52,7 +160,7 @@ export const POSTS_ES = [
     },
     {
       "type": "p",
-      "text": "En una arquitectura en la nube, tu foto es la entrada para el programa de otra persona. En Pixelify, el programa es la entrada para tu propio dispositivo. Cuando abres el escalador o el eliminador de fondos, tu navegador descarga la red neuronal en sí —los algoritmos matemáticos que hacen el trabajo— y la almacena localmente en caché. A partir de ese momento, cada imagen que procesas se multiplica, segmenta y reconstruye en tu propia memoria RAM y GPU, bajo tu control exclusivo."
+      "text": "En una arquitectura en la nube, tu foto es la entrada para el programa de otra persona. En Pixelify, el programa es la entrada para tu propio dispositivo. Cuando abres el escalador o el eliminador de fondos, tu navegador descarga la red neuronal en sí -los algoritmos matemáticos que hacen el trabajo- y la almacena localmente en caché. A partir de ese momento, cada imagen que procesas se multiplica, segmenta y reconstruye en tu propia memoria RAM y GPU, bajo tu control exclusivo."
     },
     {
       "type": "img",

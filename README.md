@@ -86,7 +86,7 @@ Static export ends up in `out/` (prerendered HTML for every route + `/404.html`)
 
 The site is deployed on **Vercel** as a fully static export. `vercel.json` provides:
 
-- **AdSense-first header strategy:** COOP/COEP are served **only on `/upscaler` and `/bg_remove`**, the two AI tool routes that need `crossOriginIsolated` for multi-threaded WASM SIMD (~2–4× faster WASM fallback). Every other page ships with plain headers, so Google AdSense scripts keep full cookie access and normal ad serving there. Under COEP the ad scripts still load but are cookie-stripped (result: "limited ads" on those two tool pages — accepted tradeoff).
+- **AdSense-first header strategy:** COOP/COEP are served **only on `/upscaler` and `/bg_remove`**, the two AI tool routes that need `crossOriginIsolated` for multi-threaded WASM SIMD (~2–4× faster WASM fallback). Every other page ships with plain headers, so Google AdSense scripts keep full cookie access and normal ad serving there. Under COEP the ad scripts still load but are cookie-stripped (result: "limited ads" on those two tool pages - accepted tradeoff).
 - `Cache-Control: immutable` for `/models/*` so the ~67MB ONNX files are fetched once per client.
 
 Deploy by connecting the repository in the Vercel dashboard (framework preset: Next.js). No other settings required.

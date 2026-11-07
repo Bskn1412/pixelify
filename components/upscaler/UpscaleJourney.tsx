@@ -3,7 +3,7 @@ import { MousePointer2, Upload, Download, Cpu } from 'lucide-react';
 import { useTranslation } from '@/locales';
 
 /* ============================================================
-   SECTION 4 — THE JOURNEY (sticky scroll)
+   SECTION 4 - THE JOURNEY (sticky scroll)
    Pinned visual column + step list that swaps the preview as
    you scroll. Before/after + progress readouts update per step.
    ============================================================ */
@@ -160,7 +160,7 @@ export const UpscaleJourney: React.FC = () => {
 
   /* --- section reveal: the title uses .pb-reveal (opacity 0 until
      .pb-in lands on this root). Without this the headline stays
-     invisible forever — every sibling section adds its own pb-in. --- */
+     invisible forever - every sibling section adds its own pb-in. --- */
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;

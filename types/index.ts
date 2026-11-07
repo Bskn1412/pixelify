@@ -94,7 +94,7 @@ export interface UpscaleResult {
   psnrGain?: string;
   detailGain?: string;
   enhancementsApplied?: string[];
-  /** Object URL of the encoded PNG blob — revocable, no megabyte base64 copies in state. */
+  /** Object URL of the encoded PNG blob - revocable, no megabyte base64 copies in state. */
   blobUrl?: string;
   engine?: 'webgpu' | 'wasm' | 'canvas';
   engineFallback?: boolean;

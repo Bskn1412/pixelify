@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react';
 import { useTranslation } from '@/locales';
 
 /* ============================================================
-   BRAND FAQ — PIXELIFY UPSCALER (8K · NO CLOUD)
+   BRAND FAQ - PIXELIFY UPSCALER (8K · NO CLOUD)
    Same white/green/black/gray design system as the four
    showcase sections (uc-*). Editorial split header, two-column
    accordion with smooth grid-template-rows expansion.

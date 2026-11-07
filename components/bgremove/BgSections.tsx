@@ -4,11 +4,11 @@ import '@/styles/bgremove-sections.css';
 import { useTranslation } from '@/locales';
 
 /* ============================================================
-   BG REMOVE PAGE SECTIONS — dark "studio band" system (bgr-*)
+   BG REMOVE PAGE SECTIONS - dark "studio band" system (bgr-*)
    Editorial display type · ghost outline numerals · rotated
    marquee · cursor-follow previews · viewfinder brackets.
    Palette: white · black · gray · green (#00FF85).
-   Sample images are placeholders — swap at the top.
+   Sample images are placeholders - swap at the top.
    ============================================================ */
 
 const IMG_S1 = '/bgremove/samples/s1.png';
@@ -48,7 +48,7 @@ const PlusMark: React.FC<{ style: React.CSSProperties; dim?: boolean }> = ({ sty
 );
 
 /* ============================================================
-   1 — SHOWCASE : editorial split + rotated shots + marquee
+   1 - SHOWCASE : editorial split + rotated shots + marquee
    ============================================================ */
 const MARQUEE = [
   'Chopper segmentation', 'WebGPU on-device', 'Zero uploads',
@@ -95,7 +95,7 @@ export const BgShowcase: React.FC = () => {
 
 
 /* ============================================================
-   3 — PIPELINE : sticky crosshair + ghost-number steps
+   3 - PIPELINE : sticky crosshair + ghost-number steps
    ============================================================ */
 const Crosshair: React.FC = () => (
   <svg className="bgr-cross" viewBox="0 0 100 100" fill="none" aria-hidden="true">
@@ -165,7 +165,7 @@ export const BgPipeline: React.FC = () => {
 };
 
 /* ============================================================
-   4 — PRECISION : viewfinder lens + counter stats
+   4 - PRECISION : viewfinder lens + counter stats
    ============================================================ */
 const Lens: React.FC<{ before: string; after: string }> = ({ before, after }) => {
   const { t } = useTranslation();
@@ -292,7 +292,7 @@ export const BgPrecision: React.FC = () => {
 
 
 /* ============================================================
-   2 — SAMPLES : index list + cursor-follow preview
+   2 - SAMPLES : index list + cursor-follow preview
    ============================================================ */
 export interface SampleDef {
   src: string;
@@ -383,7 +383,7 @@ export const BgSampleGallery: React.FC<{ onLoadSample: (src: string, name: strin
 
 
 /* ============================================================
-   5 — FAQ : identical design system to the upscaler FAQ
+   5 - FAQ : identical design system to the upscaler FAQ
    (reuses the globally-bundled uc-faq classes)
    ============================================================ */
 const FAQ_ITEMS = [
@@ -456,9 +456,9 @@ export const BgFaq: React.FC = () => {
       <div className="uc-faq-inner">
         <header className="uc-faq-head">
           <h2 className="uc-faq-title pb-reveal" style={{ '--rv-i': 1 } as React.CSSProperties}>
-           <span className='text-[#00ff85]'>{t.homeFaq?.titlePrefix || 'Frequently'}</span>{' '}
-           <span className='text-[#00ff85]'>{t.homeFaq?.titleMiddle || 'Asked'}</span>{' '}
-           <span className='text-[#00ff85]'>{t.homeFaq?.titleSuffix || 'Questions'}</span>
+            <span className='text-[#00ff85]'>{t.homeFaq?.titlePrefix || 'Frequently'}</span>{' '}
+            <span className='text-[#00ff85]'>{t.homeFaq?.titleMiddle || 'Asked'}</span>{' '}
+            <span className='text-[#00ff85]'>{t.homeFaq?.titleSuffix || 'Questions'}</span>
           </h2>
         </header>
 

@@ -1,5 +1,5 @@
 /* ============================================================
-   WAIT CAPTION — rotating status line for AI processing overlays
+   WAIT CAPTION - rotating status line for AI processing overlays
    Subtle, professional: soft rise + fade, no layout shift.
    ============================================================ */
 
@@ -8,6 +8,7 @@
     opacity: 0;
     transform: translateY(3px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);

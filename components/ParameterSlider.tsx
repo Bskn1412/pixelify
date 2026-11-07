@@ -186,7 +186,7 @@ const ParameterSlider: React.FC<ParameterSliderProps> = ({
         />
 
         {/* ==================================================
-            VALUE (display only — values are adjusted with the
+            VALUE (display only - values are adjusted with the
             drag bar only, never typed manually)
            ================================================== */}
 

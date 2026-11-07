@@ -4,6 +4,90 @@
  */
 export const POSTS_FR = [
 {
+    slug: 'data_harvesting_warning_a9e5b7',
+    title: 'Ce qui arrive à vos photos après avoir cliqué sur « Téléverser »',
+    description:
+      'Les outils d\'image gratuits monétisent les téléversements de manières que la plupart des utilisateurs ne voient jamais : clauses de conservation, données dérivées, entraînement de modèles, exposition aux fuites. Un guide pratique pour lire les petites lignes et éliminer ce risque de votre vie.',
+    tags: ['Confidentialité', 'Sécurité', 'Industrie'],
+    date: '2026-11-07',
+    author: 'L\'équipe Pixelify',
+    cover: '/blogs/home-hero.jpg',
+    coverAlt: 'Page d\'accueil Pixelify mettant l\'accent sur le traitement local et l\'absence d\'envoi vers le cloud',
+    blocks: [
+      {
+        type: 'p',
+        text: 'L\'accord semble équitable en surface : vous obtenez gratuitement un outil puissant, et en échange vous transmettez une image. Vous imaginez une machine traitant le fichier puis l\'oubliant, à la manière d\'un photocopieur. Ce modèle mental est faux dans presque tous ses détails, et la distance entre ce que les gens supposent et ce qui se passe réellement est le lieu où réside le risque. Cet article traite de cette distance : ce que deviennent les images téléversées en aval, et comment évaluer n\'importe quel outil en moins de cinq minutes.',
+      },
+      { type: 'h2', text: 'Le modèle économique caché derrière la « gratuité »' },
+      {
+        type: 'p',
+        text: 'Le calcul coûte de l\'argent. La capacité des serveurs, la bande passante et l\'inférence des modèles génèrent des factures, et un outil qui traite les images de millions d\'utilisateurs sans leur faire payer est financé par quelqu\'un d\'autre. Les candidats sont préoccupants : la publicité nécessitant des données comportementales, le courtage de données où les téléversements alimentent des segments d\'audience vendus, l\'entraînement de modèles où vos images deviennent des fonctionnalités de produit, ou la simple acquisition d\'utilisateurs (développer la base maintenant, monétiser après le rachat).',
+      },
+      {
+        type: 'p',
+        text: 'Les conditions d\'utilisation expriment généralement ces réalités avec des mots ordinaires. Les concessions larges d\'autorisations pour « utiliser, copier, modifier et créer des œuvres dérivées à partir du contenu que vous téléversez » ne sont pas des excès de rédaction ; elles forment la base juridique pour l\'entraînement, la redistribution dans des jeux de données et l\'analyse de produit. Les clauses sur les « données agrégées et anonymisées » couvrent l\'extraction comportementale à partir des journaux d\'interaction, c\'est-à-dire quelles images vous traitez, à quelle fréquence et dans quels formats. Et la mention « nous pouvons conserver le contenu pour améliorer nos services » constitue la clause d\'entraînement sous sa forme la plus littérale.',
+      },
+      { type: 'h2', text: 'Ce qu\'est réellement une image téléversée' },
+      {
+        type: 'p',
+        text: 'Les gens évaluent le risque à partir de la photo qu\'ils voient. Le véritable objet d\'évaluation est le fichier. Une photo transporte des métadonnées EXIF : le modèle de l\'appareil, l\'horodatage exact, parfois les coordonnées GPS, un registre de l\'endroit où vous étiez et du moment, attaché directement au contenu visuel lui-même. Au-delà des métadonnées, les pixels eux-mêmes révèlent des informations : des documents visibles sur un bureau, des écrans laissés dans le champ, des tableaux blancs, des badges et cordons, des reflets dans les miroirs et fenêtres, les visages de personnes qui n\'ont jamais donné leur consentement.',
+      },
+      {
+        type: 'ul',
+        items: [
+          'Métadonnées EXIF : appareil, horodatage et souvent localisation précise, collectés automatiquement lors du téléversement.',
+          'Renseignements en arrière-plan : bureaux, écrans, documents et badges lisibles aux résolutions modernes.',
+          'Tiers présents dans le champ : chaque visage sur une photo de groupe est une personne dont vous venez de partager les données.',
+          'Signaux de contenu : ce que vous éditez, à quelle fréquence et dans quel format construit un profil comportemental.',
+        ],
+      },
+      { type: 'h2', text: 'Conservation : la promesse qui survit à la session' },
+      {
+        type: 'p',
+        text: 'Une promesse de suppression est un processus exécuté par des humains selon un calendrier, pas une propriété intrinsèque du système. « Supprimé après 24 heures » décrit un comportement prévu, et le fichier a existé quelque part pendant ces 24 heures — suffisamment longtemps pour qu\'une fuite, une assignation en justice, une exportation interne ou une acquisition y trouve un intérêt. Les sauvegardes compliquent tout : une ligne supprimée dans une base de données de production peut persister pendant des semaines dans des instantanés (snapshots) que personne ne garde en mémoire. Le seul fichier qui ne peut pas fuiter, être assigné ou être acquis est celui qui n\'a jamais été envoyé.',
+      },
+      { type: 'h2', text: 'Le calcul des fuites de données que personne ne fait' },
+      {
+        type: 'p',
+        text: 'Partez du principe que tout service conservant vos images finira par les exposer, non par malveillance, mais parce que les statistiques du secteur l\'indiquent. Posez-vous ensuite la question essentielle : quel est le pire résultat réaliste ? Pour une photo de vacances, rien. Pour le scan familial de documents d\'un parent âgé, un risque d\'usurpation d\'identité. Pour le produit non encore révélé d\'un client, une rupture contractuelle entraînant de vrais dommages. Pour des images médicales ou juridiques, un préjudice irréparable à tout prix. La décision de téléverser n\'est pas « photo contre pas de photo ». C\'est un cas le plus défavorable spécifique, évalué honnêtement.',
+      },
+      { type: 'h2', text: 'L\'audit de cinq minutes' },
+      {
+        type: 'p',
+        text: 'Vous n\'avez pas besoin d\'un avocat pour évaluer un outil, bien que lire la politique réelle vaille mieux que lire un résumé. Quatre questions vous permettent d\'obtenir l\'essentiel, et toutes ont des réponses observables. Le but n\'est pas une certitude parfaite ; c\'est la reconnaissance de schémas parmi les services que vous utilisez au quotidien.',
+      },
+      {
+        type: 'ol',
+        items: [
+          'Que revendique la politique sur le contenu téléversé ? Les autorisations larges pour les œuvres dérivées et l\'entraînement sont un signal d\'alarme ; les engagements explicites sans entraînement ni conservation sont un signal vert.',
+          'Quelle est la durée de conservation annoncée, et la suppression est-elle décrite comme automatique ou manuelle ? Un processus automatique et immédiat est significativement différent de « nous pouvons conserver ».',
+          'Où s\'effectue le traitement ? Une politique qui ne mentionne jamais où s\'exécute le calcul vous indique généralement qu\'il tourne sur leurs serveurs.',
+          'Un modèle économique visible ne nécessitant pas vos données existe-t-il ? Un prix qui couvre vraisemblablement les coûts est le signal le plus simple que vos téléversements ne sont pas le produit.',
+        ],
+      },
+      { type: 'h2', text: 'Des habitudes défensives efficaces dans tous les cas' },
+      {
+        type: 'p',
+        text: 'Certaines précautions méritent d\'être adoptées universellement, car elles ne coûtent rien et ne transfèrent aucune confiance. Supprimez les métadonnées avant de partager toute image : la plupart des plates-formes le font déjà lors de la publication, mais les téléversements directs vers des services tiers le font rarement, et un nettoyage de deux secondes élimine complètement le registre de géolocalisation. Recadrez avant d\'envoyer : si l\'outil n\'a besoin que du sujet, l\'arrière-plan n\'a jamais à être transmis. Et conservez une règle stricte par catégorie : certains types d\'images ne doivent tout simplement jamais être insérés dans des formulaires web, quelle que soit la réputation apparente du service.',
+      },
+      {
+        type: 'callout',
+        title: 'La règle par catégorie',
+        text: 'Imagerie médicale, documents juridiques, projets non publiés, photos de mineurs et tout ce que vous ne montreriez pas à un inconnu à un arrêt de bus : ces éléments ne sont jamais téléversés vers des outils gratuits. Cette seule règle élimine la plupart des pires scénarios réalistes.',
+      },
+      { type: 'h2', text: 'La réponse structurelle : éliminer totalement l\'étape du téléversement' },
+      {
+        type: 'p',
+        text: 'Tous les conseils ci-dessus constituent de la prévention, réduisant l\'exposition au sein d\'une architecture qui exige cette exposition. L\'alternative structurelle est une architecture qui ne l\'exige pas. Lorsque le traitement s\'exécute sur votre propre appareil, il n\'y a aucun téléversement à auditer, aucune clause de conservation à analyser, aucune fuite à subir et aucun pipeline d\'entraînement auquel refuser de participer. Le fichier reste là où il a été créé, et la fonctionnalité reste pleinement accessible.',
+      },
+      {
+        type: 'p',
+        text: 'Il ne s\'agit pas d\'une position utopique ; c\'est un choix d\'ingénierie. Le même GPU qui affiche votre écran peut exécuter les réseaux qui traitent les images, et la technologie des navigateurs a atteint le point où cette capacité est déployée pour tout le monde, automatiquement, sur le matériel que vous possédez déjà. Par défaut, l\'industrie déplace vos données vers le calcul. Le meilleur modèle déplace le calcul vers vos données, et en 2026, ce meilleur modèle n\'est pas une démonstration de recherche. C\'est un bouton, sur ce site, s\'exécutant sur votre machine, dès maintenant.',
+      },
+    ],
+  },
+
+{
     slug: 'pixelify_privacy_first_a7f3d9',
     title: 'Pixelify : Pourquoi nous avons créé un éditeur d\'images qui ne voit jamais vos photos',
     description:
@@ -43,7 +127,7 @@ export const POSTS_FR = [
       { type: 'h2', text: 'Pixelify inverse le pipeline' },
       {
         type: 'p',
-        text: 'Dans un pipeline cloud, votre photo sert d\'entrée au programme de quelqu\'un d\'autre. Dans Pixelify, le programme sert d\'entrée à votre appareil. Lorsque vous ouvrez l\'outil d\'agrandissement ou de suppression d\'arrière-plan, votre navigateur télécharge le réseau neuronal lui-même — les mathématiques réelles qui exécutent le travail — et le stocke localement en cache. À partir de ce moment, chaque image que vous traitez est multipliée, segmentée et reconstruite dans votre propre mémoire, par votre propre processeur, sous votre contrôle exclusif.',
+        text: 'Dans un pipeline cloud, votre photo sert d\'entrée au programme de quelqu\'un d\'autre. Dans Pixelify, le programme sert d\'entrée à votre appareil. Lorsque vous ouvrez l\'outil d\'agrandissement ou de suppression d\'arrière-plan, votre navigateur télécharge le réseau neuronal lui-même - les mathématiques réelles qui exécutent le travail - et le stocke localement en cache. À partir de ce moment, chaque image que vous traitez est multipliée, segmentée et reconstruite dans votre propre mémoire, par votre propre processeur, sous votre contrôle exclusif.',
       },
       {
         type: 'img',
@@ -72,7 +156,7 @@ export const POSTS_FR = [
       { type: 'h2', text: 'Ce que signifie réellement « s\'exécute localement » : la version honnête' },
       {
         type: 'p',
-        text: 'L\'honnêteté importe plus que le battage médiatique, voici donc ce qui se passe réellement. Les réseaux neuronaux sont de grands fichiers de nombres. Votre navigateur récupère ce fichier une fois, de la même manière qu\'il chargerait des ressources pour un jeu vidéo, et le conserve en cache pour que les visites ultérieures ne le re-téléchargent pas. Lorsque vous traitez une image, le navigateur fait passer vos pixels à travers ces chiffres en utilisant votre matériel graphique. Sur les machines prenant en charge les API modernes de calcul GPU, les opérations lourdes s\'exécutent sur la puce graphique — la même puce qui affiche les jeux —, c\'est pourquoi les résultats apparaissent en quelques secondes plutôt qu\'en quelques minutes.',
+        text: 'L\'honnêteté importe plus que le battage médiatique, voici donc ce qui se passe réellement. Les réseaux neuronaux sont de grands fichiers de nombres. Votre navigateur récupère ce fichier une fois, de la même manière qu\'il chargerait des ressources pour un jeu vidéo, et le conserve en cache pour que les visites ultérieures ne le re-téléchargent pas. Lorsque vous traitez une image, le navigateur fait passer vos pixels à travers ces chiffres en utilisant votre matériel graphique. Sur les machines prenant en charge les API modernes de calcul GPU, les opérations lourdes s\'exécutent sur la puce graphique - la même puce qui affiche les jeux, c\'est pourquoi les résultats apparaissent en quelques secondes plutôt qu\'en quelques minutes.',
       },
       {
         type: 'p',
@@ -81,7 +165,7 @@ export const POSTS_FR = [
       { type: 'h2', text: 'Les compromis que nous avons acceptés volontairement' },
       {
         type: 'p',
-        text: 'Une conception axée sur le local comporte de vrais coûts, et prétendre le contraire trahirait tout le principe. Les nouveaux utilisateurs doivent attendre pendant le téléchargement des fichiers réseau — généralement quelques dizaines de mégaoctets — avant d\'obtenir leur premier résultat. La vitesse de traitement dépend entièrement de votre matériel : un téléphone vieux de cinq ans sera plus lent qu\'un ordinateur de bureau équipé d\'un GPU dédié, car il n\'y a aucun serveur distant auquel emprunter de la puissance. Les très grandes images sont limitées par la mémoire de votre appareil plutôt que par celle d\'un centre de données. Et les outils cloud peuvent déployer un nouveau réseau du jour au lendemain ; nous en déployons un lorsqu\'il est testé et intégré.',
+        text: 'Une conception axée sur le local comporte de vrais coûts, et prétendre le contraire trahirait tout le principe. Les nouveaux utilisateurs doivent attendre pendant le téléchargement des fichiers réseau, généralement quelques dizaines de mégaoctets, avant d\'obtenir leur premier résultat. La vitesse de traitement dépend entièrement de votre matériel : un téléphone vieux de cinq ans sera plus lent qu\'un ordinateur de bureau équipé d\'un GPU dédié, car il n\'y a aucun serveur distant auquel emprunter de la puissance. Les très grandes images sont limitées par la mémoire de votre appareil plutôt que par celle d\'un centre de données. Et les outils cloud peuvent déployer un nouveau réseau du jour au lendemain ; nous en déployons un lorsqu\'il est testé et intégré.',
       },
       {
         type: 'p',
@@ -90,7 +174,7 @@ export const POSTS_FR = [
       { type: 'h2', text: 'À qui s\'adresse réellement cet outil' },
       {
         type: 'p',
-        text: 'Aux photographes retouchant le travail de leurs clients sous accord de confidentialité. Aux agences gérant des photos de produits non encore révélés. Aux journalistes traitant des images provenant de sources confidentielles. Aux enseignants et parents améliorant les photos d\'école des enfants. À toute personne ayant déjà hésité devant une zone de téléversement avec un pressentiment difficile à formuler. Cette hésitation est rationnelle. Pixelify est conçu pour que cette hésitation ne soit plus jamais nécessaire — non pas parce que nous vous demandons une confiance aveugle, mais parce qu\'il n\'y a tout simplement plus rien à devoir confier.',
+        text: 'Aux photographes retouchant le travail de leurs clients sous accord de confidentialité. Aux agences gérant des photos de produits non encore révélés. Aux journalistes traitant des images provenant de sources confidentielles. Aux enseignants et parents améliorant les photos d\'école des enfants. À toute personne ayant déjà hésité devant une zone de téléversement avec un pressentiment difficile à formuler. Cette hésitation est rationnelle. Pixelify est conçu pour que cette hésitation ne soit plus jamais nécessaire non pas parce que nous vous demandons une confiance aveugle, mais parce qu\'il n\'y a tout simplement plus rien à devoir confier.',
       },
       {
         type: 'p',

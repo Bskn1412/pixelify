@@ -75,7 +75,7 @@ export default function ContactView() {
             </div>
           </motion.section>
 
-          {/* Right Reference Sidebar — positioned below heading to align with the form card */}
+          {/* Right Reference Sidebar - positioned below heading to align with the form card */}
           {/* NOTE: You can adjust `lg:pt-28` higher or lower (e.g. lg:pt-20, lg:pt-24, lg:pt-32) to move this section down or up on desktop */}
           <motion.aside
             initial={{ opacity: 0, x: 10 }}

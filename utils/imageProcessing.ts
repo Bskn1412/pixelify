@@ -169,7 +169,7 @@ export function enhanceImageDataBuffer(
     typeof options.contrast === 'number' ? options.contrast : 50;
 
   // ---------------------------------------------------------
-  // 1. DENOISE — separable box blend, controlled by removeNoiseLevel.
+  // 1. DENOISE - separable box blend, controlled by removeNoiseLevel.
   // ---------------------------------------------------------
 
   if (options.removeNoise !== false && noiseVal > 50) {
@@ -186,7 +186,7 @@ export function enhanceImageDataBuffer(
   }
 
   // ---------------------------------------------------------
-  // 2. FACE ENHANCEMENT — lightweight skin-tone balancing, not an AI model.
+  // 2. FACE ENHANCEMENT - lightweight skin-tone balancing, not an AI model.
   // ---------------------------------------------------------
 
   if (options.faceRestore !== false && faceVal > 50) {
@@ -214,7 +214,7 @@ export function enhanceImageDataBuffer(
   }
 
   // ---------------------------------------------------------
-  // 3. COLOR ENHANCEMENT — saturation, 1.0 at 50%.
+  // 3. COLOR ENHANCEMENT - saturation, 1.0 at 50%.
   // ---------------------------------------------------------
 
   if ((options.colorEnhance || colorVal !== 50) && colorVal !== 50) {
@@ -235,7 +235,7 @@ export function enhanceImageDataBuffer(
   }
 
   // ---------------------------------------------------------
-  // 4. HDR / LOCAL CONTRAST — smooth S-curve.
+  // 4. HDR / LOCAL CONTRAST - smooth S-curve.
   // ---------------------------------------------------------
 
   if ((options.hdrBoost || hdrVal !== 50) && hdrVal > 50) {
@@ -254,7 +254,7 @@ export function enhanceImageDataBuffer(
   }
 
   // ---------------------------------------------------------
-  // 5. BRIGHTNESS — 50 = original.
+  // 5. BRIGHTNESS - 50 = original.
   // ---------------------------------------------------------
 
   if (brightness !== 50) {
@@ -268,7 +268,7 @@ export function enhanceImageDataBuffer(
   }
 
   // ---------------------------------------------------------
-  // 6. CONTRAST — bounded to 0.55..1.45 to keep the dynamic range.
+  // 6. CONTRAST - bounded to 0.55..1.45 to keep the dynamic range.
   // ---------------------------------------------------------
 
   if (contrast !== 50) {
@@ -282,7 +282,7 @@ export function enhanceImageDataBuffer(
   }
 
   // ---------------------------------------------------------
-  // 7. SHARPENING — unsharp mask against a radius-1 box blur.
+  // 7. SHARPENING - unsharp mask against a radius-1 box blur.
   // ---------------------------------------------------------
 
   if (options.sharpen !== false && sharpVal > 50) {

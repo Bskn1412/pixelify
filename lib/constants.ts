@@ -275,16 +275,19 @@ export const MODELS: Record<ModelKey, ModelConfig> = {
 export const CHOPPER_MODEL_URL =
   (process.env.HF_CHOPPER_MODEL || process.env.NEXT_PUBLIC_HF_CHOPPER_MODEL || process.env.HG_CHOPPER_MODEL)
     ? resolveModelUrl(
-      process.env.HF_CHOPPER_MODEL || process.env.NEXT_PUBLIC_HF_CHOPPER_MODEL || process.env.HG_CHOPPER_MODEL,
+      process.env.HF_CHOPPER_MODEL || process.env.NEXT_PUBLIC_HF_CHOPPER_MODEL, 
       'chopper.onnx'
     )
     : undefined;
 
 /** Optional remote URL for background removal model (Diablo) configured via env. Falls back to /models/Diablo.onnx */
-export const DIABLO_MODEL_URL = resolveModelUrl(
-  process.env.HF_DIABLO_MODEL || process.env.NEXT_PUBLIC_HF_DIABLO_MODEL || process.env.HG_DIABLO_MODEL,
-  'Diablo.onnx'
-);
+export const DIABLO_MODEL_URL =
+  (process.env.HF_DIABLO_MODEL || process.env.NEXT_PUBLIC_HF_DIABLO_MODEL || process.env.HG_CHOPPER_MODEL)
+    ? resolveModelUrl(
+      process.env.HF_DIABLO_MODEL || process.env.NEXT_PUBLIC_HF_DIABLO_MODEL, 
+      'Diablo.onnx'
+    )
+    : undefined;
 
 /** Remote URLs for LiteRT WebAssembly runtimes hosted on Hugging Face */
 export const LITERT_WASM_URLS = {
@@ -310,8 +313,8 @@ export const MAX_OUTPUT_DIM = 16384;
 
 /* ============================================================
    BACKGROUND REMOVER MODELS (Cutout Models)
-   chopper   — BiRefNet-lite 512 (transformers.js, ~44MB, fast)
-   diablo    — BEN2-family 1024 matting network (raw ONNX,
+   chopper   - High-Speed 512 Matting (transformers.js, ~44MB, fast)
+   diablo    - Studio 1024 Matting network (raw ONNX,
                ~222MB first download, ultra-precision edges)
    ============================================================ */
 export interface BgModelConfig {
@@ -344,7 +347,7 @@ export const BG_MODELS: Record<BgModelKey, BgModelConfig> = {
     popular: true,
   },
   diablo: {
-    name: 'Diablo (Ultra Precision / BEN2)',
+    name: 'Diablo (Ultra Precision)',
     label: 'Diablo',
     desc: 'Max edge fidelity for hair, fur & glass.',
     size: '~200MB',

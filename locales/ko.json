@@ -384,12 +384,11 @@
     "docs": "문서",
     "blogs": "기술 블로그",
     "faqs": "자주 묻는 질문",
-    "sysReq": "시스템 요구사항",
     "about": "Pixelify 소개",
     "contact": "문의하기",
     "privacy": "개인정보 처리방침",
     "terms": "서비스 이용약관",
-    "rights": "All rights reserved. 기기 내 로컬 연산."
+    "rights": "© 2026 Pixelify Inc. 모든 권리 보유."
   },
   "blogs": {
     "title": "기술 블로그 및 가이드",
@@ -521,7 +520,7 @@
     "previewWorkflow": "과정 미리보기",
     "refiningSubjectBoundaries": "피사체 윤곽선을 부드럽게 다듬는 중",
     "enhancingImageDetail": "선명도와 질감을 복원하는 중",
-    "simulatedNotice": "체험용 시뮬레이션 상태입니다 — 데모에서는 실제 이미지가 서버로 전송되지 않습니다.",
+    "simulatedNotice": "체험용 시뮬레이션 상태입니다 - 데모에서는 실제 이미지가 서버로 전송되지 않습니다.",
     "preparingPreview": "결과물 준비 중",
     "simulated": "시뮬레이션",
     "previewState": "미리보기 상태",

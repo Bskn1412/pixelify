@@ -9,7 +9,7 @@ const STORAGE_KEY = 'pixelify_cookie_notice_ack';
  * Bottom cookie notice. Shown once per browser until the user taps
  * "Done" (persisted in local storage). Deliberately generic: states that
  * the site uses cookies in the visitor's browser and links to the full
- * privacy policy — it does not enumerate third parties.
+ * privacy policy - it does not enumerate third parties.
  */
 export default function CookieNotice() {
   const [visible, setVisible] = useState(false);

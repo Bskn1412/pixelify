@@ -113,19 +113,19 @@
     "items": [
       {
         "q": "How does Pixelify process images without uploading to cloud servers?",
-        "a": "The AI runs right in your browser using WebGPU and ONNX Runtime, so your images stay on your device—not on someone else’s server."
+        "a": "The AI runs right in your browser using WebGPU and ONNX Runtime, so your images stay on your device-not on someone else’s server."
       },
       {
         "q": "Is Pixelify really 100% free with no watermarks or subscriptions?",
-        "a": "Yes—no subscriptions, credits, watermarks, or surprise paywalls; just upload, edit, and download."
+        "a": "Yes-no subscriptions, credits, watermarks, or surprise paywalls; just upload, edit, and download."
       },
       {
         "q": "What is the maximum resolution and image size I can upscale?",
-        "a": "Upscale images up to 40 MB and 16K resolution (16,384 × 16,384 px)—your device’s memory is the only real boss here."
+        "a": "Upscale images up to 40 MB and 16K resolution (16,384 × 16,384 px)-your device’s memory is the only real boss here."
       },
       {
         "q": "Can I use Pixelify offline without an active internet connection?",
-        "a": "Once the AI models are cached, you can process images offline—perfect for flights, commutes, or Wi-Fi that decided to take a day off."
+        "a": "Once the AI models are cached, you can process images offline-perfect for flights, commutes, or Wi-Fi that decided to take a day off."
       },
       {
         "q": "How does Chopper compare to standard background removers?",
@@ -141,14 +141,14 @@
       },
       {
         "q": "How do I clear downloaded models if I need to free up browser storage?",
-        "a": "Open Settings and select “Clear downloaded models”—a quick cleanup without having to clear your entire browser cache."
+        "a": "Open Settings and select “Clear downloaded models”-a quick cleanup without having to clear your entire browser cache."
       }
     ]
   },
   "upscaler": {
     "badge": "On-Device Neural Super-Resolution",
     "title": "AI Image Upscaler",
-    "subtitle": "Upscale photos and digital art up to 16K with crystal clarity. Running 100% on your device GPU via WebGPU — no uploads, zero tracking.",
+    "subtitle": "Upscale photos and digital art up to 16K with crystal clarity. Running 100% on your device GPU via WebGPU - no uploads, zero tracking.",
     "dropzoneTitle": "Drop image here to upscale",
     "dropzoneSubtitle": "or browse from your device",
     "dropzoneLimits": "PNG, JPG, WebP up to 15 MB",
@@ -384,12 +384,11 @@
     "docs": "Docs",
     "blogs": "Blogs",
     "faqs": "FAQs",
-    "sysReq": "System requirements",
     "about": "About Pixelify",
     "contact": "Contact",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
-    "rights": "All rights reserved. Processed on-device."
+    "rights": "© 2026 Pixelify Inc. All rights reserved."
   },
   "blogs": {
     "title": "Blog & AI Guides",
@@ -521,7 +520,7 @@
     "previewWorkflow": "Preview workflow",
     "refiningSubjectBoundaries": "Refining subject boundaries",
     "enhancingImageDetail": "Enhancing image detail",
-    "simulatedNotice": "Illustrative processing state — no image is being processed in this demo.",
+    "simulatedNotice": "Illustrative processing state - no image is being processed in this demo.",
     "preparingPreview": "Preparing preview",
     "simulated": "Simulated",
     "previewState": "Preview state",

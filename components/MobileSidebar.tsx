@@ -118,7 +118,7 @@ export default function MobileSidebar({
     return () => window.removeEventListener('keydown', onKey);
   }, [open, onClose]);
 
-  /* Navigate, close, and always land at the TOP of the new page —
+  /* Navigate, close, and always land at the TOP of the new page -
      the router keeps the previous scroll position otherwise. */
   const go = (tab: ViewTab) => {
     onTabChange(tab);
@@ -174,11 +174,10 @@ export default function MobileSidebar({
                 key={tab}
                 type="button"
                 onClick={() => go(tab)}
-                className={`group flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] transition-all ${
-                  isActive
+                className={`group flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] transition-all ${isActive
                     ? 'bg-white/[0.1] font-semibold text-white shadow-sm border border-white/10'
                     : 'font-medium text-neutral-300 hover:bg-white/[0.04] hover:text-white border border-transparent'
-                }`}
+                  }`}
               >
                 <Icon
                   size={18}
@@ -202,26 +201,25 @@ export default function MobileSidebar({
             <span>Engines & Settings</span>
           </div>
           <div className="flex flex-col gap-1.5 rounded-xl border border-white/[0.07] bg-black/25 px-2.5 py-2">
-            
+
             <EngineRow label={t.nav.upscaler} engine={upscalerEngine} />
             <EngineRow label={t.nav.bgRemove} engine={bgEngine} />
             {webgpuAvailable !== undefined && (
               <div className="flex items-center justify-between text-[11px]">
                 <span className="font-semibold text-neutral-400">{t.nav.webgpuSupport}</span>
                 <span
-                  className={`font-mono text-[9.5px] font-bold ${
-                    webgpuAvailable === null
+                  className={`font-mono text-[9.5px] font-bold ${webgpuAvailable === null
                       ? 'text-neutral-500'
                       : webgpuAvailable
-                      ? 'text-[#00FF85]'
-                      : 'text-sky-300'
-                  }`}
+                        ? 'text-[#00FF85]'
+                        : 'text-sky-300'
+                    }`}
                 >
                   {webgpuAvailable === null
                     ? t.nav.checking
                     : webgpuAvailable
-                    ? t.nav.available
-                    : t.nav.unavailable}
+                      ? t.nav.available
+                      : t.nav.unavailable}
                 </span>
               </div>
             )}
@@ -252,13 +250,12 @@ export default function MobileSidebar({
                         handleLanguageChange(lang.code);
                       }
                     }}
-                    className={`flex items-center justify-between rounded-xl px-2.5 py-2 text-xs transition-colors ${
-                      isSelected
+                    className={`flex items-center justify-between rounded-xl px-2.5 py-2 text-xs transition-colors ${isSelected
                         ? 'border border-[#00ff85]/30 bg-[#00ff85]/10 font-bold text-white'
                         : lang.active
-                        ? 'border border-white/10 bg-white/[0.04] text-neutral-300 hover:bg-white/[0.08]'
-                        : 'border border-white/5 bg-transparent text-neutral-600 opacity-40 cursor-not-allowed'
-                    }`}
+                          ? 'border border-white/10 bg-white/[0.04] text-neutral-300 hover:bg-white/[0.08]'
+                          : 'border border-white/5 bg-transparent text-neutral-600 opacity-40 cursor-not-allowed'
+                      }`}
                   >
                     <div className="flex items-center gap-1.5 min-w-0">
                       <div className="w-3.5 h-3.5 flex items-center justify-center shrink-0">

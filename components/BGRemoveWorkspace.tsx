@@ -1423,7 +1423,7 @@ export default function BGRemoveWorkspace({
           </button>
         </div>
       ) : (
-        /* State 2: Chopper succeeded — offer Diablo */
+        /* State 2: Chopper succeeded - offer Diablo */
         <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.03] p-3.5 shadow-sm flex flex-col gap-2.5 transition-all">
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1">
@@ -1443,7 +1443,7 @@ export default function BGRemoveWorkspace({
           </div>
 
           {isDiabloCached ? (
-            /* Diablo is already cached — instant switch without download warnings or delays */
+            /* Diablo is already cached - instant switch without download warnings or delays */
             <button
               type="button"
               onClick={() => handleModelSwitch('diablo')}
@@ -1454,7 +1454,7 @@ export default function BGRemoveWorkspace({
               <span>{t.bgRemove.refineDiablo}</span>
             </button>
           ) : showDiabloConfirm ? (
-            /* Diablo not cached & user clicked Try Diablo — explicit confirmation card */
+            /* Diablo not cached & user clicked Try Diablo - explicit confirmation card */
             <div className="rounded-xl border border-amber-400/30 bg-amber-400/[0.07] p-3 flex flex-col gap-2.5 animate-in fade-in duration-150">
               <div className="flex items-center gap-2 text-amber-300 text-xs font-bold">
                 <div className="flex h-5 w-5 items-center justify-center rounded-md bg-amber-400/20 text-amber-300 border border-amber-400/30 shrink-0">
@@ -1488,7 +1488,7 @@ export default function BGRemoveWorkspace({
               </div>
             </div>
           ) : (
-            /* Diablo not cached & confirmation closed — offer Try Diablo */
+            /* Diablo not cached & confirmation closed - offer Try Diablo */
             <button
               type="button"
               onClick={() => setShowDiabloConfirm(true)}
@@ -1521,7 +1521,7 @@ export default function BGRemoveWorkspace({
   return (
     <div className="flex w-full flex-col items-center gap-2 pb-24 lg:pb-0">
       {/* ========================================================================= */}
-      {/* 1. TOP FLOATING NAVBAR / TOOLBAR PILL — DESKTOP ONLY */}
+      {/* 1. TOP FLOATING NAVBAR / TOOLBAR PILL - DESKTOP ONLY */}
       {/* ========================================================================= */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -1687,11 +1687,10 @@ export default function BGRemoveWorkspace({
               setMobileSheetOpen(true);
             }
           }}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
-            activeTab === 'design' && mobileSheetOpen
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer ${activeTab === 'design' && mobileSheetOpen
               ? 'bg-[#00FF85]/20 text-[#00FF85] border border-[#00FF85]/40 font-bold'
               : 'bg-white/5 text-neutral-300 hover:bg-white/10 border border-white/10'
-          }`}
+            }`}
           title="Layers & Design"
         >
           <Layers className="h-4 w-4" />
@@ -1703,11 +1702,10 @@ export default function BGRemoveWorkspace({
           <button
             type="button"
             onClick={() => setIsCompareMode((prev) => !prev)}
-            className={`p-2 rounded-xl transition cursor-pointer ${
-              isCompareMode
+            className={`p-2 rounded-xl transition cursor-pointer ${isCompareMode
                 ? 'bg-white text-slate-900 shadow-md ring-2 ring-white/30'
                 : 'text-neutral-300 hover:bg-white/10'
-            }`}
+              }`}
             title="Toggle Compare"
             aria-label="Toggle Compare"
           >
@@ -1891,11 +1889,10 @@ export default function BGRemoveWorkspace({
         {/* SETTINGS PANEL: DESKTOP RIGHT COLUMN + MOBILE RESPONSIVE POPUP DRAWER */}
         {/* ========================================================================= */}
         <div
-          className={`bgremove-settings-column ${
-            mobileSheetOpen
+          className={`bgremove-settings-column ${mobileSheetOpen
               ? 'fixed inset-x-0 bottom-0 z-50 max-h-[82vh] rounded-t-3xl border-t border-white/15 bg-[#12141A]/98 p-4 pt-3 shadow-[0_-12px_40px_rgba(0,0,0,0.8)] backdrop-blur-2xl flex flex-col lg:relative lg:inset-auto lg:z-auto lg:max-h-none lg:rounded-none lg:border-none lg:bg-transparent lg:p-0 lg:shadow-none'
               : 'hidden lg:block'
-          }`}
+            }`}
         >
           {/* BIG FLOATING OUTSIDE CLOSE BUTTON (MATCHING USER SCREENSHOT) */}
           {mobileSheetOpen && (
@@ -1923,12 +1920,12 @@ export default function BGRemoveWorkspace({
                   {activeTab === 'cutout'
                     ? 'Cutout Tools'
                     : activeTab === 'background'
-                    ? 'Background Options'
-                    : activeTab === 'effects'
-                    ? 'Effects & Shadows'
-                    : activeTab === 'adjust'
-                    ? 'Adjust & Transform'
-                    : 'Design & Text Layers'}
+                      ? 'Background Options'
+                      : activeTab === 'effects'
+                        ? 'Effects & Shadows'
+                        : activeTab === 'adjust'
+                          ? 'Adjust & Transform'
+                          : 'Design & Text Layers'}
                 </span>
               </div>
             </div>
@@ -1947,7 +1944,7 @@ export default function BGRemoveWorkspace({
                   >
                     {/* DIABLO OPTION & STATUS */}
                     {diabloOptionControl}
-                      
+
                     <div>
                       <span className="text-slate-800 dark:text-white font-bold block mb-1.5">
                         Cutout Tools
@@ -2269,11 +2266,10 @@ export default function BGRemoveWorkspace({
                                 setCustomBgImage(undefined);
                                 setSubjectBgBlur(0);
                               }}
-                              className={`relative aspect-square rounded-xl border-2 transition cursor-pointer ${
-                                selectedBg.id === COLOR_PRESETS[0].id && !customBgColor && !customBgImage
+                              className={`relative aspect-square rounded-xl border-2 transition cursor-pointer ${selectedBg.id === COLOR_PRESETS[0].id && !customBgColor && !customBgImage
                                   ? 'border-[#00FF85] ring-2 ring-[#00FF85]/20'
                                   : 'border-transparent hover:border-white/40'
-                              }`}
+                                }`}
                             >
                               <span
                                 className={`absolute inset-0 rounded-[10px] border border-black/10 ${COLOR_PRESETS[0].style || ''}`}
@@ -2286,9 +2282,8 @@ export default function BGRemoveWorkspace({
                             {/* 1b. Custom Color Picker - Positioned right after transparent! */}
                             <div className="relative">
                               <div
-                                className={`relative aspect-square w-full overflow-hidden rounded-xl border-2 transition cursor-pointer ${
-                                  customBgColor ? 'border-[#00FF85] ring-2 ring-[#00FF85]/20' : 'border-slate-300 dark:border-white/15 hover:border-white/40'
-                                }`}
+                                className={`relative aspect-square w-full overflow-hidden rounded-xl border-2 transition cursor-pointer ${customBgColor ? 'border-[#00FF85] ring-2 ring-[#00FF85]/20' : 'border-slate-300 dark:border-white/15 hover:border-white/40'
+                                  }`}
                               >
                                 <span
                                   className="absolute inset-0 rounded-[10px]"
@@ -2330,11 +2325,10 @@ export default function BGRemoveWorkspace({
                                   setCustomBgImage(undefined);
                                   setSubjectBgBlur(0);
                                 }}
-                                className={`relative aspect-square rounded-xl border-2 transition cursor-pointer ${
-                                  selectedBg.id === preset.id && !customBgColor && !customBgImage
+                                className={`relative aspect-square rounded-xl border-2 transition cursor-pointer ${selectedBg.id === preset.id && !customBgColor && !customBgImage
                                     ? 'border-[#00FF85] ring-2 ring-[#00FF85]/20'
                                     : 'border-transparent hover:border-white/40'
-                                }`}
+                                  }`}
                               >
                                 <span
                                   className={`absolute inset-0 rounded-[10px] border border-black/10 ${preset.style || ''}`}
@@ -2368,11 +2362,10 @@ export default function BGRemoveWorkspace({
                                   setCustomBgImage(undefined);
                                   setSubjectBgBlur(0);
                                 }}
-                                className={`relative aspect-square rounded-xl border-2 transition cursor-pointer ${
-                                  selectedBg.id === preset.id && !customBgColor && !customBgImage
+                                className={`relative aspect-square rounded-xl border-2 transition cursor-pointer ${selectedBg.id === preset.id && !customBgColor && !customBgImage
                                     ? 'border-[#00FF85] ring-2 ring-[#00FF85]/20'
                                     : 'border-transparent hover:border-white/40'
-                                }`}
+                                  }`}
                               >
                                 <span
                                   className="absolute inset-0 rounded-[10px] border border-black/10 shadow-inner"
@@ -2577,8 +2570,8 @@ export default function BGRemoveWorkspace({
                                 htmlFor="effect-stroke-color"
                                 onClick={handleOpenStrokeColorPicker}
                                 className={`relative h-8 w-8 overflow-hidden rounded-xl border-2 transition hover:scale-105 cursor-pointer block ${effects.strokeColor
-                                    ? 'border-[#00FF85] ring-2 ring-[#00FF85]/20'
-                                    : 'border-slate-300 dark:border-white/15'
+                                  ? 'border-[#00FF85] ring-2 ring-[#00FF85]/20'
+                                  : 'border-slate-300 dark:border-white/15'
                                   }`}
                                 title="Open stroke color picker"
                                 aria-label="Open custom stroke color picker"
@@ -3160,11 +3153,10 @@ export default function BGRemoveWorkspace({
                                 key={cat.id}
                                 type="button"
                                 onClick={() => setFontComboCategory(cat.id)}
-                                className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition shrink-0 cursor-pointer ${
-                                  fontComboCategory === cat.id
+                                className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition shrink-0 cursor-pointer ${fontComboCategory === cat.id
                                     ? 'bg-[#00FF85] text-slate-900 shadow-sm'
                                     : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white'
-                                }`}
+                                  }`}
                               >
                                 {cat.label}
                               </button>
@@ -3198,10 +3190,10 @@ export default function BGRemoveWorkspace({
                                         textShadow: l.textShadow
                                           ? l.textShadow
                                           : l.glow
-                                          ? `0 0 12px ${l.color}`
-                                          : l.shadow
-                                          ? '0 2px 8px rgba(0,0,0,0.8)'
-                                          : undefined,
+                                            ? `0 0 12px ${l.color}`
+                                            : l.shadow
+                                              ? '0 2px 8px rgba(0,0,0,0.8)'
+                                              : undefined,
                                         backgroundColor: l.bgPill === 'black' ? 'rgba(9, 9, 13, 0.85)' : l.bgPill === 'mint' ? '#00FF85' : undefined,
                                         padding: l.bgPill && l.bgPill !== 'none' ? '1px 6px' : undefined,
                                         borderRadius: l.bgPill && l.bgPill !== 'none' ? '6px' : undefined,
@@ -3454,7 +3446,7 @@ export default function BGRemoveWorkspace({
             </span>
           </button>
 
-          {/* MOBILE DOWNLOAD POPUP — FIXED HIGH Z-INDEX TO NEVER BE CLIPPED */}
+          {/* MOBILE DOWNLOAD POPUP - FIXED HIGH Z-INDEX TO NEVER BE CLIPPED */}
           {mobileDownloadOpen && !isServiceBusy && (
             <>
               {/* Tap outside backdrop */}
@@ -3545,9 +3537,8 @@ export default function BGRemoveWorkspace({
                     setMobileSheetOpen(true);
                   }
                 }}
-                className={`flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl transition cursor-pointer shrink-0 ${
-                  isActive ? 'text-[#00FF85]' : 'text-neutral-400 hover:text-white'
-                }`}
+                className={`flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl transition cursor-pointer shrink-0 ${isActive ? 'text-[#00FF85]' : 'text-neutral-400 hover:text-white'
+                  }`}
               >
                 <div className={`p-1.5 rounded-xl transition ${isActive ? 'bg-[#00FF85]/15 text-[#00FF85]' : 'bg-transparent text-neutral-400'}`}>
                   <tab.Icon className="h-4 w-4" />

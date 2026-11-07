@@ -6,7 +6,7 @@ import { useTranslation } from '@/locales';
    ============================================================ */
 
 /* ============================================================
-   SHOWCASE DATA — real result pairs from /public/showcase
+   SHOWCASE DATA - real result pairs from /public/showcase
    ============================================================ */
 interface ShowcasePair {
   id: string;
@@ -376,7 +376,7 @@ const CompareLens: React.FC<{
       {/* divider */}
       <div className="uc-lens-divider" style={{ left: `${pos}%` }} />
 
-      {/* handle (decoration — drag anywhere on the frame) */}
+      {/* handle (decoration - drag anywhere on the frame) */}
       <span className="uc-lens-handle" style={{ left: `${pos}%` }} aria-hidden="true">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
           <path d="M8 7l-5 5 5 5" />
@@ -392,7 +392,7 @@ const CompareLens: React.FC<{
 };
 
 /* ============================================================
-   SECTION 1 — HERO SHOWCASE
+   SECTION 1 - HERO SHOWCASE
    Auto-cycles through every pair with full slider sweep choreography.
    ============================================================ */
 export const UpscaleShowcase: React.FC = () => {

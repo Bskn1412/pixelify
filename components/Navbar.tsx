@@ -13,7 +13,7 @@ import { useRouter, usePathname } from 'next/navigation';
 
 type Engine = 'webgpu' | 'wasm' | null;
 
-/** Desktop pill-nav items (order matters — it drives the sliding pill). */
+/** Desktop pill-nav items (order matters - it drives the sliding pill). */
 const DESKTOP_NAV_ITEMS: { tab: ViewTab; label: string; warmup?: boolean }[] = [
   { tab: 'home', label: 'Home' },
   { tab: 'bg_remove', label: 'BG Remover', warmup: true },
@@ -39,7 +39,7 @@ interface NavbarProps {
   onOpenMobileSidebar?: () => void;
   /** Whether the mobile navigation sidebar drawer is currently open */
   isMobileSidebarOpen?: boolean;
-  /** Hides the navbar on mobile (< lg) — e.g. when the upscaler workspace owns the screen */
+  /** Hides the navbar on mobile (< lg) - e.g. when the upscaler workspace owns the screen */
   mobileHidden?: boolean;
   /** Offline / online status */
   isOnline?: boolean;
@@ -159,7 +159,7 @@ export default function Navbar({
   const settingsRef = useRef<HTMLDivElement>(null);
   const langRef = useRef<HTMLDivElement>(null);
 
-  /* DESKTOP ACTIVE PILL — CSS transform transition (compositor-driven).
+  /* DESKTOP ACTIVE PILL - CSS transform transition (compositor-driven).
      Deliberately NOT a framer-motion layout animation: layout/FLIP runs on
      the main thread and stutters while Next.js mounts the next page (the
      three.js hero is heavy at the same instant). Transform transitions are
@@ -175,7 +175,7 @@ export default function Navbar({
     transition: 'none',
   });
 
-  /* The pill targets this tab — set INSTANTLY on navbar click, before the
+  /* The pill targets this tab - set INSTANTLY on navbar click, before the
      route changes, so the slide starts immediately instead of waiting for
      Next.js navigation to land. Synced back from activeTab for browser
      back/forward and links outside the navbar. */
@@ -201,7 +201,7 @@ export default function Navbar({
       width: btnRect.width,
       height: btnRect.height,
       /* An absolutely positioned child's containing block is the nav's PADDING
-         box (left-0 sits inside the border), so subtract the border width —
+         box (left-0 sits inside the border), so subtract the border width -
          otherwise the pill sits 1px right/down of the button. */
       transform: `translate(${x}px, ${y}px)`,
       /* transform + width animate the slide; must be EXPLICIT on every update
@@ -215,7 +215,7 @@ export default function Navbar({
   }, []);
 
   /* Navbar click handler: start the pill slide now, navigate after.
-     Both happen in the same tick — the browser paints the pill's first
+     Both happen in the same tick - the browser paints the pill's first
      animation frame before the next page's heavy mount work can block it. */
   const selectTab = useCallback(
     (tab: ViewTab) => {
@@ -233,7 +233,7 @@ export default function Navbar({
 
   // Re-measure when the pill target changes and after font/layout settles.
   // activeTab matters too: when the route lands, buttons restyle to
-  // font-bold — widths shift, so the pill must be re-measured or it settles
+  // font-bold - widths shift, so the pill must be re-measured or it settles
   // misaligned (measured against the still-medium labels).
   useLayoutEffect(() => {
     let cancelled = false;
@@ -241,11 +241,11 @@ export default function Navbar({
     measure();
     // Two frames later too: font swap after hydration can shift text width.
     requestAnimationFrame(() => requestAnimationFrame(measure));
-    // Google Fonts (Inter, display=swap) land late — re-measure after every
+    // Google Fonts (Inter, display=swap) land late - re-measure after every
     // swap; fallback and webfont metrics differ, which throws the pill off.
     const fonts = typeof document !== 'undefined' ? document.fonts : undefined;
     const onFontsDone = () => measure();
-    fonts?.ready.then(onFontsDone).catch(() => {});
+    fonts?.ready.then(onFontsDone).catch(() => { });
     fonts?.addEventListener?.('loadingdone', onFontsDone);
     return () => {
       cancelled = true;
@@ -406,7 +406,7 @@ export default function Navbar({
               </button>
             ))}
 
-            {/* WHITE ACTIVE PILL — clip-mask reveal layer */}
+            {/* WHITE ACTIVE PILL - clip-mask reveal layer */}
             <span
               aria-hidden="true"
               style={activePillStyle}
@@ -439,7 +439,7 @@ export default function Navbar({
             {!isOnline ? (
               <div
                 className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-semibold backdrop-blur-md shadow-sm transition-all"
-                title="Offline Mode — WebGPU & WebAssembly AI runs 100% locally on your device"
+                title="Offline Mode - WebGPU & WebAssembly AI runs 100% locally on your device"
               >
                 <WifiOff size={13} className="text-amber-400 animate-pulse shrink-0" />
                 <span className="hidden sm:inline">Offline</span>
@@ -448,75 +448,75 @@ export default function Navbar({
             ) : justReconnected ? (
               <div
                 className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#00FF85]/15 border border-[#00FF85]/30 text-[#00FF85] text-[11px] font-semibold backdrop-blur-md shadow-sm animate-fade-in"
-                title="Online — Back online"
+                title="Online - Back online"
               >
                 <Wifi size={13} className="text-[#00FF85] shrink-0" />
                 <span className="hidden sm:inline">Online</span>
               </div>
             ) : null}
 
-            {/* MODEL DOWNLOADS BADGE — only while models are transferring */}
+            {/* MODEL DOWNLOADS BADGE - only while models are transferring */}
             {modelDownloads.length > 0 && (
               <ModelDownloadIndicator items={modelDownloads} />
             )}
 
             {/* SETTINGS GEAR ICON BUTTON */}
             <div className="relative" ref={settingsRef}>
-            <button
-              onClick={() => {
-                setIsSettingsOpen(!isSettingsOpen);
-                setIsLangOpen(false);
-              }}
-              className="hidden sm:flex w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-xl text-white items-center justify-center transition-all shadow-xl active:scale-95"
-              title="Settings & Preferences"
-              aria-label="Settings and Preferences"
-            >
-              <Icon className='text-gray-300' name="settings" size={19} />
-            </button>
+              <button
+                onClick={() => {
+                  setIsSettingsOpen(!isSettingsOpen);
+                  setIsLangOpen(false);
+                }}
+                className="hidden sm:flex w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-xl text-white items-center justify-center transition-all shadow-xl active:scale-95"
+                title="Settings & Preferences"
+                aria-label="Settings and Preferences"
+              >
+                <Icon className='text-gray-300' name="settings" size={19} />
+              </button>
 
-            {/* SETTINGS DROPDOWN MENU */}
-            {isSettingsOpen && (
-              <div className="absolute right-0 mt-2.5 w-72 rounded-2xl bg-[#121218]/95 backdrop-blur-xl border border-white/15 p-3 shadow-2xl z-50 animate-fade-in flex flex-col gap-2">
-                <div>
-                  <div className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-violet-200/70">
-                    <Cpu size={12} /> {t.nav.processingEngines} <span className="ml-auto h-px flex-1 bg-gradient-to-r from-violet-300/20 to-transparent" />
+              {/* SETTINGS DROPDOWN MENU */}
+              {isSettingsOpen && (
+                <div className="absolute right-0 mt-2.5 w-72 rounded-2xl bg-[#121218]/95 backdrop-blur-xl border border-white/15 p-3 shadow-2xl z-50 animate-fade-in flex flex-col gap-2">
+                  <div>
+                    <div className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-violet-200/70">
+                      <Cpu size={12} /> {t.nav.processingEngines} <span className="ml-auto h-px flex-1 bg-gradient-to-r from-violet-300/20 to-transparent" />
+                    </div>
+                    <div className="space-y-1 rounded-xl border border-white/[0.07] bg-black/25 px-2.5 py-2">
+                      <div className="settings-row-enter engine-row-shell" style={{ animationDelay: '55ms' }}><EngineRow label={t.nav.upscaler} engine={upscalerEngine} /></div>
+                      <div className="settings-row-enter engine-row-shell" style={{ animationDelay: '105ms' }}><EngineRow label={t.nav.bgRemove} engine={bgEngine} /></div>
+                    </div>
+                    <div className="settings-row-enter mt-1.5 flex items-center justify-between rounded-xl border border-violet-200/[0.13] bg-gradient-to-r from-violet-300/[0.08] via-white/[0.035] to-teal-200/[0.06] px-2.5 py-1.5" style={{ animationDelay: '155ms' }}>
+                      <span className="flex items-center gap-1.5 text-[11px] font-medium text-white/70"><Gauge size={13} className="text-violet-200/70" />{t.nav.webgpuSupport}</span>
+                      <span className={`text-[10px] font-semibold ${webgpuAvailable === null ? 'text-white/40' : webgpuAvailable ? 'text-emerald-300' : 'text-sky-300'}`}>
+                        {webgpuAvailable === null ? t.nav.checking : webgpuAvailable ? t.nav.available : t.nav.unavailable}
+                      </span>
+                    </div>
+                    <p className="mt-1.5 px-0.5 text-[9.5px] leading-relaxed text-white/35">{modelStatus}</p>
                   </div>
-                  <div className="space-y-1 rounded-xl border border-white/[0.07] bg-black/25 px-2.5 py-2">
-                    <div className="settings-row-enter engine-row-shell" style={{ animationDelay: '55ms' }}><EngineRow label={t.nav.upscaler} engine={upscalerEngine} /></div>
-                    <div className="settings-row-enter engine-row-shell" style={{ animationDelay: '105ms' }}><EngineRow label={t.nav.bgRemove} engine={bgEngine} /></div>
-                  </div>
-                  <div className="settings-row-enter mt-1.5 flex items-center justify-between rounded-xl border border-violet-200/[0.13] bg-gradient-to-r from-violet-300/[0.08] via-white/[0.035] to-teal-200/[0.06] px-2.5 py-1.5" style={{ animationDelay: '155ms' }}>
-                    <span className="flex items-center gap-1.5 text-[11px] font-medium text-white/70"><Gauge size={13} className="text-violet-200/70" />{t.nav.webgpuSupport}</span>
-                    <span className={`text-[10px] font-semibold ${webgpuAvailable === null ? 'text-white/40' : webgpuAvailable ? 'text-emerald-300' : 'text-sky-300'}`}>
-                      {webgpuAvailable === null ? t.nav.checking : webgpuAvailable ? t.nav.available : t.nav.unavailable}
-                    </span>
-                  </div>
-                  <p className="mt-1.5 px-0.5 text-[9.5px] leading-relaxed text-white/35">{modelStatus}</p>
-                </div>
 
-                <div className="settings-row-enter grid grid-cols-2 gap-1.5 pt-1.5" style={{ animationDelay: '205ms' }}>
-                  <button
-                    type="button"
-                    onClick={onClearModelCache}
-                    disabled={isClearingModelCache || !canClearModelCache}
-                    className="flex items-center justify-center gap-1.5 rounded-xl border border-white/[0.08] bg-white/[0.04] px-2 py-2 text-center text-[11px] font-medium text-white/70 hover:bg-white/[0.08] hover:text-white transition-colors disabled:cursor-not-allowed disabled:opacity-40"
-                    title={t.nav.clearModelsDesc}
-                  >
-                    <Trash2 size={13} className="shrink-0 text-white/50" />
-                    <span className="truncate">{isClearingModelCache ? t.nav.clearing : t.nav.clearModels}</span>
-                  </button>
-                  <Link
-                    href={"/blogs/enable_webgpu_guide_b5c9e8"}
-                    onClick={()=>setIsSettingsOpen(false)}
-                    className="flex items-center justify-center gap-1.5 rounded-xl border border-violet-400/20 bg-violet-400/[0.07] px-2 py-2 text-center text-[11px] font-medium text-violet-200 hover:bg-violet-400/[0.14] hover:text-violet-100 transition-colors"
-                    title={t.nav.learnWebgpu}
-                  >
-                    <ExternalLink size={13} className="shrink-0 text-violet-300" />
-                    <span className="truncate">{t.nav.learnWebgpu}</span>
-                  </Link>
+                  <div className="settings-row-enter grid grid-cols-2 gap-1.5 pt-1.5" style={{ animationDelay: '205ms' }}>
+                    <button
+                      type="button"
+                      onClick={onClearModelCache}
+                      disabled={isClearingModelCache || !canClearModelCache}
+                      className="flex items-center justify-center gap-1.5 rounded-xl border border-white/[0.08] bg-white/[0.04] px-2 py-2 text-center text-[11px] font-medium text-white/70 hover:bg-white/[0.08] hover:text-white transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+                      title={t.nav.clearModelsDesc}
+                    >
+                      <Trash2 size={13} className="shrink-0 text-white/50" />
+                      <span className="truncate">{isClearingModelCache ? t.nav.clearing : t.nav.clearModels}</span>
+                    </button>
+                    <Link
+                      href={"/blogs/enable_webgpu_guide_b5c9e8"}
+                      onClick={() => setIsSettingsOpen(false)}
+                      className="flex items-center justify-center gap-1.5 rounded-xl border border-violet-400/20 bg-violet-400/[0.07] px-2 py-2 text-center text-[11px] font-medium text-violet-200 hover:bg-violet-400/[0.14] hover:text-violet-100 transition-colors"
+                      title={t.nav.learnWebgpu}
+                    >
+                      <ExternalLink size={13} className="shrink-0 text-violet-300" />
+                      <span className="truncate">{t.nav.learnWebgpu}</span>
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
             </div>
 
             {/* LANGUAGE SELECTOR PILL BUTTON (Desktop/tablet >= md only; mobile uses drawer buttons) */}
@@ -560,24 +560,23 @@ export default function Navbar({
                             handleLanguageChange(lang.code);
                           }
                         }}
-                        className={`flex items-center justify-between w-full px-2.5 py-2 rounded-xl text-xs transition-colors ${
-                          isSelected
+                        className={`flex items-center justify-between w-full px-2.5 py-2 rounded-xl text-xs transition-colors ${isSelected
                             ? 'bg-white/15 text-white font-bold'
                             : lang.active
-                            ? 'text-white/80 hover:bg-white/10 hover:text-white'
-                            : 'text-white/30 cursor-not-allowed opacity-50'
-                        }`}
+                              ? 'text-white/80 hover:bg-white/10 hover:text-white'
+                              : 'text-white/30 cursor-not-allowed opacity-50'
+                          }`}
                       >
                         <div className="flex items-center gap-2 min-w-0">
-                         
+
                           <span className="truncate">{lang.nativeLabel}</span>
-                        
+
                         </div>
                         <div className="flex items-center gap-1.5 shrink-0 ml-2">
                           <span className="font-mono text-[10.5px] font-bold text-white/50">
                             {lang.short}
                           </span>
-                           <div className="w-4 h-4 flex items-center justify-center shrink-0">
+                          <div className="w-4 h-4 flex items-center justify-center shrink-0">
                             {isSelected && <Check size={14} className="text-[#00ff85]" />}
                           </div>
                           {!lang.active && (

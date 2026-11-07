@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useMemo } from 'react';
 import { useTranslation } from '@/locales';
 
 /* ============================================================
-   SECTION 2 — INFINITE SHOWREEL MARQUEE
+   SECTION 2 - INFINITE SHOWREEL MARQUEE
    Payooner-style full-bleed gallery ribbon. Duplicated track,
    GPU translate loop, GSAP scroll-velocity skew, pauses on
    hover. Rows tilt in from the sides on first reveal.
