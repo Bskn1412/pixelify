@@ -1,17 +1,23 @@
 'use client';
 
 import { useCallback, useEffect, useId, useState } from 'react';
-import { CalendarDays, Crown, RefreshCw, Trophy, UsersRound } from 'lucide-react';
+import Image from 'next/image';
+import { ArrowUp, CalendarDays, Crown, RefreshCw, Trophy, UsersRound } from 'lucide-react';
 import LeaderboardSkeleton from '@/components/LeaderboardSkeleton';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { getVisitorId } from '@/lib/visitor';
 import { VISITOR_PROFILE_UPDATED_EVENT } from '@/lib/visitor-profile';
 
-type Player = { id: string; username: string | null; display_name: string; avatar_url: string | null; created_at: string; score: number; rank: number };
+type Player = { id: string; username: string | null; display_name: string; avatar_url: string | null; country_code?: string | null; created_at: string; score: number; rank: number };
 type Stats = { uniqueVisitors: number; pageViews: number; todayVisitors: number; participants: number };
 type BoardData = { top: Player[]; position: Player | null; stats: Stats };
 
 function shortId(value: string) { return `${value.slice(0, 8)}…${value.slice(-4)}`; }
+
+function countryFlag(countryCode: string | null | undefined) {
+  if (!countryCode || !/^[A-Z]{2}$/.test(countryCode) || countryCode === 'XX') return null;
+  return String.fromCodePoint(...Array.from(countryCode, (letter) => 0x1f1e6 + letter.charCodeAt(0) - 65));
+}
 
 function memberSince(value: string) {
   const timestamp = new Date(value).getTime();
@@ -38,15 +44,20 @@ function Rank({ rank }: { rank: number }) {
   const color = rank === 1 ? 'text-amber-300' : rank === 2 ? 'text-slate-200' : rank === 3 ? 'text-orange-300' : rank <= 10 ? 'text-blue-300' : rank <= 25 ? 'text-violet-300' : rank <= 45 ? 'text-cyan-300' : rank <= 75 ? 'text-emerald-300' : rank <= 100 ? 'text-orange-300' : 'text-neutral-500';
   if (rank <= 3) {
     const podium = {
-      1: { color: 'text-amber-300', number: 'from-yellow-100 via-amber-300 to-amber-600', glow: 'drop-shadow-[0_0_12px_rgba(251,191,36,0.75)]' },
-      2: { color: 'text-slate-200', number: 'from-white via-slate-200 to-slate-400', glow: 'drop-shadow-[0_0_10px_rgba(203,213,225,0.65)]' },
-      3: { color: 'text-orange-300', number: 'from-orange-200 via-orange-400 to-amber-700', glow: 'drop-shadow-[0_0_10px_rgba(251,146,60,0.65)]' },
+      1: { src: '/images/leaderboard/rank-1-gold.png' },
+      2: { src: '/images/leaderboard/rank-2-silver.png' },
+      3: { src: '/images/leaderboard/rank-3-bronze.png' },
     }[rank as 1 | 2 | 3];
     const ordinal = rank === 1 ? '1st' : rank === 2 ? '2nd' : '3rd';
     return (
-      <span aria-label={`${ordinal} place`} className={`flex w-10 shrink-0 flex-col items-center justify-center gap-1 font-mono ${podium.glow}`}>
-        <Crown size={14} strokeWidth={2.5} className={`${podium.color} fill-current`} aria-hidden="true" />
-        <span className={`bg-gradient-to-b ${podium.number} bg-clip-text text-lg font-black leading-none text-transparent`}>{rank}</span>
+      <span className="flex w-10 shrink-0 items-center justify-center">
+        <Image
+          src={podium.src}
+          alt={`${ordinal} place medal`}
+          width={36}
+          height={36}
+          className="h-9 w-9 shrink-0 object-contain drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
+        />
       </span>
     );
   }
@@ -61,7 +72,7 @@ function PlayerRow({ player, isCurrentUser = false }: { player: Player; isCurren
   const name = isDefaultName ? shortId(player.id) : player.display_name;
   const profileName = isDefaultName ? 'Anonymous User' : player.display_name;
   return (
-    <div className={`relative z-0 grid grid-cols-[34px_minmax(0,1fr)_70px] items-center gap-3 px-3 py-4 hover:z-20 focus-within:z-20 first:rounded-t-2xl last:rounded-b-2xl sm:grid-cols-[48px_minmax(0,1fr)_100px] sm:gap-4 sm:px-6 ${player.rank === 1 ? 'bg-amber-300/[0.045]' : player.rank === 2 ? 'bg-slate-200/[0.025]' : player.rank === 3 ? 'bg-orange-300/[0.03]' : ''}`}>
+    <div className={`relative z-0 grid grid-cols-[34px_minmax(0,1fr)_70px] items-center gap-3 px-3 py-4 hover:z-20 focus-within:z-20 sm:grid-cols-[48px_minmax(0,1fr)_100px] sm:gap-4 sm:px-6 ${player.rank === 1 ? 'bg-amber-300/[0.045]' : player.rank === 2 ? 'bg-slate-200/[0.025]' : player.rank === 3 ? 'bg-orange-300/[0.03]' : ''}`}>
       <Rank rank={player.rank} />
       <div className="leaderboard-profile relative flex min-w-0 items-center gap-3" data-open={profileOpen} onMouseLeave={() => setProfileOpen(false)}>
         <button
@@ -99,7 +110,19 @@ function PlayerRow({ player, isCurrentUser = false }: { player: Player; isCurren
           </div>
         </div>
       </div>
-      <span className="text-right font-mono text-sm font-bold tabular-nums text-white">{player.score.toLocaleString()}<span className="ml-1 hidden text-[10px] font-medium text-white/40 sm:inline">PTS</span></span>
+      <span className="relative flex self-stretch items-center justify-end text-right font-mono text-sm font-bold tabular-nums text-white">
+        {player.score.toLocaleString()}<span className="ml-1 hidden text-[10px] font-medium text-white/40 sm:inline">PTS</span>
+        {countryFlag(player.country_code) && (
+          <span
+            role="img"
+            aria-label={`Country ${player.country_code}`}
+            title={`Country ${player.country_code}`}
+            className="absolute -right-5 -top-1 z-10 grid h-5 w-5 place-items-center rounded-md border border-white/15 bg-[#111318] text-sm leading-none shadow-[0_3px_8px_rgba(0,0,0,0.55)]"
+          >
+            {countryFlag(player.country_code)}
+          </span>
+        )}
+      </span>
     </div>
   );
 }
@@ -108,6 +131,7 @@ export default function LeaderboardPage() {
   const [data, setData] = useState<BoardData | null>(null);
   const [visitorId, setVisitorId] = useState<string | null>(null);
   const [error, setError] = useState(false);
+  const [showScrollToTop, setShowScrollToTop] = useState(false);
 
   const load = useCallback(async () => {
     setError(false);
@@ -128,6 +152,12 @@ export default function LeaderboardPage() {
     window.addEventListener(VISITOR_PROFILE_UPDATED_EVENT, load);
     return () => window.removeEventListener(VISITOR_PROFILE_UPDATED_EVENT, load);
   }, [load]);
+  useEffect(() => {
+    const updateVisibility = () => setShowScrollToTop(window.scrollY > 320);
+    updateVisibility();
+    window.addEventListener('scroll', updateVisibility, { passive: true });
+    return () => window.removeEventListener('scroll', updateVisibility);
+  }, []);
 
   return (
     <main className="min-h-screen bg-[#050507] px-4 pb-20 pt-0 text-white sm:px-6 sm:pt-0">
@@ -168,6 +198,20 @@ export default function LeaderboardPage() {
           </div>
         )}
       </div>
+      {showScrollToTop && (
+        <button
+          type="button"
+          aria-label="Scroll to top"
+          title="Scroll to top"
+          onClick={() => {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) window.scrollTo(0, 0);
+            else window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          className="fixed bottom-5 right-5 z-40 grid h-11 w-11 place-items-center rounded-full border border-sky-200/25 bg-[#111820]/95 text-sky-100 shadow-[0_8px_28px_rgba(0,0,0,0.55)] backdrop-blur-xl transition-colors hover:border-sky-200/50 hover:bg-[#18232c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-200/70"
+        >
+          <ArrowUp size={18} aria-hidden="true" />
+        </button>
+      )}
     </main>
   );
 }

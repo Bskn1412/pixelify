@@ -169,6 +169,21 @@ export default function MobileSidebar({
           </button>
         </div>
 
+        <button
+          type="button"
+          onClick={() => { onClose(); requestDisplayNameEdit(); }}
+          className="mx-2.5 mb-3 flex min-h-14 items-center gap-3 px-2 text-left"
+        >
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-sky-200/20 bg-sky-200/[0.08] text-sm font-semibold text-sky-100" aria-hidden="true">
+            {displayName.slice(0, 1).toUpperCase()}
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-sm font-semibold text-white/90">{displayName}</span>
+            <span className="mt-0.5 block text-[10px] text-white/40">Display name</span>
+          </span>
+          <Pencil size={14} className="shrink-0 text-white/45" aria-hidden="true" />
+        </button>
+
         {/* SECTION LABEL */}
         <span className="px-4 pb-1 pt-4 text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-500">
           Platform
@@ -209,20 +224,6 @@ export default function MobileSidebar({
             <Cpu size={12} className="text-violet-300/80" />
             <span>Engines & Settings</span>
           </div>
-          <button
-            type="button"
-            onClick={() => { onClose(); requestDisplayNameEdit(); }}
-            className="flex min-h-14 items-center gap-3 rounded-xl border border-white/10 bg-white/[0.035] px-3 text-left transition-colors hover:bg-white/[0.07]"
-          >
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-sky-200/20 bg-sky-200/[0.08] text-sm font-semibold text-sky-100" aria-hidden="true">
-              {displayName.slice(0, 1).toUpperCase()}
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm font-semibold text-white/90">{displayName}</span>
-              <span className="mt-0.5 block text-[10px] text-white/40">Display name</span>
-            </span>
-            <Pencil size={14} className="shrink-0 text-white/45" aria-hidden="true" />
-          </button>
           <div className="flex flex-col gap-1.5 rounded-xl border border-white/[0.07] bg-black/25 px-2.5 py-2">
 
             <EngineRow label={t.nav.upscaler} engine={upscalerEngine} />

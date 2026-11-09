@@ -87,7 +87,9 @@ The build produces the Next.js server output required by the Vercel API routes.
 
 ## Deployment
 
-The site is deployed on **Vercel**. Configure `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (or `SUPABASE_SECRET_KEY`) as server-only Vercel environment variables, then apply `supabase/migrations/202611100001_visitor_leaderboard.sql` to the project. Never expose the service key as a `NEXT_PUBLIC_*` variable.
+The site is deployed on **Vercel**. Configure `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (or `SUPABASE_SECRET_KEY`) as server-only Vercel environment variables, then apply the SQL migrations in `supabase/migrations` in order. Never expose the service key as a `NEXT_PUBLIC_*` variable.
+
+Set `VISITOR_IP_HASH_SECRET` to a stable random secret for server-side HMAC visitor counting (for example, generate one with `openssl rand -hex 32`). If it is unset, the server uses the Supabase service key as the HMAC key. Rotating the HMAC key starts a new network-counting bucket. Only the keyed hash is stored for aggregate visitor counts; browser IDs continue to identify profiles and points.
 
 `vercel.json` provides:
 

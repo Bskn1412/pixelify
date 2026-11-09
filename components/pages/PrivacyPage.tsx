@@ -219,7 +219,10 @@ export default function PrivacyPage({ onTabChange }: Props) {
           (advertising). Each processes the limited request data
           described above. We have no commercial relationship with them that involves your content.
           Supabase receives a random browser ID, visited page metadata and successful tool action
-          types; it never receives image content.
+          types, a keyed hash of the request IP for aggregate visitor counts, and a country code
+          derived from the request IP for the leaderboard flag. Raw IP addresses and image content
+          are not stored in Supabase. Visitors on the same public IP may count as one network visitor,
+          while profile names and points remain tied to the browser ID.
         </P>
         <P>
           External links inside our articles lead to third-party sites. Their practices are governed
@@ -231,7 +234,8 @@ export default function PrivacyPage({ onTabChange }: Props) {
         <P>
           Pixelify does not require an account, email or login. You may optionally add a display
           name to your anonymous visitor ID for the leaderboard, or skip and remain anonymous.
-          Visitor IDs, optional display names, page-view metadata and score records are stored in
+          Visitor IDs, optional display names, page-view metadata, score records, keyed IP hashes for
+          aggregate visitor counts and IP-derived country codes for leaderboard flags are stored in
           Supabase. Edit or remove your display name from Settings. Clear this browser&apos;s local
           storage to stop using the same ID; contact us using the details below to request deletion
           of stored visitor records. Your browser-stored preferences remain under your control:

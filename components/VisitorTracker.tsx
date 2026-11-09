@@ -5,11 +5,14 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { UsersRound } from 'lucide-react';
 import { getVisitorId } from '@/lib/visitor';
+import { SITE_LANGUAGES } from '@/lib/i18n';
 
 type Stats = { uniqueVisitors: number; pageViews: number };
 
 export default function VisitorTracker() {
   const pathname = usePathname();
+  const normalizedPath = (pathname || '/').replace(/\/+$/, '') || '/';
+  const isHomePage = normalizedPath === '/' || SITE_LANGUAGES.some(({ code }) => normalizedPath === `/${code}`);
   const [stats, setStats] = useState<Stats | null>(null);
 
   useEffect(() => {
@@ -32,6 +35,8 @@ export default function VisitorTracker() {
       : Promise.resolve();
     void tracked.then(loadStats);
   }, [pathname]);
+
+  if (!isHomePage) return null;
 
   return (
     <aside className="fixed right-0 top-1/2 z-[80] -translate-y-1/2">
