@@ -4,6 +4,111 @@
  */
 export const POSTS_PT = [
 {
+  "slug": "pc_vs_mobile_speed_c8d4f2",
+  "title": "Celular ou PC: Onde a IA no dispositivo realmente roda mais rápido",
+  "description": "GPUs de desktop, processadores de notebooks e SoCs de smartphones agora executam redes neurais, mas não de forma idêntica. O que realmente determina a velocidade, por que celulares às vezes vencem e como obter o melhor desempenho do hardware que você já possui.",
+  "tags": [
+    "Desempenho",
+    "WebGPU",
+    "Guia"
+  ],
+  "date": "2026-11-09",
+  "author": "A Equipe Pixelify",
+  "cover": "/blogs/home-mobile.jpg",
+  "coverAlt": "Pixelify sendo executado na tela de um celular",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "A resposta intuitiva para a pergunta \"qual aparelho é mais rápido\" costuma ser a opção mais cara. Um computador de mesa com placa de vídeo dedicada sempre superará um smartphone em capacidade bruta de cálculo. No entanto, o poder computacional bruto é apenas uma das variáveis na equação que define a experiência real do usuário: o tempo real decorrido desde o momento em que você solta uma imagem até visualizar o resultado final. A memória, o projeto térmico, a pilha de software e até mesmo o cabo de conexão alteram esse número de maneiras que as fichas técnicas não revelam."
+    },
+    {
+      "type": "h2",
+      "text": "O que realmente determina a velocidade percebida"
+    },
+    {
+      "type": "p",
+      "text": "Quatro variáveis determinam o resultado e interagem entre si. O throughput computacional estabelece o teto teórico — quantas operações por segundo o chip consegue processar. A largura de banda de memória define a rapidez com que os dados circulam entre o armazenamento e as unidades de cálculo e, no processamento de imagens, frequentemente se torna o primeiro gargalo: um processador veloz sem dados suficientes fica ocioso. A margem térmica determina se essa velocidade sobrevive ao décimo segundo de uma tarefa intensa ou se despenca devido ao aquecimento. E o caminho de software (aceleração via GPU versus CPU alternativa) pode fazer mais diferença do que os três fatores de hardware somados."
+    },
+    {
+      "type": "p",
+      "text": "Essa última variável é o grande nivelador. Um celular moderno rodando com aceleração gráfica ativada supera com frequência um notebook que processe a mesma rede neural em modo CPU, apesar da superioridade teórica do notebook. Por outro lado, uma GPU de desktop com drivers otimizados supera qualquer outro dispositivo. A hierarquia de hardware existe; o caminho de execução adotado é quem decide se essa hierarquia conseguirá se expressar."
+    },
+    {
+      "type": "h2",
+      "text": "A vantagem concreta dos computadores de mesa"
+    },
+    {
+      "type": "p",
+      "text": "Desktops vencem com folga em cargas prolongadas. Uma placa gráfica dedicada com sua própria memória de vídeo e refrigeração ativa pode operar em clock máximo indefinidamente, sem estrangulamento térmico nem preocupações com bateria. Imagens pesadas ganham em dobro: a memória VRAM dedicada comporta blocos de trabalho maiores, o que resulta em azulejos maiores, menos passadas e menor sobrecarga de junção. Em processamentos em lote (cinquenta fotos de catálogo, acervos escaneados), a consistência do desktop se multiplica: sem limitação de calor, a última foto é processada tão rápido quanto a primeira."
+    },
+    {
+      "type": "img",
+      "src": "/blogs/upscaler-sections.jpg",
+      "alt": "Demonstração de resultados aprimorados com estatísticas de desempenho local",
+      "caption": "Mesma rede neural, mesma imagem: a diferença entre dispositivos é pura engenharia, não mágica."
+    },
+    {
+      "type": "h2",
+      "text": "Onde os celulares genuinamente vencem"
+    },
+    {
+      "type": "p",
+      "text": "Os smartphones contam com uma vantagem estrutural que as fichas técnicas omitem: o caminho de dados mais curto possível. Os chips móveis reúnem memória, computação e processamento de sinal de imagem em uma única peça de silício, fazendo os dados percorrerem milímetros em vez de trafegarem por barramentos externos. As GPUs móveis também são extremamente eficientes por watt, pois toda a gestão térmica do aparelho foi projetada para explosões de alta performance em um formato de bolso. Para uma imagem individual — a tarefa mais comum no dia a dia —, um smartphone moderno entrega o resultado em segundos, e o ganho de praticidade é imbatível: o melhor dispositivo é aquele que já está em suas mãos."
+    },
+    {
+      "type": "p",
+      "text": "Há também uma dimensão de software muito relevante. O suporte à computação gráfica nos navegadores móveis evoluiu rapidamente, e os fabricantes de processadores mobile agora incluem unidades neurais inexistentes em notebooks de duas gerações atrás. A distância entre um smartphone topo de linha e um notebook intermediário encolheu a ponto de, em tarefas individuais interativas, a maioria das pessoas não notar diferença em um teste cego."
+    },
+    {
+      "type": "h2",
+      "text": "A barreira térmica e a questão da bateria"
+    },
+    {
+      "type": "p",
+      "text": "Todo aparelho portátil esbarra no mesmo limite físico. Computação contínua gera calor; esse calor precisa se dissipar de um chassi fechado de bolso; logo, o aparelho desacelera para evitar superaquecimento. Isso se manifesta em um padrão bem conhecido: a primeira imagem é processada velozmente, enquanto a quinta é perceptivelmente mais lenta. Não é defeito; é física elementar, e é o preço de rodar cálculos de nível de desktop em um corpo sem ventoinha. A resposta prática é o planejamento: lotes extensos devem rodar em máquinas conectadas à tomada e refrigeradas; imagens individuais podem ser processadas de onde você estiver."
+    },
+    {
+      "type": "h2",
+      "text": "Como obter o máximo de velocidade do que você tem"
+    },
+    {
+      "type": "p",
+      "text": "A escolha do aparelho costuma ser fixa na rotina da maioria das pessoas, mas a sua configuração não é. O passo de maior impacto é confirmar qual motor suas ferramentas estão utilizando: o painel de configurações no aplicativo exibe isso em tempo real, e a diferença entre o caminho acelerado e o fallback em CPU pode superar uma ordem de magnitude. Além disso, alguns hábitos práticos aumentam consideravelmente o rendimento em qualquer máquina."
+    },
+    {
+      "type": "h2",
+      "text": "Boas práticas recomendadas para qualquer aparelho"
+    },
+    {
+      "type": "p",
+      "text": "Verificar o motor é o primeiro hábito fundamental, pois esclarece as quedas de desempenho mais inesperadas antes mesmo de analisar o hardware, e toma apenas dez segundos. O segundo hábito é como você organiza lotes no notebook: disparar um lote imenso de uma só vez aquece o equipamento até o estrangulamento térmico; dividir a tarefa em dois ou três blocos com pequenos intervalos permite concluir o trabalho todo mais rápido no mesmo computador, porque o segundo bloco reinicia em clock máximo. Um terceiro: dimensionar o fator de escala de acordo com o destino real da imagem é uma escolha consciente de otimização, não uma perda; uma ampliação de 2x fluida a 60 fps na tela é melhor do que um 4x demorado que não acrescenta detalhes ao original. Cada uma dessas decisões transforma características fixas de hardware em comportamentos otimizados."
+    },
+    {
+      "type": "ul",
+      "items": [
+        "Confira o indicador do motor gráfico primeiro: ele resolve a maioria dos mistérios de lentidão antes de culpar o aparelho.",
+        "Feche abas e programas pesados: pressão de memória RAM força o uso de blocos menores e mais passadas.",
+        "Ligue à tomada: os modos de economia de bateria reduzem silenciosamente a potência de cálculo em qualquer sistema.",
+        "Deixe o aparelho respirar entre imagens se notar aquecimento: um chip frio trabalha em frequência máxima.",
+        "Ajuste o tamanho certo: 2× para exibição em telas consome uma fração do tempo de 4× e termina muito mais rápido."
+      ]
+    },
+    {
+      "type": "h2",
+      "text": "A conclusão realista"
+    },
+    {
+      "type": "p",
+      "text": "Se o seu objetivo diário é processamento contínuo de imagens em altíssima resolução (produção gráfica, escaneamento de arquivos, catálogos extensos), um desktop com GPU dedicada é a ferramenta certa, e a vantagem que ele oferece é real. Se sua rotina envolve fotos avulsas ao longo do dia, seu celular não é uma solução improvisada; é o equipamento ideal por estar sempre à mão. E como as ferramentas locais executam exatamente a mesma rede neural em qualquer plataforma, a qualidade do resultado não oscila com o aparelho; apenas o tempo de espera muda."
+    },
+    {
+      "type": "p",
+      "text": "Esse último detalhe merece destaque porque subverte toda a lógica da nuvem. Com o processamento remoto, você aluga a infraestrutura de terceiros e paga pelo privilégio. Com o processamento local, você aproveita o melhor computador que já possui, sem custo marginal, sem filas e sem uploads. O debate sobre desempenho deixou de ser \"meu dispositivo aguenta?\", pois qualquer smartphone ou computador recente aguenta. Agora a questão é apenas \"quanta paciência eu tenho hoje?\", e a resposta honesta quase sempre é: pouca."
+    }
+  ]
+},
+
+{
   "slug": "data_harvesting_warning_a9e5b7",
   "title": "O que acontece com suas fotos depois de clicar em \"Enviar\"",
   "description": "Ferramentas gratuitas monetizam uploads de maneiras que a maioria dos usuários não vê: cláusulas de retenção, dados derivados, treino de IA e risco de vazamentos. Um guia prático para ler as letras miúdas e proteger sua rotina.",

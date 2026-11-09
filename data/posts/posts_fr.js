@@ -4,6 +4,90 @@
  */
 export const POSTS_FR = [
 {
+    slug: 'pc_vs_mobile_speed_c8d4f2',
+    title: 'Téléphone ou PC : Où l\'IA sur appareil s\'exécute-t-elle le plus vite ?',
+    description:
+      'Les GPU de bureau, les puces d\'ordinateurs portables et les SoC de smartphones exécutent tous des réseaux neuronaux désormais, mais pas de façon égale. Ce qui détermine réellement la vitesse, pourquoi les téléphones gagnent parfois, et comment obtenir le résultat le plus rapide depuis le matériel que vous possédez.',
+    tags: ['Performance', 'WebGPU', 'Guide'],
+    date: '2026-11-09',
+    author: 'L\'équipe Pixelify',
+    cover: '/blogs/home-mobile.jpg',
+    coverAlt: 'Pixelify s\'exécutant sur un écran de téléphone mobile',
+    blocks: [
+      {
+        type: 'p',
+        text: 'La réponse intuitive à la question « quel appareil est le plus rapide » privilégie la solution la plus chère. Un ordinateur de bureau avec une carte graphique dédiée surpasse un téléphone en puissance de calcul brute, et ce sera toujours le cas. Mais le calcul brut n\'est qu\'un terme dans l\'équation qui produit le chiffre réellement expérimenté par l\'utilisateur, c\'est-à-dire le temps réel écoulé entre le dépôt de l\'image et l\'affichage du résultat. La mémoire, la conception thermique, le parcours logiciel et même le câble de transfert dans votre main déplacent ce chiffre dans des directions que les fiches techniques ne prévoient pas.',
+      },
+      { type: 'h2', text: 'Ce qui détermine réellement la vitesse ressentie' },
+      {
+        type: 'p',
+        text: 'Quatre variables décident du résultat, et elles interagissent. Le débit de calcul fixe le plafond théorique, c\'est-à-dire le nombre d\'opérations par seconde que la puce peut soutenir. La bande passante mémoire détermine la vitesse à laquelle les données circulent entre le stockage et les unités de calcul, et pour le travail sur les images, elle constitue souvent le premier facteur limitant ; une puce rapide privée de données reste inactive. La marge thermique détermine si cette vitesse survit à la dixième seconde d\'un travail long ou s\'effondre sous l\'effet de la chaleur. Et le parcours logiciel, accélération GPU contre recours au CPU, peut importer plus que les trois termes matériels réunis.',
+      },
+      {
+        type: 'p',
+        text: 'Cette dernière variable est le grand égaliseur. Un téléphone moderne sur un parcours GPU accéléré surpasse régulièrement un ordinateur portable exécutant le même réseau sur un parcours CPU, malgré la supériorité théorique de l\'ordinateur portable. À l\'inverse, un GPU de bureau avec des pilotes aboutis distancera tout le monde. Le classement matériel est réel ; le parcours sur lequel il s\'exécute décide si ce classement peut s\'exprimer.',
+      },
+      { type: 'h2', text: 'L\'avantage concret de l\'ordinateur de bureau' },
+      {
+        type: 'p',
+        text: 'Les ordinateurs de bureau l\'emportent sur les charges soutenues. Une carte dédiée possédant sa propre mémoire exclusive et un refroidissement actif peut tourner à pleine fréquence indéfiniment, sans mur thermique ni inquiétude de batterie. Les grandes images en bénéficient doublement : la mémoire vidéo dédiée conserve des ensembles de travail plus volumineux, ce qui signifie des tuiles plus grandes, moins de passes et moins de surcoût d\'assemblage. Pour le travail par lots (cinquante photos de produits, des archives scannées), la régularité de l\'ordinateur de bureau s\'accumule : l\'absence de bridage thermique permet à la dernière photo de se terminer aussi vite que la première.',
+      },
+      {
+        type: 'img',
+        src: '/blogs/upscaler-sections.jpg',
+        alt: 'Présentation de résultats agrandis avec statistiques de performance sur appareil',
+        caption: 'Même réseau, même image : la différence entre les appareils relève de l\'ingénierie, pas de la magie.',
+      },
+      { type: 'h2', text: 'Là où les téléphones gagnent véritablement' },
+      {
+        type: 'p',
+        text: 'Les téléphones possèdent un avantage structurel que leurs fiches techniques masquent : le parcours de données le plus court. Les puces mobiles intègrent la mémoire, le calcul et le traitement du signal d\'image sur un seul morceau de silicium, de sorte que les données se déplacent sur des millimètres plutôt qu\'à travers un bus. Les GPU de téléphone sont également extrêmement efficaces par watt, car tout le budget thermique de l\'appareil est conçu autour de pics de performance dans un format de poche. Pour une seule photo, la tâche la plus courante dans le monde réel, un téléphone moderne termine le travail en quelques secondes, et le gain de praticité est énorme : le meilleur appareil est celui que vous avez déjà en main.',
+      },
+      {
+        type: 'p',
+        text: 'Il existe également une dimension logicielle qui mérite d\'être soulignée. La prise en charge du calcul GPU par les navigateurs mobiles a mûri rapidement, et les concepteurs de puces mobiles intègrent désormais du matériel d\'accélération neuronale qui n\'existait pas dans les ordinateurs portables il y a deux générations. L\'écart entre un téléphone haut de gamme et un ordinateur portable de milieu de gamme s\'est réduit au point où, pour des tâches interactives sur une seule image, la plupart des utilisateurs ne perçoivent aucune différence lors d\'un test à l\'aveugle.',
+      },
+      { type: 'h2', text: 'Le mur thermique et la question de la batterie' },
+      {
+        type: 'p',
+        text: 'Tout appareil portable rencontre un jour la même limite. Le calcul soutenu génère de la chaleur ; la chaleur doit s\'échapper d\'un boîtier étanche de la taille d\'une poche ; l\'appareil ralentit donc au lieu de surchauffer. Cela se manifeste selon un schéma bien connu : la première image est traitée rapidement, la cinquième nettement plus lentement. Ce n\'est pas un défaut ; ce sont les lois de la physique, et c\'est le prix pour exécuter des calculs de niveau ordinateur de bureau dans un appareil sans ventilateur. La réponse pratique réside dans la planification : les grands lots appartiennent au matériel branché et refroidi par ventilateur ; les images isolées s\'exécutent là où vous vous trouvez.',
+      },
+      { type: 'h2', text: 'Obtenir le résultat le plus rapide à partir de ce que vous possédez' },
+      {
+        type: 'p',
+        text: 'Le choix de l\'appareil est fixe pour la plupart des gens au quotidien, mais pas la configuration. L\'étape individuelle la plus impactante consiste à confirmer quel moteur vos outils utilisent réellement ; le panneau des paramètres de l\'application le rapporte en direct, et la différence entre un parcours accéléré et un recours au CPU peut dépasser un ordre de grandeur. Au-delà de cela, quelques habitudes améliorent mesurablement le débit sur n\'importe quel appareil.',
+      },
+      {
+        type: 'h2',
+        text: 'Des pratiques à adopter sur tous les appareils',
+      },
+      {
+        type: 'p',
+        text: 'La vérification du moteur est la première habitude, car elle explique la plupart des écarts de performance surprenants avant toute recherche de diagnostic matériel, et elle prend dix secondes. Une seconde habitude, tout aussi importante, concerne le traitement d\'un lot sur un ordinateur portable : exécuter un grand lot d\'un seul coup amène souvent l\'appareil vers son point de bridage thermique, de sorte que diviser l\'ensemble en deux ou trois sessions avec une pause intermédiaire permet de terminer tout le travail plus rapidement sur le même matériel, car la seconde session démarre à pleine fréquence. Une troisième : ajuster correctement le facteur d\'agrandissement aux besoins réels constitue une véritable décision d\'optimisation, et non un compromis ; un résultat 2× à 60 ips à l\'écran surpasse un résultat 4× qui a pris deux fois plus de temps sans rien apporter de plus par rapport à la source. Chacune de ces habitudes transforme une propriété matérielle fixe en un comportement configurable.',
+      },
+      {
+        type: 'ul',
+        items: [
+          'Vérifiez d\'abord le badge du moteur : il explique la plupart des écarts de performance surprenants avant le matériel.',
+          'Fermez les onglets et applications gourmands en mémoire ; la pression sur la mémoire force l\'usage de tuiles plus petites et augmente le nombre de passes.',
+          'Branchez votre appareil. Le mode d\'économie d\'énergie limite silencieusement vos capacités de calcul sur toutes les plates-formes.',
+          'Laissez l\'appareil refroidir entre les éléments d\'un lot si vous le sentez chauffer ; une puce refroidie fonctionne à pleine fréquence.',
+          'Dimensionnez correctement la tâche : le 2× pour l\'affichage coûte une fraction du 4× et se termine plus rapidement.',
+        ],
+      },
+      { type: 'h2', text: 'La conclusion honnête' },
+      {
+        type: 'p',
+        text: 'Si le traitement soutenu sur de très grandes images constitue votre besoin quotidien (impression professionnelle, numérisation d\'archives, catalogues), un ordinateur de bureau avec un GPU dédié est le bon outil, et l\'écart qu\'il creuse est réel. Si le travail consiste à traiter des images isolées tout au long de la journée, votre téléphone n\'est pas un compromis ; c\'est l\'appareil optimal, parce qu\'il est disponible immédiatement. Et parce que les outils locaux exécutent le même réseau partout, la qualité du résultat ne varie pas selon le matériel ; seule l\'attente varie.',
+      },
+      {
+        type: 'p',
+        text: 'Ce dernier point mérite d\'être souligné, car il inverse complètement la logique du cloud. Avec le traitement distant, vous louez le niveau matériel de quelqu\'un d\'autre et vous payez pour ce privilège. Avec le traitement local, vous utilisez le meilleur matériel que vous possédez déjà, sans coût marginal, sans file d\'attente et sans téléversement. La discussion sur les performances n\'est plus « mon appareil peut-il suivre », car chaque appareil des ces dernières années en est capable. Il s\'agit simplement de savoir « à quel point suis-je patient aujourd\'hui », et la réponse honnête est généralement : pas très patient.',
+      },
+    ],
+  },
+
+{
     slug: 'data_harvesting_warning_a9e5b7',
     title: 'Ce qui arrive à vos photos après avoir cliqué sur « Téléverser »',
     description:

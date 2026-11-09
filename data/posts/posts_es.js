@@ -4,6 +4,111 @@
  */
 export const POSTS_ES = [
 {
+  "slug": "pc_vs_mobile_speed_c8d4f2",
+  "title": "¿Teléfono o PC?: Dónde se ejecuta realmente más rápido la IA en el dispositivo",
+  "description": "Las GPU de escritorio, los chips de portátiles y los SoC móviles ejecutan redes neuronales hoy en día, aunque no por igual. Qué determina realmente la velocidad, por qué los teléfonos a veces ganan y cómo obtener el mejor rendimiento del hardware que ya tienes.",
+  "tags": [
+    "Rendimiento",
+    "WebGPU",
+    "Guía"
+  ],
+  "date": "2026-11-09",
+  "author": "El equipo de Pixelify",
+  "cover": "/blogs/home-mobile.jpg",
+  "coverAlt": "Pixelify ejecutándose en la pantalla de un teléfono móvil",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "La respuesta intuitiva a la pregunta \"¿qué dispositivo es más rápido?\" suele ser la opción más cara. Un ordenador de sobremesa con una tarjeta gráfica dedicada supera a un smartphone en potencia de cálculo bruta, y siempre lo hará. Sin embargo, la computación bruta es solo un término en la ecuación que produce la cifra que el usuario realmente experimenta: el tiempo real transcurrido desde que suelta una imagen hasta que ve el resultado final. La memoria, el diseño térmico, la vía de software e incluso el cable que sostienes en la mano alteran esa cifra en direcciones que las fichas técnicas jamás predicen."
+    },
+    {
+      "type": "h2",
+      "text": "Qué determina realmente la velocidad que percibes"
+    },
+    {
+      "type": "p",
+      "text": "Cuatro variables deciden el resultado y se influyen mutuamente. El rendimiento de cómputo establece el techo teórico, es decir, cuántas operaciones por segundo puede sostener el procesador. El ancho de banda de memoria define la rapidez con la que los datos viajan entre el almacenamiento y las unidades de cálculo, y en el tratamiento de imágenes suele ser el primer cuello de botella: un chip rápido sin datos suficientes se queda inactivo. El margen térmico determina si esa velocidad resiste el décimo segundo de una tarea pesada o se desploma ante el calor. Y la vía de ejecución del software (aceleración por GPU frente a la CPU como respaldo) puede importar más que los tres factores de hardware combinados."
+    },
+    {
+      "type": "p",
+      "text": "Esta última variable es el gran ecualizador. Un smartphone moderno que ejecuta una vía acelerada por GPU supera habitualmente a un ordenador portátil que procesa la misma red sobre CPU, a pesar de la teórica superioridad del portátil. Por otro lado, una GPU de clase de escritorio con controladores maduros se distanciará de cualquier competidor. La jerarquía del hardware es real; la vía de software en la que se ejecuta decide si esa jerarquía logra manifestarse."
+    },
+    {
+      "type": "h2",
+      "text": "La ventaja del ordenador de sobremesa, de forma concreta"
+    },
+    {
+      "type": "p",
+      "text": "Los equipos de sobremesa ganan indiscutiblemente en cargas continuas. Una tarjeta gráfica dedicada con su propia memoria de vídeo y refrigeración activa puede funcionar a su frecuencia máxima de forma indefinida, sin barreras térmicas ni preocupaciones de batería. Las imágenes de gran tamaño obtienen una doble ventaja: la memoria VRAM dedicada alberga áreas de trabajo más amplias, lo que se traduce en mosaicos mayores, menos pasadas y menor sobrecoste de unión. En flujos por lotes (cincuenta fotos de producto, un archivo escaneado), la consistencia del sobremesa se multiplica: sin estrangulamiento térmico, la última foto se procesa con la misma rapidez que la primera."
+    },
+    {
+      "type": "img",
+      "src": "/blogs/upscaler-sections.jpg",
+      "alt": "Muestra de resultados mejorados con estadísticas de rendimiento en el dispositivo",
+      "caption": "Misma red neuronal, misma imagen: la diferencia entre dispositivos es pura ingeniería, no magia."
+    },
+    {
+      "type": "h2",
+      "text": "Dónde ganan realmente los teléfonos móviles"
+    },
+    {
+      "type": "p",
+      "text": "Los teléfonos inteligentes tienen una ventaja estructural que las especificaciones no reflejan: la ruta de datos más corta. Los chips móviles integran memoria, computación y procesamiento de señales de imagen en una sola pieza de silicio, por lo que los datos se desplazan milímetros en lugar de atravesar un bus de placa base. Las GPU móviles son además extraordinariamente eficientes por vatio, ya que todo el balance térmico del dispositivo está concebido para ráfagas de máximo rendimiento en un chasis que cabe en el bolsillo. Para una foto individual —la tarea cotidiana más frecuente—, un móvil actual completa el trabajo en pocos segundos, y el multiplicador de conveniencia es inmenso: el mejor dispositivo es el que ya tienes en la mano."
+    },
+    {
+      "type": "p",
+      "text": "También conviene destacar la dimensión del software. El soporte de computación por GPU en navegadores móviles ha madurado con rapidez, y los fabricantes de procesadores móviles integran hardware de aceleración neuronal inexistente en portátiles de hace dos generaciones. La distancia entre un teléfono de gama alta y un portátil de gama media se ha reducido tanto que, en tareas interactivas sobre una sola imagen, la mayoría de usuarios no percibe diferencia alguna en una prueba a ciegas."
+    },
+    {
+      "type": "h2",
+      "text": "La barrera térmica y el factor de la batería"
+    },
+    {
+      "type": "p",
+      "text": "Cualquier dispositivo portátil acaba encontrando el mismo límite físico. El cálculo continuado genera calor; ese calor debe disiparse a través de un cuerpo sellado de bolsillo; en consecuencia, el dispositivo reduce su frecuencia para protegerse. Esto produce un patrón muy reconocible: la primera imagen se procesa al instante, pero la quinta tarda notablemente más. No es un defecto: es física pura, y es el precio de ejecutar matemáticas de clase de sobremesa en un dispositivo sin ventilador. La respuesta práctica es la planificación: los lotes grandes pertenecen al hardware enchufado y refrigerado; las imágenes individuales se procesan dondequiera que estés."
+    },
+    {
+      "type": "h2",
+      "text": "Cómo exprimir la máxima velocidad del hardware que tienes"
+    },
+    {
+      "type": "p",
+      "text": "Para la mayoría de personas el dispositivo disponible es fijo en el día a día, pero su configuración no lo es. El paso individual con mayor impacto es verificar qué motor están usando realmente tus herramientas: el panel de ajustes de la aplicación lo indica en tiempo real, y la diferencia entre una vía acelerada y el respaldo por CPU puede superar un orden de magnitud. Aparte de eso, unos pocos hábitos mejoran de forma cuantificable el rendimiento en cualquier equipo."
+    },
+    {
+      "type": "h2",
+      "text": "Prácticas recomendadas para cualquier dispositivo"
+    },
+    {
+      "type": "p",
+      "text": "La verificación del motor es el primer hábito, ya que explica la mayoría de caídas sorprendentes de rendimiento antes de tener que analizar el hardware, y solo cuesta diez segundos. Un segundo hábito crucial es la gestión de lotes en ordenadores portátiles: ejecutar un lote enorme de golpe hace que el equipo alcance su punto de estrangulamiento térmico; dividirlo en dos o tres bloques con una breve pausa intermedia suele finalizar la tarea completa antes sobre el mismo equipo, porque el segundo bloque arranca a velocidad máxima. Un tercero: ajustar el factor de escalado a la necesidad real de salida es una decisión legítima de optimización, no una renuncia; una salida a 2× a 60 fps en pantalla supera a un 4× que tardó el doble sin aportar información real que la fuente no tuviera. Cada una de estas pautas convierte una propiedad fija de hardware en un comportamiento configurable."
+    },
+    {
+      "type": "ul",
+      "items": [
+        "Comprueba primero la insignia del motor: explica la gran mayoría de discrepancias de rendimiento antes de culpar al hardware.",
+        "Cierra pestañas y aplicaciones que consuman mucha memoria: la saturación de RAM obliga a generar teselas más pequeñas y más pasadas.",
+        "Conecta el cargador: el modo de ahorro de batería limita de forma silenciosa la potencia de cálculo en cualquier plataforma.",
+        "Deja enfriar el dispositivo entre imágenes si notas que se calienta: un chip frío rinde a su frecuencia máxima.",
+        "Dimensiona bien la tarea: escalar a 2× para visualización en pantalla cuesta una fracción de tiempo respecto a 4× y finaliza mucho más rápido."
+      ]
+    },
+    {
+      "type": "h2",
+      "text": "La conclusión honesta"
+    },
+    {
+      "type": "p",
+      "text": "Si lo que necesitas a diario es rendimiento sostenido con imágenes gigantescas (producción gráfica, escaneo de archivos, catalogación comercial), un ordenador de sobremesa con GPU dedicada es la herramienta adecuada, y la distancia que abre es palpable. Si tu trabajo consiste en retocar imágenes sueltas a lo largo del día, tu teléfono móvil no es una opción de compromiso; es el dispositivo óptimo porque está siempre contigo. Y dado que las herramientas locales ejecutan exactamente la misma red neuronal en todas partes, la calidad del resultado final no varía con el hardware: solo cambia la espera."
+    },
+    {
+      "type": "p",
+      "text": "Este último punto merece especial atención, ya que invierte por completo la lógica del modelo en la nube. Con el procesamiento remoto, alquilas un nivel de hardware ajeno y pagas por ese privilegio. Con el procesamiento local, aprovechas el mejor hardware que ya posees, sin coste marginal, sin colas de espera y sin subir tus fotos. La conversación sobre rendimiento ya no es \"¿podrá mi dispositivo con esto?\", porque cualquier máquina de los últimos años puede. Es sencillamente \"¿cuánta paciencia tengo hoy?\", y la respuesta honesta suele ser: no demasiada."
+    }
+  ]
+},
+
+{
   "slug": "data_harvesting_warning_a9e5b7",
   "title": "Qué le ocurre a tus fotos después de pulsar \"Subir\"",
   "description": "Las herramientas gratuitas monetizan las fotos de formas que la mayoría no percibe: cláusulas de retención, datos derivados, entrenamiento de IA y riesgo de filtraciones. Una guía práctica para leer la letra pequeña y eliminar este riesgo.",

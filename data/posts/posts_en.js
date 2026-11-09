@@ -4,6 +4,90 @@
  */
 export const POSTS_EN = [
 {
+    slug: 'pc_vs_mobile_speed_c8d4f2',
+    title: 'Phone or PC: Where On-Device AI Actually Runs Faster',
+    description:
+      'Desktop GPUs, laptop chips, and phone SoCs all run neural networks now, though not equally. What actually determines speed, why phones sometimes win, and how to get the fastest result from the hardware you own.',
+    tags: ['Performance', 'WebGPU', 'Guide'],
+    date: '2026-11-09',
+    author: 'The Pixelify Team',
+    cover: '/blogs/home-mobile.jpg',
+    coverAlt: 'Pixelify running on a mobile phone viewport',
+    blocks: [
+      {
+        type: 'p',
+        text: 'The intuitive answer to "which device is faster" is the expensive one. A desktop with a discrete graphics card outmuscles a phone in raw computation, and always will. But raw compute is only one term in the equation that produces the number a user actually experiences, meaning the wall-clock time from dropping an image to seeing the result. Memory, thermal design, software path, and even the transfer cable in your hand shift that number in directions the spec sheets do not predict.',
+      },
+      { type: 'h2', text: 'What actually determines the speed you feel' },
+      {
+        type: 'p',
+        text: 'Four variables decide the outcome, and they interact. Compute throughput sets the theoretical ceiling, meaning how many operations per second the chip can sustain. Memory bandwidth is how fast data moves between storage and the compute units, and for image work it frequently binds first; a fast chip starved of data idles. Thermal headroom determines whether that speed survives the tenth second of a long job or collapses under heat. And the software path, GPU acceleration versus CPU fallback, can matter more than all three hardware terms combined.',
+      },
+      {
+        type: 'p',
+        text: 'This last variable is the great equalizer. A modern phone on an accelerated GPU path routinely beats a laptop running the same network on a CPU fallback, despite the laptop\'s theoretical superiority. Conversely, a desktop-class GPU with mature driver support will pull away from everything. The hardware ranking is real; the path it is running on decides whether the ranking gets to express itself.',
+      },
+      { type: 'h2', text: 'The desktop advantage, concretely' },
+      {
+        type: 'p',
+        text: 'Desktops win on sustained load. A discrete card with its own dedicated memory and active cooling can run at full clock indefinitely, with no thermal wall and no battery anxiety. Large images benefit doubly: dedicated video memory holds bigger working sets, which means larger tiles, fewer passes, and less stitching overhead. For batch work (fifty product shots, a scanned archive), the desktop\'s consistency compounds: no throttling means the last photo finishes as fast as the first.',
+      },
+      {
+        type: 'img',
+        src: '/blogs/upscaler-sections.jpg',
+        alt: 'Showcase of upscaled results with on-device performance statistics',
+        caption: 'Same network, same image: the difference between devices is engineering, not magic.',
+      },
+      { type: 'h2', text: 'Where phones genuinely win' },
+      {
+        type: 'p',
+        text: 'Phones have a structural advantage their spec sheets hide: the shortest data path. Mobile chips integrate memory, compute, and image signal processing on a single piece of silicon, so data moves millimeters instead of across a bus. Phone GPUs are also extraordinarily efficient per watt, because the entire thermal budget of the device is designed around burst performance in a pocket-sized enclosure. For a single photo, the most common real-world task, a modern phone completes the job in seconds, and the convenience multiplier is enormous: the best device is the one already in your hand.',
+      },
+      {
+        type: 'p',
+        text: 'There is also a software dimension worth noting. Mobile browsers\' GPU compute support has matured rapidly, and phone silicon vendors now ship neural acceleration hardware that did not exist in laptops two generations ago. The gap between a flagship phone and a mid-range laptop has narrowed to the point where, for interactive single-image tasks, most users cannot perceive a difference in a blind test.',
+      },
+      { type: 'h2', text: 'The thermal wall and the battery question' },
+      {
+        type: 'p',
+        text: 'Every portable device eventually meets the same limit. Sustained compute generates heat; heat must leave a sealed, pocket-sized enclosure; so the device slows down rather than cooking itself. This manifests as a familiar pattern: the first image processes quickly, the fifth noticeably slower. It is not a defect; it is physics, and it is the price of running desktop-class math in a device with no fan. The practical response is scheduling: long batches belong on plugged-in, fan-cooled hardware; single images belong wherever you are.',
+      },
+      { type: 'h2', text: 'Getting the fastest result from what you own' },
+    {
+      type: 'p',
+      text: 'Device choice is fixed for most people on most days, but configuration is not. The single highest-impact step is confirming which engine your tools are actually using; the settings panel in the app reports this live, and the difference between an accelerated path and a CPU fallback can exceed an order of magnitude. Beyond that, a handful of habits measurably improve throughput on any device.',
+    },
+    {
+      type: 'h2',
+      text: 'Practices worth adopting on every device',
+    },
+    {
+      type: 'p',
+      text: 'Engine verification is the first habit, because it explains most surprising performance gaps before any hardware diagnosis ever needs to happen, and it costs ten seconds. A second, equally important habit is how a batch is treated on a laptop: running one large batch all at once often means the device warms toward its throttling point, so breaking the set into two or three runs with a pause in between can finish the whole job sooner on the same hardware, because the second run starts at full clock. A third: right-sizing the scale factor for the actual output need is a legitimate optimization decision, not a compromise; a 2x result at 60 fps on screen beats a 4x result that took twice as long and matched nothing the source contained. Each of these turns a fixed hardware property into a configurable behavior.',
+    },
+      {
+        type: 'ul',
+        items: [
+          'Check the engine badge first: it explains most surprising performance gaps before hardware does.',
+          'Close memory-heavy tabs and apps; memory pressure forces smaller tiles and more passes.',
+          'Plug in. Battery-saving throttling silently caps your compute on every platform.',
+          'Let the device cool between batch items if you feel it warming; a cool chip runs at full clock.',
+          'Right-size the job: 2× for display use costs a fraction of 4× and finishes faster.',
+        ],
+      },
+      { type: 'h2', text: 'The honest bottom line' },
+      {
+        type: 'p',
+        text: 'If sustained throughput on huge images is your daily need (print production, archival scanning, catalog work), a desktop with a discrete GPU is the right tool, and the gap it opens is real. If the work is single images throughout the day, your phone is not a compromise; it is the optimal device, because it is present. And because local tools run the same network everywhere, the quality of the result does not vary with the hardware; only the wait does.',
+      },
+      {
+        type: 'p',
+        text: 'That last point deserves emphasis, because it inverts the cloud logic entirely. With remote processing, you rent someone else\'s hardware tier and pay for the privilege. With local processing, you use the best hardware you already own, at no marginal cost, with no queue and no upload. The performance conversation is no longer "can my device keep up", because every device from the last several years can. It is simply "how patient am I today," and the honest answer, usually, is not very.',
+      },
+    ],
+  },
+
+{
     slug: 'data_harvesting_warning_a9e5b7',
     title: 'What Happens to Your Photos After You Hit "Upload"',
     description:
