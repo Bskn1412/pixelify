@@ -44,6 +44,7 @@ import {
 import { DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY, SITE_LANGUAGES } from '../lib/i18n';
 import { getDictionary } from '../locales';
 import ScrollToTopButton from './ScrollToTopButton';
+import { awardPoint } from '@/lib/visitor';
 
 const STORAGE_KEY = 'pixelify_upscaler_history_2026'; // legacy, no longer written
 const UPSCALER_PRELOAD_ORDER: ModelKey[] = ['vitality'];
@@ -817,6 +818,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
           : entry));
         return;
       }
+      const operationId = window.crypto.randomUUID();
 
       // Prime audio context and ask for browser notification permission on user gesture
       primeAudio();
@@ -880,6 +882,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
               : i
           )
         );
+        void awardPoint('upscale', operationId);
 
         // Play pleasant completion chime & send desktop notification
         playSuccessChime();

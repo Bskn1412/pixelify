@@ -1,11 +1,12 @@
-import React, { useEffect, useCallback } from 'react';
-import { X, Home, Eraser, Maximize, ChevronRight, Trash2, ExternalLink, Cpu, Globe, Check } from 'lucide-react';
+import React, { useEffect, useCallback, useState } from 'react';
+import { X, Home, Eraser, Maximize, ChevronRight, Trash2, ExternalLink, Cpu, Globe, Check, Pencil } from 'lucide-react';
 import type { ViewTab } from '../types';
 import Logo from './Logo';
 import { EngineRow } from './Navbar';
 import { useApp } from './AppProvider';
 import { SITE_LANGUAGES } from '../lib/i18n';
 import { useTranslation } from '../locales';
+import { getSavedDisplayName, requestDisplayNameEdit, VISITOR_PROFILE_UPDATED_EVENT } from '@/lib/visitor-profile';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 
@@ -59,6 +60,14 @@ export default function MobileSidebar({
   const { t } = useTranslation();
   const router = useRouter();
   const pathname = usePathname();
+  const [displayName, setDisplayName] = useState('Anonymous player');
+
+  useEffect(() => {
+    const syncDisplayName = () => setDisplayName(getSavedDisplayName() || 'Anonymous player');
+    syncDisplayName();
+    window.addEventListener(VISITOR_PROFILE_UPDATED_EVENT, syncDisplayName);
+    return () => window.removeEventListener(VISITOR_PROFILE_UPDATED_EVENT, syncDisplayName);
+  }, []);
 
   const handleLanguageChange = useCallback((newLang: string) => {
     setCurrentLang(newLang);
@@ -200,6 +209,20 @@ export default function MobileSidebar({
             <Cpu size={12} className="text-violet-300/80" />
             <span>Engines & Settings</span>
           </div>
+          <button
+            type="button"
+            onClick={() => { onClose(); requestDisplayNameEdit(); }}
+            className="flex min-h-14 items-center gap-3 rounded-xl border border-white/10 bg-white/[0.035] px-3 text-left transition-colors hover:bg-white/[0.07]"
+          >
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-sky-200/20 bg-sky-200/[0.08] text-sm font-semibold text-sky-100" aria-hidden="true">
+              {displayName.slice(0, 1).toUpperCase()}
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-semibold text-white/90">{displayName}</span>
+              <span className="mt-0.5 block text-[10px] text-white/40">Display name</span>
+            </span>
+            <Pencil size={14} className="shrink-0 text-white/45" aria-hidden="true" />
+          </button>
           <div className="flex flex-col gap-1.5 rounded-xl border border-white/[0.07] bg-black/25 px-2.5 py-2">
 
             <EngineRow label={t.nav.upscaler} engine={upscalerEngine} />

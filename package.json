@@ -23,8 +23,8 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@litertjs/core": "^2.6.0",
     "@emailjs/browser": "^5.0.3",
+    "@litertjs/core": "^2.6.0",
     "@react-three/drei": "^9.122.0",
     "@react-three/fiber": "^8.18.0",
     "@vercel/analytics": "^2.0.1",

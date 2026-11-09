@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback, useLayoutEffect, useMemo } from 'react';
-import { Menu, Trash2, WifiOff, Wifi, Cpu, Gauge, ExternalLink, Globe, ChevronDown, Check } from 'lucide-react';
+import { Menu, Trash2, WifiOff, Wifi, Cpu, Gauge, ExternalLink, Globe, ChevronDown, Check, Pencil } from 'lucide-react';
 import type { ViewTab, ThemeMode } from '../types';
 import type { ModelDownloadItem } from '../types';
 import Icon from './Icon';
@@ -8,6 +8,7 @@ import ModelDownloadIndicator from './ModelDownloadIndicator';
 import { useApp } from './AppProvider';
 import { SITE_LANGUAGES } from '../lib/i18n';
 import { useTranslation } from '../locales';
+import { getSavedDisplayName, requestDisplayNameEdit, VISITOR_PROFILE_UPDATED_EVENT } from '@/lib/visitor-profile';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 
@@ -155,9 +156,17 @@ export default function Navbar({
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isNavHidden, setIsNavHidden] = useState(false);
+  const [displayName, setDisplayName] = useState('Anonymous player');
   const lastScrollY = useRef(0);
   const settingsRef = useRef<HTMLDivElement>(null);
   const langRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const syncDisplayName = () => setDisplayName(getSavedDisplayName() || 'Anonymous player');
+    syncDisplayName();
+    window.addEventListener(VISITOR_PROFILE_UPDATED_EVENT, syncDisplayName);
+    return () => window.removeEventListener(VISITOR_PROFILE_UPDATED_EVENT, syncDisplayName);
+  }, []);
 
   /* DESKTOP ACTIVE PILL - CSS transform transition (compositor-driven).
      Deliberately NOT a framer-motion layout animation: layout/FLIP runs on
@@ -477,6 +486,20 @@ export default function Navbar({
               {/* SETTINGS DROPDOWN MENU */}
               {isSettingsOpen && (
                 <div className="absolute right-0 mt-2.5 w-72 rounded-2xl bg-[#121218]/95 backdrop-blur-xl border border-white/15 p-3 shadow-2xl z-50 animate-fade-in flex flex-col gap-2">
+                  <button
+                    type="button"
+                    onClick={() => { setIsSettingsOpen(false); requestDisplayNameEdit(); }}
+                    className="flex w-full items-center gap-2.5 rounded-xl border border-white/10 bg-white/[0.035] px-2.5 py-2 text-left transition-colors hover:bg-white/[0.07]"
+                  >
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-sky-200/20 bg-sky-200/[0.08] text-sm font-semibold text-sky-100" aria-hidden="true">
+                      {displayName.slice(0, 1).toUpperCase()}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-xs font-semibold text-white/90">{displayName}</span>
+                      <span className="mt-0.5 block text-[10px] text-white/40">Display name</span>
+                    </span>
+                    <Pencil size={14} className="shrink-0 text-white/45" aria-hidden="true" />
+                  </button>
                   <div>
                     <div className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-violet-200/70">
                       <Cpu size={12} /> {t.nav.processingEngines} <span className="ml-auto h-px flex-1 bg-gradient-to-r from-violet-300/20 to-transparent" />

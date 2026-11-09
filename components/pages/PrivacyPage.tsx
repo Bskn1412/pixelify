@@ -29,7 +29,7 @@ export default function PrivacyPage({ onTabChange }: Props) {
       updated="Last updated: October 27, 2026"
       toc={TOC}
       documentTitle="Privacy Policy: Pixelify"
-      metaDescription="Pixelify's privacy policy: no accounts or image uploads, no first-party cookies, and a cookieless aggregate site-visit counter."
+      metaDescription="Pixelify's privacy policy: no accounts or image uploads. Anonymous visitor IDs support page-view totals and optional leaderboard points."
       onTabChange={onTabChange}
     >
       <Section id="summary" num={1} title="The short version">
@@ -37,12 +37,12 @@ export default function PrivacyPage({ onTabChange }: Props) {
           <ul className="space-y-1.5">
             <li>· Your images are never uploaded. All processing happens inside your browser.</li>
             <li>· We have no accounts, so we hold no names, emails or passwords.</li>
-            <li>· No accounts or behavioral analytics. A cookieless counter records aggregate site visits.</li>
+            <li>· No accounts. An anonymous browser ID records page views and optional leaderboard points.</li>
             <li>
               · The site is supported by Google AdSense ads. Ad providers set their own cookies
               (see "Advertising").
             </li>
-            <li>· Your preferences and model files stay in your browser. The counter stores an aggregate visit total.</li>
+            <li>· Your preferences and model files stay in your browser. Pixelify stores anonymous visit and score records.</li>
           </ul>
         </Callout>
         <P>
@@ -55,9 +55,9 @@ export default function PrivacyPage({ onTabChange }: Props) {
 
       <Section id="what-we-dont" num={2} title="What we do and do not collect">
         <P>
-          Pixelify has no application backend or user accounts. A small external counter records
-          aggregate site visits; the limits of that counter are described below. The following
-          data is not collected by Pixelify or sent to the visit counter:
+          Pixelify has no login or registration system. Its server stores anonymous visitor IDs,
+          page-view events and optional leaderboard scores. The following data is not collected
+          by Pixelify:
         </P>
         <UL
           items={[
@@ -74,9 +74,9 @@ export default function PrivacyPage({ onTabChange }: Props) {
             </>,
             <>
               <strong>Behavioral analytics or profiles.</strong>
-              We do not record clicks, tools used, images processed, session replays, or build
-              profiles across pages or sites. The site counter only records an aggregate visit
-              total and uses a short-lived deduplication hash (see "Network requests").
+              We do not record clicks, image contents, session replays, or build profiles across
+              pages or sites. We do record page paths, referrers, timestamps and
+              points earned from successful image processing, linked to a random ID in this browser.
             </>,
             <>
               <strong>Selling data.</strong> We have no bulk data to sell and no advertising
@@ -85,7 +85,7 @@ export default function PrivacyPage({ onTabChange }: Props) {
             </>,
             <>
               <strong>Cookies.</strong>
-              Pixelify and the visitor counter set no cookies. Embedded ad providers may set their
+              Pixelify sets no cookies. Embedded ad providers may set their
               own cookies; see "Advertising".
             </>,
             <>
@@ -158,15 +158,13 @@ export default function PrivacyPage({ onTabChange }: Props) {
               prefer to block it entirely, the site remains fully usable with system fonts.
             </>,
             <>
-              <strong>Site visit counter.</strong> When a page loads or the route changes on
-              pixelify.me, the browser sends a shared site-level counter key and standard request metadata to
-              the <a href="https://page-views-api.ratneshc.com/docs/getting-started" target="_blank" rel="noreferrer">Page Views API</a>
-              (its <a href="https://github.com/ratneshchipre/page-views-api" target="_blank" rel="noreferrer">source is public</a>).
-              Its documentation says it derives a short-lived SHA-256 hash from the IP address and
-              user agent to group repeat visits for about 30 minutes, and does not store the raw IP
-              address or set cookies. We send the same counter key for every route, so route names
-              are not included in the counter data. The resulting aggregate count is shown in the
-              floating visitor badge on all pages.
+              <strong>Anonymous visitor and leaderboard data.</strong> The browser creates a random
+              UUID and stores it in local storage. On a new page in a tab, Pixelify sends that ID,
+              the page path, referrer and timestamp to its server, which stores them in Supabase.
+              Successful background removals and upscales send a random operation ID and action type
+              so the server can award one point per operation. We do not send images, file names or
+              image contents. We do not store IP addresses in the database. Vercel processes normal
+              request metadata to serve the site and API.
             </>,
           ]}
         />
@@ -214,14 +212,14 @@ export default function PrivacyPage({ onTabChange }: Props) {
 
       <Section id="thirdparties" num={6} title="Third parties">
         <P>
-          Summarised: <strong>Vercel</strong> (hosting), <strong>Page Views API</strong>
-          (aggregate site visit count), <strong>Hugging Face</strong>
+          Summarised: <strong>Vercel</strong> (hosting and API), <strong>Supabase</strong>
+          (anonymous visitor events and leaderboard records), <strong>Hugging Face</strong>
           (background-removal model weights), <strong>jsDelivr</strong> (inference libraries),
           <strong> Google Fonts</strong> (typefaces) and <strong>Google AdSense</strong>
           (advertising). Each processes the limited request data
           described above. We have no commercial relationship with them that involves your content.
-          The counter receives a shared site-level key and ordinary request metadata; no image or editing
-          activity is sent to it.
+          Supabase receives a random browser ID, visited page metadata and successful tool action
+          types; it never receives image content.
         </P>
         <P>
           External links inside our articles lead to third-party sites. Their practices are governed
@@ -231,10 +229,12 @@ export default function PrivacyPage({ onTabChange }: Props) {
 
       <Section id="rights" num={7} title="Your rights & choices">
         <P>
-          Pixelify does not keep user profiles or raw visitor identifiers. The counter provider
-          maintains aggregate totals and says its temporary deduplication hash expires after about
-          30 minutes. For questions about that processing, you can also contact us using the
-          contact details below. The data stored by your browser remains under your control:
+          Pixelify does not require an account, email or login. You may optionally add a display
+          name to your anonymous visitor ID for the leaderboard, or skip and remain anonymous.
+          Visitor IDs, optional display names, page-view metadata and score records are stored in
+          Supabase. Edit or remove your display name from Settings. Clear this browser&apos;s local
+          storage to stop using the same ID; contact us using the details below to request deletion
+          of stored visitor records. Your browser-stored preferences remain under your control:
         </P>
         <UL
           items={[
@@ -244,17 +244,15 @@ export default function PrivacyPage({ onTabChange }: Props) {
           ]}
         />
         <P>
-          If you have a statutory data request about the counter, contact us and we will help
-          direct it to the service that processes the count. Pixelify does not have an account or
-          dashboard for that service and cannot edit its aggregate records directly.
+          Contact us if you have a data request or want your anonymous visitor records removed.
         </P>
       </Section>
 
       <Section id="children" num={8} title="Children">
         <P>
           Pixelify is not directed at children under 13 (or the equivalent age in your
-          jurisdiction). The site has no account system; the aggregate site visit counter described
-          above does not create a user profile.
+          jurisdiction). The site has no account system; the anonymous visitor and leaderboard records described
+          above do not create a named user profile.
         </P>
       </Section>
 

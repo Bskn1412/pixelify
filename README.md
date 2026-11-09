@@ -1,10 +1,11 @@
 # Pixelify
 
-Free on-device AI photo editor: image super-resolution (upscaler) and neural background removal, running completely client-side with no backend. Built with **Next.js (App Router)** and deployed as a fully static export.
+Free on-device AI photo editor: image super-resolution (upscaler) and neural background removal, running completely client-side. A small Vercel API handles anonymous page-view and leaderboard records in Supabase. Built with **Next.js (App Router)**.
 
 ## Features
 
-- Next.js App Router with file-based routing and static export
+- Next.js App Router with file-based pages and Vercel serverless API routes
+- Anonymous visitor tracking and community leaderboard (Supabase)
 - Drag & drop image upload
 - PNG, JPG, WEBP support
 - Three upscaler models: Vitality (fast, 4×), Pixel-Dance (balanced, 4×), and Alpha-Satoru (maximum quality, 4×)
@@ -19,7 +20,7 @@ Free on-device AI photo editor: image super-resolution (upscaler) and neural bac
 
 ```
 pixelify/
-├── app/                    # Next.js App Router pages (static export)
+├── app/                    # Next.js App Router pages and API routes
 │   ├── layout.tsx          # Root layout, global SEO metadata, AdSense, structured data
 │   ├── page.tsx            # /
 │   ├── upscaler/page.tsx   # /upscaler
@@ -28,6 +29,8 @@ pixelify/
 │   ├── blogs/[...path]/    # /blogs/<slug> (en) + /blogs/<lang>/<slug>
 │   ├── about|products|privacy|terms|story|truckbg/page.tsx
 │   ├── not-found.tsx       # 404
+│   ├── api/                 # Server-side Supabase RPC endpoints
+│   ├── leaderboard/page.tsx # Community board
 │   ├── sitemap.ts          # /sitemap.xml
 │   └── robots.ts           # /robots.txt
 ├── components/             # React UI (home, workspaces, blog, static pages…)
@@ -45,7 +48,7 @@ pixelify/
 ├── public/
 │   ├── models/             # Vitality.onnx, Pixel-Dance.onnx, Alpha-Satoru.onnx
 │   └── …                   # Images, fonts, icons
-├── next.config.mjs         # output: 'export', trailingSlash
+├── next.config.mjs         # Next.js and model environment configuration
 ├── tailwind.config.js
 ├── postcss.config.js
 └── tsconfig.json
@@ -71,7 +74,7 @@ Open http://localhost:3000
 npm run build
 ```
 
-Static export ends up in `out/` (prerendered HTML for every route + `/404.html`).
+The build produces the Next.js server output required by the Vercel API routes.
 
 ## Models
 
@@ -84,14 +87,16 @@ Static export ends up in `out/` (prerendered HTML for every route + `/404.html`)
 
 ## Deployment
 
-The site is deployed on **Vercel** as a fully static export. `vercel.json` provides:
+The site is deployed on **Vercel**. Configure `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (or `SUPABASE_SECRET_KEY`) as server-only Vercel environment variables, then apply `supabase/migrations/202611100001_visitor_leaderboard.sql` to the project. Never expose the service key as a `NEXT_PUBLIC_*` variable.
+
+`vercel.json` provides:
 
 - **AdSense-first header strategy:** COOP/COEP are served **only on `/upscaler` and `/bg_remove`**, the two AI tool routes that need `crossOriginIsolated` for multi-threaded WASM SIMD (~2–4× faster WASM fallback). Every other page ships with plain headers, so Google AdSense scripts keep full cookie access and normal ad serving there. Under COEP the ad scripts still load but are cookie-stripped (result: "limited ads" on those two tool pages - accepted tradeoff).
 - `Cache-Control: immutable` for `/models/*` so the ~67MB ONNX files are fetched once per client.
 
-Deploy by connecting the repository in the Vercel dashboard (framework preset: Next.js). No other settings required.
+Deploy by connecting the repository in the Vercel dashboard (framework preset: Next.js); the server-only Supabase environment variables and migration above are required for visitor and leaderboard data.
 
-Static export output also ends up in `out/` if you ever want to self-host (`output: 'export'` in `next.config.mjs`).
+The visitor and leaderboard API requires a server runtime and is not available from a static-only export.
 
 ## Browser Compatibility
 
