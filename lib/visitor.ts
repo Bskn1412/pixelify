@@ -22,6 +22,26 @@ export function getVisitorId(): string {
   return visitorId;
 }
 
+export function setVisitorId(visitorId: string) {
+  if (!UUID.test(visitorId)) return;
+  try { window.localStorage.setItem(VISITOR_KEY, visitorId); } catch { /* The signed cookie remains authoritative. */ }
+}
+
+export async function syncVisitorIdentity(): Promise<string> {
+  const response = await fetch('/api/identity', { cache: 'no-store' });
+  if (!response.ok) throw new Error('Could not initialize visitor identity.');
+  const result = await response.json() as { visitorId: string };
+  setVisitorId(result.visitorId);
+  try {
+    const pending: unknown = JSON.parse(window.localStorage.getItem(PENDING_REWARDS_KEY) || '[]');
+    if (Array.isArray(pending)) {
+      const migrated = pending.filter((item) => item && typeof item === 'object').map((item) => ({ ...(item as PendingReward), visitorId: result.visitorId }));
+      writePendingRewards(migrated);
+    }
+  } catch { /* Pending work is optional if local storage is unavailable. */ }
+  return result.visitorId;
+}
+
 function readPendingRewards(): PendingReward[] {
   try {
     const stored: unknown = JSON.parse(window.localStorage.getItem(PENDING_REWARDS_KEY) || '[]');
@@ -98,7 +118,7 @@ async function drainPendingRewards() {
 /** Save each successful operation locally before attempting the server write. */
 export async function awardPoint(action: RewardAction, operationId: string): Promise<void> {
   try {
-    const visitorId = getVisitorId();
+    const visitorId = await syncVisitorIdentity();
     const pending = readPendingRewards();
     if (pending.some((item) => item.operationId === operationId)) {
       await syncPendingRewards();

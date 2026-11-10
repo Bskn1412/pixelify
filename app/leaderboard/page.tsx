@@ -1,217 +1,115 @@
 'use client';
 
-import { useCallback, useEffect, useId, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
-import { ArrowUp, CalendarDays, Crown, RefreshCw, Trophy, UsersRound } from 'lucide-react';
-import LeaderboardSkeleton from '@/components/LeaderboardSkeleton';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { getVisitorId } from '@/lib/visitor';
-import { VISITOR_PROFILE_UPDATED_EVENT } from '@/lib/visitor-profile';
+import Link from 'next/link';
+import { motion, useReducedMotion } from 'framer-motion';
+import { ArrowDown, ArrowRight, CalendarDays, CircleHelp, Crown, RefreshCw, Sparkles, Target, Trophy, UsersRound } from 'lucide-react';
+import { syncVisitorIdentity } from '@/lib/visitor';
+import '@/styles/leaderboard.css';
 
-type Player = { id: string; username: string | null; display_name: string; avatar_url: string | null; country_code?: string | null; created_at: string; score: number; rank: number };
-type Stats = { uniqueVisitors: number; pageViews: number; todayVisitors: number; participants: number };
-type BoardData = { top: Player[]; position: Player | null; stats: Stats };
-
-function shortId(value: string) { return `${value.slice(0, 8)}…${value.slice(-4)}`; }
-
-function countryFlag(countryCode: string | null | undefined) {
-  if (!countryCode || !/^[A-Z]{2}$/.test(countryCode) || countryCode === 'XX') return null;
-  return String.fromCodePoint(...Array.from(countryCode, (letter) => 0x1f1e6 + letter.charCodeAt(0) - 65));
+type Player = { id: string; username: string | null; display_name: string; avatar_url: string | null; country_code?: string | null; created_at?: string | null; score: number; rank: number };
+type Board = { top: Player[]; position: Player | null; stats: { participants: number } };
+type Period = 'all' | 'week' | 'month';
+const medal = ['/images/leaderboard/medal-gold.svg', '/images/leaderboard/medal-silver.svg', '/images/leaderboard/medal-bronze.svg'];
+const periodName: Record<Period, string> = { all: 'All time', week: 'This week', month: 'This month' };
+const shortId = (id: string) => `${id.slice(0, 8)}…${id.slice(-4)}`;
+const visibleName = (player: Player) => player.display_name && player.display_name !== 'Pixelify User' ? player.display_name : shortId(player.id);
+const flag = (code?: string | null) => code && /^[A-Z]{2}$/.test(code) && code !== 'XX' ? String.fromCodePoint(...Array.from(code, c => 127397 + c.charCodeAt(0))) : '';
+function joinedDate(value?: string | null) {
+  if (!value) return 'Join date unavailable';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? 'Join date unavailable' : new Intl.DateTimeFormat(undefined, { dateStyle: 'long' }).format(date);
 }
 
-function memberSince(value: string) {
-  const timestamp = new Date(value).getTime();
-  if (!Number.isFinite(timestamp)) return 'Join date unavailable';
-
-  const minutes = Math.max(0, Math.floor((Date.now() - timestamp) / 60_000));
-  if (minutes < 1) return 'Joined just now';
-  if (minutes < 60) return `Joined ${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago`;
-
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `Joined ${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
-
-  const days = Math.floor(hours / 24);
-  if (days < 30) return `Joined ${days} ${days === 1 ? 'day' : 'days'} ago`;
-
-  const months = Math.floor(days / 30);
-  if (months < 12) return `Joined ${months} ${months === 1 ? 'month' : 'months'} ago`;
-
-  const years = Math.floor(days / 365);
-  return `Joined ${years} ${years === 1 ? 'year' : 'years'} ago`;
-}
-
-function Rank({ rank }: { rank: number }) {
-  const color = rank === 1 ? 'text-amber-300' : rank === 2 ? 'text-slate-200' : rank === 3 ? 'text-orange-300' : rank <= 10 ? 'text-blue-300' : rank <= 25 ? 'text-violet-300' : rank <= 45 ? 'text-cyan-300' : rank <= 75 ? 'text-emerald-300' : rank <= 100 ? 'text-orange-300' : 'text-neutral-500';
-  if (rank <= 3) {
-    const podium = {
-      1: { src: '/images/leaderboard/rank-1-gold.png' },
-      2: { src: '/images/leaderboard/rank-2-silver.png' },
-      3: { src: '/images/leaderboard/rank-3-bronze.png' },
-    }[rank as 1 | 2 | 3];
-    const ordinal = rank === 1 ? '1st' : rank === 2 ? '2nd' : '3rd';
-    return (
-      <span className="flex w-10 shrink-0 items-center justify-center">
-        <Image
-          src={podium.src}
-          alt={`${ordinal} place medal`}
-          width={36}
-          height={36}
-          className="h-9 w-9 shrink-0 object-contain drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
-        />
-      </span>
-    );
-  }
-  return <span className={`w-10 shrink-0 text-center font-mono text-lg font-black ${color}`}>{rank}</span>;
-}
-
-function PlayerRow({ player, isCurrentUser = false }: { player: Player; isCurrentUser?: boolean }) {
+function PlayerRow({ player, mine, index, reduced }: { player: Player; mine: boolean; index?: number; reduced?: boolean | null }) {
   const [profileOpen, setProfileOpen] = useState(false);
-  const profileCardId = useId();
-  const isDefaultName = !player.display_name || player.display_name === 'Pixelify User';
-  const avatarInitial = (isDefaultName ? player.id : player.display_name).slice(0, 1).toUpperCase();
-  const name = isDefaultName ? shortId(player.id) : player.display_name;
-  const profileName = isDefaultName ? 'Anonymous User' : player.display_name;
-  return (
-    <div className={`relative z-0 grid grid-cols-[34px_minmax(0,1fr)_70px] items-center gap-3 px-3 py-4 hover:z-20 focus-within:z-20 sm:grid-cols-[48px_minmax(0,1fr)_100px] sm:gap-4 sm:px-6 ${player.rank === 1 ? 'bg-amber-300/[0.045]' : player.rank === 2 ? 'bg-slate-200/[0.025]' : player.rank === 3 ? 'bg-orange-300/[0.03]' : ''}`}>
-      <Rank rank={player.rank} />
-      <div className="leaderboard-profile relative flex min-w-0 items-center gap-3" data-open={profileOpen} onMouseLeave={() => setProfileOpen(false)}>
-        <button
-          type="button"
-          aria-label={`Show profile for ${profileName}`}
-          aria-expanded={profileOpen}
-          aria-describedby={profileCardId}
-          onClick={() => setProfileOpen((open) => !open)}
-          onBlur={() => setProfileOpen(false)}
-          onKeyDown={(event) => { if (event.key === 'Escape') { setProfileOpen(false); event.currentTarget.blur(); } }}
-          className="leaderboard-profile-trigger flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-white/10 bg-gradient-to-br from-sky-400/20 to-violet-400/20 text-sm font-bold text-white/75"
-        >
-          {player.avatar_url ? <img src={player.avatar_url} alt="" className="h-full w-full object-cover" /> : avatarInitial}
-        </button>
-        <div className="min-w-0">
-          <p className={`${isDefaultName ? 'truncate font-mono text-xs' : 'truncate text-sm'} font-semibold ${player.rank === 1 ? 'text-amber-100' : player.rank === 2 ? 'text-slate-100' : player.rank === 3 ? 'text-orange-100' : 'text-white'}`}>
-            {name}{isDefaultName && isCurrentUser && <span className="ml-1.5 whitespace-nowrap font-sans text-sky-300">(You)</span>}
-          </p>
-          {!isDefaultName && <p className="mt-1 truncate font-mono text-[10px] text-white/40">{shortId(player.id)}{isCurrentUser && <span className="ml-1 whitespace-nowrap font-sans text-sky-300">(You)</span>}</p>}
-          {player.username && <p className="mt-1 truncate text-xs text-white/40">@{player.username}</p>}
-        </div>
-        <div id={profileCardId} role="tooltip" className="leaderboard-profile-card absolute left-0 top-[calc(100%+0.5rem)] z-50 w-72 max-w-[calc(100vw-5rem)] rounded-2xl p-4 shadow-[0_18px_55px_rgba(0,0,0,0.6)] backdrop-blur-2xl">
-          <div className="flex min-w-0 items-center gap-3">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/15 bg-white/[0.06] text-sm font-bold text-white/80">
-              {player.avatar_url ? <img src={player.avatar_url} alt="" className="h-full w-full object-cover" /> : avatarInitial}
-            </span>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-white">{profileName}{isCurrentUser && <span className="ml-1.5 text-sky-200">(You)</span>}</p>
-              {player.username && <p className="mt-0.5 truncate text-xs text-white/50">@{player.username}</p>}
-            </div>
-          </div>
-          <div className="mt-3 space-y-2 border-t border-white/10 pt-3 text-xs">
-            <p className="font-mono text-white/70">{shortId(player.id)}</p>
-            <p className="flex items-center gap-1.5 text-white/55"><CalendarDays size={13} className="shrink-0 text-sky-200/80" aria-hidden="true" />{memberSince(player.created_at)}</p>
-          </div>
-        </div>
+  const rankClass = player.rank <= 3 ? ` lb-rank-${player.rank}` : '';
+  return <motion.article layout initial={reduced ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .32, delay: reduced ? 0 : Math.min((index ?? 0) * .012, .24) }} className={`lb-player${rankClass}`}>
+    <div className="lb-player-rank">{player.rank <= 3 ? <Image src={medal[player.rank - 1]} width={44} height={44} alt={`${player.rank} place medal`} /> : <span>{player.rank}</span>}</div>
+    <div className="lb-profile" data-open={profileOpen} onMouseEnter={() => setProfileOpen(true)} onMouseLeave={() => setProfileOpen(false)}>
+      <button type="button" className="lb-profile-trigger" aria-label={`Show ${visibleName(player)} profile`} aria-expanded={profileOpen} aria-controls={`lb-profile-${player.id}`} onFocus={() => setProfileOpen(true)} onBlur={() => setProfileOpen(false)} onClick={() => setProfileOpen(true)} onKeyDown={(event) => { if (event.key === 'Escape') { setProfileOpen(false); event.currentTarget.blur(); } }}>
+        <span className="lb-avatar">{player.avatar_url ? <img src={player.avatar_url} alt="" /> : visibleName(player).slice(0, 1).toUpperCase()}</span>
+        <span className="lb-player-name"><strong>{visibleName(player)}{mine && <span className="lb-you">You</span>}</strong>{player.username && <small>@{player.username}</small>}</span>
+      </button>
+      <div className="lb-profile-card" id={`lb-profile-${player.id}`} role="tooltip" aria-hidden={!profileOpen}>
+        <strong>{visibleName(player)}{mine && <span className="lb-you">You</span>}</strong>
+        {player.username && <small>@{player.username}</small>}
+        <span className="lb-profile-since"><CalendarDays size={14} aria-hidden="true" /> Member since {joinedDate(player.created_at)}</span>
       </div>
-      <span className="relative flex self-stretch items-center justify-end text-right font-mono text-sm font-bold tabular-nums text-white">
-        {player.score.toLocaleString()}<span className="ml-1 hidden text-[10px] font-medium text-white/40 sm:inline">PTS</span>
-        {countryFlag(player.country_code) && (
-          <span
-            role="img"
-            aria-label={`Country ${player.country_code}`}
-            title={`Country ${player.country_code}`}
-            className="absolute -right-5 -top-1 z-10 grid h-5 w-5 place-items-center rounded-md border border-white/15 bg-[#111318] text-sm leading-none shadow-[0_3px_8px_rgba(0,0,0,0.55)]"
-          >
-            {countryFlag(player.country_code)}
-          </span>
-        )}
-      </span>
     </div>
-  );
+    <div className="lb-player-score"><b>{player.score.toLocaleString()}</b><span>PTS</span></div>
+    {flag(player.country_code) && <span className="lb-country" title={`Country ${player.country_code}`} aria-label={`Country ${player.country_code}`}>{flag(player.country_code)}</span>}
+    {player.rank === 1 && <Image className="lb-row-crown" src="/images/leaderboard/crown.svg" width={42} height={32} alt="" />}
+  </motion.article>;
 }
 
 export default function LeaderboardPage() {
-  const [data, setData] = useState<BoardData | null>(null);
-  const [visitorId, setVisitorId] = useState<string | null>(null);
-  const [error, setError] = useState(false);
-  const [showScrollToTop, setShowScrollToTop] = useState(false);
+  const [board, setBoard] = useState<Board | null>(null);
+  const [visitorId, setVisitorId] = useState('');
+  const [period, setPeriod] = useState<Period>('all');
+  const [activityCount, setActivityCount] = useState<number | null>(null);
+  const [error, setError] = useState('');
+  const [howOpen, setHowOpen] = useState(false);
+  const reduced = useReducedMotion();
 
-  const load = useCallback(async () => {
-    setError(false);
+  const load = useCallback(async (range = period) => {
+    setError('');
     try {
-      let id: string | null = null;
-      try { id = getVisitorId(); } catch { /* Keep public rankings available if browser storage is blocked. */ }
+      const id = await syncVisitorIdentity();
       setVisitorId(id);
-      const response = await fetch(`/api/leaderboard${id ? `?visitorId=${encodeURIComponent(id)}` : ''}`, { cache: 'no-store' });
-      if (!response.ok) throw new Error('Could not load leaderboard');
-      setData(await response.json());
-    } catch {
-      setError(true);
-    }
-  }, []);
+      const response = await fetch(`/api/leaderboard?period=${range}`, { cache: 'no-store' });
+      if (!response.ok) {
+        const issue = await response.json().catch(() => null);
+        throw new Error(issue?.error || 'Leaderboard data could not be loaded right now.');
+      }
+      setBoard(await response.json());
+      const activityResponse = await fetch('/api/activity?type=all&period=all&page=1', { cache: 'no-store' });
+      if (activityResponse.ok) {
+        const data = await activityResponse.json();
+        setActivityCount(data.summary?.total ?? 0);
+      }
+    } catch (reason) { setError(reason instanceof Error ? reason.message : 'Leaderboard data could not be loaded right now.'); }
+  }, [period]);
 
   useEffect(() => { void load(); }, [load]);
   useEffect(() => {
-    window.addEventListener(VISITOR_PROFILE_UPDATED_EVENT, load);
-    return () => window.removeEventListener(VISITOR_PROFILE_UPDATED_EVENT, load);
+    const refresh = () => { void load(); };
+    window.addEventListener('pixelify:reward-update', refresh);
+    return () => window.removeEventListener('pixelify:reward-update', refresh);
   }, [load]);
-  useEffect(() => {
-    const updateVisibility = () => setShowScrollToTop(window.scrollY > 320);
-    updateVisibility();
-    window.addEventListener('scroll', updateVisibility, { passive: true });
-    return () => window.removeEventListener('scroll', updateVisibility);
-  }, []);
 
-  return (
-    <main className="min-h-screen bg-[#050507] px-4 pb-20 pt-0 text-white sm:px-6 sm:pt-0">
-      <div className="mx-auto max-w-5xl">
-        <header className="mb-8 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.22em] text-sky-300"><Trophy size={14} /> Community</p>
-            <h1 className="mt-3 text-4xl font-black tracking-tight sm:text-6xl">Leaderboard<span className="text-sky-300">.</span></h1>
-            <p className="mt-3 max-w-xl text-sm leading-6 text-white/50 sm:text-base">A little recognition for every image made better. Process with Pixelify to earn points.</p>
-          </div>
-          <div aria-label="Total leaderboard participants" className="flex w-fit items-center gap-3 rounded-2xl border border-sky-300/15 bg-sky-300/[0.04] px-4 py-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-sky-200/10 bg-sky-200/[0.06] text-sky-200"><UsersRound size={17} /></span>
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-white/40">Total participants</p>
-              {data ? <p className="mt-0.5 text-xl font-bold tabular-nums">{data.stats.participants.toLocaleString()}</p> : error ? <p className="mt-1 text-sm text-white/45">Unavailable</p> : <Skeleton className="mt-1 h-5 w-12" />}
-            </div>
-          </div>
-        </header>
+  return <main className="leaderboard-page">
+    <div className="lb-atmosphere" aria-hidden="true"><div className="lb-grid" /><Image className="lb-waves" src="/images/leaderboard/neon-waves.svg" width={1600} height={480} alt="" /></div>
+    <div className="lb-shell">
+      <section className="lb-hero">
+        <motion.div className="lb-hero-copy" initial={reduced ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .7 }}>
+          <p className="lb-eyebrow"><UsersRound size={16} /> Community</p>
+          <h1>Leaderboard<span>.</span></h1>
+          <p className="lb-hero-text">A little recognition for every image made better. Process with Pixelify to earn points, climb the ranks, and unlock badges.</p>
+          <div className="lb-hero-actions"><button className="lb-button lb-button-primary" onClick={() => setHowOpen((open) => !open)}><CircleHelp size={16} /> How it works</button><Link className="lb-button lb-button-secondary" href="/leaderboard/activity/">My activity <ArrowRight size={15} /></Link></div>
+          {howOpen && <div className="lb-how-card" id="how-it-works"><strong>Make something better, earn a point.</strong><p>Finish a background removal or AI upscale. Each successful operation earns one point and appears in your activity history.</p></div>}
+        </motion.div>
+        <motion.div className="lb-hero-art" initial={reduced ? false : { opacity: 0, scale: .88 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: .9, delay: .12 }}>
+          <span className="lb-orbit lb-orbit-one" /><span className="lb-orbit lb-orbit-two" />
+          <Image src="/images/leaderboard/trophy-hero.webp" width={560} height={560} priority alt="A luminous championship trophy on a circular podium" />
+          <span className="lb-pixel lb-pixel-a" /><span className="lb-pixel lb-pixel-b" /><span className="lb-pixel lb-pixel-c" />
+        </motion.div>
+        <div className="lb-participants glass-panel"><span className="lb-participant-icon"><UsersRound size={21} /></span><div><small>Total participants</small><strong>{board ? board.stats.participants.toLocaleString() : error ? 'Unavailable' : '…'}</strong></div><span className="lb-participant-label">All time<br />community</span></div>
+      </section>
 
-        {error ? (
-          <div role="alert" className="rounded-2xl border border-rose-300/15 bg-rose-300/[0.04] p-8 text-center">
-            <p className="text-sm text-white/65">Leaderboard data could not be loaded right now.</p>
-            <button type="button" onClick={() => void load()} className="leaderboard-retry-button mt-4 inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm hover:bg-white/5"><RefreshCw size={14} /> Try again</button>
-          </div>
-        ) : !data ? (
-          <LeaderboardSkeleton rows={9} />
-        ) : (
-          <div className="leaderboard-content-enter">
-            <section aria-label="Top 101 players" className="rounded-2xl border border-white/[0.09] bg-white/[0.02]">
-              <div className="flex items-center justify-between border-b border-white/[0.07] px-4 py-4 sm:px-6"><h2 className="text-sm font-bold tracking-wide">TOP PLAYERS</h2><span className="text-xs text-white/35">Ranked by points</span></div>
-              {data.top.length ? <div className="divide-y divide-white/[0.06]">{data.top.map((player) => <PlayerRow key={player.id} player={player} isCurrentUser={player.id === visitorId} />)}</div> : <div className="p-10 text-center"><Crown className="mx-auto text-sky-200/50" /><p className="mt-3 font-semibold">The board is ready for its first champion.</p><p className="mt-1 text-sm text-white/45">Process an image to earn the first point.</p></div>}
-            </section>
+      <section className="lb-board glass-panel" aria-labelledby="top-players">
+        <header className="lb-board-heading"><Image src="/images/leaderboard/crown.svg" width={52} height={40} alt="" /><div><h2 id="top-players">Top players</h2><p>Community leaders ranked by points</p></div><div className="lb-periods" role="group" aria-label="Ranking period">{(['all', 'week', 'month'] as Period[]).map((value) => <button key={value} className={period === value ? 'selected' : ''} onClick={() => setPeriod(value)}>{periodName[value]}</button>)}</div></header>
+        {error ? <div className="lb-state" role="alert"><p>{error}</p><button onClick={() => void load()}><RefreshCw size={15} /> Try again</button></div> : !board ? <div className="lb-loading">{Array.from({ length: 5 }, (_, i) => <span key={i} />)}</div> : board.top.length ? <div className="lb-player-list">{board.top.map((player, index) => <PlayerRow key={player.id} player={player} mine={player.id === visitorId} index={index} reduced={reduced} />)}</div> : <div className="lb-state"><Crown /><strong>The board is ready for its first champion.</strong><p>Process an image to earn the first point.</p></div>}
+      </section>
 
-            <section aria-labelledby="your-position" className="mt-8 rounded-2xl border border-sky-300/20 bg-sky-300/[0.035] p-5 sm:p-7">
-              <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-sky-200/65">Your Position</p><h2 id="your-position" className="mt-1 text-xl font-bold">Your place in the community</h2></div>{data.position && <span className="rounded-full border border-sky-200/15 bg-sky-200/[0.08] px-3 py-1.5 font-mono text-sm font-bold text-sky-100">Rank #{data.position.rank}</span>}</div>
-              {!visitorId ? <p className="mt-5 text-sm text-white/55">Your anonymous visitor identity is unavailable in this browser.</p> : data.position ? <div className="mt-5"><PlayerRow player={data.position} isCurrentUser /></div> : <div className="mt-5 flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-sm font-bold">P</div><div><p className="text-sm font-semibold">Not ranked yet</p><p className="mt-1 text-xs text-white/45">Process an image to earn your first point!</p></div></div>}
-            </section>
-          </div>
-        )}
-      </div>
-      {showScrollToTop && (
-        <button
-          type="button"
-          aria-label="Scroll to top"
-          title="Scroll to top"
-          onClick={() => {
-            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) window.scrollTo(0, 0);
-            else window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          className="fixed bottom-5 right-5 z-40 grid h-11 w-11 place-items-center rounded-full border border-sky-200/25 bg-[#111820]/95 text-sky-100 shadow-[0_8px_28px_rgba(0,0,0,0.55)] backdrop-blur-xl transition-colors hover:border-sky-200/50 hover:bg-[#18232c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-200/70"
-        >
-          <ArrowUp size={18} aria-hidden="true" />
-        </button>
-      )}
-    </main>
-  );
+      <section className="lb-position" aria-labelledby="your-position">
+        <div className="lb-position-rank glass-panel"><div className="lb-position-title"><Target size={20} /><div><small>Your position</small><h2 id="your-position">Your place in the community</h2></div></div>
+          {board?.position ? <><div className="lb-big-rank"><span>#{board.position.rank}</span><Image src="/images/leaderboard/crown.svg" width={86} height={64} alt="" /></div><p>{board.position.rank === 1 ? 'You are leading the community.' : `Ranked ${board.position.rank.toLocaleString()} in the community.`}</p></> : <><div className="lb-big-rank"><span>—</span></div><p>{board ? 'Complete an image operation to earn your first point.' : 'Your rank will appear here.'}</p></>}
+        </div>
+        <div className="lb-position-card glass-panel"><div className="lb-avatar lb-avatar-large">{board?.position?.avatar_url ? <img src={board.position.avatar_url} alt="" /> : (board?.position ? visibleName(board.position).slice(0, 1).toUpperCase() : 'P')}</div><div className="lb-position-details"><strong>{board?.position ? visibleName(board.position) : 'Your Pixelify profile'}</strong><span>{visitorId ? `${shortId(visitorId)} · You` : 'Anonymous player'}</span><div className="lb-position-pills"><span><Trophy size={14} /> {board?.position ? `Rank #${board.position.rank}` : 'Unranked'}</span><span><Sparkles size={14} /> {board?.position?.score ?? 0} points</span><span><UsersRound size={14} /> {activityCount ?? '—'} operations</span></div></div>{flag(board?.position?.country_code) && <span className="lb-position-flag">{flag(board?.position?.country_code)}</span>}</div>
+      </section>
+      <div className="lb-bottom-link"><Link href="/leaderboard/activity/">See your activity history <ArrowRight size={15} /></Link><a href="#top-players">Back to top players <ArrowDown size={14} /></a></div>
+    </div>
+  </main>;
 }

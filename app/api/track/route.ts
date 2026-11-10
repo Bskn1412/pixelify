@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createHmac } from 'node:crypto';
 import { isIP } from 'node:net';
 import { supabaseRpc } from '@/lib/supabase-admin';
+import { verifiedVisitorId } from '@/lib/visitor-auth';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -18,10 +19,11 @@ function getNetworkHash(request: Request): string | null {
   return createHmac('sha256', secret).update(ip).digest('hex');
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    if (typeof body.visitorId !== 'string' || !UUID.test(body.visitorId)) {
+    const visitorId = verifiedVisitorId(request);
+    if (!visitorId || body.visitorId !== visitorId || typeof body.visitorId !== 'string' || !UUID.test(body.visitorId)) {
       return NextResponse.json({ error: 'Invalid visitor ID.' }, { status: 400 });
     }
     const pagePath = typeof body.path === 'string' ? body.path.slice(0, 500) : '/';
@@ -31,7 +33,7 @@ export async function POST(request: Request) {
       ? countryHeader
       : null;
     const trackingArgs = {
-      p_visitor_id: body.visitorId,
+      p_visitor_id: visitorId,
       p_page_path: pagePath.startsWith('/') ? pagePath : '/',
       p_referrer: referrer,
       p_network_hash: getNetworkHash(request),

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { UsersRound } from 'lucide-react';
-import { getVisitorId } from '@/lib/visitor';
+import { syncVisitorIdentity } from '@/lib/visitor';
 import { SITE_LANGUAGES } from '@/lib/i18n';
 
 type Stats = { uniqueVisitors: number; pageViews: number };
@@ -16,8 +16,7 @@ export default function VisitorTracker() {
   const [stats, setStats] = useState<Stats | null>(null);
 
   useEffect(() => {
-    let visitorId: string;
-    try { visitorId = getVisitorId(); } catch { return; }
+    let cancelled = false;
     const path = pathname || '/';
     const sessionKey = 'pixelify_last_tracked_path_v1';
     let shouldTrack = true;
@@ -30,10 +29,14 @@ export default function VisitorTracker() {
     } catch { /* Continue tracking when session storage is unavailable. */ }
 
     const loadStats = () => fetch('/api/stats', { cache: 'no-store' }).then((r) => r.ok ? r.json() : null).then((value) => value && setStats(value)).catch(() => {});
-    const tracked = shouldTrack
-      ? fetch('/api/track', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ visitorId, path, referrer }), keepalive: true }).catch(() => {})
-      : Promise.resolve();
-    void tracked.then(loadStats);
+    void syncVisitorIdentity().then((visitorId) => {
+      if (cancelled) return;
+      const tracked = shouldTrack
+        ? fetch('/api/track', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ visitorId, path, referrer }), keepalive: true }).catch(() => {})
+        : Promise.resolve();
+      void tracked.then(loadStats);
+    }).catch(() => {});
+    return () => { cancelled = true; };
   }, [pathname]);
 
   if (!isHomePage) return null;

@@ -1,4 +1,4 @@
-import { getVisitorId } from '@/lib/visitor';
+import { syncVisitorIdentity } from '@/lib/visitor';
 
 const DISPLAY_NAME_KEY = 'pixelify_display_name_v1';
 const PENDING_NAME_KEY = 'pixelify_pending_display_name_v1';
@@ -39,7 +39,7 @@ export async function syncPendingDisplayName() {
     const response = await fetch('/api/profile', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ visitorId: getVisitorId(), displayName: name }),
+      body: JSON.stringify({ visitorId: await syncVisitorIdentity(), displayName: name }),
     });
     if (!response.ok) return false;
     if (window.localStorage.getItem(PENDING_NAME_KEY) === name) window.localStorage.removeItem(PENDING_NAME_KEY);
