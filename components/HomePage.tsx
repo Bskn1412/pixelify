@@ -13,7 +13,6 @@ import HomeFaq from './HomeFaq';
 import Testimonials from "./TestimonialsSection";
 import HomeDemo from './HomeDemo';
 import HomeWorkflowDemos from './HomeWorkflowDemos';
-import HomeVisitorCount from './HomeVisitorCount';
 import '@/styles/home.css';
 import { useTranslation } from '@/locales';
 interface HomePageProps {
@@ -124,7 +123,6 @@ export default function HomePage({
 
       {/* FOOTER */}
       <Footer onTabChange={onTabChange} />
-      <HomeVisitorCount />
     </div>
   );
 }

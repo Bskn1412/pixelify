@@ -1,11 +1,12 @@
-import React, { useEffect, useCallback } from 'react';
-import { X, Home, Eraser, Maximize, ChevronRight, Trash2, ExternalLink, Cpu, Globe, Check } from 'lucide-react';
+import React, { useEffect, useCallback, useState } from 'react';
+import { X, Home, Eraser, Maximize, ChevronRight, Trash2, ExternalLink, Cpu, Globe, Check, Pencil } from 'lucide-react';
 import type { ViewTab } from '../types';
 import Logo from './Logo';
 import { EngineRow } from './Navbar';
 import { useApp } from './AppProvider';
 import { SITE_LANGUAGES } from '../lib/i18n';
 import { useTranslation } from '../locales';
+import { getSavedDisplayName, requestDisplayNameEdit, VISITOR_PROFILE_UPDATED_EVENT } from '@/lib/visitor-profile';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 
@@ -59,6 +60,14 @@ export default function MobileSidebar({
   const { t } = useTranslation();
   const router = useRouter();
   const pathname = usePathname();
+  const [displayName, setDisplayName] = useState('Anonymous player');
+
+  useEffect(() => {
+    const syncDisplayName = () => setDisplayName(getSavedDisplayName() || 'Anonymous player');
+    syncDisplayName();
+    window.addEventListener(VISITOR_PROFILE_UPDATED_EVENT, syncDisplayName);
+    return () => window.removeEventListener(VISITOR_PROFILE_UPDATED_EVENT, syncDisplayName);
+  }, []);
 
   const handleLanguageChange = useCallback((newLang: string) => {
     setCurrentLang(newLang);
@@ -159,6 +168,21 @@ export default function MobileSidebar({
             <X size={18} />
           </button>
         </div>
+
+        <button
+          type="button"
+          onClick={() => { onClose(); requestDisplayNameEdit(); }}
+          className="mx-2.5 mb-3 flex min-h-14 items-center gap-3 px-2 text-left"
+        >
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-sky-200/20 bg-sky-200/[0.08] text-sm font-semibold text-sky-100" aria-hidden="true">
+            {displayName.slice(0, 1).toUpperCase()}
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-sm font-semibold text-white/90">{displayName}</span>
+            <span className="mt-0.5 block text-[10px] text-white/40">Display name</span>
+          </span>
+          <Pencil size={14} className="shrink-0 text-white/45" aria-hidden="true" />
+        </button>
 
         {/* SECTION LABEL */}
         <span className="px-4 pb-1 pt-4 text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-500">

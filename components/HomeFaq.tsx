@@ -36,7 +36,7 @@ const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: 'Are my private photos and client confidential assets safe?',
-    a: 'Your images stay on your device during processing; even our site-visit counter has no business knowing what you’re editing.',
+    a: 'Your images stay on your device during processing. We store anonymous page visits and successful tool actions for the community leaderboard, never your images or file names.',
   },
   {
     q: 'How do I clear downloaded models if I need to free up browser storage?',

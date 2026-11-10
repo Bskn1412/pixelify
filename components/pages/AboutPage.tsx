@@ -107,8 +107,8 @@ export default function AboutPage({ onTabChange }: Props) {
         <P>
           Privacy here is a property of the architecture, not a promise in a policy. We cannot
           leak, sell, or lose image data we never receive. There are no accounts, session replay,
-          advertising pixels, or first-party cookies on this site. A cookieless external counter
-          records aggregate site visits; it does not receive images or tool usage.
+          advertising pixels, or first-party cookies on this site. An anonymous first-party visitor ID
+          supports page-view totals and successful-action points; it never receives images or file names.
           Your theme and sound preferences stay in your own browser's local storage. The site is
           supported by Google AdSense ads on content pages. AdSense sets its own cookies (Google's
           cookies, not ours), and the ad code never touches the AI tools: your images are still
@@ -116,8 +116,8 @@ export default function AboutPage({ onTabChange }: Props) {
         </P>
         <P>
           For completeness: your browser does make a few ordinary requests to load the site: the
-          application itself, the model files, fonts, open-source libraries, and an aggregate
-          site visit count. None of those requests contain your images. The full breakdown is in our
+          application itself, model files, fonts, open-source libraries, and anonymous page-view
+          and leaderboard requests. None of those requests contain your images. The full breakdown is in our
           <a href="/privacy"> Privacy Policy</a>, written to be checkable against the code rather
           than taken on faith.
         </P>

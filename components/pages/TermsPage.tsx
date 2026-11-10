@@ -52,9 +52,10 @@ export default function TermsPage({ onTabChange }: Props) {
           Pixelify is a client-side web application that performs image upscaling and background
           removal in your browser. We provide it on an "as available" basis: we may add, change or
           remove features, models and export options at any time, and we may suspend or discontinue
-          the service in whole or in part without notice. Because there is no server component, we
-          cannot promise uptime, support response times, or continued availability of any specific
-          model.
+          the service in whole or in part without notice. The site uses a small server component
+          for anonymous page-view totals and leaderboard records; image processing still runs on
+          your device. We cannot promise uptime, support response times, or continued availability
+          of any specific model.
         </P>
         <P>
           The service is intended for personal and commercial image editing. It is not intended

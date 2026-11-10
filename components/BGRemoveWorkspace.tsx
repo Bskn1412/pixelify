@@ -27,6 +27,7 @@ import {
   ModernElementInspector,
 } from './bgremove/ModernDesignControls';
 import { useTranslation } from '@/locales';
+import { awardPoint } from '@/lib/visitor';
 
 interface BGRemoveWorkspaceProps {
   jobs: BGJob[];
@@ -548,6 +549,7 @@ export default function BGRemoveWorkspace({
   };
 
   async function processJob(job: BGJob, modelKey: BgModelKey = bgModelKey) {
+    const operationId = window.crypto.randomUUID();
     const isDiablo = modelKey === 'diablo';
     if (isDiablo) {
       console.log(`[Diablo Model] 🎯 Taking Diablo model for job "${job.name}" (ID: ${job.id})`);
@@ -729,6 +731,7 @@ export default function BGRemoveWorkspace({
         elapsedMs,
         model: modelKey,
       });
+      void awardPoint('background_removal', operationId);
 
       addToast('success', `${job.name} background removed with ${BG_MODELS[modelKey].label}!`);
     } catch (err: any) {

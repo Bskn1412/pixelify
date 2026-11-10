@@ -10,6 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '',
     '/upscaler/',
     '/bg_remove/',
+    '/leaderboard/',
     '/blogs/',
     '/about/',
     '/products/',
