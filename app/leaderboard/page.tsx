@@ -99,7 +99,7 @@ export default function LeaderboardPage() {
       </section>
 
       <section className="lb-board glass-panel" aria-labelledby="top-players">
-        <header className="lb-board-heading"><Image src="/images/leaderboard/crown.svg" width={52} height={40} alt="" /><div><h2 id="top-players">Top players</h2><p>Community leaders ranked by points</p></div><div className="lb-periods" role="group" aria-label="Ranking period">{(['all', 'week', 'month'] as Period[]).map((value) => <button key={value} className={period === value ? 'selected' : ''} onClick={() => setPeriod(value)}>{periodName[value]}</button>)}</div></header>
+        <header className="lb-board-heading"><Image src="/images/leaderboard/crown.svg" width={52} height={40} alt="" /><div><h2 id="top-players">Top Users</h2><p>Community leaders ranked by points</p></div><div className="lb-periods" role="group" aria-label="Ranking period">{(['all', 'week', 'month'] as Period[]).map((value) => <button key={value} className={period === value ? 'selected' : ''} onClick={() => setPeriod(value)}>{periodName[value]}</button>)}</div></header>
         {error ? <div className="lb-state" role="alert"><p>{error}</p><button onClick={() => void load()}><RefreshCw size={15} /> Try again</button></div> : !board ? <div className="lb-loading">{Array.from({ length: 5 }, (_, i) => <span key={i} />)}</div> : board.top.length ? <div className="lb-player-list">{board.top.map((player, index) => <PlayerRow key={player.id} player={player} mine={player.id === visitorId} index={index} reduced={reduced} />)}</div> : <div className="lb-state"><Crown /><strong>The board is ready for its first champion.</strong><p>Process an image to earn the first point.</p></div>}
       </section>
 
@@ -109,7 +109,7 @@ export default function LeaderboardPage() {
         </div>
         <div className="lb-position-card glass-panel"><div className="lb-avatar lb-avatar-large">{board?.position?.avatar_url ? <img src={board.position.avatar_url} alt="" /> : (board?.position ? visibleName(board.position).slice(0, 1).toUpperCase() : 'P')}</div><div className="lb-position-details"><strong>{board?.position ? visibleName(board.position) : 'Your Pixelify profile'}</strong><span>{visitorId ? `${shortId(visitorId)} · You` : 'Anonymous player'}</span><div className="lb-position-pills"><span><Trophy size={14} /> {board?.position ? `Rank #${board.position.rank}` : 'Unranked'}</span><span><Sparkles size={14} /> {board?.position?.score ?? 0} points</span><span><UsersRound size={14} /> {activityCount ?? '—'} operations</span></div></div>{flag(board?.position?.country_code) && <span className="lb-position-flag">{flag(board?.position?.country_code)}</span>}</div>
       </section>
-      <div className="lb-bottom-link"><Link href="/leaderboard/activity/">See your activity history <ArrowRight size={15} /></Link><a href="#top-players">Back to top players <ArrowDown size={14} /></a></div>
+      <div className="lb-bottom-link"><Link href="/leaderboard/activity/">See your activity history <ArrowRight size={15} /></Link><a href="#top-players">Back to top users <ArrowDown size={14} /></a></div>
     </div>
   </main>;
 }

@@ -50,7 +50,8 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Keep presentation order deterministic while preserving SQL RANK() ties.
+    // Keep presentation order deterministic; SQL ranks are already unique
+    // (score desc, join date asc, id asc) so this mirrors the SQL ordering.
     data.top = data.top.slice().sort((a, b) =>
       (b.score ?? 0) - (a.score ?? 0) ||
       (a.created_at ?? '').localeCompare(b.created_at ?? '') || a.id.localeCompare(b.id));
