@@ -4,14 +4,15 @@ import { useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowDown, ArrowRight, CalendarDays, CircleHelp, Crown, RefreshCw, Sparkles, Target, Trophy, UsersRound } from 'lucide-react';
+import { ArrowDown, ArrowRight, CalendarDays, CircleHelp, Crown, RefreshCw, Star, Target, Trophy, UserRound, UsersRound } from 'lucide-react';
+import { BorderBeam } from 'border-beam';
 import { syncVisitorIdentity } from '@/lib/visitor';
 import '@/styles/leaderboard.css';
 
 type Player = { id: string; username: string | null; display_name: string; avatar_url: string | null; country_code?: string | null; created_at?: string | null; score: number; rank: number };
 type Board = { top: Player[]; position: Player | null; stats: { participants: number } };
 type Period = 'all' | 'week' | 'month';
-const medal = ['/images/leaderboard/medal-gold.svg', '/images/leaderboard/medal-silver.svg', '/images/leaderboard/medal-bronze.svg'];
+const medal = ['/images/leaderboard/rank-1.webp', '/images/leaderboard/rank-2.webp', '/images/leaderboard/rank-3.webp'];
 const periodName: Record<Period, string> = { all: 'All time', week: 'This week', month: 'This month' };
 const shortId = (id: string) => `${id.slice(0, 8)}…${id.slice(-4)}`;
 const visibleName = (player: Player) => player.display_name && player.display_name !== 'Pixelify User' ? player.display_name : shortId(player.id);
@@ -25,11 +26,12 @@ function joinedDate(value?: string | null) {
 function PlayerRow({ player, mine, index, reduced }: { player: Player; mine: boolean; index?: number; reduced?: boolean | null }) {
   const [profileOpen, setProfileOpen] = useState(false);
   const rankClass = player.rank <= 3 ? ` lb-rank-${player.rank}` : '';
-  return <motion.article layout initial={reduced ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .32, delay: reduced ? 0 : Math.min((index ?? 0) * .012, .24) }} className={`lb-player${rankClass}`}>
-    <div className="lb-player-rank">{player.rank <= 3 ? <Image src={medal[player.rank - 1]} width={44} height={44} alt={`${player.rank} place medal`} /> : <span>{player.rank}</span>}</div>
-    <div className="lb-profile" data-open={profileOpen} onMouseEnter={() => setProfileOpen(true)} onMouseLeave={() => setProfileOpen(false)}>
+
+  const row = <motion.article layout initial={reduced ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .32, delay: reduced ? 0 : Math.min((index ?? 0) * .012, .24) }} className={`lb-player${rankClass}`} onMouseEnter={() => setProfileOpen(true)} onMouseLeave={() => setProfileOpen(false)}>
+    <div className="lb-player-rank">{player.rank <= 3 ? <Image src={medal[player.rank - 1]} width={46} height={26} alt={`${player.rank} place medal`} /> : <span>{player.rank}</span>}</div>
+    <div className="lb-profile" data-open={profileOpen}>
       <button type="button" className="lb-profile-trigger" aria-label={`Show ${visibleName(player)} profile`} aria-expanded={profileOpen} aria-controls={`lb-profile-${player.id}`} onFocus={() => setProfileOpen(true)} onBlur={() => setProfileOpen(false)} onClick={() => setProfileOpen(true)} onKeyDown={(event) => { if (event.key === 'Escape') { setProfileOpen(false); event.currentTarget.blur(); } }}>
-        <span className="lb-avatar">{player.avatar_url ? <img src={player.avatar_url} alt="" /> : visibleName(player).slice(0, 1).toUpperCase()}</span>
+        <span className="lb-avatar">{player.avatar_url ? <img src={player.avatar_url} alt="" /> : <UserRound aria-hidden="true" />}</span>
         <span className="lb-player-name"><strong>{visibleName(player)}{mine && <span className="lb-you">You</span>}</strong>{player.username && <small>@{player.username}</small>}</span>
       </button>
       <div className="lb-profile-card" id={`lb-profile-${player.id}`} role="tooltip" aria-hidden={!profileOpen}>
@@ -42,6 +44,11 @@ function PlayerRow({ player, mine, index, reduced }: { player: Player; mine: boo
     {flag(player.country_code) && <span className="lb-country" title={`Country ${player.country_code}`} aria-label={`Country ${player.country_code}`}>{flag(player.country_code)}</span>}
     {player.rank === 1 && <Image className="lb-row-crown" src="/images/leaderboard/crown.svg" width={42} height={32} alt="" />}
   </motion.article>;
+
+  if (player.rank === 1) return <BorderBeam className="lb-player-beam" size="md" colorVariant="gold" duration={2.4} borderRadius={12} strength={1} brightness={2} saturation={1.8} glowSize={1}>{row}</BorderBeam>;
+  if (player.rank === 2) return <BorderBeam className="lb-player-beam" size="md" colorVariant="ice" duration={2.8} borderRadius={12} strength={1} brightness={2} saturation={1.8} glowSize={1}>{row}</BorderBeam>;
+  if (player.rank === 3) return <BorderBeam className="lb-player-beam" size="md" colorVariant="sunset" duration={3.0} borderRadius={12} strength={1} brightness={2} saturation={1.8} glowSize={1}>{row}</BorderBeam>;
+  return row;
 }
 
 export default function LeaderboardPage() {
@@ -107,7 +114,7 @@ export default function LeaderboardPage() {
         <div className="lb-position-rank glass-panel"><div className="lb-position-title"><Target size={20} /><div><small>Your position</small><h2 id="your-position">Your place in the community</h2></div></div>
           {board?.position ? <><div className="lb-big-rank"><span>#{board.position.rank}</span><Image src="/images/leaderboard/crown.svg" width={86} height={64} alt="" /></div><p>{board.position.rank === 1 ? 'You are leading the community.' : `Ranked ${board.position.rank.toLocaleString()} in the community.`}</p></> : <><div className="lb-big-rank"><span>—</span></div><p>{board ? 'Complete an image operation to earn your first point.' : 'Your rank will appear here.'}</p></>}
         </div>
-        <div className="lb-position-card glass-panel"><div className="lb-avatar lb-avatar-large">{board?.position?.avatar_url ? <img src={board.position.avatar_url} alt="" /> : (board?.position ? visibleName(board.position).slice(0, 1).toUpperCase() : 'P')}</div><div className="lb-position-details"><strong>{board?.position ? visibleName(board.position) : 'Your Pixelify profile'}</strong><span>{visitorId ? `${shortId(visitorId)} · You` : 'Anonymous player'}</span><div className="lb-position-pills"><span><Trophy size={14} /> {board?.position ? `Rank #${board.position.rank}` : 'Unranked'}</span><span><Sparkles size={14} /> {board?.position?.score ?? 0} points</span><span><UsersRound size={14} /> {activityCount ?? '—'} operations</span></div></div>{flag(board?.position?.country_code) && <span className="lb-position-flag">{flag(board?.position?.country_code)}</span>}</div>
+        <div className="lb-position-card glass-panel">{flag(board?.position?.country_code) && <span className="lb-position-flag">{flag(board?.position?.country_code)}</span>}<div className="lb-avatar lb-avatar-large">{board?.position?.avatar_url ? <img src={board.position.avatar_url} alt="" /> : <UserRound aria-hidden="true" />}</div><div className="lb-position-details"><strong>{board?.position ? visibleName(board.position) : 'Your Pixelify profile'}</strong><span>{visitorId ? `${shortId(visitorId)} · You` : 'Anonymous player'}</span><div className="lb-position-pills"><span><Trophy size={14} /> {board?.position ? `Rank #${board.position.rank}` : 'Unranked'}</span><span><Star size={14} /> {board?.position?.score ?? 0} points</span><span><UsersRound size={14} /> {activityCount ?? '—'} operations</span></div></div></div>
       </section>
       <div className="lb-bottom-link"><Link href="/leaderboard/activity/">See your activity history <ArrowRight size={15} /></Link><a href="#top-players">Back to top users <ArrowDown size={14} /></a></div>
     </div>
