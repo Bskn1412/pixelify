@@ -4,6 +4,87 @@
  */
 export const POSTS_FR = [
 {
+    slug: 'bg_remover_advantages_f9d2a6',
+    title: 'Sept gains pratiques grâce au détourage d\'arrière-plan en un clic',
+    description:
+      'Fiches e-commerce, vignettes, photos de CV, thèmes visuels, création pour l\'impression : un guide de terrain sur ce que le détourage instantané débloque, et pourquoi son exécution sur votre propre appareil en multiplie la valeur.',
+    tags: ['Détourage d\'arrière-plan', 'Cas d\'usage', 'Flux de travail'],
+    date: '2026-11-11',
+    author: 'L\'équipe Pixelify',
+    cover: '/blogs/home-samples.jpg',
+    coverAlt: 'Grille de démonstrations instantanées Pixelify avec des exemples d\'images pour le traitement en un clic',
+    blocks: [
+      {
+        type: 'p',
+        text: 'La façon la plus rapide de juger un outil n\'est pas sa liste de fonctionnalités, mais ce qu\'il vous permet de cesser de faire. Personne ne regrette de faire bouillir de l\'eau à la casserole avant de posséder une bouilloire. La suppression d\'arrière-plan a franchi ce seuil : ce qui était autrefois une ligne sur le devis d\'un designer est désormais une étape que vous réalisez pendant que le café coule. Voici les sept domaines où le détourage instantané transforme de vrais flux de travail, non pas en théorie, mais dans les petites tâches quotidiennes où les minutes économisées deviennent des heures.',
+      },
+      { type: 'h2', text: '1. Des fiches produits qui vendent réellement' },
+      {
+        type: 'p',
+        text: 'Les places de marché ont des exigences précises concernant les arrière-plans. Amazon préfère le blanc pur. Les catalogues imprimés exigent un détourage propre pour la composition. Les publicités sur les réseaux sociaux récompensent les sujets qui se détachent du fil d\'actualité. Une photo prise sur une table de cuisine échoue sur ces trois points, et refaire les prises de vue coûte cher. Avec un outil de détourage automatique, la photo prise sur la table devient un produit isolé qui peut être placé sur du blanc, sur un dégradé ou dans une mise en page élaborée : aucun studio, aucune boîte à lumière, aucune nouvelle prise de vue lorsque la plate-forme modifie ses directives.',
+      },
+      {
+        type: 'p',
+        text: 'L\'effet commercial est mesurable dans les données du secteur : les fiches présentant des sujets propres et isolés surpassent systématiquement celles dont l\'arrière-plan est encombré, car l\'œil se pose directement sur le produit au lieu de composer avec l\'environnement. Pour un petit vendeur photographiant cinquante articles par mois, l\'ancienne alternative consistait soit à payer pour de la retouche, soit à renoncer à la publication. Le détourage en un clic élimine complètement ce dilemme.',
+      },
+      { type: 'h2', text: '2. Des vignettes et photos de profil percutantes' },
+      {
+        type: 'p',
+        text: 'Chaque vignette est une compétition pour capter un regard. Un visage se détachant sur une couleur vive avec un contour net se lit instantanément à une largeur de 200 pixels ; le même visage perdu dans le décor d\'une chambre est perçu comme un bruit visuel. Cela s\'applique aussi bien aux vignettes YouTube, aux visuels de podcasts, aux portraits d\'intervenants pour des conférences qu\'aux profils de sites de rencontre. Le détourage est ce qui permet à l\'incrustation de texte, à l\'ombre portée et à la couleur de marque — tout le langage visuel des images cliquables — de jouer pleinement leur rôle.',
+      },
+      {
+        type: 'img',
+        src: '/blogs/home-mobile.jpg',
+        alt: 'Page d\'accueil Pixelify sur un écran mobile montrant le message de traitement local',
+        caption: 'Tout cela s\'exécute sur le téléphone dans votre main : les détourages n\'ont plus besoin d\'un bureau.',
+      },
+      { type: 'h2', text: '3. Des documents qui témoignent d\'un vrai soin' },
+      {
+        type: 'p',
+        text: 'Portraits pour CV, photos d\'identité, trombinoscopes d\'entreprise, gazettes scolaires : la partie peu spectaculaire de l\'édition d\'images. Ce sont également les tâches présentant la plus forte sensibilité en matière de confidentialité : une photo de CV est une donnée d\'identité, une photo d\'école est une donnée concernant un mineur, un portrait d\'annuaire appartient à un collègue. Envoyer l\'une de ces photos vers un outil web gratuit pour supprimer un arrière-plan est une décision que la plupart des gens ne prendraient pas consciemment. Exécuter le détourage localement transforme un moment d\'hésitation en une opération totalement neutre.',
+      },
+      { type: 'h2', text: '4. Mèmes, montages et contenus à réaction rapide' },
+      {
+        type: 'p',
+        text: 'La culture Internet repose sur la vitesse d\'itération. Le sujet détouré est l\'élément fondamental du mème : sujet extrait, sujet collé dans un nouveau contexte. Lorsque l\'extraction prend une seconde au lieu de dix minutes, la contrainte créative passe de « puis-je prendre la peine de détourer cela » à « est-ce drôle ». Les équipes réseaux sociaux qui suivent un événement en direct, les community managers qui rebondissent sur une tendance, les amis dans une conversation de groupe : tous heurtent le même mur avec l\'édition traditionnelle, et cet obstacle disparaît d\'un simple clic.',
+      },
+      { type: 'h2', text: '5. Conception graphique et création de maquettes' },
+      {
+        type: 'p',
+        text: 'Les graphistes passent une proportion importante de leur temps sur l\'extraction : isoler des sujets sur des photos de banque d\'images pour les intégrer dans des mises en page, ou séparer le contenu d\'une capture d\'écran de son environnement de bureau. Le détourage automatique rend la première passe instantanée et libère le véritable savoir-faire du designer (jugement, composition, goût) pour la partie où il apporte une vraie valeur. La même logique s\'applique aux présentations : un portrait d\'intervenant détouré derrière un titre offre un rendu professionnel en trois secondes.',
+      },
+      { type: 'h2', text: '6. Travaux d\'impression et d\'artisanat' },
+      {
+        type: 'p',
+        text: 'Machines de découpe, imprimantes d\'autocollants, transfert thermique, scrapbooking : tous nécessitent une isolation propre avec conservation de la transparence, exportée en PNG. La communauté des créateurs a longtemps subi des logiciels de retouche lourds dont la courbe d\'apprentissage existe principalement pour des tâches de ce type. Un outil de détourage qui génère directement un PNG transparent à partir d\'un glisser-déposer permet au travail de création de démarrer directement sur la partie la plus stimulante.',
+      },
+      {
+        type: 'callout',
+        title: 'Le traitement par lots devient captivant',
+        text: 'Traitez une photo, vérifiez les contours, puis lancez le reste. Les vendeurs gérant des lots de cinquante articles terminent régulièrement les détourages de toute une session photo en moins de temps qu\'il n\'en fallait autrefois pour une seule photo.',
+      },
+      { type: 'h2', text: '7. Le travail que vous ne pourriez jamais effectuer dans le cloud' },
+      {
+        type: 'p',
+        text: 'Ce dernier point concerne moins les fonctionnalités que l\'autorisation morale. Il existe toute une catégorie d\'images que les gens évitent de traiter en ligne à juste titre : photographies médicales, preuves juridiques, photos de produits non révélés sous accord de confidentialité, documents personnels, images d\'enfants, photos de famille privées. Elles nécessitent toutes exactement ce qu\'apporte un outil de détourage — l\'isolement du sujet —, et toutes sont compromises par l\'étape du téléversement. Le traitement local ne se contente pas de rendre ces tâches plus rapides. Il les rend enfin possibles.',
+      },
+      { type: 'h2', text: 'Pourquoi le traitement local multiplie chaque avantage ci-dessus' },
+      {
+        type: 'p',
+        text: 'Chaque gain de cette liste bénéficie d\'un second effet multiplicateur lorsque le traitement ne quitte jamais l\'appareil. Vitesse : pas de téléversement, pas de file d\'attente, pas de téléchargement, la boucle est donc aussi rapide que votre GPU le permet. Coût : pas de crédits par image, ce qui signifie que les traitements par lots ne dépendent plus d\'un budget. Fiabilité : aucune panne de serveur ne transforme une échéance en crise, et l\'outil continue de fonctionner en avion. Confidentialité : la partie sensible de vos images devient enfin traitable. Et itération : le travail de détourage est rarement parfait du premier coup, et l\'itération locale fait la différence entre ajuster deux fois et renoncer à la tâche.',
+      },
+      {
+        type: 'p',
+        text: 'Considérez ce que ce dernier point signifie en pratique. Le détourage d\'une personne avec des cheveux volants sur un arrière-plan chargé peut nécessiter une seconde vérification avant exportation, c\'est-à-dire un zoom à 100 % le long de la ligne des cheveux et une appréciation rapide pour vérifier si le contour paraît naturel. Sur un outil cloud payant à l\'usage, cette seconde vérification coûte un autre crédit et un autre téléversement ; sur un outil local, elle ne coûte rien, de sorte que les gens la réalisent vraiment. La différence de qualité entre les flux de travail cloud et locaux tient moins à l\'algorithme qu\'au nombre d\'itérations que le modèle tarifaire a encouragées.',
+      },
+      {
+        type: 'p',
+        text: 'Le fil conducteur est que la suppression d\'arrière-plan a cessé d\'être une compétence spécialisée pour devenir une infrastructure de base, au même titre que les filtres ont rendu la correction des couleurs accessible, ou que le sous-titrage automatique est devenu la norme. Lorsque l\'extraction ne coûte rien, la composition devient le facteur principal, et la composition est précisément ce dans quoi les humains excellent. Cet échange — les machines prenant en charge la partie fastidieuse tandis que les humains conservent la partie créative — constitue toute la promesse de l\'IA locale, et elle est déjà pleinement concrétisée dans ce domaine très pratique.',
+      },
+    ],
+  },
+
+{
     slug: 'pc_vs_mobile_speed_c8d4f2',
     title: 'Téléphone ou PC : Où l\'IA sur appareil s\'exécute-t-elle le plus vite ?',
     description:

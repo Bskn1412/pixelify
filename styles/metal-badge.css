@@ -1,0 +1,158 @@
+/*
+ * Pixelify Liquid Metal Badge (Compact 45x25)
+ * Pure white border with official metal-fx WebGL shader.
+ */
+
+.px-metal-badge {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 25px;
+  min-width: 45px;
+  max-width: 45px;
+  min-height: 25px;
+  max-height: 25px;
+  border-radius: 9999px;
+  overflow: hidden;
+  box-sizing: border-box;
+  vertical-align: middle;
+  user-select: none;
+  cursor: pointer;
+  background: transparent;
+  /* Pure crisp white border with zero black outline */
+  border: 1.5px solid #ffffff;
+  /* Soft white ambient halo */
+  box-shadow:
+    0 0 10px rgba(255, 255, 255, 0.4),
+    0 0 20px rgba(255, 255, 255, 0.15);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+  transform: translateZ(0);
+  flex-shrink: 0;
+}
+
+.px-metal-badge:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 0 14px rgba(255, 255, 255, 0.6),
+    0 0 26px rgba(255, 255, 255, 0.25);
+}
+
+.px-metal-badge:active {
+  transform: scale(0.96);
+}
+
+/* Crisp pure white text inside the pill */
+.px-metal-badge__content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: #000000 !important;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.px-metal-badge__leading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 2px;
+}
+
+/* Ensure metal-fx canvas fits exactly inside the 45x25 capsule */
+.px-metal-badge .metal-fx-root {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: transparent !important;
+  border-radius: inherit !important;
+  overflow: hidden !important;
+}
+
+.px-metal-badge .metal-fx-canvas {
+  inset: -22% !important;
+  width: 144% !important;
+  height: 144% !important;
+  transform-origin: center;
+  animation: px-metal-badge-material-drift 2.8s ease-in-out infinite alternate;
+}
+
+@keyframes px-metal-badge-material-drift {
+  from {
+    transform: translate3d(-4%, 3%, 0) scale(1.08);
+  }
+  to {
+    transform: translate3d(4%, -3%, 0) scale(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .px-metal-badge .metal-fx-canvas {
+    animation: none;
+    transform: scale(1.08);
+  }
+}
+
+.px-metal-badge .metal-fx-root::before,
+.px-metal-badge .metal-fx-root::after {
+  box-shadow: none !important;
+}
+
+.px-metal-badge .metal-fx-inner {
+  display: none !important;
+}
+
+/*
+ * Leaderboard Link:
+ * - NO border
+ * - Cursive professional font applied ONLY here
+ * - 45-degree up diagonal arrow
+ */
+.hero-leaderboard-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  padding: 2px 6px !important;
+  font-family: 'Satisfy', 'Dancing Script', cursive !important;
+  font-size: 1.15rem !important; /* ~18px, perfect cursive readability */
+  font-weight: 500 !important;
+  letter-spacing: 0.02em !important;
+  color: #b3c0ade0 !important;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: color 0.2s ease, text-shadow 0.2s ease, opacity 0.2s ease;
+  line-height: 1.2 !important;
+}
+
+.hero-leaderboard-link:hover {
+  color: #ffffff !important;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.5) !important;
+}
+
+.hero-leaderboard-arrow {
+  display: inline-block;
+  color: rgba(179, 192, 173, 0.88);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
+}
+
+.hero-leaderboard-link:hover .hero-leaderboard-arrow {
+  color: #ffffff;
+  transform: translate(2.5px, -2.5px);
+}

@@ -3,8 +3,11 @@ import gsap from 'gsap';
 import { SplitText } from 'gsap/SplitText';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ThinkingOrb } from 'thinking-orbs';
+import { ArrowUpRight } from 'lucide-react';
+import Link from 'next/link';
 import { useApp } from './AppProvider';
 import { useTranslation } from '@/locales';
+import { MetalBadge } from '@/components/MetalBadge';
 
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
@@ -113,7 +116,7 @@ export default function PixelifyHero({
       const entrance = gsap.from(
         [
           ...root.querySelectorAll<HTMLElement>(
-            '.sub, .hero-actions, .hero-scroll-wrap'
+            '.hero-badge-wrap, .sub, .hero-actions, .hero-scroll-wrap'
           ),
         ],
         {
@@ -172,126 +175,148 @@ export default function PixelifyHero({
   };
 
   return (
-    <section
-      className="hero pixelify-hero"
-      ref={rootRef}
-    >
-      {/* Background Video */}
-      <div className="hero-video-wrap" aria-hidden="true">
-        <video
-          className="hero-bg-video"
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="auto"
-        >
-          <source src="/upscaled-video.mp4" type="video/mp4" />
-        </video>
-        <div className="hero-video-overlay" />
-      </div>
+    <>
 
-      <div className="hero-inner">
 
-        <div className="hero-top-group">
-          {/* =====================================================
+      <section
+        className="hero pixelify-hero"
+        ref={rootRef}
+      >
+        {/* Background Video */}
+        <div className="hero-video-wrap" aria-hidden="true">
+          <video
+            className="hero-bg-video"
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+          >
+            <source src="/upscaled-video.mp4" type="video/mp4" />
+          </video>
+          <div className="hero-video-overlay" />
+        </div>
+
+        <div className="hero-inner">
+
+          <div className="hero-top-group">
+            <div className="hero-badge-wrap mb-4 sm:mb-6 flex items-center justify-center gap-3">
+              <MetalBadge label="New" />
+              <Link
+                href="/leaderboard/"
+                className="hero-leaderboard-link group inline-flex items-center gap-1.5 text-white/90 transition-colors"
+                aria-label="Check out the community leaderboard"
+              >
+                <span>Checkout Leaderboard</span>
+                <ArrowUpRight
+                  size={16}
+                  aria-hidden="true"
+                  className="hero-leaderboard-arrow"
+                />
+              </Link>
+            </div>
+
+            {/* =====================================================
               STAIRCASE HEADLINE
               ===================================================== */}
 
-          <h1
-            className="headline"
-            aria-label="Your images, your device, your control, powered by Pixelify"
-          >
-            {/* FIRST 3 LINES: YOUR + [IMAGES / DEVICE / CONTROL] */}
-            <span className="hero-trio-row">
-              <span className="hero-trio-wrap">
-                <span className="hero-serif-your dim-3">
-                  <span className="ht">{t.hero.your}</span>
-                </span>
-                <span className="hero-trio-stack">
-                  <span className="hero-stack-item dim-2">
-                    <span className="ht">{t.hero.images}</span>
+            <h1
+              className="headline"
+              aria-label="Your images, your device, your control, powered by Pixelify"
+            >
+              {/* FIRST 3 LINES: YOUR + [IMAGES / DEVICE / CONTROL] */}
+              <span className="hero-trio-row">
+                <span className="hero-trio-wrap">
+                  <span className="hero-serif-your dim-3">
+                    <span className="ht">{t.hero.your}</span>
                   </span>
-                  <span className="hero-stack-item dim-2">
-                    <span className="ht">{t.hero.device}</span>
-                  </span>
-                  <span className="hero-stack-item dim-2">
-                    <span className="ht">{t.hero.control}</span>
+                  <span className="hero-trio-stack">
+                    <span className="hero-stack-item dim-2">
+                      <span className="ht">{t.hero.images}</span>
+                    </span>
+                    <span className="hero-stack-item dim-2">
+                      <span className="ht">{t.hero.device}</span>
+                    </span>
+                    <span className="hero-stack-item dim-2">
+                      <span className="ht">{t.hero.control}</span>
+                    </span>
                   </span>
                 </span>
               </span>
-            </span>
 
-            {/* LINE 4 */}
-            <span className="line bright step-4">
-              <span className="step-4-row" aria-hidden="true">
-                <span className="ht word-powered">
-                  {t.hero.powered}
-                </span>
-                <span className="ht">
-                  {t.hero.by}
-                </span>
-                <span className="glow-wrap">
-                  <ThinkingOrb
-                    state="solving"
-                    size={64}
-                  />
-                </span>
-                <span className="ht ai-token">
-                  {t.hero.brand}
+              {/* LINE 4 */}
+              <span className="line bright step-4">
+                <span className="step-4-row" aria-hidden="true">
+                  <span className="ht word-powered">
+                    {t.hero.powered}
+                  </span>
+                  <span className="ht">
+                    {t.hero.by}
+                  </span>
+                  <span className="glow-wrap">
+                    <ThinkingOrb
+                      state="solving"
+                      size={64}
+                    />
+                  </span>
+                  <span className="ht ai-token">
+                    {t.hero.brand}
+                  </span>
                 </span>
               </span>
-            </span>
-          </h1>
+            </h1>
 
-          {/* SUBTITLE */}
-          <p className="sub">
-            {t.hero.subtitle}
-          </p>
+            {/* SUBTITLE */}
+            <p className="sub">
+              {t.hero.subtitle}
+            </p>
 
-          {/* ACTIONS */}
-          <div className="hero-actions">
-            <button
-              type="button"
-              className="hero-secondary"
-              onClick={onLaunchBGRemove}
-              onMouseEnter={() => warmup('bg_remove')}
-              onTouchStart={() => warmup('bg_remove')}
-            >
-              {t.hero.launchBg}
-              <span>↗</span>
-            </button>
+            {/* ACTIONS */}
+            <div className="hero-actions">
+              <button
+                type="button"
+                className="hero-secondary"
+                onClick={onLaunchBGRemove}
+                onMouseEnter={() => warmup('bg_remove')}
+                onTouchStart={() => warmup('bg_remove')}
+              >
+                {t.hero.launchBg}
+                <span>↗</span>
+              </button>
 
-            <button
-              type="button"
-              className="hero-secondary"
-              onClick={onLaunchUpscaler}
-              onMouseEnter={() => warmup('upscaler')}
-              onTouchStart={() => warmup('upscaler')}
-            >
-              {t.hero.launchUpscaler}
-              <span>↗</span>
-            </button>
+              <button
+                type="button"
+                className="hero-secondary"
+                onClick={onLaunchUpscaler}
+                onMouseEnter={() => warmup('upscaler')}
+                onTouchStart={() => warmup('upscaler')}
+              >
+                {t.hero.launchUpscaler}
+                <span>↗</span>
+              </button>
 
-          </div>
-        </div>
-
-        {/* SCROLL DOWN INDICATOR */}
-        <div className="hero-scroll-wrap">
-          <button
-            type="button"
-            className="hero-scroll-btn group"
-            onClick={handleScrollDown}
-            aria-label="Scroll down to studio options"
-          >
-            <span className="hero-scroll-text">SCROLL</span>
-            <div className="hero-scroll-pill">
-              <span className="hero-scroll-dot" />
             </div>
-          </button>
-        </div>
+          </div>
 
-      </div>
-    </section>
+
+
+          {/* SCROLL DOWN INDICATOR */}
+          <div className="hero-scroll-wrap">
+            <button
+              type="button"
+              className="hero-scroll-btn group"
+              onClick={handleScrollDown}
+              aria-label="Scroll down to studio options"
+            >
+              <span className="hero-scroll-text">SCROLL</span>
+              <div className="hero-scroll-pill">
+                <span className="hero-scroll-dot" />
+              </div>
+            </button>
+          </div>
+
+        </div>
+      </section>
+    </>
   );
 }
