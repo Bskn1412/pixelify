@@ -155,7 +155,7 @@ export function DocsShell({ children }: { children: React.ReactNode }) {
             onClick={() => setMobileOpen(true)}
             aria-label="Open documentation navigation"
           >
-            <Menu size={20} />
+            <Menu className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
           <Link href="/" className="px-header-brand" title="Pixelify Docs Overview">
             <Logo size="xs" className="shrink-0 pointer-events-none" />
@@ -170,7 +170,7 @@ export function DocsShell({ children }: { children: React.ReactNode }) {
             onClick={() => setSearchOpen(true)}
             aria-label="Search documentation"
           >
-            <Search size={15} className="px-header-search-icon" />
+            <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 px-header-search-icon shrink-0" />
             <span className="px-header-search-placeholder">Search documentation...</span>
             <kbd className="px-header-search-kbd">⌘ K</kbd>
           </button>
@@ -184,7 +184,7 @@ export function DocsShell({ children }: { children: React.ReactNode }) {
             aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
             title={dark ? "Switch to light mode" : "Switch to dark mode"}
           >
-            {dark ? <Sun size={17} /> : <Moon size={17} />}
+            {dark ? <Sun className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
           </button>
 
           <div className="relative" ref={langRef}>
@@ -195,13 +195,12 @@ export function DocsShell({ children }: { children: React.ReactNode }) {
               aria-label="Select Language"
               aria-expanded={langOpen}
             >
-              <Globe size={15} className="text-gray-400 shrink-0" />
+              <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400 shrink-0" />
               <span className="font-bold text-xs uppercase tracking-wider">
                 {(currentLang || "en").toUpperCase()}
               </span>
               <ChevronDown
-                size={13}
-                className={`transition-transform duration-200 shrink-0 ${langOpen ? "rotate-180" : ""}`}
+                className={`w-3 h-3 sm:w-3.5 sm:h-3.5 transition-transform duration-200 shrink-0 ${langOpen ? "rotate-180" : ""}`}
               />
             </button>
 

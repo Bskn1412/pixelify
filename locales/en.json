@@ -27,7 +27,7 @@
     "home": "Home",
     "bgRemove": "BG Remover",
     "upscaler": "AI Upscaler",
-    "blogs": "Blogs",
+    "blog": "Blog",
     "settingsTitle": "Settings & Preferences",
     "processingEngines": "Processing engines",
     "webgpuSupport": "WebGPU support",
@@ -269,8 +269,8 @@
     "downloadCutout": "Download PNG",
     "tabCutout": "Cutout",
     "tabBackdrop": "Backdrop",
-    "tabText": "Text",
-    "tabRefine": "Refine"
+    "tabRefine": "Crop",
+    "tabText": "Design"
   },
   "bgSections": {
     "marquee": [
@@ -382,7 +382,7 @@
     "bgRemover": "Background Remover",
     "products": "Products & Features",
     "docs": "Docs",
-    "blogs": "Blogs",
+    "blog": "Blog",
     "faqs": "FAQs",
     "about": "About Pixelify",
     "contact": "Contact",
@@ -390,7 +390,7 @@
     "terms": "Terms of Service",
     "rights": "© 2026 Pixelify Inc. All rights reserved."
   },
-  "blogs": {
+  "blog": {
     "title": "Blog & AI Guides",
     "subtitle": "Articles on local AI, privacy, background removal, upscaling, WebGPU, and on-device processing.",
     "searchPlaceholder": "Search articles by title, tag, or topic…",

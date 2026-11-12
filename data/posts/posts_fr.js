@@ -3,6 +3,100 @@
  * Archive of remaining posts is preserved in data/blog_archive/
  */
 export const POSTS_FR = [
+  {
+    slug: 'upscaler_advantages_e5a8d3',
+    title: 'Ce que débloque l\'agrandissement par IA : Sept flux de travail réels transformés',
+    description:
+      'Du sauvetage de numérisations familiales vieux de dix ans aux affiches prêtes à imprimer et aux captures d\'écran nettes : des cas d\'usage pratiques où l\'agrandissement par IA prouve sa valeur, et pourquoi la vitesse sur appareil rend l\'itération totalement gratuite.',
+    tags: ['Agrandisseur', 'Cas d\'usage', 'Flux de travail'],
+    date: '2026-11-12',
+    author: 'L\'équipe Pixelify',
+    cover: '/blog/home-samples.jpg',
+    coverAlt: 'Grille d\'échantillons Pixelify avec démonstrations pour le sport, les mangas, l\'océan et la restauration de visages',
+    blocks: [
+      {
+        type: 'p',
+        text: 'Tous les outils d\'image promettent d\'améliorer vos photos. Bien moins nombreux sont ceux qui apportent un vrai changement dans ce que vous pouvez réellement accomplir, ce passage silencieux de « je ne peux pas utiliser ce fichier » à « ce fichier convient parfaitement ». L\'agrandissement par IA réalise cette transformation plus souvent que toute autre capacité, car les limites de résolution sont partout et sont absolues : une impression nécessite des pixels, une présentation nécessite des pixels, un grand écran nécessite des pixels, et aucun niveau de compétence en graphisme ne peut les faire apparaître au moment de l\'export. Voici où cette technologie devient rentable.',
+      },
+      { type: 'h2', text: '1. Archives familiales et numérisations anciennes' },
+      {
+        type: 'p',
+        text: 'Un scanner capture ce qui se trouve sur le tirage, à la résolution du scanner, et pour la plupart des archives personnelles, cette résolution est inférieure à ce qu\'exigent les écrans et flux d\'impression modernes. L\'agrandissement comble l\'écart entre l\'archive que vous possédez et le résultat que vous souhaitez : un tirage 10×15 scanné devient un agrandissement encadrable ; une petite numérisation d\'une photo de groupe devient suffisamment lisible pour identifier les visages à travers une pièce. La portée émotionnelle est ici bien réelle, tout comme la pertinence technique, car les photographies sont précisément le type de contenu où les modèles de reconstruction sont les plus efficaces.',
+      },
+      {
+        type: 'callout',
+        title: 'Numérisez une fois, exportez partout',
+        text: 'Numérisez à la résolution optique native du scanner à plat, conservez le fichier maître intact, et agrandissez des copies dérivées pour chaque besoin d\'export. La reconstruction apporte des choix visuels ; le scan d\'origine reste la vérité de référence à laquelle revenir.',
+      },
+      { type: 'h2', text: '2. Captures d\'écran, présentations et documentations' },
+      {
+        type: 'p',
+        text: 'Les captures d\'écran vieillissent mal. Une capture qui semblait très nette sur un écran 1080p devient floue lorsqu\'elle est intégrée dans une présentation 4K, projetée dans une salle éclairée ou zoomée pendant une démonstration. L\'agrandissement restaure la lisibilité des textes d\'interface et la netteté des lignes, avec la réserve documentée que le texte reconstruit comporte une part d\'incertitude en dessous d\'une certaine taille source. Pour les présentations, la règle pratique : agrandissez généreusement pour la lisibilité sur scène, mais vérifiez les textes critiques à 100 % avant de finaliser votre document.',
+      },
+      { type: 'h2', text: '3. Photographie de produit sans nouvelle prise de vue' },
+      {
+        type: 'p',
+        text: 'Les plates-formes d\'e-commerce permettent le zoom. Une photo de produit prise à 1200 pixels semble adéquate dans une grille mais s\'effondre sur la fiche détaillée, où les acheteurs zoome pour inspecter les matières et les coutures. L\'ancienne solution consistait à refaire les prises de vue à plus haute résolution, une journée de studio pour ce qui est fondamentalement un problème de résolution. Agrandir la prise de vue existante résout le vrai problème pour une fraction du coût, et parce que le traitement peut s\'exécuter localement, les photos de produits non encore publiés ne quittent jamais le studio.',
+      },
+      {
+        type: 'img',
+        src: '/blog/upscaler-page.jpg',
+        alt: 'Agrandisseur Pixelify comparant une version floue et une version nette d\'une photo de chaussure',
+        caption: 'Comparaison côte à côte lors du téléversement : l\'écart avant/après constitue tout l\'intérêt.',
+      },
+      { type: 'h2', text: '4. Affiches, impressions et supports physiques' },
+      {
+        type: 'p',
+        text: 'L\'impression impose une logique stricte : les exigences de DPI ne se négocient pas. Une affiche A3 à 300 DPI nécessite environ 3500 pixels de large, et une source au format web ne peut tout simplement pas la remplir sans reconstruction. L\'agrandissement fait passer des images qu\'il était impossible d\'imprimer dans la zone d\'impression acceptable, avec le conseil pratique que les tirages physiques méritent une vérification attentive des épreuves ; des artéfacts de reconstruction invisibles à l\'écran peuvent se révéler sous l\'encre et la loupe.',
+      },
+      { type: 'h2', text: '5. Vignettes pour réseaux sociaux et contenus' },
+      {
+        type: 'p',
+        text: 'La re-compression des plates-formes constitue une seconde perte de résolution venant s\'ajouter à la première. Les images sources qui survivent à un premier traitement échouent souvent au suivant, se dégradant en artéfacts qui évoquent un contenu négligé. Fournir aux plates-formes un fichier maître plus grand et plus propre donne à leur encodeur de meilleures informations à traiter, et le résultat visible est une vignette qui conserve ses détails dans un fil d\'actualité saturé de contenus flous. C\'est un avantage discret qui a un impact direct sur le taux de clic.',
+      },
+      { type: 'h2', text: '6. Flux de travail créatifs et artistiques' },
+      {
+        type: 'p',
+        text: 'Les artistes numériques agrandissent leurs propres œuvres pour des éditions imprimées, des rendus de la taille d\'une tapisserie ou des zooms sur fiches détaillées. La compatibilité est excellente : les œuvres d\'art partagent les régularités statistiques de la photographie, et l\'œil exercé des artistes repère immédiatement tout décalage de reconstruction. Un usage en forte croissance concerne les images générées par IA, qui arrivent souvent à une résolution modeste et bénéficient énormément d\'une reconstruction entraînée sur des statistiques naturelles — le chemin le plus rapide d\'un aperçu généré vers un tirage final.',
+      },
+      { type: 'h2', text: '7. Accessibilité : rendre lisible ce qui est petit' },
+      {
+        type: 'p',
+        text: 'La basse vision est un problème de résolution. Les images qui sont « correctes » sur un téléphone deviennent illisibles lorsqu\'elles sont zoomées, car le zoom agrandit le flou tout autant que le détail. Agrandir l\'image par IA avant de zoomer transforme l\'expérience : la vue agrandie apporte une vraie structure au lieu d\'un flou étiré. C\'est une application peu évoquée, et pourtant l\'un des cas les plus clairs où la reconstruction n\'est pas esthétique mais fonctionnelle.',
+      },
+      { type: 'h2', text: 'Pourquoi le traitement local multiplie chacun de ces usages' },
+      {
+        type: 'p',
+        text: 'Chaque flux de travail ci-dessus s\'améliore doublement lorsque le calcul s\'exécute sur votre propre matériel. L\'itération devient gratuite, de sorte que les utilisateurs comparent les échelles et les réglages au lieu de deviner une seule fois. Les traitements par lots deviennent pratiques, de sorte qu\'un catalogue complet ou des archives entières peuvent être traités en une seule session. Les documents sensibles de toutes sortes, des scans familiaux aux images médicales ou produits sous embargo, deviennent enfin traitables. Et le résultat ne touche jamais un serveur, ce qui, pour les cas d\'usage d\'archivage et professionnels ci-dessus, n\'est pas un bonus mais la condition préalable pour accomplir le travail.',
+      },
+      {
+        type: 'p',
+        text: 'Une considération supplémentaire apparaît rarement dans les listes de fonctionnalités : l\'agrandissement modifie la façon dont les images vieillissent. Une petite source visionnée sur un téléphone ne montre que ce que le téléphone peut afficher ; un fichier maître plus grand reste en avance sur chaque futur écran, chaque future re-compression, chaque futur changement de format. Cela signifie que l\'investissement dans un fichier plus grand porte ses fruits sur des années plutôt que d\'être dépensé à nouveau lors de la prochaine étape d\'export. Conserver quelques fichiers dérivés correctement agrandis (jusqu\'à 4x) comme nouveaux fichiers maîtres ne coûte rien de plus que quelques mégaoctets, et ce sont ces fichiers qui seront réutilisés dans dix ans, lorsque l\'original aura disparu depuis longtemps.',
+      },
+      {
+        type: 'ul',
+        items: [
+          'Itérez librement : testez deux échelles, comparez à 100 %, conservez le meilleur résultat.',
+          'Traitez les archives par lots : procédez par groupes représentatifs, vérifiez ponctuellement, puis continuez.',
+          'Conservez les fichiers maîtres : agrandissez toujours une copie, jamais le seul fichier que vous possédez.',
+          'Adaptez l\'échelle au besoin : 2× pour l\'affichage, 4× pour les épreuves d\'impression, plus uniquement lorsque la source le mérite.',
+        ],
+      },
+      {
+        type: 'p',
+        text: 'Le schéma à travers ces sept cas reste le même. La résolution était autrefois une contrainte liée au moment de la prise de vue que l\'on ne pouvait résoudre qu\'avec un meilleur équipement au moment de photographier. La reconstruction déplace cette décision au moment de l\'export, là où elle a toute sa place : vous décidez de la taille dont l\'image a besoin lorsque vous savez à quoi elle est destinée. Ce découplage, bien plus que n\'importe quelle mesure de performance, explique pourquoi l\'agrandissement est devenu discrètement la capacité la plus utilisée dans l\'édition d\'images moderne.',
+      },
+      {
+        type: 'h2',
+        text: 'La discrète arithmétique du binaire',
+      },
+      {
+        type: 'p',
+        text: 'Un dernier chiffre mérite sa place dans cette analyse, car il explique pourquoi cette capacité s\'est répandue si vite et si largement. Un réseau moderne qui reconstruit les détails est, au fond, un ensemble fixe de poids multipliés par des données de pixels — un calcul qui dépend uniquement des octets que vous possédez déjà et non d\'une connexion à un serveur qui détiendrait ces octets. En termes algébriques, le téléversement apporte un bilan nul : il n\'ajoute rien au calcul. C\'est ce qui fait de l\'agrandissement local ce cas rare où l\'outil qui vous en demande le moins est aussi celui qui est le plus rapide, et où la garantie de confidentialité n\'est pas une promesse d\'excuse mais la conception même du système.',
+      },
+    ],
+  },
+
 {
     slug: 'bg_remover_advantages_f9d2a6',
     title: 'Sept gains pratiques grâce au détourage d\'arrière-plan en un clic',
@@ -11,7 +105,7 @@ export const POSTS_FR = [
     tags: ['Détourage d\'arrière-plan', 'Cas d\'usage', 'Flux de travail'],
     date: '2026-11-11',
     author: 'L\'équipe Pixelify',
-    cover: '/blogs/home-samples.jpg',
+    cover: '/blog/home-samples.jpg',
     coverAlt: 'Grille de démonstrations instantanées Pixelify avec des exemples d\'images pour le traitement en un clic',
     blocks: [
       {
@@ -34,7 +128,7 @@ export const POSTS_FR = [
       },
       {
         type: 'img',
-        src: '/blogs/home-mobile.jpg',
+        src: '/blog/home-mobile.jpg',
         alt: 'Page d\'accueil Pixelify sur un écran mobile montrant le message de traitement local',
         caption: 'Tout cela s\'exécute sur le téléphone dans votre main : les détourages n\'ont plus besoin d\'un bureau.',
       },
@@ -84,7 +178,7 @@ export const POSTS_FR = [
     ],
   },
 
-{
+  {
     slug: 'pc_vs_mobile_speed_c8d4f2',
     title: 'Téléphone ou PC : Où l\'IA sur appareil s\'exécute-t-elle le plus vite ?',
     description:
@@ -92,7 +186,7 @@ export const POSTS_FR = [
     tags: ['Performance', 'WebGPU', 'Guide'],
     date: '2026-11-09',
     author: 'L\'équipe Pixelify',
-    cover: '/blogs/home-mobile.jpg',
+    cover: '/blog/home-mobile.jpg',
     coverAlt: 'Pixelify s\'exécutant sur un écran de téléphone mobile',
     blocks: [
       {
@@ -115,7 +209,7 @@ export const POSTS_FR = [
       },
       {
         type: 'img',
-        src: '/blogs/upscaler-sections.jpg',
+        src: '/blog/upscaler-sections.jpg',
         alt: 'Présentation de résultats agrandis avec statistiques de performance sur appareil',
         caption: 'Même réseau, même image : la différence entre les appareils relève de l\'ingénierie, pas de la magie.',
       },
@@ -168,7 +262,7 @@ export const POSTS_FR = [
     ],
   },
 
-{
+  {
     slug: 'data_harvesting_warning_a9e5b7',
     title: 'Ce qui arrive à vos photos après avoir cliqué sur « Téléverser »',
     description:
@@ -176,7 +270,7 @@ export const POSTS_FR = [
     tags: ['Confidentialité', 'Sécurité', 'Industrie'],
     date: '2026-11-07',
     author: 'L\'équipe Pixelify',
-    cover: '/blogs/home-hero.jpg',
+    cover: '/blog/home-hero.jpg',
     coverAlt: 'Page d\'accueil Pixelify mettant l\'accent sur le traitement local et l\'absence d\'envoi vers le cloud',
     blocks: [
       {
@@ -252,7 +346,7 @@ export const POSTS_FR = [
     ],
   },
 
-{
+  {
     slug: 'pixelify_privacy_first_a7f3d9',
     title: 'Pixelify : Pourquoi nous avons créé un éditeur d\'images qui ne voit jamais vos photos',
     description:
@@ -260,7 +354,7 @@ export const POSTS_FR = [
     tags: ['Confidentialité', 'IA Locale', 'Produit'],
     date: '2026-11-06',
     author: 'L\'équipe Pixelify',
-    cover: '/blogs/story-page.jpg',
+    cover: '/blog/story-page.jpg',
     coverAlt: 'Page d\'histoire Pixelify montrant les mots PIXELIFY LOCAL AI FOR YOUR',
     blocks: [
       {
@@ -296,7 +390,7 @@ export const POSTS_FR = [
       },
       {
         type: 'img',
-        src: '/blogs/home-hero.jpg',
+        src: '/blog/home-hero.jpg',
         alt: 'Page d\'accueil Pixelify avec le slogan Agrandissez, restaurez et transformez vos images localement',
         caption: 'La promesse affichée : traitement local, pas de téléversements, pas de cloud.',
       },
@@ -348,327 +442,327 @@ export const POSTS_FR = [
     ],
   },
 
-{
-  "slug": "enable_webgpu_guide_b5c9e8",
-  "title": "Activer WebGPU : Le changement de deux minutes qui accélère considérablement l'IA dans le navigateur",
-  "description": "WebGPU permet à l'IA basée sur navigateur de s'exécuter sur votre puce graphique plutôt que sur votre CPU, souvent 5 à 10 fois plus vite. Un guide navigateur par navigateur pour l'activer, plus comment confirmer son fonctionnement via le badge du moteur dans les paramètres.",
-  "tags": [
-    "WebGPU",
-    "Guide",
-    "Performance"
-  ],
-  "date": "2026-11-05",
-  "author": "L'équipe Pixelify",
-  "cover": "/blogs/settings-engine.jpg",
-  "coverAlt": "Menu déroulant des paramètres Pixelify montrant les badges de statut du moteur en direct",
-  "blocks": [
-    {
-      "type": "p",
-      "text": "Voici une tâche de deux minutes avec un bénéfice mesurable. L'IA basée sur navigateur s'exécute sur l'un des deux parcours : un parcours CPU qui fonctionne partout mais reste lent, ou un parcours GPU (WebGPU) qui exploite votre puce graphique et termine le même travail plusieurs fois plus vite. De nombreux navigateurs intègrent WebGPU sans le rendre évidents, parfois derrière un fanion (flag), parfois simplement jamais vérifié. L'activer et confirmer que l'outil est passé dessus est la modification de configuration au rendement le plus élevé que vous puissiez effectuer."
-    },
-    {
-      "type": "h2",
-      "text": "Ce qu'est WebGPU, en un paragraphe"
-    },
-    {
-      "type": "p",
-      "text": "WebGPU est l'interface moderne du navigateur avec le matériel graphique, le successeur de l'ancienne génération WebGL, repensée pour le calcul intensif autant que pour le rendu. Cette refonte est cruciale pour l'IA : l'ancienne pile était conçue pour dessiner des triangles, et lui faire exécuter des charges de travail mathématiques nécessitait des contorsions qui limitaient les performances. WebGPU expose le calcul correctement, c'est pourquoi les réseaux neuronaux, qui sont de l'arithmétique purement parallèle, observent des gains si spectaculaires lorsqu'il est disponible."
-    },
-    {
-      "type": "h2",
-      "text": "Vérifiez si vous l'avez déjà"
-    },
-    {
-      "type": "p",
-      "text": "Avant de modifier quoi que ce soit, le chemin le plus rapide consiste souvent à découvrir que vous avez déjà terminé. Ouvrez le panneau des paramètres de l'application (l'icône d'engrenage dans le coin supérieur) et observez les badges du moteur. Si le badge indique l'accélération GPU, WebGPU est actif et il n'y a rien à configurer. S'il indique un basculement sur le CPU, les sections ci-dessous couvrent chaque navigateur majeur. Sur les téléphones, la réponse dépend très souvent de la version de votre système d'exploitation plutôt que d'un réglage, donc la mise à jour du système constitue l'intégralité de la procédure."
-    },
-    {
-      "type": "callout",
-      "title": "Où regarder",
-      "text": "Paramètres (icône engrenage) → badges du moteur. Chaque outil rapporte son propre moteur actif, relu directement depuis l'environnement d'exécution plutôt que supposé, afin que le badge reflète la réalité et non un optimisme de détection de fonctionnalités."
-    },
-    {
-      "type": "h2",
-      "text": "Chrome et Microsoft Edge",
-      "icons": [
-        "chrome",
-        "edge"
-      ]
-    },
-    {
-      "type": "p",
-      "text": "Si votre navigateur utilise le recours au processeur (CPU) plutôt que l'accélération graphique (GPU), l'activation du fanion (flag) WebGPU approprié peut résoudre le problème. Suivez les étapes ci-dessous pour vérifier et configurer WebGPU dans Google Chrome ou Microsoft Edge."
-    },
-    {
-      "type": "img",
-      "src": "/blogs/how-to-webgpu-chrome.png",
-      "alt": "Activation des drapeaux WebGPU dans Google Chrome et Microsoft Edge",
-      "caption": "Recherchez « WebGPU » dans chrome://flags ou edge://flags et activez le paramètre."
-    },
-    {
-      "type": "h3",
-      "text": "Étape 1 : Ouvrir la page des fonctionnalités expérimentales"
-    },
-    {
-      "type": "p",
-      "text": "Lancez Google Chrome ou Microsoft Edge sur votre ordinateur. Cliquez sur la barre d'adresse, saisissez chrome://flags dans Chrome ou edge://flags dans Microsoft Edge, puis appuyez sur Entrée pour accéder à la page des fonctionnalités expérimentales."
-    },
-    {
-      "type": "h3",
-      "text": "Étape 2 : Rechercher WebGPU"
-    },
-    {
-      "type": "p",
-      "text": "Une fois la page Experiments ouverte, repérez la zone de recherche en haut. Tapez WebGPU pour filtrer les paramètres disponibles et afficher les drapeaux relatifs à WebGPU."
-    },
-    {
-      "type": "h3",
-      "text": "Étape 3 : Activer le drapeau WebGPU"
-    },
-    {
-      "type": "p",
-      "text": "Trouvez l'option « Force enable WebGPU interop », comme illustré sur la capture d'écran. Cliquez sur le menu déroulant à côté et sélectionnez Enabled (Activé) au lieu de Default."
-    },
-    {
-      "type": "p",
-      "text": "Ce drapeau concerne principalement des configurations graphiques spécifiques, notamment celles basées sur Vulkan sous Linux. Si cette option n'est pas disponible ou ne s'applique pas à votre système, n'en déduisez pas que son activation est strictement obligatoire pour faire fonctionner WebGPU."
-    },
-    {
-      "type": "h3",
-      "text": "Étape 4 : Relancer le navigateur"
-    },
-    {
-      "type": "p",
-      "text": "Après avoir modifié le paramètre, cliquez sur le bouton Relaunch (Relancer) si le navigateur l'affiche. Cela redémarre le navigateur et applique la nouvelle configuration expérimentale. Pensez à enregistrer vos travaux en cours avant de redémarrer."
-    },
-    {
-      "type": "h3",
-      "text": "Étape 5 : Vérifier le fonctionnement de WebGPU"
-    },
-    {
-      "type": "p",
-      "text": "Après le redémarrage, rouvrez votre application WebGPU et vérifiez si l'avertissement de basculement sur le CPU a disparu. Vous pouvez également visiter chrome://gpu dans Chrome ou edge://gpu dans Edge pour examiner la configuration graphique du navigateur et identifier d'éventuels blocages matériels."
-    },
-    {
-      "type": "h3",
-      "text": "Que faire si WebGPU ne fonctionne toujours pas ?"
-    },
-    {
-      "type": "p",
-      "text": "Si WebGPU continue d'utiliser le CPU, le problème peut provenir de la compatibilité du pilote graphique, de la configuration du navigateur ou du matériel. Mettez à jour vos pilotes graphiques, assurez-vous que votre navigateur utilise bien la carte graphique dédiée appropriée et consultez les diagnostics GPU du navigateur pour identifier les erreurs."
-    },
-    {
-      "type": "callout",
-      "title": "Remarque",
-      "text": "WebGPU est activé par défaut sur de nombreux systèmes de bureau compatibles. Les drapeaux disponibles et leurs effets varient selon la version du navigateur et le système d'exploitation ; l'activation d'un drapeau ne garantit donc pas automatiquement l'accélération matérielle."
-    },
-    {
-      "type": "h2",
-      "text": "Mozilla Firefox",
-      "icons": [
-        "firefox"
-      ]
-    },
-    {
-      "type": "p",
-      "text": "Firefox prend en charge WebGPU dans ses versions modernes, activé par défaut sur les plates-formes majeures. Si votre système signale toujours un basculement sur le CPU, vous pouvez vérifier ou activer manuellement WebGPU via l'éditeur de configuration avancée de Firefox en suivant les étapes ci-dessous."
-    },
-    {
-      "type": "h3",
-      "text": "Étape 1 : Ouvrir la page de configuration"
-    },
-    {
-      "type": "p",
-      "text": "Lancez Firefox sur votre ordinateur, tapez about:config dans la barre d'adresse et appuyez sur Entrée."
-    },
-    {
-      "type": "h3",
-      "text": "Étape 2 : Accepter l'avertissement et continuer"
-    },
-    {
-      "type": "p",
-      "text": "Firefox affichera un message d'avertissement indiquant que la modification des préférences avancées peut affecter les performances et la stabilité. Cliquez sur « Accepter le risque et poursuivre » pour ouvrir l'éditeur de configuration."
-    },
-    {
-      "type": "h3",
-      "text": "Étape 3 : Rechercher les préférences WebGPU"
-    },
-    {
-      "type": "p",
-      "text": "Dans la zone de recherche en haut, tapez dom.webgpu.enabled pour localiser le paramètre principal de WebGPU."
-    },
-    {
-      "type": "h3",
-      "text": "Étape 4 : Basculer les paramètres WebGPU sur True"
-    },
-    {
-      "type": "p",
-      "text": "Double-cliquez sur dom.webgpu.enabled (ou cliquez sur le bouton bascule à droite) pour faire passer sa valeur de false à true. Si votre configuration graphique nécessite une accélération forcée (notamment sous Linux avec Vulkan), recherchez également gfx.webgpu.force-enabled et passez-le à true."
-    },
-    {
-      "type": "h3",
-      "text": "Étape 5 : Redémarrer Firefox et vérifier"
-    },
-    {
-      "type": "p",
-      "text": "Fermez complètement puis rouvrez Firefox pour appliquer les modifications. Rendez-vous sur about:support et consultez la section « Accélération graphique » pour confirmer l'état de WebGPU, ou rechargez Pixelify et examinez le badge du moteur dans les Paramètres."
-    },
-    {
-      "type": "h3",
-      "text": "Dépannage pour Firefox"
-    },
-    {
-      "type": "p",
-      "text": "Firefox requiert des pilotes Vulkan à jour sous Linux/Windows et Metal sous macOS. Si Firefox persiste à utiliser le CPU, vérifiez que vos pilotes graphiques sont mis à jour avec la dernière version du constructeur, et assurez-vous que WebRender fonctionne bien en mode accélération matérielle sur about:support."
-    },
-    {
-      "type": "h2",
-      "text": "Brave Browser",
-      "icons": [
-        "brave"
-      ]
-    },
-    {
-      "type": "p",
-      "text": "Brave est construit sur la base de Chromium, ce qui lui confère le même puissant moteur d'accélération matérielle que Chrome. Cependant, comme Brave intègre des boucliers stricts de protection de la vie privée et des réglages par défaut spécifiques, WebGPU peut parfois être restreint. Suivez ces étapes pour activer WebGPU dans Brave."
-    },
-    {
-      "type": "h3",
-      "text": "Étape 1 : Ouvrir la page des drapeaux Brave"
-    },
-    {
-      "type": "p",
-      "text": "Lancez le navigateur Brave sur votre ordinateur. Dans la barre d'adresse, tapez brave://flags et appuyez sur Entrée pour accéder à la page Experiments."
-    },
-    {
-      "type": "h3",
-      "text": "Étape 2 : Rechercher WebGPU"
-    },
-    {
-      "type": "p",
-      "text": "Dans la zone de recherche en haut de la page des fonctionnalités expérimentales, tapez WebGPU pour filtrer tous les réglages associés à WebGPU."
-    },
-    {
-      "type": "h3",
-      "text": "Étape 3 : Activer les drapeaux WebGPU"
-    },
-    {
-      "type": "p",
-      "text": "Repérez les drapeaux « Force enable WebGPU interop » et/ou « Unsafe WebGPU ». Cliquez sur le menu déroulant à côté de chaque paramètre concerné et passez-le de Default à Enabled."
-    },
-    {
-      "type": "h3",
-      "text": "Étape 4 : Vérifier la protection contre le pistage des boucliers Brave"
-    },
-    {
-      "type": "p",
-      "text": "Les boucliers Brave bloquent le pistage par empreinte numérique (fingerprinting) par défaut, ce qui peut parfois empêcher les sites web d'interroger les détails de votre carte graphique. Si Pixelify ne parvient toujours pas à initialiser le GPU, cliquez sur l'icône du lion Brave dans la barre d'adresse pour ce site et assurez-vous que la protection contre les empreintes n'est pas réglée sur « Agressif »."
-    },
-    {
-      "type": "h3",
-      "text": "Étape 5 : Relancer Brave et vérifier"
-    },
-    {
-      "type": "p",
-      "text": "Cliquez sur le bouton Relaunch en bas de la page des drapeaux pour redémarrer Brave. Une fois relancé, visitez brave://gpu pour vérifier le statut de WebGPU, ou revenez sur Pixelify et vérifiez que le statut du moteur indique bien l'accélération GPU."
-    },
-    {
-      "type": "h3",
-      "text": "Dépannage pour Brave"
-    },
-    {
-      "type": "p",
-      "text": "Si Brave continue d'utiliser le CPU, naviguez vers brave://settings/system et vérifiez que l'option « Utiliser l'accélération matérielle si disponible » est bien activée. Veillez également à ce que votre système d'exploitation attribue bien à Brave votre GPU dédié haute performance."
-    },
-    {
-      "type": "h2",
-      "text": "Safari sur macOS",
-      "icons": [
-        "safari"
-      ]
-    },
-    {
-      "type": "p",
-      "text": "Safari prend en charge WebGPU depuis les versions récentes de macOS et Safari, activé par défaut sur les puces Apple Silicon et le matériel Intel compatible. Si vous devez inspecter ou configurer WebGPU dans Safari, suivez les étapes ci-dessous."
-    },
-    {
-      "type": "h3",
-      "text": "Étape 1 : Activer le menu Développement"
-    },
-    {
-      "type": "p",
-      "text": "Ouvrez Safari sur macOS. Dans la barre de menus, cliquez sur Safari > Réglages (ou Préférences), sélectionnez l'onglet Avancé, puis cochez la case « Afficher les fonctionnalités pour les développeurs web » (ou « Afficher le menu Développement dans la barre des menus »)."
-    },
-    {
-      "type": "h3",
-      "text": "Étape 2 : Ouvrir les drapeaux de fonctionnalités (Feature Flags)"
-    },
-    {
-      "type": "p",
-      "text": "Cliquez sur le menu Développement dans la barre de menus supérieure, puis rendez-vous dans Fonctionnalités expérimentales (ou Feature Flags sur les versions récentes de Safari)."
-    },
-    {
-      "type": "h3",
-      "text": "Étape 3 : Activer WebGPU"
-    },
-    {
-      "type": "p",
-      "text": "Dans le filtre de recherche, tapez WebGPU. Localisez la ligne WebGPU et assurez-vous que la case est cochée/activée."
-    },
-    {
-      "type": "h3",
-      "text": "Étape 4 : Redémarrer Safari et vérifier"
-    },
-    {
-      "type": "p",
-      "text": "Quittez et rouvrez Safari. Ouvrez à nouveau Pixelify et vérifiez le badge de statut du moteur dans les Paramètres (icône d'engrenage) pour confirmer que l'accélération GPU est active."
-    },
-    {
-      "type": "h2",
-      "text": "Android et iOS"
-    },
-    {
-      "type": "p",
-      "text": "Sur Android, la disponibilité de WebGPU dépend à la fois de la version du navigateur et de la génération du pilote GPU de l'appareil ; les appareils haut de gamme des deux dernières années sont largement pris en charge, et la mise à jour du navigateur ainsi que du composant Webview du système résout la plupart des écarts. Sur iOS et iPadOS, la prise en charge de WebGPU est arrivée avec les versions récentes de Safari et est héritée par tous les navigateurs de la plate-forme, car ils utilisent tous le même moteur sous-jacent. Dans les deux écosystèmes, la version du système d'exploitation constitue généralement le facteur déterminant."
-    },
-    {
-      "type": "img",
-      "src": "/blogs/home-mobile.jpg",
-      "alt": "Pixelify sur un téléphone montrant le traitement local avec accélération matérielle",
-      "caption": "Sur les téléphones, la disponibilité de WebGPU est généralement une question de version du système d'exploitation plutôt qu'un réglage."
-    },
-    {
-      "type": "h2",
-      "text": "Confirmer que cela a réellement fonctionné"
-    },
-    {
-      "type": "p",
-      "text": "Cette étape est celle que les gens sautent, et c'est pourtant celle qui compte. Un fanion activé ne garantit pas qu'un outil puisse l'utiliser : les pilotes peuvent faire de fausses déclarations, le matériel peut manquer de fonctionnalités requises au sein d'une génération, et le navigateur peut basculer silencieusement sur le CPU. La seule confirmation fiable est l'outil lui-même indiquant quel moteur il exécute. Rouvrez le panneau des paramètres après avoir tout activé et relisez le badge. Accélération GPU : c'est terminé. Recours au CPU : une étape ci-dessus n'a pas fonctionné, et la page de diagnostic GPU du navigateur nommera la fonctionnalité défaillante."
-    },
-    {
-      "type": "h2",
-      "text": "À quoi s'attendre après l'activation"
-    },
-    {
-      "type": "p",
-      "text": "Attentes réalistes : les petites images individuelles qui prenaient cinq à dix secondes sur le parcours CPU tombent couramment à une ou deux secondes. Les grandes images et les traitements par lots s'améliorent dans des proportions similaires, avec l'avantage supplémentaire que le parcours GPU gère la thermique de façon plus douce sur les ordinateurs portables ; la puce graphique est plus efficace pour les mathématiques soutenues que le ventilateur du CPU ne l'est pour évacuer la chaleur du processeur. La qualité ne change pas entre les parcours ; le même réseau s'exécute dans les deux cas. Seule l'attente change, et elle change considérablement."
-    },
-    {
-      "type": "h2",
-      "text": "Deux autres choses à savoir"
-    },
-    {
-      "type": "p",
-      "text": "La première est que WebGPU est une plate-forme partagée, et non une fonctionnalité premium propre à cet outil. Tout autre projet d'IA locale que vous installez sur la même machine commencera à utiliser le même parcours accéléré que vous venez de débloquer, sans qu'aucun d'entre eux ne vous demande de configurer quoi que ce soit. Cette interopérabilité est exactement ce qui fait ressentir l'IA basée sur navigateur comme une véritable plate-forme plutôt que comme un ensemble d'applications isolées."
-    },
-    {
-      "type": "p",
-      "text": "La seconde concerne la façon de vérifier les progrès pendant que vous expérimentez. Si vous souhaitez confirmer que l'accélération est réelle sur votre propre machine plutôt que de croire les chiffres d'un article de blog, traitez une seule image une fois avec le badge sur GPU et une fois avec le badge sur CPU, puis mesurez l'étape de traitement avec le profiler de votre système. La plupart des utilisateurs constatent que la différence est suffisamment nette pour être évidente dans le résultat ; ceux qui veulent des chiffres exacts peuvent les obtenir en trente secondes, ce qui transforme la lecture d'un blog en une mesure directe."
-    },
-    {
-      "type": "p",
-      "text": "Une dernière note sur la raison pour laquelle cela compte au-delà de la vitesse. WebGPU n'est pas un accélérateur propriétaire lié à un seul service ; c'est un standard ouvert multi-fournisseurs que chaque navigateur et fabricant de matériel implémente. L'activer une fois met à niveau tous les outils d'IA locale que vous utilisez, aujourd'hui et à l'avenir, sans qu'aucun d'entre eux ne vous demande d'installer quoi que ce soit. Deux minutes, aucun téléchargement, aucun compte, et un réglage qui fait passer l'IA sur navigateur de « pratique » à « véritablement rapide »."
-    }
-  ]
-}
+  {
+    "slug": "enable_webgpu_guide_b5c9e8",
+    "title": "Activer WebGPU : Le changement de deux minutes qui accélère considérablement l'IA dans le navigateur",
+    "description": "WebGPU permet à l'IA basée sur navigateur de s'exécuter sur votre puce graphique plutôt que sur votre CPU, souvent 5 à 10 fois plus vite. Un guide navigateur par navigateur pour l'activer, plus comment confirmer son fonctionnement via le badge du moteur dans les paramètres.",
+    "tags": [
+      "WebGPU",
+      "Guide",
+      "Performance"
+    ],
+    "date": "2026-11-05",
+    "author": "L'équipe Pixelify",
+    "cover": "/blog/settings-engine.jpg",
+    "coverAlt": "Menu déroulant des paramètres Pixelify montrant les badges de statut du moteur en direct",
+    "blocks": [
+      {
+        "type": "p",
+        "text": "Voici une tâche de deux minutes avec un bénéfice mesurable. L'IA basée sur navigateur s'exécute sur l'un des deux parcours : un parcours CPU qui fonctionne partout mais reste lent, ou un parcours GPU (WebGPU) qui exploite votre puce graphique et termine le même travail plusieurs fois plus vite. De nombreux navigateurs intègrent WebGPU sans le rendre évidents, parfois derrière un fanion (flag), parfois simplement jamais vérifié. L'activer et confirmer que l'outil est passé dessus est la modification de configuration au rendement le plus élevé que vous puissiez effectuer."
+      },
+      {
+        "type": "h2",
+        "text": "Ce qu'est WebGPU, en un paragraphe"
+      },
+      {
+        "type": "p",
+        "text": "WebGPU est l'interface moderne du navigateur avec le matériel graphique, le successeur de l'ancienne génération WebGL, repensée pour le calcul intensif autant que pour le rendu. Cette refonte est cruciale pour l'IA : l'ancienne pile était conçue pour dessiner des triangles, et lui faire exécuter des charges de travail mathématiques nécessitait des contorsions qui limitaient les performances. WebGPU expose le calcul correctement, c'est pourquoi les réseaux neuronaux, qui sont de l'arithmétique purement parallèle, observent des gains si spectaculaires lorsqu'il est disponible."
+      },
+      {
+        "type": "h2",
+        "text": "Vérifiez si vous l'avez déjà"
+      },
+      {
+        "type": "p",
+        "text": "Avant de modifier quoi que ce soit, le chemin le plus rapide consiste souvent à découvrir que vous avez déjà terminé. Ouvrez le panneau des paramètres de l'application (l'icône d'engrenage dans le coin supérieur) et observez les badges du moteur. Si le badge indique l'accélération GPU, WebGPU est actif et il n'y a rien à configurer. S'il indique un basculement sur le CPU, les sections ci-dessous couvrent chaque navigateur majeur. Sur les téléphones, la réponse dépend très souvent de la version de votre système d'exploitation plutôt que d'un réglage, donc la mise à jour du système constitue l'intégralité de la procédure."
+      },
+      {
+        "type": "callout",
+        "title": "Où regarder",
+        "text": "Paramètres (icône engrenage) → badges du moteur. Chaque outil rapporte son propre moteur actif, relu directement depuis l'environnement d'exécution plutôt que supposé, afin que le badge reflète la réalité et non un optimisme de détection de fonctionnalités."
+      },
+      {
+        "type": "h2",
+        "text": "Chrome et Microsoft Edge",
+        "icons": [
+          "chrome",
+          "edge"
+        ]
+      },
+      {
+        "type": "p",
+        "text": "Si votre navigateur utilise le recours au processeur (CPU) plutôt que l'accélération graphique (GPU), l'activation du fanion (flag) WebGPU approprié peut résoudre le problème. Suivez les étapes ci-dessous pour vérifier et configurer WebGPU dans Google Chrome ou Microsoft Edge."
+      },
+      {
+        "type": "img",
+        "src": "/blog/how-to-webgpu-chrome.png",
+        "alt": "Activation des drapeaux WebGPU dans Google Chrome et Microsoft Edge",
+        "caption": "Recherchez « WebGPU » dans chrome://flags ou edge://flags et activez le paramètre."
+      },
+      {
+        "type": "h3",
+        "text": "Étape 1 : Ouvrir la page des fonctionnalités expérimentales"
+      },
+      {
+        "type": "p",
+        "text": "Lancez Google Chrome ou Microsoft Edge sur votre ordinateur. Cliquez sur la barre d'adresse, saisissez chrome://flags dans Chrome ou edge://flags dans Microsoft Edge, puis appuyez sur Entrée pour accéder à la page des fonctionnalités expérimentales."
+      },
+      {
+        "type": "h3",
+        "text": "Étape 2 : Rechercher WebGPU"
+      },
+      {
+        "type": "p",
+        "text": "Une fois la page Experiments ouverte, repérez la zone de recherche en haut. Tapez WebGPU pour filtrer les paramètres disponibles et afficher les drapeaux relatifs à WebGPU."
+      },
+      {
+        "type": "h3",
+        "text": "Étape 3 : Activer le drapeau WebGPU"
+      },
+      {
+        "type": "p",
+        "text": "Trouvez l'option « Force enable WebGPU interop », comme illustré sur la capture d'écran. Cliquez sur le menu déroulant à côté et sélectionnez Enabled (Activé) au lieu de Default."
+      },
+      {
+        "type": "p",
+        "text": "Ce drapeau concerne principalement des configurations graphiques spécifiques, notamment celles basées sur Vulkan sous Linux. Si cette option n'est pas disponible ou ne s'applique pas à votre système, n'en déduisez pas que son activation est strictement obligatoire pour faire fonctionner WebGPU."
+      },
+      {
+        "type": "h3",
+        "text": "Étape 4 : Relancer le navigateur"
+      },
+      {
+        "type": "p",
+        "text": "Après avoir modifié le paramètre, cliquez sur le bouton Relaunch (Relancer) si le navigateur l'affiche. Cela redémarre le navigateur et applique la nouvelle configuration expérimentale. Pensez à enregistrer vos travaux en cours avant de redémarrer."
+      },
+      {
+        "type": "h3",
+        "text": "Étape 5 : Vérifier le fonctionnement de WebGPU"
+      },
+      {
+        "type": "p",
+        "text": "Après le redémarrage, rouvrez votre application WebGPU et vérifiez si l'avertissement de basculement sur le CPU a disparu. Vous pouvez également visiter chrome://gpu dans Chrome ou edge://gpu dans Edge pour examiner la configuration graphique du navigateur et identifier d'éventuels blocages matériels."
+      },
+      {
+        "type": "h3",
+        "text": "Que faire si WebGPU ne fonctionne toujours pas ?"
+      },
+      {
+        "type": "p",
+        "text": "Si WebGPU continue d'utiliser le CPU, le problème peut provenir de la compatibilité du pilote graphique, de la configuration du navigateur ou du matériel. Mettez à jour vos pilotes graphiques, assurez-vous que votre navigateur utilise bien la carte graphique dédiée appropriée et consultez les diagnostics GPU du navigateur pour identifier les erreurs."
+      },
+      {
+        "type": "callout",
+        "title": "Remarque",
+        "text": "WebGPU est activé par défaut sur de nombreux systèmes de bureau compatibles. Les drapeaux disponibles et leurs effets varient selon la version du navigateur et le système d'exploitation ; l'activation d'un drapeau ne garantit donc pas automatiquement l'accélération matérielle."
+      },
+      {
+        "type": "h2",
+        "text": "Mozilla Firefox",
+        "icons": [
+          "firefox"
+        ]
+      },
+      {
+        "type": "p",
+        "text": "Firefox prend en charge WebGPU dans ses versions modernes, activé par défaut sur les plates-formes majeures. Si votre système signale toujours un basculement sur le CPU, vous pouvez vérifier ou activer manuellement WebGPU via l'éditeur de configuration avancée de Firefox en suivant les étapes ci-dessous."
+      },
+      {
+        "type": "h3",
+        "text": "Étape 1 : Ouvrir la page de configuration"
+      },
+      {
+        "type": "p",
+        "text": "Lancez Firefox sur votre ordinateur, tapez about:config dans la barre d'adresse et appuyez sur Entrée."
+      },
+      {
+        "type": "h3",
+        "text": "Étape 2 : Accepter l'avertissement et continuer"
+      },
+      {
+        "type": "p",
+        "text": "Firefox affichera un message d'avertissement indiquant que la modification des préférences avancées peut affecter les performances et la stabilité. Cliquez sur « Accepter le risque et poursuivre » pour ouvrir l'éditeur de configuration."
+      },
+      {
+        "type": "h3",
+        "text": "Étape 3 : Rechercher les préférences WebGPU"
+      },
+      {
+        "type": "p",
+        "text": "Dans la zone de recherche en haut, tapez dom.webgpu.enabled pour localiser le paramètre principal de WebGPU."
+      },
+      {
+        "type": "h3",
+        "text": "Étape 4 : Basculer les paramètres WebGPU sur True"
+      },
+      {
+        "type": "p",
+        "text": "Double-cliquez sur dom.webgpu.enabled (ou cliquez sur le bouton bascule à droite) pour faire passer sa valeur de false à true. Si votre configuration graphique nécessite une accélération forcée (notamment sous Linux avec Vulkan), recherchez également gfx.webgpu.force-enabled et passez-le à true."
+      },
+      {
+        "type": "h3",
+        "text": "Étape 5 : Redémarrer Firefox et vérifier"
+      },
+      {
+        "type": "p",
+        "text": "Fermez complètement puis rouvrez Firefox pour appliquer les modifications. Rendez-vous sur about:support et consultez la section « Accélération graphique » pour confirmer l'état de WebGPU, ou rechargez Pixelify et examinez le badge du moteur dans les Paramètres."
+      },
+      {
+        "type": "h3",
+        "text": "Dépannage pour Firefox"
+      },
+      {
+        "type": "p",
+        "text": "Firefox requiert des pilotes Vulkan à jour sous Linux/Windows et Metal sous macOS. Si Firefox persiste à utiliser le CPU, vérifiez que vos pilotes graphiques sont mis à jour avec la dernière version du constructeur, et assurez-vous que WebRender fonctionne bien en mode accélération matérielle sur about:support."
+      },
+      {
+        "type": "h2",
+        "text": "Brave Browser",
+        "icons": [
+          "brave"
+        ]
+      },
+      {
+        "type": "p",
+        "text": "Brave est construit sur la base de Chromium, ce qui lui confère le même puissant moteur d'accélération matérielle que Chrome. Cependant, comme Brave intègre des boucliers stricts de protection de la vie privée et des réglages par défaut spécifiques, WebGPU peut parfois être restreint. Suivez ces étapes pour activer WebGPU dans Brave."
+      },
+      {
+        "type": "h3",
+        "text": "Étape 1 : Ouvrir la page des drapeaux Brave"
+      },
+      {
+        "type": "p",
+        "text": "Lancez le navigateur Brave sur votre ordinateur. Dans la barre d'adresse, tapez brave://flags et appuyez sur Entrée pour accéder à la page Experiments."
+      },
+      {
+        "type": "h3",
+        "text": "Étape 2 : Rechercher WebGPU"
+      },
+      {
+        "type": "p",
+        "text": "Dans la zone de recherche en haut de la page des fonctionnalités expérimentales, tapez WebGPU pour filtrer tous les réglages associés à WebGPU."
+      },
+      {
+        "type": "h3",
+        "text": "Étape 3 : Activer les drapeaux WebGPU"
+      },
+      {
+        "type": "p",
+        "text": "Repérez les drapeaux « Force enable WebGPU interop » et/ou « Unsafe WebGPU ». Cliquez sur le menu déroulant à côté de chaque paramètre concerné et passez-le de Default à Enabled."
+      },
+      {
+        "type": "h3",
+        "text": "Étape 4 : Vérifier la protection contre le pistage des boucliers Brave"
+      },
+      {
+        "type": "p",
+        "text": "Les boucliers Brave bloquent le pistage par empreinte numérique (fingerprinting) par défaut, ce qui peut parfois empêcher les sites web d'interroger les détails de votre carte graphique. Si Pixelify ne parvient toujours pas à initialiser le GPU, cliquez sur l'icône du lion Brave dans la barre d'adresse pour ce site et assurez-vous que la protection contre les empreintes n'est pas réglée sur « Agressif »."
+      },
+      {
+        "type": "h3",
+        "text": "Étape 5 : Relancer Brave et vérifier"
+      },
+      {
+        "type": "p",
+        "text": "Cliquez sur le bouton Relaunch en bas de la page des drapeaux pour redémarrer Brave. Une fois relancé, visitez brave://gpu pour vérifier le statut de WebGPU, ou revenez sur Pixelify et vérifiez que le statut du moteur indique bien l'accélération GPU."
+      },
+      {
+        "type": "h3",
+        "text": "Dépannage pour Brave"
+      },
+      {
+        "type": "p",
+        "text": "Si Brave continue d'utiliser le CPU, naviguez vers brave://settings/system et vérifiez que l'option « Utiliser l'accélération matérielle si disponible » est bien activée. Veillez également à ce que votre système d'exploitation attribue bien à Brave votre GPU dédié haute performance."
+      },
+      {
+        "type": "h2",
+        "text": "Safari sur macOS",
+        "icons": [
+          "safari"
+        ]
+      },
+      {
+        "type": "p",
+        "text": "Safari prend en charge WebGPU depuis les versions récentes de macOS et Safari, activé par défaut sur les puces Apple Silicon et le matériel Intel compatible. Si vous devez inspecter ou configurer WebGPU dans Safari, suivez les étapes ci-dessous."
+      },
+      {
+        "type": "h3",
+        "text": "Étape 1 : Activer le menu Développement"
+      },
+      {
+        "type": "p",
+        "text": "Ouvrez Safari sur macOS. Dans la barre de menus, cliquez sur Safari > Réglages (ou Préférences), sélectionnez l'onglet Avancé, puis cochez la case « Afficher les fonctionnalités pour les développeurs web » (ou « Afficher le menu Développement dans la barre des menus »)."
+      },
+      {
+        "type": "h3",
+        "text": "Étape 2 : Ouvrir les drapeaux de fonctionnalités (Feature Flags)"
+      },
+      {
+        "type": "p",
+        "text": "Cliquez sur le menu Développement dans la barre de menus supérieure, puis rendez-vous dans Fonctionnalités expérimentales (ou Feature Flags sur les versions récentes de Safari)."
+      },
+      {
+        "type": "h3",
+        "text": "Étape 3 : Activer WebGPU"
+      },
+      {
+        "type": "p",
+        "text": "Dans le filtre de recherche, tapez WebGPU. Localisez la ligne WebGPU et assurez-vous que la case est cochée/activée."
+      },
+      {
+        "type": "h3",
+        "text": "Étape 4 : Redémarrer Safari et vérifier"
+      },
+      {
+        "type": "p",
+        "text": "Quittez et rouvrez Safari. Ouvrez à nouveau Pixelify et vérifiez le badge de statut du moteur dans les Paramètres (icône d'engrenage) pour confirmer que l'accélération GPU est active."
+      },
+      {
+        "type": "h2",
+        "text": "Android et iOS"
+      },
+      {
+        "type": "p",
+        "text": "Sur Android, la disponibilité de WebGPU dépend à la fois de la version du navigateur et de la génération du pilote GPU de l'appareil ; les appareils haut de gamme des deux dernières années sont largement pris en charge, et la mise à jour du navigateur ainsi que du composant Webview du système résout la plupart des écarts. Sur iOS et iPadOS, la prise en charge de WebGPU est arrivée avec les versions récentes de Safari et est héritée par tous les navigateurs de la plate-forme, car ils utilisent tous le même moteur sous-jacent. Dans les deux écosystèmes, la version du système d'exploitation constitue généralement le facteur déterminant."
+      },
+      {
+        "type": "img",
+        "src": "/blog/home-mobile.jpg",
+        "alt": "Pixelify sur un téléphone montrant le traitement local avec accélération matérielle",
+        "caption": "Sur les téléphones, la disponibilité de WebGPU est généralement une question de version du système d'exploitation plutôt qu'un réglage."
+      },
+      {
+        "type": "h2",
+        "text": "Confirmer que cela a réellement fonctionné"
+      },
+      {
+        "type": "p",
+        "text": "Cette étape est celle que les gens sautent, et c'est pourtant celle qui compte. Un fanion activé ne garantit pas qu'un outil puisse l'utiliser : les pilotes peuvent faire de fausses déclarations, le matériel peut manquer de fonctionnalités requises au sein d'une génération, et le navigateur peut basculer silencieusement sur le CPU. La seule confirmation fiable est l'outil lui-même indiquant quel moteur il exécute. Rouvrez le panneau des paramètres après avoir tout activé et relisez le badge. Accélération GPU : c'est terminé. Recours au CPU : une étape ci-dessus n'a pas fonctionné, et la page de diagnostic GPU du navigateur nommera la fonctionnalité défaillante."
+      },
+      {
+        "type": "h2",
+        "text": "À quoi s'attendre après l'activation"
+      },
+      {
+        "type": "p",
+        "text": "Attentes réalistes : les petites images individuelles qui prenaient cinq à dix secondes sur le parcours CPU tombent couramment à une ou deux secondes. Les grandes images et les traitements par lots s'améliorent dans des proportions similaires, avec l'avantage supplémentaire que le parcours GPU gère la thermique de façon plus douce sur les ordinateurs portables ; la puce graphique est plus efficace pour les mathématiques soutenues que le ventilateur du CPU ne l'est pour évacuer la chaleur du processeur. La qualité ne change pas entre les parcours ; le même réseau s'exécute dans les deux cas. Seule l'attente change, et elle change considérablement."
+      },
+      {
+        "type": "h2",
+        "text": "Deux autres choses à savoir"
+      },
+      {
+        "type": "p",
+        "text": "La première est que WebGPU est une plate-forme partagée, et non une fonctionnalité premium propre à cet outil. Tout autre projet d'IA locale que vous installez sur la même machine commencera à utiliser le même parcours accéléré que vous venez de débloquer, sans qu'aucun d'entre eux ne vous demande de configurer quoi que ce soit. Cette interopérabilité est exactement ce qui fait ressentir l'IA basée sur navigateur comme une véritable plate-forme plutôt que comme un ensemble d'applications isolées."
+      },
+      {
+        "type": "p",
+        "text": "La seconde concerne la façon de vérifier les progrès pendant que vous expérimentez. Si vous souhaitez confirmer que l'accélération est réelle sur votre propre machine plutôt que de croire les chiffres d'un article de blog, traitez une seule image une fois avec le badge sur GPU et une fois avec le badge sur CPU, puis mesurez l'étape de traitement avec le profiler de votre système. La plupart des utilisateurs constatent que la différence est suffisamment nette pour être évidente dans le résultat ; ceux qui veulent des chiffres exacts peuvent les obtenir en trente secondes, ce qui transforme la lecture d'un blog en une mesure directe."
+      },
+      {
+        "type": "p",
+        "text": "Une dernière note sur la raison pour laquelle cela compte au-delà de la vitesse. WebGPU n'est pas un accélérateur propriétaire lié à un seul service ; c'est un standard ouvert multi-fournisseurs que chaque navigateur et fabricant de matériel implémente. L'activer une fois met à niveau tous les outils d'IA locale que vous utilisez, aujourd'hui et à l'avenir, sans qu'aucun d'entre eux ne vous demande d'installer quoi que ce soit. Deux minutes, aucun téléchargement, aucun compte, et un réglage qui fait passer l'IA sur navigateur de « pratique » à « véritablement rapide »."
+      }
+    ]
+  }
 ];

@@ -20,6 +20,7 @@ export async function runPass(
   modelKey: ModelKey,
   onProgress: (pct: number, text: string) => void,
   onSessionUpdated?: (newSession: LiteRtSession) => void,
+  checkCancelled?: () => void,
 ): Promise<Float32Array> {
   const m = MODELS[modelKey];
   const tileSize = m.tileSize;
@@ -51,8 +52,10 @@ export async function runPass(
     }
   });
   await yieldToBrowser();
+  checkCancelled?.();
   let lastReportedPct = -1;
   for (let ty = 0; ty < numVTiles; ty++) for (let tx = 0; tx < numHTiles; tx++) {
+    checkCancelled?.();
     done++;
     const pct = passIdx * 100 / totalPasses + done / totalTiles * 100 / totalPasses;
     const roundedPct = Math.round(pct);
@@ -111,6 +114,7 @@ export async function runPass(
       }
     }
     await yieldToBrowser();
+    checkCancelled?.();
   }
   return outData;
 }

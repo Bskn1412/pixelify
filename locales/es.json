@@ -27,7 +27,7 @@
     "home": "Inicio",
     "bgRemove": "Eliminador de fondo",
     "upscaler": "Escalador IA",
-    "blogs": "Blogs",
+    "blog": "Blog",
     "settingsTitle": "Ajustes y preferencias",
     "processingEngines": "Motores de procesamiento",
     "webgpuSupport": "Compatibilidad con WebGPU",
@@ -269,8 +269,8 @@
     "downloadCutout": "Descargar PNG",
     "tabCutout": "Recorte",
     "tabBackdrop": "Fondo",
-    "tabText": "Texto",
-    "tabRefine": "Refinar"
+    "tabText": "Diseño",
+    "tabRefine": "Recortar"
   },
   "bgSections": {
     "marquee": [
@@ -382,7 +382,7 @@
     "bgRemover": "Eliminador de fondo",
     "products": "Productos y funciones",
     "docs": "Documentación",
-    "blogs": "Blogs",
+    "blog": "Blog",
     "faqs": "Preguntas frecuentes",
     "about": "Sobre Pixelify",
     "contact": "Contacto",
@@ -390,7 +390,7 @@
     "terms": "Términos del servicio",
     "rights": "© 2026 Pixelify Inc. Todos los derechos reservados."
   },
-  "blogs": {
+  "blog": {
     "title": "Blog y guías de IA",
     "subtitle": "Artículos sobre IA local, privacidad, eliminación de fondos, escalado y WebGPU.",
     "searchPlaceholder": "Buscar artículos por título, etiqueta o tema…",

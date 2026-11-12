@@ -27,7 +27,7 @@
     "home": "होम",
     "bgRemove": "बैकग्राउंड हटाएं",
     "upscaler": "AI अपस्केलर",
-    "blogs": "ब्लॉग",
+    "blog": "ब्लॉग",
     "settingsTitle": "सेटिंग्स और प्राथमिकताएं",
     "processingEngines": "प्रोसेसिंग इंजन",
     "webgpuSupport": "WebGPU सपोर्ट",
@@ -269,8 +269,8 @@
     "downloadCutout": "PNG डाउनलोड करें",
     "tabCutout": "कटआउट",
     "tabBackdrop": "बैकड्रॉप",
-    "tabText": "टेक्स्ट",
-    "tabRefine": "सुधारें"
+    "tabText": "टेक्स्टडिज़ाइन",
+    "tabRefine": "क्रॉप करें"
   },
   "bgSections": {
     "marquee": [
@@ -382,7 +382,7 @@
     "bgRemover": "बैकग्राउंड रिमूवर",
     "products": "उत्पाद और सुविधाएं",
     "docs": "डॉक्यूमेंटेशन",
-    "blogs": "ब्लॉग",
+    "blog": "ब्लॉग",
     "faqs": "FAQ",
     "about": "Pixelify के बारे में",
     "contact": "संपर्क करें",
@@ -390,7 +390,7 @@
     "terms": "सेवा की शर्तें",
     "rights": "© 2026 Pixelify Inc. सभी अधिकार सुरक्षित हैं।"
   },
-  "blogs": {
+  "blog": {
     "title": "ब्लॉग और AI गाइड",
     "subtitle": "लोकल AI, गोपनीयता, बैकग्राउंड रिमूवल, अपस्केलिंग और WebGPU पर लेख।",
     "searchPlaceholder": "शीर्षक या टैग द्वारा खोजें…",

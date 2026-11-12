@@ -116,7 +116,7 @@ export default function PixelifyHero({
       const entrance = gsap.from(
         [
           ...root.querySelectorAll<HTMLElement>(
-            '.hero-badge-wrap, .sub, .hero-actions, .hero-scroll-wrap'
+            '.sub, .hero-actions, .hero-scroll-wrap'
           ),
         ],
         {
@@ -176,7 +176,26 @@ export default function PixelifyHero({
 
   return (
     <>
-
+      {/* =====================================================
+        LEADERBOARD ANNOUNCEMENT BADGE & LINK (TOP OF HERO)
+        ===================================================== */}
+      <div className="w-full flex items-center justify-center pt-4 pb-2.5 sm:pt-5 sm:pb-3.5 relative z-20">
+        <div className="hero-badge-wrap flex items-center justify-center gap-3">
+          <MetalBadge label="New" />
+          <Link
+            href="/leaderboard/"
+            className="hero-leaderboard-link group inline-flex items-center gap-1.5 text-white/90 transition-colors"
+            aria-label="Check out the community leaderboard"
+          >
+            <span>Checkout Leaderboard</span>
+            <ArrowUpRight
+              size={16}
+              aria-hidden="true"
+              className="hero-leaderboard-arrow"
+            />
+          </Link>
+        </div>
+      </div>
 
       <section
         className="hero pixelify-hero"
@@ -200,22 +219,6 @@ export default function PixelifyHero({
         <div className="hero-inner">
 
           <div className="hero-top-group">
-            <div className="hero-badge-wrap mb-4 sm:mb-6 flex items-center justify-center gap-3">
-              <MetalBadge label="New" />
-              <Link
-                href="/leaderboard/"
-                className="hero-leaderboard-link group inline-flex items-center gap-1.5 text-white/90 transition-colors"
-                aria-label="Check out the community leaderboard"
-              >
-                <span>Checkout Leaderboard</span>
-                <ArrowUpRight
-                  size={16}
-                  aria-hidden="true"
-                  className="hero-leaderboard-arrow"
-                />
-              </Link>
-            </div>
-
             {/* =====================================================
               STAIRCASE HEADLINE
               ===================================================== */}

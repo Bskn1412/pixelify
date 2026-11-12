@@ -4,20 +4,19 @@ import AppProvider from '@/components/AppProvider';
 import VisitorTracker from '@/components/VisitorTracker';
 import LeaderboardRewardFeedback from '@/components/LeaderboardRewardFeedback';
 import VisitorNameDialog from '@/components/VisitorNameDialog';
+import TopProgressBar from '@/components/TopProgressBar';
 import { Analytics } from '@vercel/analytics/next';
 
 import '@/styles/index.css';
 import '@/styles/app.css';
 import '@/styles/upscaler-sections.css';
 import '@/styles/not-found.css';
-import '@/styles/model-loader.css';
-import '@/styles/solving-orb.css';
-import '@/styles/upscaling-loader.css';
 import '@/styles/bgremove-sections.css';
 import '@/styles/home.css';
 
 import '@/styles/docs.css';
 import '@/styles/leaderboard.css';
+import '@/styles/generation-overlay.css';
 
 const SITE_URL = 'https://pixelify.me';
 
@@ -176,7 +175,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <ul>
               <li><a href="/upscaler/">AI Image Upscaler Studio</a></li>
               <li><a href="/bg_remove/">AI Background Remover</a></li>
-              <li><a href="/blogs/">Articles &amp; AI Technology Guides</a></li>
+              <li><a href="/blog/">Articles &amp; AI Technology Guides</a></li>
               <li><a href="/leaderboard/">Community Leaderboard</a></li>
               <li><a href="/about/">About Pixelify</a></li>
               <li><a href="/products/">Products &amp; Features</a></li>
@@ -187,6 +186,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </noscript>
 
+        <TopProgressBar />
         <AppProvider>{children}</AppProvider>
         <VisitorTracker />
         <LeaderboardRewardFeedback />

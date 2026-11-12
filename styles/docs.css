@@ -108,7 +108,7 @@
 .px-header-brand {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 10px;
   text-decoration: none;
   cursor: pointer;
   transition: opacity 0.2s ease;
@@ -132,7 +132,7 @@
   box-shadow: 0 0 10px rgba(124, 92, 252, 0.2);
   transition: all 0.2s ease;
   line-height: 1.25;
-  margin-left: -2px;
+  margin-left: 3px;
 }
 
 .px-header-brand:hover .px-header-docs-word {
@@ -2082,7 +2082,28 @@
   }
 
   .px-header {
-    padding: 0 16px;
+    padding: 0 14px;
+    gap: 10px;
+  }
+
+  .px-header-left {
+    gap: 10px;
+  }
+
+  .px-header-right {
+    gap: 8px;
+  }
+
+  .px-header-theme-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .px-header-lang-btn {
+    height: 36px;
+    padding: 0 11px;
+    gap: 6px;
+    font-size: 12px;
   }
 
   .px-content {
@@ -2145,13 +2166,46 @@
 }
 
 @media(max-width:650px) {
+  .px-header {
+    padding: 0 10px;
+    height: 56px;
+    gap: 6px;
+  }
+
+  .px-header-left {
+    gap: 6px;
+    flex: 0 1 auto;
+  }
+
+  .px-header-brand {
+    gap: 6px;
+  }
+
+  .px-header-docs-word {
+    font-size: 10px;
+    padding: 2px 5.5px;
+    letter-spacing: 0.5px;
+    margin-left: 1px;
+  }
+
+  .px-header-menu-btn {
+    width: 32px;
+    height: 32px;
+    padding: 4px;
+  }
+
+  .px-header-center {
+    flex: 0 0 auto;
+    margin: 0;
+  }
+
   .px-header-search-placeholder {
     display: none;
   }
 
   .px-header-search-btn {
-    width: 38px;
-    height: 38px;
+    width: 32px;
+    height: 32px;
     padding: 0;
     justify-content: center;
     border-radius: 50%;
@@ -2159,6 +2213,35 @@
 
   .px-header-search-kbd {
     display: none;
+  }
+
+  .px-header-right {
+    gap: 5px;
+    flex: 0 1 auto;
+  }
+
+  .px-header-theme-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .px-header-lang-btn {
+    height: 32px;
+    padding: 0 8px;
+    gap: 4px;
+    font-size: 11px;
+  }
+
+  .px-header-lang-dropdown {
+    width: 175px;
+    max-width: calc(100vw - 20px);
+    right: 0;
+    top: calc(100% + 6px);
+  }
+
+  .px-header-lang-item {
+    padding: 6px 8px;
+    font-size: 12px;
   }
 
   .px-hero {

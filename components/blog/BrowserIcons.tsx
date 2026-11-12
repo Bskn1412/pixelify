@@ -1,17 +1,17 @@
 import React from 'react';
 
 export const BROWSER_IMAGES: Record<string, string> = {
-  chrome: '/blogs/chrome.webp',
-  'google-chrome': '/blogs/chrome.webp',
-  edge: '/blogs/microsoft-edge.webp',
-  msedge: '/blogs/microsoft-edge.webp',
-  'microsoft-edge': '/blogs/microsoft-edge.webp',
-  firefox: '/blogs/firefox.png',
-  'mozilla-firefox': '/blogs/firefox.png',
-  brave: '/blogs/brave-browser-icon.webp',
-  'brave-browser': '/blogs/brave-browser-icon.webp',
-  safari: '/blogs/safari.png',
-  'apple-safari': '/blogs/safari.png',
+  chrome: '/blog/chrome.webp',
+  'google-chrome': '/blog/chrome.webp',
+  edge: '/blog/microsoft-edge.webp',
+  msedge: '/blog/microsoft-edge.webp',
+  'microsoft-edge': '/blog/microsoft-edge.webp',
+  firefox: '/blog/firefox.png',
+  'mozilla-firefox': '/blog/firefox.png',
+  brave: '/blog/brave-browser-icon.webp',
+  'brave-browser': '/blog/brave-browser-icon.webp',
+  safari: '/blog/safari.png',
+  'apple-safari': '/blog/safari.png',
 };
 
 interface BrowserIconProps {
@@ -43,7 +43,7 @@ export function BrowserIcon({
 }
 
 /**
- * Automatically renders a heading title with browser images from public/blogs/.
+ * Automatically renders a heading title with browser images from public/blog/.
  * Places the Edge icon specifically to the left of "Microsoft Edge" (or "Edge"),
  * and the Chrome icon to the left of "Chrome".
  */

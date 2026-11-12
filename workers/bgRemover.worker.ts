@@ -224,7 +224,9 @@ const GPU_PROBE_TIMEOUT_MS = 3500;
 const ORT_VERSION = '1.26.0-dev.20260416-b7804b056c';
 const ORT_BASE_CDN = `https://cdn.jsdelivr.net/npm/onnxruntime-web@${ORT_VERSION}/dist/`;
 const ORT_BUNDLE_URL = `${ORT_BASE_CDN}ort.webgpu.bundle.min.mjs`;
-const DEFAULT_DIABLO_MODEL_URL = '/models/Diablo.onnx';
+const HF_DEFAULT_DIABLO_URL = 'https://huggingface.co/Joker5800/pixelify/resolve/main/Diablo.onnx';
+const LOCAL_DIABLO_MODEL_URL = '/models/Diablo.onnx';
+const DEFAULT_DIABLO_MODEL_URL = HF_DEFAULT_DIABLO_URL;
 const DIABLO_MODEL_CACHE = 'onnx-models';
 const DIABLO_INPUT_SIZE = 1024;
 const IMAGENET_MEAN = [0.485, 0.456, 0.406];
@@ -627,9 +629,24 @@ async function getDiabloModelSource(): Promise<DiabloModelSource> {
       if (!cached && cacheUrl !== DEFAULT_DIABLO_MODEL_URL) {
         cached = await cache.match(DEFAULT_DIABLO_MODEL_URL);
       }
+      if (!cached && cacheUrl !== HF_DEFAULT_DIABLO_URL) {
+        cached = await cache.match(HF_DEFAULT_DIABLO_URL);
+      }
+      if (!cached && cacheUrl !== LOCAL_DIABLO_MODEL_URL) {
+        cached = await cache.match(LOCAL_DIABLO_MODEL_URL);
+      }
+      if (!cached) {
+        const keys = await cache.keys();
+        for (const req of keys) {
+          if (req.url.toLowerCase().includes('diablo.onnx') || req.url.toLowerCase().includes('diablo')) {
+            cached = await cache.match(req);
+            break;
+          }
+        }
+      }
       if (cached) {
         const ab = await cached.arrayBuffer();
-        if (ab && ab.byteLength > 0) {
+        if (ab && ab.byteLength > 100_000) {
           const isHf = cacheUrl.includes('huggingface.co');
           console.log(`[Diablo Model] 📦 Cache Hit! Loaded Diablo model weights from browser cache: ${(ab.byteLength / (1024 * 1024)).toFixed(2)} MB (${isHf ? 'Hugging Face' : 'public/models'})`);
           return {
@@ -643,54 +660,76 @@ async function getDiabloModelSource(): Promise<DiabloModelSource> {
   const isHf = targetUrl.includes('huggingface.co');
   console.log(`[Diablo Model] 🌐 Cache Miss. Downloading Diablo weights from: ${targetUrl} (${isHf ? 'Hugging Face' : 'public/models'})`);
 
+  const fallbackUrl = isHf ? LOCAL_DIABLO_MODEL_URL : HF_DEFAULT_DIABLO_URL;
   let response: Response;
   try {
     const res = await fetch(targetUrl);
     if (res.ok) {
       response = res;
-    } else if (targetUrl !== DEFAULT_DIABLO_MODEL_URL) {
-      console.warn(`[Diablo Model] ⚠️ Primary URL ${targetUrl} returned HTTP ${res.status}. Falling back to local ${DEFAULT_DIABLO_MODEL_URL}...`);
-      response = await fetch(DEFAULT_DIABLO_MODEL_URL);
+    } else if (targetUrl !== fallbackUrl) {
+      console.warn(`[Diablo Model] ⚠️ Primary URL ${targetUrl} returned HTTP ${res.status}. Falling back to ${fallbackUrl}...`);
+      response = await fetch(fallbackUrl);
     } else {
-      throw new Error(`Could not fetch Diablo weights (HTTP ${res.status}).`);
+      throw new Error(`Could not fetch Diablo weights from ${targetUrl} (HTTP ${res.status}).`);
     }
   } catch (err: any) {
-    if (targetUrl !== DEFAULT_DIABLO_MODEL_URL) {
-      console.warn(`[Diablo Model] ⚠️ Primary URL ${targetUrl} failed (${err?.message}). Falling back to local ${DEFAULT_DIABLO_MODEL_URL}...`);
-      response = await fetch(DEFAULT_DIABLO_MODEL_URL);
+    if (targetUrl !== fallbackUrl) {
+      console.warn(`[Diablo Model] ⚠️ Primary URL ${targetUrl} failed (${err?.message}). Falling back to ${fallbackUrl}...`);
+      try {
+        response = await fetch(fallbackUrl);
+      } catch (fallbackErr: any) {
+        throw new Error(`Could not fetch Diablo weights (${err?.message || fallbackErr?.message}).`);
+      }
     } else {
       throw err;
     }
   }
   if (!response.ok) throw new Error(`Could not fetch Diablo weights (HTTP ${response.status}).`);
 
-  const total = Number(response.headers.get('content-length') || 0);
-  if (total > 0) {
-    console.log(`[Diablo Model] 📊 Total Diablo weights size: ${(total / (1024 * 1024)).toFixed(2)} MB`);
-  }
+  const DEFAULT_DIABLO_SIZE = 200 * 1024 * 1024;
+  const total = Number(response.headers.get('content-length') || 0) || DEFAULT_DIABLO_SIZE;
+  console.log(`[Diablo Model] 📊 Total Diablo weights size: ${(total / (1024 * 1024)).toFixed(2)} MB`);
+
+  post({
+    type: 'PROGRESS',
+    stage: 'model-download',
+    progress: 0,
+    loaded: 0,
+    total,
+    isWeights: true,
+    model: 'diablo',
+    file: 'Diablo.onnx',
+  });
 
   let downloadedBlob: Blob;
   if (response.body && typeof response.body.getReader === 'function') {
     const reader = response.body.getReader();
     const chunks: Uint8Array[] = [];
     let received = 0;
-    let lastReported = -1;
+    let lastReportedPct = -1;
     for (; ;) {
       const { done, value } = await reader.read();
       if (done) break;
-      chunks.push(value);
-      received += value.byteLength;
-      if (total > 0) {
+      if (value) {
+        chunks.push(value);
+        received += value.byteLength;
         const pct = Math.max(0, Math.min(100, Math.round((received / total) * 100)));
-        if (pct !== lastReported) {
+        if (pct !== lastReportedPct) {
           if (pct % 10 === 0 || pct === 100) {
             console.log(`[Diablo Model] ⏳ Downloading Diablo weights: ${pct}% (${(received / (1024 * 1024)).toFixed(2)} MB / ${(total / (1024 * 1024)).toFixed(2)} MB)`);
           }
-          lastReported = pct;
-          post({ type: 'PROGRESS', stage: 'model-download', progress: pct, isWeights: true, model: 'diablo', file: 'Diablo.onnx' });
+          lastReportedPct = pct;
+          post({
+            type: 'PROGRESS',
+            stage: 'model-download',
+            progress: pct,
+            loaded: received,
+            total,
+            isWeights: true,
+            model: 'diablo',
+            file: 'Diablo.onnx',
+          });
         }
-      } else {
-        post({ type: 'STATUS', stage: 'downloading-diablo', loaded: received, model: 'diablo' });
       }
     }
     downloadedBlob = new Blob(chunks as any, { type: 'application/octet-stream' });
@@ -704,18 +743,30 @@ async function getDiabloModelSource(): Promise<DiabloModelSource> {
 
   console.log(`[Diablo Model] ✅ Diablo weights download completed: ${(downloadedBlob.size / (1024 * 1024)).toFixed(2)} MB`);
 
+  post({
+    type: 'PROGRESS',
+    stage: 'model-download',
+    progress: 100,
+    loaded: downloadedBlob.size,
+    total: downloadedBlob.size,
+    isWeights: true,
+    model: 'diablo',
+    file: 'Diablo.onnx',
+  });
+
   if (typeof caches !== 'undefined') {
     try {
       const cache = await caches.open(DIABLO_MODEL_CACHE);
-      await cache.put(cacheUrl, new Response(downloadedBlob.slice(0), {
-        status: 200,
-        headers: { 'content-type': 'application/octet-stream', 'content-length': String(downloadedBlob.size) },
-      }));
+      const headers = { 'content-type': 'application/octet-stream', 'content-length': String(downloadedBlob.size) };
+      await cache.put(cacheUrl, new Response(downloadedBlob.slice(0), { status: 200, headers }));
       if (cacheUrl !== DEFAULT_DIABLO_MODEL_URL) {
-        await cache.put(DEFAULT_DIABLO_MODEL_URL, new Response(downloadedBlob.slice(0), {
-          status: 200,
-          headers: { 'content-type': 'application/octet-stream', 'content-length': String(downloadedBlob.size) },
-        }));
+        await cache.put(DEFAULT_DIABLO_MODEL_URL, new Response(downloadedBlob.slice(0), { status: 200, headers }));
+      }
+      if (cacheUrl !== HF_DEFAULT_DIABLO_URL) {
+        await cache.put(HF_DEFAULT_DIABLO_URL, new Response(downloadedBlob.slice(0), { status: 200, headers }));
+      }
+      if (cacheUrl !== LOCAL_DIABLO_MODEL_URL) {
+        await cache.put(LOCAL_DIABLO_MODEL_URL, new Response(downloadedBlob.slice(0), { status: 200, headers }));
       }
       console.log(`[Diablo Model] 💾 Successfully saved Diablo weights into Cache API ("${DIABLO_MODEL_CACHE}")`);
     } catch { /* storage full or blocked - cache is best-effort */ }

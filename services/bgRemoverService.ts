@@ -205,8 +205,16 @@ class BGRemoverService {
           if (msg.engine && (msg.engine === 'webgpu' || msg.engine === 'wasm')) {
             this.state.engine = msg.engine;
             this.notifyEngineSubscribers();
-            this.notifyStateSubscribers();
           }
+          this.state.isReady = true;
+          this.state.isLoading = false;
+          this.state.progress = 100;
+          this.state.phase = 'ready';
+          if (msg.model === 'diablo' || msg.model === 'chopper') {
+            this.state.model = msg.model;
+          }
+          this.notifyStateSubscribers();
+
           const entry = this.jobResolvers.get(msg.id);
           if (entry) {
             this.jobResolvers.delete(msg.id);
@@ -392,6 +400,10 @@ class BGRemoverService {
     model: BgModelKey = "chopper"
   ): Promise<{ blob: Blob; elapsedMs: number }> {
     console.log(`[Pixelify BG Service] 📤 Requesting removeBackground for job: ${id}, model: ${model}, url: ${url?.slice(0, 50)}...`);
+    if (this.state.model !== model) {
+      this.state.model = model;
+      this.notifyStateSubscribers();
+    }
     if (model === 'diablo') {
       console.log(`[Diablo Model] 📤 BGRemoverService: Dispatched removeBackground with model="diablo" to worker (Job ID: "${id}")`);
     }

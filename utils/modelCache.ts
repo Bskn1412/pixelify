@@ -41,7 +41,8 @@ export async function isDiabloModelCached(): Promise<boolean> {
   if (typeof window === 'undefined' || typeof caches === 'undefined') return false;
   try {
     const cache = await caches.open('onnx-models');
-    const localMatch = (await cache.match('/models/Diablo.onnx')) ||
+    const localMatch = (await cache.match('https://huggingface.co/Joker5800/pixelify/resolve/main/Diablo.onnx')) ||
+      (await cache.match('/models/Diablo.onnx')) ||
       (await cache.match(new URL('/models/Diablo.onnx', window.location.origin).toString()));
     if (localMatch) return true;
 

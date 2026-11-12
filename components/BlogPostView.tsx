@@ -1,6 +1,6 @@
 'use client';
 
-import BlogPost from './blogs/BlogPost';
+import BlogPost from './blog/BlogPost';
 import { useApp } from './AppProvider';
 
 interface BlogPostViewProps {

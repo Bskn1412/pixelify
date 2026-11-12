@@ -167,7 +167,7 @@ export default function AboutPage({ onTabChange }: Props) {
         <P>
           You can also start with the <a href="/products">products overview</a>, read the
           <a href="/privacy"> Privacy Policy</a> and <a href="/terms"> Terms of Service</a>, or jump
-          straight into the <a href="/blogs">blog</a>.
+          straight into the <a href="/blog">blog</a>.
         </P>
       </Section>
     </PageShell>

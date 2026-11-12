@@ -68,7 +68,7 @@ export default function MyActivityPage() {
       <nav className="activity-nav" aria-label="Activity navigation"><span className="activity-page-label">Private dashboard</span><Link href="/leaderboard/" className="activity-back"><ArrowLeft size={15} /> Public leaderboard</Link></nav>
       <header className="activity-hero">
         <div className="activity-avatar">{displayName.slice(0, 1).toUpperCase()}</div>
-        <div className="activity-hero-copy"><p className="activity-eyebrow"><Sparkles size={14} /> Personal dashboard</p><h1>My Activity<span>.</span></h1><p>Every image improved, every point earned. Your Pixelify journey in one place.</p></div>
+        <div className="activity-hero-copy"><p className="activity-eyebrow"><Trophy size={14} /> Personal dashboard</p><h1>My Activity<span>.</span></h1><p>Every image improved, every point earned. Your Pixelify journey in one place.</p></div>
         <div className="activity-hero-meta"><span>{displayName}</span><span>{visitorId ? `${visitorId.slice(0, 8)}…${visitorId.slice(-4)}` : 'Anonymous profile'}</span><b>{data?.position ? `Rank #${data.position.rank}` : 'Unranked'}</b></div>
       </header>
 

@@ -75,25 +75,25 @@ export default function MobileSidebar({
 
     if (!pathname) return;
 
-    if (pathname.startsWith('/blogs')) {
-      const rawSegments = pathname.replace(/^\/blogs\/?/, '').split('/').filter(Boolean);
+    if (pathname.startsWith('/blog')) {
+      const rawSegments = pathname.replace(/^\/blog\/?/, '').split('/').filter(Boolean);
       if (rawSegments.length === 0) {
-        router.push(newLang === 'en' ? '/blogs/' : `/blogs/${newLang}/`);
+        router.push(newLang === 'en' ? '/blog/' : `/blog/${newLang}/`);
         return;
       }
       if (rawSegments.length === 1) {
         const seg = rawSegments[0];
         const isLangIndex = SITE_LANGUAGES.some((l) => l.code === seg);
         if (isLangIndex) {
-          router.push(newLang === 'en' ? '/blogs/' : `/blogs/${newLang}/`);
+          router.push(newLang === 'en' ? '/blog/' : `/blog/${newLang}/`);
         } else {
-          router.push(newLang === 'en' ? `/blogs/${seg}/` : `/blogs/${newLang}/${seg}/`);
+          router.push(newLang === 'en' ? `/blog/${seg}/` : `/blog/${newLang}/${seg}/`);
         }
         return;
       }
       if (rawSegments.length >= 2) {
         const slug = rawSegments[1];
-        router.push(newLang === 'en' ? `/blogs/${slug}/` : `/blogs/${newLang}/${slug}/`);
+        router.push(newLang === 'en' ? `/blog/${slug}/` : `/blog/${newLang}/${slug}/`);
         return;
       }
     }
@@ -314,7 +314,7 @@ export default function MobileSidebar({
                 <span>{isClearingModelCache ? t.nav.clearing : t.nav.clearModels}</span>
               </button>
               <Link
-                href={"/blogs/enable_webgpu_guide_b5c9e8"}
+                href={"/blog/enable_webgpu_guide_b5c9e8"}
                 onClick={onClose}
                 className="flex w-full items-center justify-center gap-2 rounded-xl border border-violet-400/20 bg-violet-400/[0.07] px-3 py-2.5 text-[11px] font-medium text-violet-200 transition-colors hover:bg-violet-400/[0.14] hover:text-violet-100 active:scale-[0.98]"
                 title={t.nav.learnWebgpu}

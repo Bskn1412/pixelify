@@ -27,7 +27,7 @@
     "home": "ホーム",
     "bgRemove": "背景透過・切り抜き",
     "upscaler": "AI 超解像拡大",
-    "blogs": "ブログ",
+    "blog": "ブログ",
     "settingsTitle": "設定と環境設定",
     "processingEngines": "処理エンジン",
     "webgpuSupport": "WebGPU サポート状況",
@@ -269,8 +269,8 @@
     "downloadCutout": "透過 PNG を保存",
     "tabCutout": "切り抜き",
     "tabBackdrop": "背景設定",
-    "tabText": "文字入力",
-    "tabRefine": "微調整"
+    "tabText": "デザイン",
+    "tabRefine": "トリミング"
   },
   "bgSections": {
     "marquee": [
@@ -382,7 +382,7 @@
     "bgRemover": "背景透過・切り抜き",
     "products": "全機能一覧",
     "docs": "ドキュメント",
-    "blogs": "技術ブログ",
+    "blog": "技術ブログ",
     "faqs": "よくある質問",
     "about": "Pixelify について",
     "contact": "お問い合わせ",
@@ -390,7 +390,7 @@
     "terms": "利用規約",
     "rights": "© 2026 Pixelify Inc. 無断転載を禁じます。"
   },
-  "blogs": {
+  "blog": {
     "title": "ブログ＆AI ガイド",
     "subtitle": "ローカル AI、プライバシー、背景切り抜き、超解像、WebGPU に関する最新技術情報。",
     "searchPlaceholder": "タイトルやキーワードで検索…",

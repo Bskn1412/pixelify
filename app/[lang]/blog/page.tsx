@@ -18,7 +18,7 @@ export async function generateMetadata({
     title: `${info.nativeLabel} Blog & AI Guides | Pixelify`,
     description:
       'In-depth articles about local AI, privacy, background removal, upscaling, WebGPU and how the site runs image processing on-device: no cloud uploads or cross-site tracking.',
-    alternates: { canonical: `/${lang}/blogs/` },
+    alternates: { canonical: `/${lang}/blog/` },
   };
 }
 

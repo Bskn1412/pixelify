@@ -200,7 +200,8 @@
 .lb-player-list { position: relative; z-index: 1; display: grid; gap: 8px; }
 .lb-player-beam { position: relative; z-index: 1; overflow: visible !important; }
 .lb-player-beam:hover,
-.lb-player-beam:focus-within { z-index: 20; }
+.lb-player-beam:focus-within,
+.lb-player-beam[data-open='true'] { z-index: 50 !important; }
 .lb-player-beam-content { position: relative; overflow: visible; }
 .lb-player {
   position: relative;
@@ -213,19 +214,21 @@
   padding: 8px 22px 8px 12px;
   border: 1px solid var(--hairline-soft);
   border-radius: 12px;
-  background: var(--canvas);
+  background: #181818;
   transition: border-color 300ms cubic-bezier(.22, 1, .36, 1), background-color 300ms cubic-bezier(.22, 1, .36, 1);
 }
 .lb-player:hover,
-.lb-player:focus-within { z-index: 2; border-color: #585858; background: #111; }
+.lb-player:focus-within,
+.lb-player[data-open='true'] { z-index: 50 !important; border-color: #585858; background: #222; }
 .lb-player-beam .lb-player,
-.lb-player-beam .lb-player:hover { z-index: auto; }
+.lb-player-beam .lb-player:hover,
+.lb-player-beam .lb-player[data-open='true'] { z-index: auto !important; }
 .lb-player-rank { display: grid; place-items: center; color: var(--ink-muted); font: 600 16px 'Space Mono', monospace; }
 .lb-player-rank img { width: 46px; height: auto; object-fit: contain; filter: saturate(.78); }
 .lb-profile { position: relative; z-index: 2; min-width: 0; }
 .lb-profile-trigger { display: flex; width: 100%; min-width: 0; align-items: center; gap: 12px; padding: 0; border: 0; background: transparent; color: inherit; text-align: left; cursor: pointer; }
 .lb-profile-trigger:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 3px; border-radius: 10px; }
-.lb-avatar { display: grid; width: 40px; height: 40px; flex: 0 0 40px; place-items: center; overflow: hidden; border: 1px solid #ffffff20; border-radius: 50%; background: transparent; color: #999; font-size: 14px; font-weight: 600; }
+.lb-avatar { display: grid; width: 40px; height: 40px; flex: 0 0 40px; place-items: center; overflow: hidden; border: 1px solid #ffffff20; border-radius: 50%; background: var(--surface-2); color: #ddd; font-size: 14px; font-weight: 600; }
 .lb-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .lb-avatar > svg { width: 55%; height: 55%; }
 .lb-player-name { min-width: 0; }
@@ -233,15 +236,15 @@
 .lb-player-name small { display: block; margin-top: 3px; overflow: hidden; color: var(--ink-muted); text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
 .lb-profile-card {
   position: absolute;
-  z-index: 40;
+  z-index: 100;
   top: calc(100% + 10px);
   left: 0;
   width: 250px;
   padding: 14px 16px;
   border: 1px solid rgba(255, 255, 255, .18);
   border-radius: 15px;
-  background: #141414;
-  box-shadow: 0 18px 45px rgba(0, 0, 0, .55);
+  background: #181818 !important;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, .85);
   opacity: 0;
   visibility: hidden;
   transform: translateY(4px);

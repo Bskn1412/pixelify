@@ -4,6 +4,100 @@
  */
 export const POSTS_EN = [
 {
+    slug: 'upscaler_advantages_e5a8d3',
+    title: 'What AI Upscaling Unlocks: Seven Real Workflows Transformed',
+    description:
+      'From rescuing decade-old family scans to print-ready posters and crisp screenshots: practical use cases where AI upscaling earns its place, and why on-device speed makes iteration free.',
+    tags: ['Upscaler', 'Use Cases', 'Workflow'],
+    date: '2026-11-12',
+    author: 'The Pixelify Team',
+    cover: '/blog/home-samples.jpg',
+    coverAlt: 'Pixelify sample grid with sports, anime, ocean and face restoration demo images',
+    blocks: [
+      {
+        type: 'p',
+        text: 'Every image tool promises to improve your photos. Fewer deliver a change in what you can actually do, the quiet shift from "I cannot use this file" to "this file works." AI upscaling delivers that shift more often than any other single capability, because resolution limits are everywhere and they are absolute: a print needs pixels, a slide needs pixels, a large display needs pixels, and no amount of design skill conjures them at output time. Here is where the capability pays for itself.',
+      },
+      { type: 'h2', text: '1. Family archives and old scans' },
+      {
+        type: 'p',
+        text: 'A scanner captures what is on the print, at the scanner\'s resolution, and for most home archives that resolution is smaller than what modern display and print workflows demand. Upscaling bridges the gap between the archive you have and the output you want: a scanned 4×6 becomes a frameable enlargement; a small scan of a group photo becomes readable enough to identify faces across a room. The emotional weight here is real, and so is the technical fit, because photographs are exactly the content type where reconstruction priors are strongest.',
+      },
+      {
+        type: 'callout',
+        title: 'Scan once, output anywhere',
+        text: 'Scan at the flatbed\'s native resolution, keep the master file untouched, and upscale derived copies for each output need. Reconstruction is opinionated; the untouched scan is the truth you return to.',
+      },
+      { type: 'h2', text: '2. Screenshots, slides, and documentation' },
+      {
+        type: 'p',
+        text: 'Screenshots age badly. A capture that looked fine on a 1080p monitor turns to mush when it lands in a 4K slide, gets projected in a bright room, or is zoomed during a demo. Upscaling restores the legibility of UI text and crisp lines, with the documented caveat that reconstructed text is a gamble below a certain source size. For presentations, the practical rule: upscale generously for on-stage legibility, but verify critical text at 100% before shipping the deck.',
+      },
+      { type: 'h2', text: '3. Product photography without a re-shoot' },
+      {
+        type: 'p',
+        text: 'E-commerce platforms zoom. A product photo shot at 1200 pixels looks adequate in a grid and falls apart on the detail page, where buyers pinch-zoom to inspect material and stitching. The old fix was re-shooting at higher resolution, a day of studio time for what is fundamentally a resolution problem. Upscaling the existing shoot solves the actual issue at a fraction of the cost, and because the processing can run locally, unreleased product shots never have to leave the studio.',
+      },
+      {
+        type: 'img',
+        src: '/blog/upscaler-page.jpg',
+        alt: 'Pixelify upscaler comparing a blurry and sharp version of a shoe photo',
+        caption: 'Side-by-side comparison at upload: the before/after gap is the entire pitch.',
+      },
+      { type: 'h2', text: '4. Posters, prints, and physical output' },
+      {
+        type: 'p',
+        text: 'Print has an unforgiving math: DPI targets do not negotiate. An A3 poster at 300 DPI needs roughly 3500 pixels across, and a web-sized source simply cannot fill it without reconstruction. Upscaling moves images that were impossible to print into the printable range, with the practical guidance that print output deserves a close proof check; reconstruction artifacts that vanish on screen can reveal themselves under ink and magnification.',
+      },
+      { type: 'h2', text: '5. Social and content thumbnails' },
+      {
+        type: 'p',
+        text: 'Platform re-compression is a second resolution loss stacked on the first. Source images that survive one round of compression often fail the next, degrading into the artifacting that signals low-effort content. Delivering platforms a larger, cleaner master gives their encoder better information to work with, and the visible result is a thumbnail that holds its detail in a feed full of mush. It is a small edge with outsized click-through consequences.',
+      },
+      { type: 'h2', text: '6. Creative and artistic workflows' },
+      {
+        type: 'p',
+        text: 'Digital artists upscale their own work for print editions, tapestry-sized renders, and detail-page zooms. The medium fit is excellent: artwork shares photography\'s statistical regularities, and artists\' careful eye catches reconstruction drift immediately. A growing use is AI-generated imagery, which often arrives at modest resolution and benefits enormously from reconstruction trained on natural statistics, the fastest path from generated preview to finished print.',
+      },
+      { type: 'h2', text: '7. Accessibility: making the small readable' },
+      {
+        type: 'p',
+        text: 'Low vision is a resolution problem. Images that are "fine" on a phone become unreadable when zoomed, because zooming magnifies blur as readily as detail. Upscaling before zooming changes the experience: the enlarged view carries actual structure instead of enlarged mush. It is an under-discussed application, and one of the clearest cases where reconstruction is not cosmetic but functional.',
+      },
+      { type: 'h2', text: 'Why local processing multiplies every one of these' },
+      {
+        type: 'p',
+        text: 'Each workflow above improves doubly when the compute runs on your own hardware. Iteration becomes free, so people compare scales and settings instead of guessing once. Batches become practical, so a full catalog or an entire archive can be processed in one sitting. Sensitive material of every kind, from family scans to medical imagery to embargoed products, becomes processable at all. And the result never touches a server, which for the archival and professional use cases above is not a bonus feature but the precondition for doing the work.',
+      },
+      {
+        type: 'p',
+        text: 'One more consideration that rarely appears in feature lists: upscaling changes how images age. A small source viewed on a phone only reveals what the phone can show; a larger master stays ahead of every future screen, every future re-compression, every future format shift, which means the investment in the larger file pays down over years rather than being spent again at the next output step. Keeping a handful of properly upscaled derivatives (up to 4x) as the new masters costs nothing beyond a few megabytes, and they are the files that will be reused a decade from now, when the original is long gone.',
+      },
+      {
+        type: 'ul',
+        items: [
+          'Iterate freely: try two scales, compare at 100%, keep the better result.',
+          'Batch the archive: process in representative groups, spot-check, then continue.',
+          'Preserve masters: always upscale a copy, never the only file you have.',
+          'Match scale to need: 2× for display, 4× for print proofs, more only when the source deserves it.',
+        ],
+      },
+      {
+        type: 'p',
+        text: 'The pattern across all seven is the same. Resolution used to be a capture-time constraint you could only solve with better equipment at the moment of shooting. Reconstruction moves that decision to output time, where it belongs: you decide how big the image needs to be when you know what it is for. That decoupling, more than any benchmark, is why upscaling has quietly become the most-used capability in modern image tooling.',
+      },
+      {
+        type: 'h2',
+        text: 'The quiet arithmetic of binary',
+      },
+      {
+        type: 'p',
+        text: 'One final number deserves a place in the story, because it explains why the capability has spread so far so fast. A modern network that reconstructs detail is, at its core, a fixed set of weights multiplied against pixel data, a computation that depends only on the bytes you already have and not on a connection to a server that has the bytes. In algebraic terms, the upload is a net zero: it contributes nothing to the calculation. This is what makes local upscaling the rare case where the tool that asks for the least from you is also the one that is fastest, and the one where the privacy guarantee is not an apology but the design itself.',
+      },
+    ],
+  },
+
+{
     slug: 'bg_remover_advantages_f9d2a6',
     title: 'Seven Practical Wins From One-Click Background Removal',
     description:
@@ -11,7 +105,7 @@ export const POSTS_EN = [
     tags: ['Background Remover', 'Use Cases', 'Workflow'],
     date: '2026-11-11',
     author: 'The Pixelify Team',
-    cover: '/blogs/home-samples.jpg',
+    cover: '/blog/home-samples.jpg',
     coverAlt: 'Pixelify instant demos grid with sample images for one-click processing',
     blocks: [
       {
@@ -34,7 +128,7 @@ export const POSTS_EN = [
       },
       {
         type: 'img',
-        src: '/blogs/home-mobile.jpg',
+        src: '/blog/home-mobile.jpg',
         alt: 'Pixelify home page on a mobile viewport showing local processing messaging',
         caption: 'All of this runs on the phone in your hand: cutouts no longer need a desk.',
       },
@@ -92,7 +186,7 @@ export const POSTS_EN = [
     tags: ['Performance', 'WebGPU', 'Guide'],
     date: '2026-11-09',
     author: 'The Pixelify Team',
-    cover: '/blogs/home-mobile.jpg',
+    cover: '/blog/home-mobile.jpg',
     coverAlt: 'Pixelify running on a mobile phone viewport',
     blocks: [
       {
@@ -115,7 +209,7 @@ export const POSTS_EN = [
       },
       {
         type: 'img',
-        src: '/blogs/upscaler-sections.jpg',
+        src: '/blog/upscaler-sections.jpg',
         alt: 'Showcase of upscaled results with on-device performance statistics',
         caption: 'Same network, same image: the difference between devices is engineering, not magic.',
       },
@@ -176,7 +270,7 @@ export const POSTS_EN = [
     tags: ['Privacy', 'Security', 'Industry'],
     date: '2026-11-07',
     author: 'The Pixelify Team',
-    cover: '/blogs/home-hero.jpg',
+    cover: '/blog/home-hero.jpg',
     coverAlt: 'Pixelify hero page emphasizing local processing and no cloud uploads',
     blocks: [
       {
@@ -260,7 +354,7 @@ export const POSTS_EN = [
     tags: ['Privacy', 'Local AI', 'Product'],
     date: '2026-11-06',
     author: 'The Pixelify Team',
-    cover: '/blogs/story-page.jpg',
+    cover: '/blog/story-page.jpg',
     coverAlt: 'Pixelify story page showing the words PIXELIFY LOCAL AI FOR YOUR',
     blocks: [
       {
@@ -296,7 +390,7 @@ export const POSTS_EN = [
       },
       {
         type: 'img',
-        src: '/blogs/home-hero.jpg',
+        src: '/blog/home-hero.jpg',
         alt: 'Pixelify home page hero with the tagline Upscale, restore, and transform your images locally',
         caption: 'The promise on the tin: local processing, no uploads, no cloud.',
       },
@@ -359,7 +453,7 @@ export const POSTS_EN = [
   ],
   "date": "2026-11-05",
   "author": "The Pixelify Team",
-  "cover": "/blogs/settings-engine.jpg",
+  "cover": "/blog/settings-engine.jpg",
   "coverAlt": "Pixelify settings dropdown showing live engine status badges",
   "blocks": [
     {
@@ -401,7 +495,7 @@ export const POSTS_EN = [
     },
     {
       "type": "img",
-      "src": "/blogs/how-to-webgpu-chrome.png",
+      "src": "/blog/how-to-webgpu-chrome.png",
       "alt": "Enabling WebGPU flags in Google Chrome and Microsoft Edge",
       "caption": "Search for \"WebGPU\" in chrome://flags or edge://flags and enable the flag."
     },
@@ -633,7 +727,7 @@ export const POSTS_EN = [
     },
     {
       "type": "img",
-      "src": "/blogs/home-mobile.jpg",
+      "src": "/blog/home-mobile.jpg",
       "alt": "Pixelify on a phone showing local processing with hardware acceleration",
       "caption": "On phones, WebGPU availability is usually an OS-version question rather than a setting."
     },

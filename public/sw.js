@@ -6,7 +6,7 @@ const PRECACHE_ASSETS = [
   '/',
   '/upscaler/',
   '/bg_remove/',
-  '/blogs/',
+  '/blog/',
   '/about/',
   '/contact/',
   '/privacy/',

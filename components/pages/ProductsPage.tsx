@@ -152,7 +152,7 @@ export default function ProductsPage({ onTabChange }: Props) {
 
       <Section id="blog" num={4} title="Blog & Guides">
         <P>
-          The <a href="/blogs">blog</a> is where we write at length: how the models work, what
+          The <a href="/blog">blog</a> is where we write at length: how the models work, what
           super-resolution actually reconstructs versus invents, how WebGPU differs from WASM on
           this hardware, and how a site that processes images locally handles privacy. Articles are published in
           English, French, Chinese, Japanese, Hindi and Russian, with read-time estimates and

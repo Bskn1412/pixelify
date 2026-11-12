@@ -655,7 +655,9 @@ export default function BGRemoveWorkspace({
           if (isWeights || pct > 0) {
             const mapped = Math.min(50, Math.max(6, Math.round(6 + pct * 0.44)));
             currentProgress = Math.max(currentProgress, mapped);
-            currentMessage = `Downloading AI vision model...`;
+            currentMessage = isDiablo
+              ? (pct < 100 ? `Downloading Diablo model (${pct}%)...` : `Diablo weights loaded. Initializing neural session...`)
+              : `Downloading AI vision model...`;
             lastReportedProgress = Math.round(currentProgress);
             lastReportedMessage = currentMessage;
             updateJob(job.id, {
@@ -700,6 +702,10 @@ export default function BGRemoveWorkspace({
 
       if (tickerInterval) clearInterval(tickerInterval);
 
+      if (isDiablo) {
+        setIsDiabloCached(true);
+      }
+
       updateJob(job.id, {
         status: 'processing',
         progress: 98,
@@ -737,10 +743,14 @@ export default function BGRemoveWorkspace({
     } catch (err: any) {
       if (tickerInterval) clearInterval(tickerInterval);
       console.error('processJob failed:', err);
-      const rawMessage = String(err?.message || '');
+      const rawMessage = String(err?.message || '').trim();
+      // Surface the underlying reason: the generic sentence alone leaves the
+      // user guessing whether the model download, the engine or the image failed.
+      const reason = rawMessage ? ` (${rawMessage.slice(0, 200)})` : '';
+      const modelLabel = BG_MODELS[modelKey]?.label ?? 'the AI model';
       const userMessage = /webgpu|onnxruntime|ortRun|buffer|adapter|device lost/i.test(rawMessage)
-        ? 'Background removal hit a graphics-processing error. Please retry; if it happens again, reload the page and try once more.'
-        : 'Could not remove this background. Please try another image or retry.';
+        ? `Background removal failed. Please try again.`
+        : `Could not remove this background with ${modelLabel}${reason}. Please try another image or retry.`;
       updateJob(job.id, {
         status: 'error',
         message: userMessage,

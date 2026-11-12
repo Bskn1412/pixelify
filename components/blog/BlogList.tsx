@@ -23,10 +23,9 @@ import { useTranslation } from '../../locales';
 
 interface BlogListProps {
   onTabChange: (tab: ViewTab) => void;
-  /** Pins the language filter for /blogs/<lang>/ index pages. */
+  /** Pins the language filter for /blog/<lang>/ index pages. */
   initialLang?: string;
 }
-
 function MetaLine({ post, className = '' }: { post: Post; className?: string }) {
   return (
     <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[12px] text-muted ${className}`}>
@@ -99,7 +98,7 @@ export default function BlogList({ onTabChange, initialLang }: BlogListProps) {
     else next.set(key, value);
     if (key !== 'page') next.delete('page'); // new scope → back to page 1
     const qs = next.toString();
-    router.replace(qs ? `/blogs?${qs}` : '/blogs', { scroll: false });
+    router.replace(qs ? `/blog?${qs}` : '/blog', { scroll: false });
   };
 
   const goTo = (n: number) => {
@@ -120,11 +119,11 @@ export default function BlogList({ onTabChange, initialLang }: BlogListProps) {
       <header className="w-full border-b border-white/10 bg-[#08080B]">
         <div className="w-full px-4 pb-10 pt-8 sm:px-6 lg:px-10">
           <h1 className="max-w-4xl text-4xl font-black leading-[1.04] tracking-tight text-white sm:text-6xl">
-            {t.blogs.title}
+            {t.blog.title}
           </h1>
 
           <p className="mt-5 max-w-3xl text-[15px] leading-relaxed text-muted">
-            {t.blogs.subtitle}
+            {t.blog.subtitle}
           </p>
 
           {/* SEARCH */}
@@ -142,8 +141,8 @@ export default function BlogList({ onTabChange, initialLang }: BlogListProps) {
                 setInput(e.target.value);
                 updateParam('q', e.target.value);
               }}
-              placeholder={t.blogs.searchPlaceholder}
-              aria-label={t.blogs.searchPlaceholder}
+              placeholder={t.blog.searchPlaceholder}
+              aria-label={t.blog.searchPlaceholder}
               className="w-full rounded-2xl border border-white/10 bg-[#0E0E12] py-3.5 pl-12 pr-4 text-sm text-white placeholder:text-white/35 focus:border-[#A4D641]/50 focus:outline-none focus:ring-2 focus:ring-[#A4D641]/20"
             />
           </div>
@@ -151,7 +150,7 @@ export default function BlogList({ onTabChange, initialLang }: BlogListProps) {
           {/* ACTIVE LANGUAGE INDICATOR (strictly matches top nav selection) */}
           <div className="mt-5 flex items-center gap-2">
             <span className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">
-              {t.blogs.filterLang}:
+              {t.blog.filterLang}:
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-transparent bg-[#A4D641] px-3.5 py-1 text-[13px] font-bold text-[#0E0E12]">
               {langLabel(langFilter)}

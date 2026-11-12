@@ -7,8 +7,8 @@
  *
  * Every language ships the SAME slugs (a translation keeps its source
  * slug), so each post is tagged with a `lang` and non-English articles
- * are addressed through a language segment: /blogs/fr/<slug>.
- * English keeps the original /blogs/<slug> URLs.
+ * are addressed through a language segment: /blog/fr/<slug>.
+ * English keeps the original /blog/<slug> URLs.
  *
  * TO ADD A NEW POST:
  *   1. Append a {slug, title, description, tags, date, author, cover,
@@ -22,14 +22,14 @@
  *
  * Post shape:
  *   {
- *     slug: 'name_uuid',          // URL: /blogs/<slug> (en) | /blogs/<lang>/<slug>
+ *     slug: 'name_uuid',          // URL: /blog/<slug> (en) | /blog/<lang>/<slug>
  *     lang: 'en',                 // added by this registry (not in the data files)
  *     title: 'Article title',
  *     description: 'Card + meta description',
  *     tags: ['Tag', ...],
  *     date: 'YYYY-MM-DD',         // drives sorting
  *     author: 'Name',
- *     cover: '/blogs/image.jpg',  // card + hero image
+ *     cover: '/blog/image.jpg',  // card + hero image
  *     coverAlt: 'Alt text',
  *     blocks: [...],
  *   }
@@ -142,10 +142,10 @@ export function getPostBySlug(slug, lang = DEFAULT_LANG) {
 
 /** Canonical in-app URL for a post (English stays unprefixed). */
 export function postPath(post) {
-  if (!post) return '/blogs';
+  if (!post) return '/blog';
   return post.lang && post.lang !== DEFAULT_LANG
-    ? `/blogs/${post.lang}/${post.slug}`
-    : `/blogs/${post.slug}`;
+    ? `/blog/${post.lang}/${post.slug}`
+    : `/blog/${post.slug}`;
 }
 
 /**

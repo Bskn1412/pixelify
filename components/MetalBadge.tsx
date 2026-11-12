@@ -66,7 +66,7 @@ export function MetalBadge({
   theme = "dark",
   strength = 0.95,
   shaderScale = 1.6,
-  speed = 3.5,
+  speed = 1.5,
   textColor = "#ffffff",
   reflectionTargets,
   className = "",

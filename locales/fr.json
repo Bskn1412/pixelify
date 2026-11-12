@@ -27,7 +27,7 @@
     "home": "Accueil",
     "bgRemove": "Suppression d'arrière-plan",
     "upscaler": "Upscaler IA",
-    "blogs": "Blog",
+    "blog": "Blog",
     "settingsTitle": "Paramètres & préférences",
     "processingEngines": "Moteurs de traitement",
     "webgpuSupport": "Prise en charge WebGPU",
@@ -269,8 +269,8 @@
     "downloadCutout": "Télécharger le PNG",
     "tabCutout": "Détourage",
     "tabBackdrop": "Arrière-plan",
-    "tabText": "Texte",
-    "tabRefine": "Retouche"
+    "tabText": "Créer",
+    "tabRefine": "Recadrer"
   },
   "bgSections": {
     "marquee": [
@@ -382,7 +382,7 @@
     "bgRemover": "Suppression d'arrière-plan",
     "products": "Produits & fonctionnalités",
     "docs": "Documentation",
-    "blogs": "Blog",
+    "blog": "Blog",
     "faqs": "FAQ",
     "about": "À propos de Pixelify",
     "contact": "Contact",
@@ -390,7 +390,7 @@
     "terms": "Conditions d'utilisation",
     "rights": "© 2026 Pixelify Inc. Tous droits réservés."
   },
-  "blogs": {
+  "blog": {
     "title": "Blog & guides IA",
     "subtitle": "Articles sur l'IA locale, la confidentialité, le détourage, l'upscaling et WebGPU.",
     "searchPlaceholder": "Rechercher par titre, tag ou sujet…",

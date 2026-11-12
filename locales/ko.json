@@ -27,7 +27,7 @@
     "home": "홈",
     "bgRemove": "배경 제거(누끼)",
     "upscaler": "AI 초해상도 업스케일러",
-    "blogs": "블로그",
+    "blog": "블로그",
     "settingsTitle": "설정 및 환경설정",
     "processingEngines": "연산 엔진",
     "webgpuSupport": "WebGPU 지원 여부",
@@ -269,8 +269,8 @@
     "downloadCutout": "투명 PNG 다운로드",
     "tabCutout": "누끼(피사체)",
     "tabBackdrop": "배경 합성",
-    "tabText": "텍스트",
-    "tabRefine": "정밀 보정"
+    "tabText": "디자인",
+    "tabRefine": "자르기"
   },
   "bgSections": {
     "marquee": [
@@ -382,7 +382,7 @@
     "bgRemover": "배경 제거(누끼)",
     "products": "전체 기능 소개",
     "docs": "문서",
-    "blogs": "기술 블로그",
+    "blog": "기술 블로그",
     "faqs": "자주 묻는 질문",
     "about": "Pixelify 소개",
     "contact": "문의하기",
@@ -390,7 +390,7 @@
     "terms": "서비스 이용약관",
     "rights": "© 2026 Pixelify Inc. 모든 권리 보유."
   },
-  "blogs": {
+  "blog": {
     "title": "기술 블로그 및 가이드",
     "subtitle": "온디바이스 AI, 개인정보 보호, 누끼 따기, 화질 개선 및 WebGPU 기술에 대한 인사이트.",
     "searchPlaceholder": "제목, 태그, 키워드로 기사 검색…",

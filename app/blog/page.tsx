@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: 'Blog & AI Guides: On-Device AI, Privacy & Upscaling | Pixelify',
   description:
     'In-depth articles about local AI, privacy, background removal, upscaling, WebGPU and how the site runs image processing on-device: no cloud uploads or cross-site tracking.',
-  alternates: { canonical: '/blogs/' },
+  alternates: { canonical: '/blog/' },
   openGraph: {
     title: 'Blog & Guides · Pixelify',
     description:

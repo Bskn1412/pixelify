@@ -2,7 +2,7 @@ export type Step = 'upload' | 'config' | 'processing' | 'result';
 export type ModelKey = 'vitality' | 'pixel-dance' | 'alpha-satoru';
 export type BgModelKey = 'chopper' | 'diablo';
 export type ScaleFactor = 2 | 4 | 8;
-export type ViewTab = 'home' | 'upscaler' | 'bg_remove' | 'blogs' | 'prompts' | 'batch' | 'static';
+export type ViewTab = 'home' | 'upscaler' | 'bg_remove' | 'blog' | 'prompts' | 'batch' | 'static';
 export type ThemeMode = 'dark' | 'light' | 'system';
 export type CompareMode = 'slider' | 'sideBySide' | 'zoomLens';
 

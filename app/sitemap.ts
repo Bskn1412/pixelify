@@ -11,7 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/upscaler/',
     '/bg_remove/',
     '/leaderboard/',
-    '/blogs/',
+    '/blog/',
     '/about/',
     '/products/',
     '/privacy/',
@@ -26,7 +26,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${SITE_URL}${path}`,
     lastModified: new Date(),
     changeFrequency: path === '' ? 'weekly' : 'monthly',
-    priority: path === '' ? 1 : path.startsWith('/upscaler') || path.startsWith('/bg_remove') || path.startsWith('/blogs') ? 0.9 : 0.5,
+    priority: path === '' ? 1 : path.startsWith('/upscaler') || path.startsWith('/bg_remove') || path.startsWith('/blog') ? 0.9 : 0.5,
   }));
 
   // Localized routes for all pages: /<lang>/, /<lang>/upscaler/, etc.
@@ -39,9 +39,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }))
   );
 
-  // Localized blog index pages: /blogs/<lang>/
+  // Localized blog index pages: /blog/<lang>/
   const langIndexEntries: MetadataRoute.Sitemap = LANGUAGES.map((lang) => ({
-    url: `${SITE_URL}/blogs/${lang.code}/`,
+    url: `${SITE_URL}/blog/${lang.code}/`,
     lastModified: new Date(),
     changeFrequency: 'monthly',
     priority: 0.8,

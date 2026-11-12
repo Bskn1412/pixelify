@@ -30,7 +30,7 @@ export async function generateMetadata({
     title: `${post.title} | Pixelify`,
     description: post.description,
     alternates: {
-      canonical: `/${lang}/blogs/${slug}/`,
+      canonical: `/${lang}/blog/${slug}/`,
     },
     openGraph: {
       type: 'article',

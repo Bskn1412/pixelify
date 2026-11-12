@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { Crop as CropIcon } from 'lucide-react';
-import ModelLoader from './upscaler/ModelLoader';
+import GenerationOverlay, { GENERATION_FADE_MS } from './GenerationOverlay';
 import { useTranslation } from '@/locales';
 import FabricImageEditor, {
   FabricEditMode,
@@ -143,6 +143,55 @@ export default function BGComparator({
   const [resultAspectRatio, setResultAspectRatio] = useState<number | null>(null);
 
   const isProcessing = job.status === 'loading' || job.status === 'processing';
+
+  /* ----------------------------------------------------------
+     GENERATION OVERLAY STATE (CSS churn / hold / fade)
+     Latched while a run is active (or the job has no result yet);
+     onFinished releases the latch after the reveal fade-out.
+     ---------------------------------------------------------- */
+  const [overlayHold, setOverlayHold] = useState(false);
+  const [handoffUrl, setHandoffUrl] = useState<string | null>(null);
+  const wasProcessingRef = useRef(false);
+  const lastResultRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (isProcessing || !job.resultUrl) {
+      setOverlayHold(true);
+      if (isProcessing && !wasProcessingRef.current) {
+        // Run just started: capture the previous result as boil handoff.
+        setHandoffUrl(lastResultRef.current);
+      }
+      wasProcessingRef.current = isProcessing;
+    }
+    if (job.resultUrl && job.resultUrl !== lastResultRef.current) {
+      lastResultRef.current = job.resultUrl;
+      // Every new result lands with the compare divider centered.
+      setSplit(50);
+    }
+  }, [isProcessing, job.resultUrl]);
+
+  useEffect(() => {
+    if (job.status === 'error') setOverlayHold(false);
+  }, [job.status]);
+
+  /* Backstop: the cutout is ready, so release the churn right after the fade
+     even if the overlay's own callback never lands. */
+  useEffect(() => {
+    if (!job.resultUrl) return;
+    const id = setTimeout(() => setOverlayHold(false), GENERATION_FADE_MS + 80);
+    return () => clearTimeout(id);
+  }, [job.resultUrl]);
+
+  // Job switched: reset overlay state to the new job's.
+  useEffect(() => {
+    wasProcessingRef.current = job.status === 'loading' || job.status === 'processing';
+    lastResultRef.current = job.resultUrl;
+    setHandoffUrl(null);
+    setOverlayHold(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [job.id]);
+
+  const generationImages = useMemo(() => (handoffUrl ? [handoffUrl] : []), [handoffUrl]);
 
   // Viewport Zoom & Pan state (applies to artboard across all modes)
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -1026,49 +1075,16 @@ export default function BGComparator({
               )}
             </div>
           </div>
-        ) : isProcessing || (!job.resultUrl) ? (
-          <div
-            className="absolute inset-0 z-30 bg-slate-950/85 backdrop-blur-2xl flex flex-col items-center justify-center p-8 text-center gap-5 select-none"
-            onPointerDown={(e) => {
-              e.stopPropagation();
-            }}
-            onPointerMove={(e) => {
-              e.stopPropagation();
-            }}
-            onPointerUp={(e) => {
-              e.stopPropagation();
-            }}
-            onWheel={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            <img
-              src={job.sourceUrl}
-              alt="Source preview"
-              className="absolute inset-0 w-full h-full object-cover opacity-15 filter blur-2xl scale-110 pointer-events-none"
-            />
-
-            <div className="relative w-20 h-20 flex items-center justify-center">
-              <div className="absolute inset-0 rounded-full border-4 border-[#00FF85]/20 border-t-[#00FF85] border-r-cyan-400 animate-spin shadow-[0_0_25px_rgba(0,255,133,0.4)]" />
-              <div className="h-10 w-10 rounded-full bg-white/5 backdrop-blur flex items-center justify-center text-xl">
-                🪄
-              </div>
-            </div>
-
-            <div className="relative z-10 max-w-sm">
-              <h4 className="text-xl font-black text-white mb-1 tracking-tight">{t.modelLoading?.extractingSubject || "Extracting Subject..."}</h4>
-              <p className="text-xs text-neutral-400 font-mono">
-                {job.message || t.modelLoading?.segmentingEdges || 'Neural network segmenting edges...'}
-              </p>
-            </div>
-
-            <div className="relative z-10 w-full max-w-xs flex items-center justify-center">
-              <ModelLoader
-                progress={typeof job.progress === 'number' ? job.progress : 0}
-                width="100%"
-              />
-            </div>
-          </div>
+        ) : isProcessing || (!job.resultUrl) || overlayHold ? (
+          <GenerationOverlay
+            images={generationImages}
+            revealUrl={job.resultUrl}
+            label={job.message || t.modelLoading?.extractingSubject || 'Extracting subject'}
+            percent={isProcessing ? job.progress : null}
+            borderRadius={24}
+            blockPointerEvents
+            onFinished={() => setOverlayHold(false)}
+          />
         ) : (
           /* =========================================================
               THE ADAPTIVE ARTBOARD (FULL COVERAGE, ZERO CLIPPING)

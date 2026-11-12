@@ -134,8 +134,8 @@ export default function AppProvider({ children }: { children: React.ReactNode })
     if (path === 'upscaler' || path === 'bg_remove') {
       return path as ViewTab;
     }
-    if (path === 'blogs' || path.startsWith('blogs/')) {
-      return 'blogs' as ViewTab;
+    if (path === 'blog' || path.startsWith('blog/')) {
+      return 'blog' as ViewTab;
     }
     // Static pages (privacy, about, products, terms, story, ...) have no
     // navbar item of their own - nothing should show as highlighted.
@@ -164,7 +164,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
     if (segments.length > 0 && SITE_LANGUAGES.some((l) => l.code === segments[0])) {
       return segments[0];
     }
-    if (path.startsWith('/blogs/')) {
+    if (path.startsWith('/blog/')) {
       const blogSeg = segments[1];
       if (blogSeg && SITE_LANGUAGES.some((l) => l.code === blogSeg)) {
         return blogSeg;
@@ -193,7 +193,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
           localStorage.setItem(LANGUAGE_STORAGE_KEY, firstSegment);
         }
       }
-    } else if (pathname.startsWith('/blogs/')) {
+    } else if (pathname.startsWith('/blog/')) {
       const blogSeg = segments[1];
       if (blogSeg && SITE_LANGUAGES.some((l) => l.code === blogSeg)) {
         if (currentLang !== blogSeg) {
@@ -245,9 +245,9 @@ export default function AppProvider({ children }: { children: React.ReactNode })
       let targetPath = '';
       if (tab === 'home') {
         targetPath = langPrefix ? `${langPrefix}/` : '/';
-      } else if (tab === 'blogs') {
+      } else if (tab === 'blog') {
         const langCode = langPrefix ? langPrefix.replace('/', '') : (currentLang || DEFAULT_LANGUAGE);
-        targetPath = langCode === 'en' ? '/blogs/' : `/blogs/${langCode}/`;
+        targetPath = langCode === 'en' ? '/blog/' : `/blog/${langCode}/`;
       } else {
         targetPath = langPrefix ? `${langPrefix}/${tab}/` : `/${tab}/`;
       }
@@ -292,7 +292,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
   const [bgJobs, setBgJobs] = useState<BGJob[]>([]);
 
   // Upscaler State Hooks
-  const { runtimeRef, execEngine, sessionRef, isLoading: modelLoading, modelProgress, initLiteRT, loadModel, unloadModel } = useLiteRT();
+  const { runtimeRef, execEngine, sessionRef, isLoading: modelLoading, modelProgress, isPrefetching: modelPrefetching, initLiteRT, loadModel, unloadModel } = useLiteRT();
   const { upscale } = useUpscale({ runtimeRef, sessionRef });
 
   // LIVE ENGINE STATE - what each tool's pipeline is ACTUALLY running on right now.
@@ -478,7 +478,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
       // A real transfer passes through sub-95% values first - only then
       // do we surface the row, and keep it up until the phase changes.
       if (state.phase === 'downloading') {
-        if (state.progress > 0 && state.progress < 95) bgRealDownloadRef.current = true;
+        if (state.progress >= 0 && state.progress < 95) bgRealDownloadRef.current = true;
         if (bgRealDownloadRef.current) setBgDownloadActive(true);
       } else {
         bgRealDownloadRef.current = false;
@@ -545,7 +545,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
             if (cancelled || preloadCancelledRef.current) return;
 
             setActiveUpscalerModel('vitality');
-            const ok = await loadModel('vitality', { silentIfCached: true });
+            const ok = await loadModel('vitality', { silentIfCached: true, background: true });
             if (!cancelled) setUpscalerPreloadError(!ok);
           }
           return;
@@ -563,7 +563,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
           if (cancelled || preloadCancelledRef.current) return;
 
           setActiveUpscalerModel('vitality');
-          const ok = await loadModel('vitality', { silentIfCached: true });
+          const ok = await loadModel('vitality', { silentIfCached: true, background: true });
           if (!cancelled) setUpscalerPreloadError(!ok);
         }
       } catch (err) {
@@ -646,7 +646,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
               try {
                 await initLiteRT();
                 setActiveUpscalerModel('vitality');
-                await loadModel('vitality', { silentIfCached: true });
+                await loadModel('vitality', { silentIfCached: true, background: true });
               } catch { /* silent: click path handles errors */ }
             })();
           }
@@ -667,7 +667,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
     const out: ModelDownloadItem[] = [];
     // Only real transfers (progress events) surface - runtime init or
     // session-compile of already-cached models must NOT flash the badge.
-    if (modelLoading && modelProgress !== null) {
+    if ((modelLoading || modelPrefetching) && modelProgress !== null) {
       out.push({ id: 'upscaler', name: upscalerActiveName, progress: Math.round(modelProgress) });
     }
     // Cached Chopper reports a 100% progress tick - that's not a download;
@@ -680,7 +680,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
       });
     }
     return out;
-  }, [modelLoading, modelProgress, upscalerActiveName, bgModelPhase, bgModelProgress, bgDownloadActive, bgModelLoadName]);
+  }, [modelLoading, modelPrefetching, modelProgress, upscalerActiveName, bgModelPhase, bgModelProgress, bgDownloadActive, bgModelLoadName]);
 
   /* ----------------------------------------------------------
      ADD UPSCALE FILE (Creates individual UpscaleItem)
@@ -724,7 +724,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
       setSelectedId(newItem.id);
       setStep('config');
       setActiveUpscalerModel('vitality');
-      loadModel('vitality', { silentIfCached: true });
+      void loadModel('vitality', { silentIfCached: true, background:true });
       scrollToTop();
     };
     img.onerror = () => {
@@ -760,7 +760,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
       // and drop its pending badge rows.
       preloadCancelledRef.current = true;
       setUpscalerPreloadQueue([]);
-      const ok = await loadModel(key, { silentIfCached: true });
+      const ok = await loadModel(key, { silentIfCached: true, background: true });
       if (!ok) {
         addToast('error', `Failed to load ${MODELS[key]?.name || key} model.`);
       }
@@ -824,8 +824,6 @@ export default function AppProvider({ children }: { children: React.ReactNode })
       primeAudio();
       requestNotificationPermission().catch(() => { });
 
-      // A rerun replaces the previous result - drop its object URL first.
-      if (item.result?.blobUrl) URL.revokeObjectURL(item.result.blobUrl);
       setItems((prev) =>
         prev.map((i) =>
           i.id === id
@@ -863,6 +861,11 @@ export default function AppProvider({ children }: { children: React.ReactNode })
             );
           }
         );
+
+        // The new result replaces the old one - release the old object URL.
+        if (item.result?.blobUrl && item.result.blobUrl !== res.blobUrl) {
+          URL.revokeObjectURL(item.result.blobUrl);
+        }
 
         setItems((prev) =>
           prev.map((i) =>
@@ -942,6 +945,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
           ? {
             ...i,
             status: 'idle',
+            result: null,
             error: null,
             progress: { percent: 0, text: '' },
           }
@@ -1137,7 +1141,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
           ? (ms?.checkingGraphics || 'Checking graphics adapter')
           : bgModelPhase === 'error'
             ? (ms?.bgPreloadFailed || 'Background model preload failed; it will retry when used')
-            : modelLoading
+            : (modelLoading || modelPrefetching)
               ? (modelProgress === null
                 ? (ms?.preparingUpscaler || 'Preparing upscaler model')
                 : (ms?.preparingUpscalerPct ? ms.preparingUpscalerPct.replace('{pct}', String(Math.round(modelProgress))) : `Preparing upscaler model (${Math.round(modelProgress)}%)`))

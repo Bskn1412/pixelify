@@ -25,8 +25,8 @@ pixelify/
 │   ├── page.tsx            # /
 │   ├── upscaler/page.tsx   # /upscaler
 │   ├── bg_remove/page.tsx  # /bg_remove
-│   ├── blogs/page.tsx      # /blogs
-│   ├── blogs/[...path]/    # /blogs/<slug> (en) + /blogs/<lang>/<slug>
+│   ├── blog/page.tsx      # /blog
+│   ├── blog/[...path]/    # /blog/<slug> (en) + /blog/<lang>/<slug>
 │   ├── about|products|privacy|terms|story|truckbg/page.tsx
 │   ├── not-found.tsx       # 404
 │   ├── api/                 # Server-side Supabase RPC endpoints
@@ -36,7 +36,7 @@ pixelify/
 ├── components/             # React UI (home, workspaces, blog, static pages…)
 │   ├── AppProvider.tsx     # Global client state (theme, toasts, AI model machinery, jobs)
 │   ├── views/              # Route-specific client views
-│   ├── blogs/ bgremove/ upscaler/ pages/   # Feature folders
+│   ├── blog/ bgremove/ upscaler/ pages/   # Feature folders
 ├── hooks/                  # useONNX, useUpscale
 ├── lib/                    # constants.ts (models/presets), bgUtils, seo
 ├── types/                  # Shared TypeScript types

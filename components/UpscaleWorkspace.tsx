@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from "react";
+import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { MODELS, buildPresetOptions } from "../lib/constants";
 import { useTranslation } from '@/locales';
 import type {
@@ -9,8 +9,10 @@ import type {
   UpscaleItem,
 } from "../types";
 import ParameterSlider from "./ParameterSlider";
-import WaitCaption from "./WaitCaption";
-import '@/styles/solving-orb.css';
+import GenerationOverlay, {
+  GENERATION_FADE_MS,
+  useMediaQuery,
+} from "./GenerationOverlay";
 import {
   Sparkles,
   RotateCcw,
@@ -32,8 +34,6 @@ import {
   playSuccessChime,
   primeAudio,
 } from "../utils/notifications";
-import UpscalerLoader from "./upscaling-loader";
-import ModelLoader from "./upscaler/ModelLoader";
 
 /* ============================================================
    IMAGE CIRCLE ICON (Replacement for header star)
@@ -71,8 +71,9 @@ interface UpscaleWorkspaceProps {
   onRemoveId: (id: string) => void;
   onAddFile: (file: File) => void;
 
+  /** Blocking model load only (the run's own download); prefetches stay silent. */
   isLoading: boolean;
-  /** 0–100 real progress of the in-flight neural model load (null when idle). */
+  /** 0–100 real progress of the blocking neural model load (null when idle). */
   modelProgress?: number | null;
 
   onModelChange: (id: string, key: ModelKey) => void;
@@ -364,6 +365,58 @@ export default function UpscaleWorkspace({
     setViewportZoom(1);
   }, [activeItem?.id]);
 
+  /* ----------------------------------------------------------
+     GENERATION OVERLAY STATE (CSS churn / hold / fade)
+     ---------------------------------------------------------- */
+  const isLargeScreen = useMediaQuery("(min-width: 1024px)");
+  const [generationHold, setGenerationHold] = useState(false);
+  const [handoffUrl, setHandoffUrl] = useState<string | null>(null);
+  const lastResultRef = useRef("");
+  const prevStatusRef = useRef<string>("");
+
+  // Track the newest result and, when a run starts, capture the previous
+  // one as the boil handoff. The hold keeps the overlay mounted through
+  // the completion ceremony (reveal -> hold -> fade).
+  useEffect(() => {
+    const status = activeItem?.status;
+    if (!status) return;
+    if (status === "completed" && activeItem?.result) {
+      lastResultRef.current = activeItem.result.blobUrl || "";
+    }
+    if (status === "processing" && prevStatusRef.current !== "processing") {
+      setHandoffUrl(lastResultRef.current || null);
+      setGenerationHold(true);
+    }
+    if (status === "error" || status === "idle") {
+      setGenerationHold(false);
+      setHandoffUrl(null);
+    }
+    prevStatusRef.current = status;
+  }, [activeItem?.status, activeItem?.result, activeItem?.id]);
+
+  // Switching items resets the overlay to the new item's state.
+  useEffect(() => {
+    prevStatusRef.current = activeItem?.status ?? "";
+    lastResultRef.current = activeItem?.result?.blobUrl || "";
+    setHandoffUrl(null);
+    setGenerationHold(activeItem?.status === "processing");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeItem?.id]);
+
+  const handleGenerationFinished = useCallback(() => {
+    setGenerationHold(false);
+  }, []);
+
+  /* Backstop: once the result is on the stage the churn must not outlive it.
+     Release the hold right after the fade even if the overlay's own callback
+     never lands (busy main thread, aborted effect). */
+  const resultReady = activeItem?.status === "completed" && !!activeItem?.result;
+  useEffect(() => {
+    if (!resultReady) return;
+    const id = setTimeout(() => setGenerationHold(false), GENERATION_FADE_MS + 80);
+    return () => clearTimeout(id);
+  }, [resultReady, activeItem?.result]);
+
   const handleStageWheel = (e: React.WheelEvent<HTMLDivElement>) => {
     if (e.ctrlKey || e.metaKey) {
       e.preventDefault();
@@ -453,6 +506,29 @@ export default function UpscaleWorkspace({
   const model = MODELS[modelKey];
 
   /* ----------------------------------------------------------
+     GENERATION OVERLAY PROPS
+     ---------------------------------------------------------- */
+  // `isLoading` here is the blocking flag only: an enhancement run waiting on
+  // its model. Background prefetches (upload, page idle warmup, model switch)
+  // never raise it, so browsing the workspace with an image uploaded stays
+  // calm instead of showing "Loading AI model" before Enhance is clicked.
+  const modelLoading = isLoading;
+  const generationActive = isProcessing || modelLoading || generationHold;
+  const generationLabel = modelLoading
+    ? (t.upscaleWorkspace?.loadingModel || "Loading AI model").replace(/\s*\.{2,}$/, "")
+    : t.upscaleWorkspace?.enhancingImage || "Enhancing";
+  const generationPercent = modelLoading
+    ? modelProgress
+    : (activeItem.progress?.percent ?? null);
+  const generationRevealUrl = hasResult ? resultUrl : null;
+  // The churn blurs the previous result underneath on a re-run; otherwise
+  // it sits over the image being upscaled.
+  const generationImages = useMemo(
+    () => (handoffUrl ? [handoffUrl] : [activeItem.url]),
+    [handoffUrl, activeItem.url]
+  );
+
+  /* ----------------------------------------------------------
      RESET ADVANCED SETTINGS
      ---------------------------------------------------------- */
   const resetEnhancementSettings = () => {
@@ -477,6 +553,8 @@ export default function UpscaleWorkspace({
      ---------------------------------------------------------- */
   const handleCancelProcessing = () => {
     if (isProcessing && onCancel) {
+      setGenerationHold(false);
+      setHandoffUrl(null);
       onCancel(activeItem.id);
     }
   };
@@ -847,43 +925,16 @@ export default function UpscaleWorkspace({
                 )}
               </div>
 
-              {/* SOLVING ORB PROCESSING OVERLAY */}
-              {isProcessing && (
-                <div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center overflow-hidden bg-black/45 backdrop-blur-[3px]">
-                  <div className="relative z-20 flex flex-col items-center gap-2.5 px-6 py-4 text-center">
-                    <UpscalerLoader />
-
-                    {/* LIVE PERCENTAGE */}
-                    <div className="font-mono text-2xl font-black tabular-nums tracking-tight text-white">
-                      {Math.min(100, Math.max(0, Math.round(activeItem.progress?.percent ?? 0)))}
-                      <span className="text-base font-bold text-[#00FF85]">%</span>
-                    </div>
-
-                    <div className="max-w-[200px] truncate text-xs font-bold tracking-wide text-white">
-                      {t.upscaleWorkspace?.enhancingImage || "Enhancing"} {activeItem.name}
-                    </div>
-
-                    <div className="flex items-center gap-1.5 rounded-full border border-[#00FF85]/30 bg-[#00FF85]/10 px-2.5 py-0.5 text-[8.5px] font-semibold text-[#00FF85]">
-                      <span className="h-1.5 w-1.5 animate-ping rounded-full bg-[#00FF85]" />
-                      <span>{t.upscaleWorkspace?.neuralActive || "Neural Super-Resolution Active"}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* MODEL LOADING OVERLAY */}
-              {isLoading && !isProcessing && (
-                <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 overflow-hidden bg-black/55 backdrop-blur-[3px]">
-                  <div className="flex w-[70%] max-w-[320px] justify-center">
-                    <ModelLoader progress={modelProgress} />
-                  </div>
-                  <div className="text-xs font-bold tracking-wide text-white">
-                    {t.upscaleWorkspace?.loadingModel || "Loading AI model..."}
-                  </div>
-                  <div className="max-w-[220px] text-center text-[10px] text-white/50">
-                    {t.upscaleWorkspace?.modelCacheNote || "The neural model downloads once, then runs from your browser cache."}
-                  </div>
-                </div>
+              {/* GENERATION OVERLAY — CSS churn / fade */}
+              {!isLargeScreen && generationActive && (
+                <GenerationOverlay
+                  images={generationImages}
+                  revealUrl={generationRevealUrl}
+                  label={generationLabel}
+                  percent={generationPercent}
+                  borderRadius={16}
+                  onFinished={handleGenerationFinished}
+                />
               )}
             </div>
           </div>
@@ -1050,61 +1101,16 @@ export default function UpscaleWorkspace({
               )}
             </div>
 
-            {/* SOLVING ORB PROCESSING OVERLAY - progress ring + solving orb + % (no tiles/steps) */}
-            {isProcessing && (
-              <div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center overflow-hidden rounded-2xl bg-black/45 backdrop-blur-[3px]">
-                <div className="relative z-20 flex flex-col items-center gap-4 rounded-3x px-10 py-8 text-center">
-                  {/* Determinate ring: real % from the inference pipeline, mint variant.
-                    state="connecting": we don't use SolvingOrb's locked 'solving' -
-                    we render OrbProgressRing directly via the exported component's
-                    state override below (connecting = pulsing handshake). */}
-                  {/* <SolvingOrb
-                  size={160}
-                  variant="mint"
-                  loop={false}
-                  progress={Math.min(1, Math.max(0.03, (activeItem.progress?.percent ?? 0) / 100))}
-                  stateOverride="connecting"
-                /> */}
-
-                  <UpscalerLoader />
-
-                  {/* LIVE PERCENTAGE */}
-                  <div className="font-mono text-4xl font-black tabular-nums tracking-tight text-white">
-                    {Math.min(100, Math.max(0, Math.round(activeItem.progress?.percent ?? 0)))}
-                    <span className="text-xl font-bold text-[#00FF85]">%</span>
-                  </div>
-
-                  <div className="max-w-[280px] truncate text-base font-bold tracking-wide text-white">
-                    {t.upscaleWorkspace?.enhancingImage || "Enhancing"} {activeItem.name}
-                  </div>
-
-                  {/* Rotating status caption - band-matched to real progress */}
-                  <WaitCaption
-                    percent={activeItem.progress?.percent ?? 0}
-                    isDownload={activeItem.progress?.stepIndex === 1}
-                  />
-
-                  <div className="flex items-center gap-2 rounded-full border border-[#00FF85]/30 bg-[#00FF85]/10 px-3.5 py-1 text-[10px] font-semibold text-[#00FF85]">
-                    <span className="h-1.5 w-1.5 animate-ping rounded-full bg-[#00FF85]" />
-                    <span>{t.upscaleWorkspace?.neuralActive || "Neural Super-Resolution Active"}</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* MODEL LOADING OVERLAY - shown while the neural model downloads/compiles */}
-            {isLoading && !isProcessing && (
-              <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-4 overflow-hidden bg-black/55 backdrop-blur-[3px]">
-                <div className="flex w-[70%] max-w-[380px] justify-center">
-                  <ModelLoader progress={modelProgress} />
-                </div>
-                <div className="text-sm font-bold tracking-wide text-white">
-                  {t.upscaleWorkspace?.loadingModel || "Loading AI model..."}
-                </div>
-                <div className="max-w-[260px] text-center text-[11px] text-white/50">
-                  {t.upscaleWorkspace?.modelCacheNote || "The neural model downloads once, then runs from your browser cache."}
-                </div>
-              </div>
+            {/* GENERATION OVERLAY — CSS churn / fade */}
+            {isLargeScreen && generationActive && (
+              <GenerationOverlay
+                images={generationImages}
+                revealUrl={generationRevealUrl}
+                label={generationLabel}
+                percent={generationPercent}
+                borderRadius={16}
+                onFinished={handleGenerationFinished}
+              />
             )}
           </div>
 
@@ -1354,6 +1360,9 @@ function BeforeAfterSlider({
 }) {
   const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement | null>(null);
+  /* The result lands with the divider in the middle: equal halves of the
+     original and the enhanced image, and the handle sits where the eye
+     expects it for the before/after drag. */
   const [pos, setPos] = useState(50);
   const draggingRef = useRef(false);
 
@@ -1464,7 +1473,7 @@ function BeforeAfterSlider({
           }}
         />
 
-        {/* SLIDER LINE */}
+        {/* SLIDER LINE — thin original sliver keeps it discoverable */}
         <div
           className="pointer-events-none absolute inset-y-0 z-20 w-[1.5px] sm:w-[2px] -translate-x-1/2 bg-white shadow-[0_0_10px_rgba(0,0,0,.5)]"
           style={{
@@ -1504,10 +1513,12 @@ function BeforeAfterSlider({
         </div>
       </div>
 
-      {/* ORIGINAL LABEL */}
-      <div className="pointer-events-none absolute left-2 sm:left-3 top-2 sm:top-3 z-30 rounded-md bg-black/60 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
-        {t.upscaleWorkspace?.labelOriginal || "Original"}
-      </div>
+      {/* ORIGINAL LABEL — only meaningful once the divider reveals it */}
+      {pos > 8 && (
+        <div className="pointer-events-none absolute left-2 sm:left-3 top-2 sm:top-3 z-30 rounded-md bg-black/60 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
+          {t.upscaleWorkspace?.labelOriginal || "Original"}
+        </div>
+      )}
 
       {/* ENHANCED LABEL */}
       <div className="pointer-events-none absolute right-2 sm:right-3 top-2 sm:top-3 z-30 rounded-md bg-black/60 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">

@@ -27,27 +27,39 @@ function PlayerRow({ player, mine, index, reduced }: { player: Player; mine: boo
   const [profileOpen, setProfileOpen] = useState(false);
   const rankClass = player.rank <= 3 ? ` lb-rank-${player.rank}` : '';
 
-  const row = <motion.article layout initial={reduced ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .32, delay: reduced ? 0 : Math.min((index ?? 0) * .012, .24) }} className={`lb-player${rankClass}`} onMouseEnter={() => setProfileOpen(true)} onMouseLeave={() => setProfileOpen(false)}>
-    <div className="lb-player-rank">{player.rank <= 3 ? <Image src={medal[player.rank - 1]} width={46} height={26} alt={`${player.rank} place medal`} /> : <span>{player.rank}</span>}</div>
-    <div className="lb-profile" data-open={profileOpen}>
-      <button type="button" className="lb-profile-trigger" aria-label={`Show ${visibleName(player)} profile`} aria-expanded={profileOpen} aria-controls={`lb-profile-${player.id}`} onFocus={() => setProfileOpen(true)} onBlur={() => setProfileOpen(false)} onClick={() => setProfileOpen(true)} onKeyDown={(event) => { if (event.key === 'Escape') { setProfileOpen(false); event.currentTarget.blur(); } }}>
-        <span className="lb-avatar">{player.avatar_url ? <img src={player.avatar_url} alt="" /> : <UserRound aria-hidden="true" />}</span>
-        <span className="lb-player-name"><strong>{visibleName(player)}{mine && <span className="lb-you">You</span>}</strong>{player.username && <small>@{player.username}</small>}</span>
-      </button>
-      <div className="lb-profile-card" id={`lb-profile-${player.id}`} role="tooltip" aria-hidden={!profileOpen}>
-        <strong>{visibleName(player)}{mine && <span className="lb-you">You</span>}</strong>
-        {player.username && <small>@{player.username}</small>}
-        <span className="lb-profile-since"><CalendarDays size={14} aria-hidden="true" /> Member since {joinedDate(player.created_at)}</span>
+  const row = (
+    <motion.article
+      layout
+      initial={reduced ? false : { opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: .32, delay: reduced ? 0 : Math.min((index ?? 0) * .012, .24) }}
+      className={`lb-player${rankClass}`}
+      data-open={profileOpen}
+      style={{ zIndex: profileOpen ? 50 : undefined }}
+      onMouseEnter={() => setProfileOpen(true)}
+      onMouseLeave={() => setProfileOpen(false)}
+    >
+      <div className="lb-player-rank">{player.rank <= 3 ? <Image src={medal[player.rank - 1]} width={46} height={26} alt={`${player.rank} place medal`} /> : <span>{player.rank}</span>}</div>
+      <div className="lb-profile" data-open={profileOpen}>
+        <button type="button" className="lb-profile-trigger" aria-label={`Show ${visibleName(player)} profile`} aria-expanded={profileOpen} aria-controls={`lb-profile-${player.id}`} onFocus={() => setProfileOpen(true)} onBlur={() => setProfileOpen(false)} onClick={() => setProfileOpen(true)} onKeyDown={(event) => { if (event.key === 'Escape') { setProfileOpen(false); event.currentTarget.blur(); } }}>
+          <span className="lb-avatar">{player.avatar_url ? <img src={player.avatar_url} alt="" /> : <UserRound aria-hidden="true" />}</span>
+          <span className="lb-player-name"><strong>{visibleName(player)}{mine && <span className="lb-you">You</span>}</strong>{player.username && <small>@{player.username}</small>}</span>
+        </button>
+        <div className="lb-profile-card" id={`lb-profile-${player.id}`} role="tooltip" aria-hidden={!profileOpen}>
+          <strong>{visibleName(player)}{mine && <span className="lb-you">You</span>}</strong>
+          {player.username && <small>@{player.username}</small>}
+          <span className="lb-profile-since"><CalendarDays size={14} aria-hidden="true" /> Member since {joinedDate(player.created_at)}</span>
+        </div>
       </div>
-    </div>
-    <div className="lb-player-score"><b>{player.score.toLocaleString()}</b><span>PTS</span></div>
-    {flag(player.country_code) && <span className="lb-country" title={`Country ${player.country_code}`} aria-label={`Country ${player.country_code}`}>{flag(player.country_code)}</span>}
-    {player.rank === 1 && <Image className="lb-row-crown" src="/images/leaderboard/crown.svg" width={42} height={32} alt="" />}
-  </motion.article>;
+      <div className="lb-player-score"><b>{player.score.toLocaleString()}</b><span>PTS</span></div>
+      {flag(player.country_code) && <span className="lb-country" title={`Country ${player.country_code}`} aria-label={`Country ${player.country_code}`}>{flag(player.country_code)}</span>}
+      {player.rank === 1 && <Image className="lb-row-crown" src="/images/leaderboard/crown.svg" width={42} height={32} alt="" />}
+    </motion.article>
+  );
 
-  if (player.rank === 1) return <BorderBeam className="lb-player-beam" size="md" colorVariant="gold" duration={2.4} borderRadius={12} strength={1} brightness={2} saturation={1.8} glowSize={1}>{row}</BorderBeam>;
-  if (player.rank === 2) return <BorderBeam className="lb-player-beam" size="md" colorVariant="ice" duration={2.8} borderRadius={12} strength={1} brightness={2} saturation={1.8} glowSize={1}>{row}</BorderBeam>;
-  if (player.rank === 3) return <BorderBeam className="lb-player-beam" size="md" colorVariant="sunset" duration={3.0} borderRadius={12} strength={1} brightness={2} saturation={1.8} glowSize={1}>{row}</BorderBeam>;
+  if (player.rank === 1) return <BorderBeam className="lb-player-beam" data-open={profileOpen} style={{ zIndex: profileOpen ? 50 : undefined }} size="md" colorVariant="gold" duration={2.4} borderRadius={12} strength={1} brightness={2} saturation={1.8} glowSize={1}>{row}</BorderBeam>;
+  if (player.rank === 2) return <BorderBeam className="lb-player-beam" data-open={profileOpen} style={{ zIndex: profileOpen ? 50 : undefined }} size="md" colorVariant="ice" duration={2.8} borderRadius={12} strength={1} brightness={2} saturation={1.8} glowSize={1}>{row}</BorderBeam>;
+  if (player.rank === 3) return <BorderBeam className="lb-player-beam" data-open={profileOpen} style={{ zIndex: profileOpen ? 50 : undefined }} size="md" colorVariant="sunset" duration={3.0} borderRadius={12} strength={1} brightness={2} saturation={1.8} glowSize={1}>{row}</BorderBeam>;
   return row;
 }
 

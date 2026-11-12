@@ -8,11 +8,11 @@ import { SITE_URL } from '@/lib/seo';
 
 export function generateStaticParams() {
   return [
-    // /blogs/<lang> - localized index pages (plus /blogs/en/ as a permalink)
+    // /blog/<lang> - localized index pages (plus /blog/en/ as a permalink)
     ...LANGUAGES.map((lang) => ({ path: [lang.code] })),
-    // /blogs/<slug> - English articles
+    // /blog/<slug> - English articles
     ...getAllPosts('en').map((post) => ({ path: [post.slug] })),
-    // /blogs/<lang>/<slug> - translations (plus /blogs/en/<slug> for legacy links)
+    // /blog/<lang>/<slug> - translations (plus /blog/en/<slug> for legacy links)
     ...LANGUAGES.flatMap((l) =>
       getAllPosts(l.code).flatMap((post) => {
         const segments = [{ path: [post.lang, post.slug] }];
@@ -33,7 +33,7 @@ type Resolved =
 
 function resolve(params: { path: string[] }): Resolved {
   const { path } = params;
-  // /blogs/<lang> - a localized index page
+  // /blog/<lang> - a localized index page
   if (path.length === 1 && isSupportedLang(path[0])) {
     return { post: null, lang: path[0], path, langIndex: path[0] };
   }
@@ -45,13 +45,13 @@ function resolve(params: { path: string[] }): Resolved {
 }
 
 function langIndexHref(lang: string): string {
-  return isSupportedLang(lang) ? `/blogs/${lang}/` : '/blogs/';
+  return isSupportedLang(lang) ? `/blog/${lang}/` : '/blog/';
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const resolved = resolve(params);
 
-  // Localized index page: /blogs/<lang>/
+  // Localized index page: /blog/<lang>/
   if (resolved.post === null && resolved.langIndex) {
     const lang = resolved.langIndex;
     return {
@@ -67,7 +67,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
         description: `On-device AI articles in ${langLabel(lang)}: no cloud, no uploads, no tracking.`,
         url: `${SITE_URL}${langIndexHref(lang)}`,
         locale: lang,
-        images: [{ url: '/blogs/settings-engine.jpg', alt: 'Pixelify blog cover' }],
+        images: [{ url: '/blog/settings-engine.jpg', alt: 'Pixelify blog cover' }],
       },
     };
   }
@@ -109,7 +109,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 export default function BlogCatchAll({ params }: Params) {
   const resolved = resolve(params);
 
-  // Localized index page: /blogs/<lang>/
+  // Localized index page: /blog/<lang>/
   if (resolved.post === null && resolved.langIndex) {
     return (
       <Suspense fallback={null}>

@@ -99,17 +99,38 @@ export default function Navbar({
   const router = useRouter();
   const pathname = usePathname();
 
+  /* Prefetch the main tab routes once on mount. The navbar navigates with
+     router.push (not <Link>), so Next never fetches these chunks on its own -
+     without this the first tap on BG Remove / Upscaler blocks on the route
+     chunk (three.js etc.) and the pill animation stutters. */
+  useEffect(() => {
+    const langCode = (currentLang || 'en');
+    const prefix = langCode === 'en' ? '' : `/${langCode}`;
+    const paths = [
+      `${prefix || ''}/`,
+      `${prefix}/bg_remove/`,
+      `${prefix}/upscaler/`,
+    ];
+    const seen = new Set<string>();
+    for (const p of paths) {
+      const normalized = p.replace(/\/+/g, '/');
+      if (seen.has(normalized)) continue;
+      seen.add(normalized);
+      try { router.prefetch(normalized); } catch { /* route missing - skip */ }
+    }
+  }, [router, currentLang]);
+  
   const handleLanguageChange = useCallback((newLang: string) => {
     setCurrentLang(newLang);
     setIsLangOpen(false);
 
     if (!pathname) return;
 
-    if (pathname.startsWith('/blogs')) {
-      const rawSegments = pathname.replace(/^\/blogs\/?/, '').split('/').filter(Boolean);
-      // Case 1: Blog index (/blogs or /blogs/)
+    if (pathname.startsWith('/blog')) {
+      const rawSegments = pathname.replace(/^\/blog\/?/, '').split('/').filter(Boolean);
+      // Case 1: Blog index (/blog or /blog/)
       if (rawSegments.length === 0) {
-        router.push(newLang === 'en' ? '/blogs/' : `/blogs/${newLang}/`);
+        router.push(newLang === 'en' ? '/blog/' : `/blog/${newLang}/`);
         return;
       }
 
@@ -118,9 +139,9 @@ export default function Navbar({
         const seg = rawSegments[0];
         const isLangIndex = SITE_LANGUAGES.some((l) => l.code === seg);
         if (isLangIndex) {
-          router.push(newLang === 'en' ? '/blogs/' : `/blogs/${newLang}/`);
+          router.push(newLang === 'en' ? '/blog/' : `/blog/${newLang}/`);
         } else {
-          router.push(newLang === 'en' ? `/blogs/${seg}/` : `/blogs/${newLang}/${seg}/`);
+          router.push(newLang === 'en' ? `/blog/${seg}/` : `/blog/${newLang}/${seg}/`);
         }
         return;
       }
@@ -128,7 +149,7 @@ export default function Navbar({
       // Case 3: Two segments: [lang, slug] e.g. ['es', 'enable_webgpu_guide_b5c9e8']
       if (rawSegments.length >= 2) {
         const slug = rawSegments[1];
-        router.push(newLang === 'en' ? `/blogs/${slug}/` : `/blogs/${newLang}/${slug}/`);
+        router.push(newLang === 'en' ? `/blog/${slug}/` : `/blog/${newLang}/${slug}/`);
         return;
       }
     }
@@ -195,7 +216,7 @@ export default function Navbar({
     const nav = navRef.current;
     const btn = navBtnRefs.current[tab];
     if (!nav || !btn) {
-      // Active tab has no desktop nav item (e.g. blogs / static pages).
+      // Active tab has no desktop nav item (e.g. blog / static pages).
       setActivePillStyle((prev) => (prev.opacity === 0 ? prev : { ...prev, opacity: 0 }));
       return;
     }
@@ -529,7 +550,7 @@ export default function Navbar({
                       <span className="truncate">{isClearingModelCache ? t.nav.clearing : t.nav.clearModels}</span>
                     </button>
                     <Link
-                      href={"/blogs/enable_webgpu_guide_b5c9e8"}
+                      href={"/blog/enable_webgpu_guide_b5c9e8"}
                       onClick={() => setIsSettingsOpen(false)}
                       className="flex items-center justify-center gap-1.5 rounded-xl border border-violet-400/20 bg-violet-400/[0.07] px-2 py-2 text-center text-[11px] font-medium text-violet-200 hover:bg-violet-400/[0.14] hover:text-violet-100 transition-colors"
                       title={t.nav.learnWebgpu}

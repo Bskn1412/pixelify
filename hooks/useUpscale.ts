@@ -204,7 +204,8 @@ export function useUpscale({ runtimeRef, sessionRef }: UseUpscaleParams): UseUps
                     stepIndex: 3,
                     totalSteps: steps.length
                   }),
-                onSessionUpdated
+                onSessionUpdated,
+                checkCancelled
               );
               cw *= m.scale;
               ch *= m.scale;
@@ -236,7 +237,8 @@ export function useUpscale({ runtimeRef, sessionRef }: UseUpscaleParams): UseUps
                     stepIndex: 4,
                     totalSteps: steps.length
                   }),
-                onSessionUpdated
+                onSessionUpdated,
+                checkCancelled
               );
               cw = passDstW;
               ch = passDstH;

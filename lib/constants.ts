@@ -280,14 +280,14 @@ export const CHOPPER_MODEL_URL =
     )
     : undefined;
 
-/** Optional remote URL for background removal model (Diablo) configured via env. Falls back to /models/Diablo.onnx */
-export const DIABLO_MODEL_URL =
-  (process.env.HF_DIABLO_MODEL || process.env.NEXT_PUBLIC_HF_DIABLO_MODEL || process.env.HG_CHOPPER_MODEL)
-    ? resolveModelUrl(
-      process.env.HF_DIABLO_MODEL || process.env.NEXT_PUBLIC_HF_DIABLO_MODEL, 
-      'Diablo.onnx'
-    )
-    : undefined;
+/** Remote URL for background removal model (Diablo) configured via env. Falls back to Hugging Face */
+export const DIABLO_MODEL_URL = resolveModelUrl(
+  process.env.HF_DIABLO_MODEL ||
+    process.env.NEXT_PUBLIC_HF_DIABLO_MODEL ||
+    process.env.HG_DIABLO_MODEL ||
+    'https://huggingface.co/Joker5800/pixelify/resolve/main/Diablo.onnx',
+  'Diablo.onnx'
+);
 
 /** Remote URLs for LiteRT WebAssembly runtimes hosted on Hugging Face */
 export const LITERT_WASM_URLS = {

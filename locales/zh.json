@@ -27,7 +27,7 @@
     "home": "首页",
     "bgRemove": "抠图背景消除",
     "upscaler": "AI 超分辨率",
-    "blogs": "技术博客",
+    "blog": "技术博客",
     "settingsTitle": "设置与偏好",
     "processingEngines": "推理计算引擎",
     "webgpuSupport": "WebGPU 硬件支持",
@@ -269,8 +269,8 @@
     "downloadCutout": "下载透明 PNG",
     "tabCutout": "抠图主体",
     "tabBackdrop": "替换背景",
-    "tabText": "文字排版",
-    "tabRefine": "边缘精修"
+    "tabText": "设计",
+    "tabRefine": "裁剪"
   },
   "bgSections": {
     "marquee": [
@@ -382,7 +382,7 @@
     "bgRemover": "智能抠图去背景",
     "products": "产品功能特性",
     "docs": "技术文档",
-    "blogs": "技术博客",
+    "blog": "技术博客",
     "faqs": "常见问题",
     "about": "关于 Pixelify",
     "contact": "联系我们",
@@ -390,7 +390,7 @@
     "terms": "用户服务条款",
     "rights": "© 2026 Pixelify Inc. 版权所有，保留一切权利。"
   },
-  "blogs": {
+  "blog": {
     "title": "技术博客与 AI 指南",
     "subtitle": "探索端侧 AI、隐私防护、图像超分、智能抠图以及 WebGPU 的深度实战经验。",
     "searchPlaceholder": "按标题、标签或关键字搜索技术文章…",

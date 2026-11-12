@@ -27,7 +27,7 @@
     "home": "Главная",
     "bgRemove": "Удаление фона",
     "upscaler": "AI Апскейлер",
-    "blogs": "Блог",
+    "blog": "Блог",
     "settingsTitle": "Настройки и параметры",
     "processingEngines": "Движки обработки",
     "webgpuSupport": "Поддержка WebGPU",
@@ -269,8 +269,8 @@
     "downloadCutout": "Скачать PNG",
     "tabCutout": "Объект",
     "tabBackdrop": "Фон",
-    "tabText": "Текст",
-    "tabRefine": "Ретушь"
+    "tabText": "Дизайн",
+    "tabRefine": "Обрезать"
   },
   "bgSections": {
     "marquee": [
@@ -382,7 +382,7 @@
     "bgRemover": "Удаление фона",
     "products": "Возможности и функции",
     "docs": "Документация",
-    "blogs": "Блог",
+    "blog": "Блог",
     "faqs": "Частые вопросы",
     "about": "О проекте Pixelify",
     "contact": "Контакты",
@@ -390,7 +390,7 @@
     "terms": "Условия использования",
     "rights": "© 2026 Pixelify Inc. Все права защищены."
   },
-  "blogs": {
+  "blog": {
     "title": "Блог и руководства по ИИ",
     "subtitle": "Статьи о локальном ИИ, приватности, удалении фона, апскейлинге и WebGPU.",
     "searchPlaceholder": "Поиск статей по названию, тегу или теме…",
