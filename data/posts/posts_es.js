@@ -4,6 +4,118 @@
  */
 export const POSTS_ES = [
   {
+  "slug": "local_ai_in_browser_d2f9c4",
+  "title": "Cómo se ejecuta realmente la IA en la pestaña de tu navegador y las soluciones técnicas que requirió",
+  "description": "Los navegadores se diseñaron para mostrar documentos, no para procesar redes neuronales. Un recorrido técnico por el cómputo en GPU, Web Workers, teselado, caché y los compromisos de ingeniería que hacen que la IA local parezca mágica.",
+  "tags": [
+    "Ingeniería",
+    "IA local",
+    "WebGPU"
+  ],
+  "date": "2026-11-13",
+  "author": "El equipo de Pixelify",
+  "cover": "/blog/story-page.jpg",
+  "coverAlt": "Tipografía de la página de historia de Pixelify que describe IA local para tus imágenes",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "Los navegadores web nacieron para solicitar y mostrar documentos de texto. La idea de que ese mismo software —aislado en una sandbox, multiplataforma y ejecutándose en un portátil de hace diez años desde una cafetería— pueda reconstruir imágenes mediante redes neuronales complejas suena, a simple vista, absurda. Sin embargo, funciona; y en el espacio que separa lo 'absurdo' de lo 'funcional' es donde reside toda la ingeniería fascinante. Este es un recorrido por ese camino: qué ocurre realmente cuando sueltas una foto en una herramienta de IA local y cada solución técnica a la que nos obligaron las restricciones del navegador."
+    },
+    {
+      "type": "h2",
+      "text": "El modelo es solo un archivo"
+    },
+    {
+      "type": "p",
+      "text": "Comencemos por el modelo mental del que carece la mayoría: una red neuronal entrenada es, físicamente, un gran archivo de números (pesos sinápticos organizados en matrices y capas). No contiene código ejecutable en el sentido tradicional; es una estructura de datos que describe matemáticamente cómo transformar otros datos. Esta distinción es crucial, porque los archivos son algo que los navegadores llevan décadas manejando a la perfección. La primera vez que visitas una herramienta de IA local, tu navegador descarga ese archivo como cualquier otro recurso estático y lo almacena en la caché local para no volver a descargarlo."
+    },
+    {
+      "type": "p",
+      "text": "Esta es la primera decisión consciente de arquitectura: el archivo viaja una sola vez hacia ti, pero tus imágenes nunca hacen el viaje inverso. El tráfico carece de simetría. Decenas de megabytes bajan hacia tu máquina; exactamente cero bytes de tus fotos suben a la red. Abrir el inspector de red durante un uso intensivo deja en evidencia la arquitectura de forma visceral: el registro de peticiones permanece en absoluto silencio mientras tus fotos se procesan."
+    },
+    {
+      "type": "h2",
+      "text": "Dónde ocurre el cálculo: la GPU entra en juego"
+    },
+    {
+      "type": "p",
+      "text": "Una pasada de inferencia en una red neuronal es masivamente paralela: millones de multiplicaciones y sumas simultáneas sin dependencias secuenciales estrictas entre sí. Una CPU puede resolverlas, pero con lentitud, porque un procesador convencional cuenta con un número limitado de núcleos. En cambio, las GPU disponen de miles de núcleos pequeños diseñados específicamente para cálculos matriciales masivos, originariamente pensados para renderizar polígonos gráficos, lo que aritméticamente es idéntico a lo que exige una red neuronal."
+    },
+    {
+      "type": "p",
+      "text": "Los navegadores actuales exponen ese hardware gráfico mediante APIs modernas de cálculo. Este avance es el único responsable de que la IA en el navegador sea hoy viable. Con WebGPU —la generación actual—, el navegador entrega los pesos del modelo y los píxeles de la imagen al controlador gráfico como buffers directos, permitiendo que la GPU los procese a máxima velocidad. La misma fotografía que tardaría minutos en una ruta basada únicamente en CPU concluye en pocos segundos con aceleración gráfica. Y cuando WebGPU no está disponible, el sistema recurre a WebAssembly: un formato binario portátil que ejecuta código multihilo a velocidad casi nativa sobre la CPU. Es más lento, pero compatible con cualquier dispositivo."
+    },
+    {
+      "type": "img",
+      "src": "/blog/settings-engine.jpg",
+      "alt": "Panel de configuración de Pixelify mostrando el estado del motor en tiempo real",
+      "caption": "El panel de ajustes indica qué motor está en ejecución: aceleración por GPU o respaldo por CPU."
+    },
+    {
+      "type": "h2",
+      "text": "Solución uno: teselado, porque la memoria es finita"
+    },
+    {
+      "type": "p",
+      "text": "Una fotografía de 12 megapíxeles ampliada a 4× genera una representación intermedia de 192 megapíxeles durante el cálculo. La memoria de vídeo en un portátil estándar se comparte con el resto del sistema operativo, el propio navegador y docenas de pestañas abiertas. Retener toda la matriz de cálculo en VRAM a la vez no es viable de forma consistente. La solución es el teselado (tiling): dividir la imagen en bloques solapados, procesar cada bloque en la red de forma independiente y ensamblar los resultados finales."
+    },
+    {
+      "type": "p",
+      "text": "El teselado crea un reto adicional: las neuronas en el borde de un bloque solo ven la mitad de su contexto circundante, por lo que su cálculo difiere ligeramente de lo que producirían en el centro, y una unión simple dejaría costuras visibles. Las correcciones son complejas pero efectivas: un solapamiento amplio entre bloques para fundir gradualmente los bordes, normalización estadística uniforme en cada pasada y ventanas de mezcla matemática que disuelven las discrepancias a lo largo de cientos de píxeles donde el ojo humano no puede detectarlas."
+    },
+    {
+      "type": "h2",
+      "text": "Solución dos: mantener la interfaz interactiva"
+    },
+    {
+      "type": "p",
+      "text": "En la web, JavaScript comparte un único hilo con la interfaz. Si ese hilo se bloquea multiplicando matrices durante tres segundos, los clics dejan de responder, el desplazamiento se congela y el navegador advierte al usuario de que la página no responde. La solución reside en los Web Workers: hilos independientes en segundo plano que asumen todo el cómputo y se comunican con la página exclusivamente mediante mensajes asíncronos. La página permanece ágil y reactiva; el worker actúa como un servidor de cómputo privado dentro de la propia pestaña."
+    },
+    {
+      "type": "p",
+      "text": "La barra de progreso utiliza ese mismo canal. Al procesarse por teselas y etapas secuenciales, el worker emite datos de avance verídicos: no una animación decorativa, sino un porcentaje real calculado sobre el trabajo completado. El sonido que avisa cuando la imagen está lista viaja por el mismo hilo, permitiendo que el navegador te notifique incluso si estás en otra pestaña."
+    },
+    {
+      "type": "h2",
+      "text": "Solución tres: optimizar la primera carga"
+    },
+    {
+      "type": "p",
+      "text": "El modelo debe descargarse al principio, y una primera visita fría asume ese tiempo de transferencia. Tres capas de optimización mitigan esta espera: el archivo se almacena en el almacenamiento persistente del navegador (IndexedDB / CacheStorage), pagando el coste una sola vez por equipo; la descarga se transmite mostrando el progreso real en lugar de una pantalla bloqueada; y en visitas posteriores se verifica la integridad del archivo mediante un hash ultrarrápido en milisegundos en vez de volver a descargarlo."
+    },
+    {
+      "type": "callout",
+      "title": "La prueba irrefutable",
+      "text": "Tras cargar la página por primera vez, desconecta tu conexión a internet por completo. Cada herramienta seguirá funcionando sin interrupciones. En ese instante, la arquitectura deja de ser una afirmación de marketing y se convierte en algo comprobado por ti mismo."
+    },
+    {
+      "type": "h2",
+      "text": "Solución cuatro: diagnosticar el hardware real"
+    },
+    {
+      "type": "p",
+      "text": "La combinación de navegador, sistema operativo y tarjeta gráfica crea un sinfín de posibilidades de compatibilidad. La capa de inicialización formula una serie de comprobaciones estrictas: ¿está disponible la API de cómputo gráfico? ¿hay suficiente memoria disponible para los buffers de trabajo? ¿completó la primera inferencia real sin que el controlador gráfico fallara? (Muchos controladores declaran soporte que luego no pueden sostener). Solo cuando todas las respuestas son afirmativas se confirma la aceleración por GPU; de lo contrario, el sistema conmuta discretamente al motor por CPU, más lento pero completamente seguro."
+    },
+    {
+      "type": "p",
+      "text": "Esta decisión se muestra abiertamente en el producto. El menú de ajustes informa del motor activo en tiempo real, leído directamente del entorno de ejecución y no asumido por simples comprobaciones teóricas. Los usuarios en CPU entienden su rendimiento, los usuarios con GPU confirman la aceleración, y cualquier incidencia incluye un diagnóstico fiable. La transparencia técnica aquí no es una pose: es ingeniería rigurosa."
+    },
+    {
+      "type": "h2",
+      "text": "Por qué esto solo irá a mejor"
+    },
+    {
+      "type": "p",
+      "text": "Cada componente de este ecosistema técnico avanza a gran velocidad. Las APIs de cómputo gráfico reciben controladores más maduros y mejores compiladores de shaders. Los motores de los navegadores optimizan constantemente sus operaciones de tensores. Los fabricantes de procesadores integran GPU y NPU más potentes en móviles y portátiles año tras año. Y los propios modelos se reducen de tamaño mediante técnicas de destilación y cuantización, logrando redes más ligeras que preservan la calidad original. Estas soluciones técnicas no desaparecerán, pero el coste para el usuario tenderá a cero."
+    },
+    {
+      "type": "p",
+      "text": "La conclusión profunda es de arquitectura, no puramente de software. El navegador ha demostrado ser un hogar extraordinario para las cargas de IA: está preinstalado en todas partes, ejecuta código dentro de una sandbox de seguridad estricta y distribuye actualizaciones automáticas a miles de millones de personas sin instaladores manuales. El software que debe ejecutarse en tu propio equipo sin comprometer tu privacidad es exactamente aquello para lo que los navegadores fueron concebidos. La IA local no invadió el navegador: el navegador estaba diseñado para recibirla."
+    }
+  ]
+},
+
+{
   "slug": "upscaler_advantages_e5a8d3",
   "title": "Lo que desbloquea la ampliación con IA: siete flujos de trabajo reales transformados",
   "description": "Desde recuperar escaneos familiares de hace décadas hasta crear pósteres listos para imprimir o capturas de pantalla nítidas: casos de uso prácticos donde la ampliación con IA demuestra su valor y por qué la velocidad en el dispositivo hace que iterar sea gratis.",
