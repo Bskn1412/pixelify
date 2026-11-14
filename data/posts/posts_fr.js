@@ -4,6 +4,94 @@
  */
 export const POSTS_FR = [
   {
+    slug: 'local_ai_in_browser_d2f9c4',
+    title: 'Comment l\'IA s\'exécute réellement dans l\'onglet de votre navigateur, et les solutions qu\'il a fallu concevoir',
+    description:
+      'Les navigateurs ont été conçus pour afficher des documents, pas pour exécuter des réseaux neuronaux. Un coup d\'œil sous le capot du calcul GPU, des workers, du découpage en tuiles, du cache et des compromis d\'ingénierie qui rendent l\'IA sur appareil fluide et naturelle.',
+    tags: ['Ingénierie', 'IA Locale', 'WebGPU'],
+    date: '2026-11-13',
+    author: 'L\'équipe Pixelify',
+    cover: '/blog/story-page.jpg',
+    coverAlt: 'Typographie de la page d\'histoire Pixelify décrivant l\'IA locale pour vos images',
+    blocks: [
+      {
+        type: 'p',
+        text: 'Les navigateurs ont été conçus pour récupérer et afficher des documents. L\'idée que le même logiciel, isolé dans un environnement sécurisé, portable, s\'exécutant sur un ordinateur portable vieux de dix ans dans un café, puisse désormais reconstruire des images avec des réseaux neuronaux semble, à première vue, absurde. Cela fonctionne pourtant, et la distance entre « absurde » et « fonctionne » est l\'endroit où se situe toute l\'ingénierie intéressante. Voici une visite guidée de cette distance : ce qui se passe réellement lorsque vous déposez une image dans un outil d\'IA locale, et chaque contournement auquel les contraintes du navigateur nous ont obligés.',
+      },
+      { type: 'h2', text: 'Le réseau n\'est qu\'un simple fichier' },
+      {
+        type: 'p',
+        text: 'Commençons par le modèle mental qui manque à la plupart des gens. Un réseau neuronal entraîné est, physiquement, un grand fichier de nombres (des poids, organisés en couches). Il ne contient aucun code au sens traditionnel ; ce sont des données qui décrivent comment transformer d\'autres données. Cette distinction est essentielle car les fichiers sont des éléments que les navigateurs ont toujours su gérer efficacement. Lorsque vous visitez un outil d\'IA locale pour la première fois, le navigateur télécharge ce fichier de la même manière qu\'il chargerait n\'importe quel élément, et le conserve dans un cache pour que les visites suivantes évitent ce téléchargement.',
+      },
+      {
+        type: 'p',
+        text: 'C\'est le premier choix de conception délibéré : le fichier arrive une fois, puis vos images ne font jamais le chemin inverse. Il n\'y a aucune symétrie dans le trafic. Des dizaines de mégaoctets s\'écoulent vers vous ; zéro octet de vos images ne remonte vers l\'extérieur. Observer l\'inspecteur réseau pendant une utilisation intensive rend l\'architecture parfaitement évidente : le journal des requêtes reste totalement silencieux pendant que vos photos sont traitées.',
+      },
+      { type: 'h2', text: 'Où s\'exécutent les mathématiques : le GPU entre en scène' },
+      {
+        type: 'p',
+        text: 'Une passe de réseau neuronal est d\'une nature massivement parallèle : des millions de petites multiplications et additions sans ordre particulier entre elles. Les processeurs (CPU) gèrent cela, mais lentement, car un processeur généraliste possède un nombre modeste de cœurs. Les GPU possèdent des milliers de petits cœurs conçus exactement pour ce type de travail — à l\'origine le calcul matriciel pour le rendu graphique, qui est arithmétiquement identique à ce dont les réseaux neuronaux ont besoin.',
+      },
+      {
+        type: 'p',
+        text: 'Les navigateurs modernes exposent ce matériel via les API de calcul GPU. C\'est l\'évolution majeure qui a rendu l\'IA dans le navigateur praticable. Sous WebGPU, la génération actuelle, le navigateur transmet le fichier réseau et les données de votre image au pilote graphique sous forme de mémoires tampons brutes (buffers) et laisse le GPU les traiter. La même photographie qui prend des minutes sur un parcours purement CPU se termine en quelques secondes sur GPU. Lorsque WebGPU n\'est pas disponible, le recours se fait via WebAssembly : un format binaire portable qui exécute du code à une vitesse proche du natif dans le navigateur, réparti sur plusieurs cœurs CPU. Plus lent, mais disponible partout.',
+      },
+      {
+        type: 'img',
+        src: '/blog/settings-engine.jpg',
+        alt: 'Panneau des paramètres Pixelify montrant les badges du moteur en direct pour chaque outil',
+        caption: 'Le panneau des paramètres indique quel moteur s\'exécute réellement : l\'accélération GPU ou le recours au CPU.',
+      },
+      { type: 'h2', text: 'Première solution : le découpage en tuiles, car la mémoire est finie' },
+      {
+        type: 'p',
+        text: 'Une photo de 12 mégapixels agrandie 4× produit une représentation intermédiaire de 192 mégapixels pendant le traitement. La mémoire graphique d\'un ordinateur portable ordinaire est partagée avec tout ce que fait votre machine, du navigateur lui-même aux autres onglets jusqu\'au système d\'exploitation. Conserver toute la charge de calcul d\'un coup n\'est pas possible de façon fiable. La solution consiste à découper en tuiles : diviser l\'image en blocs qui se chevauchent, traiter chaque bloc à travers le réseau de façon indépendante, et réassembler les résultats.',
+      },
+      {
+        type: 'p',
+        text: 'Le découpage en tuiles crée son propre problème. Les neurones situés sur le bord d\'une tuile ne voient que la moitié de leur contexte, de sorte que leur résultat diffère légèrement de ce que les mêmes pixels produiraient au milieu d\'une tuile, et un assemblage basique montre ces désaccords sous forme de coutures visibles. Les correctifs sont simples mais efficaces : un chevauchement important entre les tuiles pour que les zones bordures puissent être fondues progressivement, une normalisation cohérente pour que chaque tuile voie des statistiques identiques, et des fenêtres de transition qui répartissent l\'erreur sur des centaines de pixels là où l\'œil ne peut pas la repérer.',
+      },
+      { type: 'h2', text: 'Seconde solution : maintenir la page réactive' },
+      {
+        type: 'p',
+        text: 'JavaScript partage un fil d\'exécution (thread) unique avec la page. Si ce fil d\'exécution est occupé à multiplier des matrices pendant trois secondes, les clics ne répondent plus, le défilement saccade, et le navigateur finit par demander à l\'utilisateur si la page a planté. La solution est le worker : un thread séparé qui gère entièrement le calcul et ne communique avec la page que par messages. La page reste un document fluide et réactif ; le worker devient un serveur de calcul intégré à l\'onglet.',
+      },
+      {
+        type: 'p',
+        text: 'Le suivi de la progression utilise ce même canal de messages. Comme le traitement s\'effectue par tuiles et par étapes, le worker peut transmettre une vraie progression : pas un indicateur visuel décoratif, mais un pourcentage réel dérivé du travail accompli. Le signal sonore qui retentit lorsque votre image est terminée emprunte ce même canal de communication, ce qui explique aussi pourquoi le navigateur peut vous avertir même lorsque l\'onglet est au second plan.',
+      },
+      { type: 'h2', text: 'Troisième solution : l\'attente lors du premier lancement' },
+      {
+        type: 'p',
+        text: 'Le fichier réseau doit bien provenir de quelque part, et une toute première visite nécessite du temps pour le téléchargement. Trois mécanismes se superposent. Le fichier est conservé dans le stockage persistant du navigateur, de sorte que ce coût n\'est payé qu\'une seule fois par appareil, et non à chaque session. Les téléchargements s\'effectuent en continu avec une progression visible plutôt qu\'une page figée. Et lors des visites suivantes, le cache est vérifié plutôt que re-téléchargé — une rapide vérification d\'empreinte (hash) au lieu d\'un transfert de plusieurs secondes.',
+      },
+      {
+        type: 'callout',
+        title: 'Le test révélateur',
+        text: 'Après votre première visite, attendez que la page soit entièrement chargée, puis déconnectez-vous du réseau. Tous les outils fonctionnent toujours. C\'est le moment où l\'architecture cesse d\'être une affirmation pour devenir une réalité que vous avez vérifiée vous-même.',
+      },
+      { type: 'h2', text: 'Quatrième solution : détecter les capacités du matériel' },
+      {
+        type: 'p',
+        text: 'Le navigateur, le système d\'exploitation et le matériel forment un ensemble complexe de configurations possibles. La couche de détection pose une suite de questions dans l\'ordre : une API moderne de calcul GPU est-elle disponible et l\'initialisation réussit-elle, l\'appareil possède-t-il assez de mémoire pour l\'ensemble de travail, le premier calcul réel s\'est-il déroulé sans plantage du pilote (les pilotes trompent parfois le système ; certains annoncent une prise en charge qu\'ils ne peuvent pas assurer). Ce n\'est que lorsque chaque réponse est positive que l\'outil s\'engage sur l\'accélération GPU ; dans le cas contraire, il bascule silencieusement sur le parcours CPU, qui est plus lent mais fiable.',
+      },
+      {
+        type: 'p',
+        text: 'Cette décision est volontairement visible dans le produit. Le panneau des paramètres indique le moteur actif pour chaque outil, relu depuis l\'environnement d\'exécution plutôt que supposé d\'après la détection théorique. Les utilisateurs sur le parcours CPU le voient clairement, les utilisateurs sur le parcours GPU voient l\'accélération confirmée, et les rapports de bugs arrivent avec un diagnostic déjà intégré. La transparence ici n\'est pas une posture de confidentialité ; c\'est un choix d\'ingénierie.',
+      },
+      { type: 'h2', text: 'Pourquoi cela ne fera que devenir plus rapide' },
+      {
+        type: 'p',
+        text: 'Chaque couche de cet ensemble suit une trajectoire de progression. Les API de calcul GPU bénéficient d\'une meilleure prise en charge des pilotes et d\'une compilation optimisée. Les moteurs des navigateurs améliorent leurs opérations sur les tenseurs. Les fabricants de matériel livrent chaque année des GPU mobiles et portables plus performants. Et les fichiers réseaux eux-mêmes réduisent leur taille à mesure que les techniques de distillation s\'améliorent, produisant des réseaux plus compacts qui conservent l\'essentiel de la qualité de leurs équivalents plus volumineux. La liste des solutions ci-dessus ne disparaîtra pas, mais son coût en temps pour l\'utilisateur tend vers zéro.',
+      },
+      {
+        type: 'p',
+        text: 'Le point fondamental est d\'ordre architectural et non technique. Le navigateur s\'est révélé être un environnement étonnamment adapté pour les charges de travail d\'IA : il est déjà installé partout, déjà sécurisé dans son bac à sable, applique déjà le bon modèle de sécurité et, fait unique parmi les plates-formes logicielles, déploie ses propres mises à jour auprès de milliards d\'appareils sans demande de téléchargement. Un logiciel qui doit s\'exécuter sur votre machine sans devoir faire confiance à son opérateur correspond exactement à ce pour quoi les navigateurs ont été créés. L\'IA locale n\'a pas forcé son entrée dans le navigateur. Le navigateur l\'attendait.',
+      },
+    ],
+  },
+
+{
     slug: 'upscaler_advantages_e5a8d3',
     title: 'Ce que débloque l\'agrandissement par IA : Sept flux de travail réels transformés',
     description:

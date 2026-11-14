@@ -4,6 +4,118 @@
  */
 export const POSTS_PT = [
   {
+  "slug": "local_ai_in_browser_d2f9c4",
+  "title": "Como a IA realmente roda dentro da aba do seu navegador e os malabarismos técnicos necessários",
+  "description": "Navegadores foram feitos para exibir documentos, não para rodar redes neurais. Conheça os bastidores da computação em GPU, Web Workers, divisão em blocos (tiling), cache e as soluções de engenharia que fazem a IA local parecer instantânea.",
+  "tags": [
+    "Engenharia",
+    "IA Local",
+    "WebGPU"
+  ],
+  "date": "2026-11-13",
+  "author": "A Equipe Pixelify",
+  "cover": "/blog/story-page.jpg",
+  "coverAlt": "Tipografia da página de história do Pixelify descrevendo IA local para suas imagens",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "Os navegadores web foram criados para baixar e renderizar páginas de texto. A ideia de que esse mesmo ambiente — isolado em sandbox, portátil e rodando em um notebook de dez anos atrás em uma cafeteria — possa reconstruir imagens complexas com redes neurais soa, à primeira vista, absurda. Mas funciona, e no espaço entre o 'absurdo' e o 'funcional' é onde mora toda a engenharia interessante. Este é um panorama dos bastidores: o que de fato acontece quando você arrasta uma imagem para uma ferramenta de IA local e cada solução técnica que as limitações do navegador nos forçaram a inventar."
+    },
+    {
+      "type": "h2",
+      "text": "O modelo é apenas um arquivo"
+    },
+    {
+      "type": "p",
+      "text": "Vamos começar pelo modelo mental que falta à maioria das pessoas: uma rede neural treinada é, fisicamente, um arquivo volumoso de números (pesos sinápticos distribuídos em camadas e matrizes). Ela não contém código executável tradicional; é uma estrutura de dados que dita matematicamente como transformar outras informações. Essa distinção é fundamental porque navegadores sempre foram excelentes para lidar com arquivos. Na primeira vez que você acessa uma ferramenta de IA local, o navegador baixa esse arquivo como qualquer outro recurso estático e o salva no cache persistente, dispensando novos downloads."
+    },
+    {
+      "type": "p",
+      "text": "Essa é a primeira grande decisão de arquitetura: o arquivo viaja até você uma única vez, e suas fotos nunca fazem o caminho inverso. O tráfego de rede é totalmente unidirecional. Dezenas de megabytes descem até o seu computador; exatamente zero bytes das suas imagens sobem para a internet. Observar o painel de rede durante o uso contínuo deixa isso bem claro: o registro de requisições permanece completamente inerte enquanto suas imagens são processadas."
+    },
+    {
+      "type": "h2",
+      "text": "Onde os cálculos acontecem: a GPU entra em cena"
+    },
+    {
+      "type": "p",
+      "text": "Uma passagem de inferência em redes neurais é massivamente paralela: são milhões de multiplicações e somas independentes que não dependem umas das outras. CPUs comuns conseguem lidar com isso, mas devagar, já que possuem poucos núcleos de uso geral. Já as GPUs contam com milhares de pequenos núcleos feitos exatamente para cálculos matriciais — algo desenvolvido originalmente para renderizar gráficos 3D, mas matematicamente idêntico ao que a IA exige."
+    },
+    {
+      "type": "p",
+      "text": "Os navegadores modernos agora expõem esse hardware por meio de APIs de computação em GPU. Essa foi a inovação que tornou a IA no navegador algo viável. Sob o WebGPU, a tecnologia atual, o navegador entrega o modelo e os dados da imagem diretamente aos drivers de vídeo em buffers brutos, permitindo que a GPU processe tudo com máxima performance. Uma imagem que levaria minutos na CPU é processada em segundos na GPU. E caso o WebGPU não esteja disponível, o sistema recorre ao WebAssembly: um formato binário que roda código multithread a velocidades próximas do nativo diretamente no processador. Mais lento, porém universal."
+    },
+    {
+      "type": "img",
+      "src": "/blog/settings-engine.jpg",
+      "alt": "Painel de configurações do Pixelify mostrando o motor gráfico ativo em tempo real",
+      "caption": "O painel de configurações exibe o motor em operação: aceleração por GPU ou fallback em CPU."
+    },
+    {
+      "type": "h2",
+      "text": "Desafio um: processamento em blocos (tiling), porque a memória é finita"
+    },
+    {
+      "type": "p",
+      "text": "Uma foto de 12 megapixels ampliada em 4× gera uma matriz intermediária de 192 megapixels durante o cálculo. A memória de vídeo em um notebook comum é compartilhada com o sistema operacional, o próprio navegador e dezenas de abas abertas. Reter toda a operação em VRAM de uma só vez não é viável com estabilidade. A saída é o fatiamento em blocos (tiling): a imagem é dividida em pequenas partes sobrepostas, cada parte passa pela rede neural isoladamente e os resultados são remontados no final."
+    },
+    {
+      "type": "p",
+      "text": "O tiling traz seu próprio problema: os pixels na borda de cada bloco só enxergam metade do contexto ao redor, gerando pequenas variações em relação ao centro do bloco que criariam emendas visíveis. As soluções exigem precisão matemática: sobreposição generosa entre os blocos para fazer uma fusão suave (cross-fade), normalização de cores idêntica em toda a imagem e matrizes de interpolação que diluem qualquer discrepância ao longo de centenas de pixels onde o olho humano não percebe."
+    },
+    {
+      "type": "h2",
+      "text": "Desafio dois: manter a interface ágil e responsiva"
+    },
+    {
+      "type": "p",
+      "text": "No navegador, o JavaScript divide uma única thread com a interface gráfica. Se essa thread ficar ocupada multiplicando matrizes por três segundos seguidos, a página congela, os cliques não respondem e o navegador exibe um alerta de travamento. A solução é o uso de Web Workers: threads paralelas que assumem todo o processamento pesado e conversam com a página apenas por mensagens assíncronas. A página continua leve e responsiva, enquanto o worker funciona como um servidor de cálculo silencioso dentro da aba."
+    },
+    {
+      "type": "p",
+      "text": "O indicador de progresso usa esse mesmo canal. Como o processamento ocorre em blocos e etapas bem definidas, o worker envia relatórios de avanço reais — não uma animação genérica, mas uma porcentagem matemática do trabalho já feito. O aviso sonoro emitido ao finalizar o arquivo usa o mesmo caminho, o que permite ao navegador notificar o usuário mesmo quando a aba estiver em segundo plano."
+    },
+    {
+      "type": "h2",
+      "text": "Desafio três: o tempo da primeira carga"
+    },
+    {
+      "type": "p",
+      "text": "O arquivo do modelo precisa ser transferido na primeira visita, o que exige alguns segundos de download. Para contornar isso, três estratégias foram aplicadas: o modelo fica guardado no armazenamento persistente do navegador, custando tempo apenas no primeiro acesso; o download exibe uma barra de progresso detalhada; e nos acessos seguintes, uma checagem rápida de integridade via hash valida o modelo localmente em milissegundos sem novo tráfego de rede."
+    },
+    {
+      "type": "callout",
+      "title": "O teste definitivo",
+      "text": "Após carregar o site pela primeira vez, desligue completamente o Wi-Fi ou desconecte a internet. Todas as ferramentas continuarão funcionando normalmente. É nesse momento que a promessa de privacidade deixa de ser discurso e se torna um fato comprovado por você."
+    },
+    {
+      "type": "h2",
+      "text": "Desafio quatro: identificar a real capacidade do hardware"
+    },
+    {
+      "type": "p",
+      "text": "A combinação entre navegadores, sistemas operacionais e placas de vídeo é imprevisível. Nossa camada de inicialização faz uma bateria rigorosa de checagens: a API de GPU está disponível? Há memória livre suficiente para os buffers? A primeira inferência concluiu sem travamentos no driver? (Muitos drivers relatam suporte que não conseguem sustentar na prática). Apenas se todas as respostas forem positivas a ferramenta ativa a aceleração gráfica; do contrário, ela migra discretamente para a CPU, que é mais lenta mas sempre confiável."
+    },
+    {
+      "type": "p",
+      "text": "Essa escolha é transparente dentro da aplicação. O menu de configurações exibe o motor real em execução, medido diretamente do ambiente e não suposto por testes teóricos. Quem está usando CPU entende o ritmo do processamento, quem está com GPU aproveita a velocidade máxima e relatórios de suporte chegam com diagnósticos precisos. Transparência técnica aqui é compromisso de engenharia."
+    },
+    {
+      "type": "h2",
+      "text": "Por que a velocidade só vai aumentar"
+    },
+    {
+      "type": "p",
+      "text": "Todas as partes dessa engrenagem continuam evoluindo. As APIs de GPU ganham drivers mais refinados e compiladores melhores. Os motores dos navegadores otimizam operações tensoriais com frequência. Fabricantes de chips lançam núcleos gráficos e NPUs mais velozes a cada ano. E os modelos de IA ficam cada vez mais compactos graças a técnicas modernas de destilação e quantização, mantendo a fidelidade visual com frações do peso original. Esses desafios técnicos não vão sumir, mas o tempo de espera do usuário caminhará para quase zero."
+    },
+    {
+      "type": "p",
+      "text": "O aspecto mais relevante é estrutural. O navegador revelou-se um ambiente formidável para rodar IA: já vem instalado em qualquer máquina, opera em ambiente isolado (sandbox), implementa políticas rígidas de segurança e atualiza bilhões de dispositivos sem exigir instaladores. Uma plataforma capaz de rodar código pesado no seu computador com total privacidade é exatamente o que os navegadores foram projetados para ser. A IA local não invadiu a web: a web estava pronta para recebê-la."
+    }
+  ]
+},
+
+{
   "slug": "upscaler_advantages_e5a8d3",
   "title": "O que o upscaling com IA desbloqueia: sete fluxos de trabalho reais transformados",
   "description": "De recuperar scans de família de décadas atrás a pôsteres prontos para impressão e capturas de tela nítidas: casos de uso práticos onde o upscaling com IA mostra seu valor e por que a velocidade no dispositivo torna a iteração gratuita.",
