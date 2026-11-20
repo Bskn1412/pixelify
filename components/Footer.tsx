@@ -92,9 +92,9 @@ export default function Footer({ onTabChange }: FooterProps) {
             <nav aria-label="Resources links" className="flex flex-col items-start gap-2.5">
               <h3 className="mb-0.5 text-[11px] font-bold uppercase tracking-wider text-white">{t.footer.resourcesCol}</h3>
               <Link href={getLangHref('/docs')} className="text-muted transition hover:text-white">{t.footer.docs}</Link>
-              <Link href={getLangHref('/leaderboard')} className="text-muted transition hover:text-white">Leaderboard</Link>
               <button onClick={() => onTabChange('blog')} className="text-left text-muted transition hover:text-white">{t.footer.blog}</button>
               <Link href={getLangHref('/#home-faq')} className="text-muted transition hover:text-white">{t.footer.faqs}</Link>
+              <Link href={getLangHref('/leaderboard')} className="text-muted transition hover:text-white">Leaderboard</Link>
             </nav>
 
             <nav aria-label="Company and legal links" className="flex flex-col items-start gap-2.5">

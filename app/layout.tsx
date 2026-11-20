@@ -12,7 +12,6 @@ import '@/styles/app.css';
 import '@/styles/upscaler-sections.css';
 import '@/styles/not-found.css';
 import '@/styles/bgremove-sections.css';
-import '@/styles/home.css';
 
 import '@/styles/docs.css';
 import '@/styles/leaderboard.css';
@@ -147,11 +146,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Resource hints - browsers honour them wherever they appear; React hoists <meta>/<link> metadata tags to the head when possible */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap"
+        />
         <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
         <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net" />
         <link rel="dns-prefetch" href="https://adservice.google.com" />
         <link rel="preload" href="/fonts/Minecrafter.Reg.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/Redaction35-Regular.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
         {/* Bing (Next.js Metadata API exposes only the Googlebot variant) */}
         <meta name="bingbot" content="index, follow" />
 
@@ -187,10 +191,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </noscript>
 
         <TopProgressBar />
-        <AppProvider>{children}</AppProvider>
-        <VisitorTracker />
-        <LeaderboardRewardFeedback />
-        <VisitorNameDialog />
+        <AppProvider>
+          {children}
+          <VisitorTracker />
+          <LeaderboardRewardFeedback />
+          <VisitorNameDialog />
+        </AppProvider>
         <Analytics />
 
         {/* Structured data for Google rich results */}

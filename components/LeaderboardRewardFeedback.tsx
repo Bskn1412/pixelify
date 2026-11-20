@@ -3,10 +3,13 @@
 import { useEffect, useState } from 'react';
 import { Sparkles, Trophy, Wifi } from 'lucide-react';
 import { addRewardUpdateListener, getPendingRewardCount, syncPendingRewards, type RewardUpdate } from '@/lib/visitor';
+import { useTranslation } from '@/locales';
 
 type Popup = { id: string; amount: number; status: 'pending' | 'saved' };
 
 export default function LeaderboardRewardFeedback() {
+  const { t } = useTranslation();
+  const lb = t.leaderboard;
   const [popup, setPopup] = useState<Popup | null>(null);
   const [pendingCount, setPendingCount] = useState(0);
 
@@ -58,6 +61,17 @@ export default function LeaderboardRewardFeedback() {
     return () => window.clearTimeout(dismissTimer);
   }, [popup?.id]);
 
+  const pointLabel = popup
+    ? popup.amount === 1
+      ? (lb?.pointEarned || 'Point earned')
+      : (lb?.pointsEarned || 'Points earned')
+    : '';
+
+  const syncUnit = pendingCount === 1 ? (lb?.pointUnit || 'point') : (lb?.pointsPluralUnit || 'points');
+  const syncLabel = lb?.waitingToSync
+    ? lb.waitingToSync.replace('{count}', String(pendingCount)).replace('{unit}', syncUnit)
+    : `${pendingCount} ${syncUnit} waiting to sync`;
+
   return (
     <>
       {popup && (
@@ -69,10 +83,14 @@ export default function LeaderboardRewardFeedback() {
             <div className="min-w-0">
               <p className="flex items-baseline gap-2 leading-none">
                 <span className="font-mono text-lg font-bold text-[#fdcb6e]">+{popup.amount}</span>
-                <span className="truncate text-[10px] font-semibold uppercase tracking-[0.12em] text-white">{popup.amount === 1 ? 'Point earned' : 'Points earned'}</span>
+                <span className="truncate text-[10px] font-semibold uppercase tracking-[0.12em] text-white">
+                  {pointLabel}
+                </span>
               </p>
               <p className="mt-1 truncate text-[11px] leading-tight text-[#a4a4b8]">
-                {popup.status === 'saved' ? 'Added to leaderboard' : 'Saved on this device'}
+                {popup.status === 'saved'
+                  ? (lb?.addedToLeaderboard || 'Added to leaderboard')
+                  : (lb?.savedOnDevice || 'Saved on this device')}
               </p>
             </div>
           </div>
@@ -81,7 +99,7 @@ export default function LeaderboardRewardFeedback() {
       {pendingCount > 0 && !popup && (
         <div role="status" className="leaderboard-pending-enter fixed bottom-5 right-5 z-[120] flex items-center gap-2 rounded-xl border border-[#2a2a3e] bg-[#12121e]/95 px-3 py-2 text-xs font-medium text-[#c6c6d5] shadow-xl backdrop-blur-xl">
           <Wifi size={14} className="text-[#fdcb6e]" aria-hidden="true" />
-          {pendingCount} {pendingCount === 1 ? 'point' : 'points'} waiting to sync
+          {syncLabel}
         </div>
       )}
     </>

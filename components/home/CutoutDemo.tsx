@@ -349,14 +349,14 @@ export function CutoutDemo({
         </div>
       ) : (
         <ImageCompare
-          before="/home/studio/live-cut-before.jpg"
+          before="/home/results/live-cut-before.webp"
           after={resultFor(model, true)}
           alt={`Studio headphones cut out on a transparent background by ${model}`}
           beforeLabel="Original"
           afterLabel={`Cutout · ${model}`}
           aspect="3 / 2"
           checker
-          start={30}
+          start={50}
           zoom={zoom}
         />
       )}

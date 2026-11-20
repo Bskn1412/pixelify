@@ -121,6 +121,11 @@
  * - Cursive professional font applied ONLY here
  * - 45-degree up diagonal arrow
  */
+.hero-leaderboard-link,
+.hero-leaderboard-link span {
+  font-family: 'Satisfy', 'Dancing Script', cursive !important;
+}
+
 .hero-leaderboard-link {
   display: inline-flex !important;
   align-items: center !important;
@@ -130,7 +135,6 @@
   outline: none !important;
   box-shadow: none !important;
   padding: 2px 6px !important;
-  font-family: 'Satisfy', 'Dancing Script', cursive !important;
   font-size: 1.15rem !important; /* ~18px, perfect cursive readability */
   font-weight: 500 !important;
   letter-spacing: 0.02em !important;
@@ -141,7 +145,8 @@
   line-height: 1.2 !important;
 }
 
-.hero-leaderboard-link:hover {
+.hero-leaderboard-link:hover,
+.hero-leaderboard-link:hover span {
   color: #ffffff !important;
   text-shadow: 0 0 12px rgba(255, 255, 255, 0.5) !important;
 }

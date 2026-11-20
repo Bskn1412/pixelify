@@ -7,7 +7,7 @@ import ja from './ja.json';
 import ko from './ko.json';
 import hi from './hi.json';
 import ru from './ru.json';
-import { useApp } from '@/components/AppProvider';
+import { useAppOptional } from '@/components/AppProvider';
 
 export const DICTIONARIES: Record<string, typeof en> = {
   en,
@@ -33,7 +33,8 @@ export function getDictionary(lang?: string): typeof en {
  * React hook that returns the active dictionary and current language.
  */
 export function useTranslation() {
-  const { currentLang } = useApp();
+  const app = useAppOptional();
+  const currentLang = app?.currentLang || 'en';
   const dict = getDictionary(currentLang);
   return {
     t: dict,

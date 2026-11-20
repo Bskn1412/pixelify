@@ -24,8 +24,8 @@ interface ImageCompareProps {
 }
 
 const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
-const MIN = 3;
-const MAX = 97;
+const MIN = 0;
+const MAX = 100;
 
 /**
  * A live before / after frame: the enhanced layer is clipped at the divider,
@@ -45,7 +45,7 @@ export function ImageCompare({
   afterLabel = 'Enhanced',
   aspect = '5 / 4',
   checker = false,
-  start = 58,
+  start = 50,
   auto = true,
   zoom = 100,
   className = '',
@@ -85,7 +85,7 @@ export function ImageCompare({
   }, [paint, start]);
 
   // One calm sweep the first time the frame is visible: the divider travels
-  // from the left edge to just past centre, then stays where it landed.
+  // from the far left edge to the exact centre, then stays where it landed.
   useEffect(() => {
     if (!inView || played.current) return;
     played.current = true;
@@ -95,8 +95,8 @@ export function ImageCompare({
       return;
     }
 
-    const from = 10;
-    const to = start;
+    const from = MIN;
+    const to = 50;
     const duration = 1500;
     let began = 0;
 

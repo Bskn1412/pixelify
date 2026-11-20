@@ -778,5 +778,477 @@
     "upscalerReady": "Upscaler model ready; other models load when used",
     "modelsCleared": "Models cleared; they will download again when needed",
     "preparingBackground": "Preparing AI models in the background"
+  },
+  "customerLogos": {
+    "ariaLabel": "Pixelify runs on open web technology"
+  },
+  "studioIntro": {
+    "title": "A complete image studio, running on your device",
+    "lede": "Upscale to 8×, cut out any subject, and finish the frame, all on your device, with nothing uploaded to a server.",
+    "openUpscaler": "Open the upscaler",
+    "tryBgRemover": "Try the BG remover",
+    "features": {
+      "start": {
+        "title": "Start with any image",
+        "copy": "Drop a PNG, JPG or WebP or paste straight from the clipboard. Files up to 20 MB open instantly."
+      },
+      "refine": {
+        "title": "Refine in the studio",
+        "copy": "Choose a model and scale, then tune sharpness, denoise and face detail before you run."
+      },
+      "export": {
+        "title": "Export in one click",
+        "copy": "Download the full-resolution result or a transparent cutout. No account, no watermark."
+      }
+    },
+    "seeAll": "See everything the studio can do"
+  },
+  "studioCanvas": {
+    "brand": "Pixelify Studio",
+    "tabs": {
+      "canvas": "Canvas",
+      "models": "Models",
+      "export": "Export"
+    },
+    "pages": {
+      "home": "Home",
+      "upscaler": "Upscaler",
+      "bg": "BG Remover",
+      "models": "Models",
+      "gallery": "Gallery"
+    },
+    "railNote": {
+      "title": "On-device",
+      "copy": "Nothing leaves this tab. No upload queue, no account."
+    },
+    "stageHead": "See the difference",
+    "tools": {
+      "fit": "Fit canvas",
+      "zoomIn": "Zoom in",
+      "resetZoom": "Reset zoom"
+    },
+    "panelHeadings": {
+      "export": {
+        "title": "Export",
+        "sub": "format & scale"
+      },
+      "models": {
+        "title": "Models",
+        "sub": "5 models, on device"
+      },
+      "gallery": {
+        "title": "Gallery",
+        "sub": "Recent results"
+      },
+      "home": {
+        "title": "Settings",
+        "sub": "Studio & engine preferences"
+      },
+      "cutout": {
+        "title": "Cutout",
+        "sub": "Alpha matte & edges"
+      },
+      "upscale": {
+        "title": "Upscale",
+        "sub": "AI resolution & details"
+      }
+    },
+    "reset": "Reset",
+    "galleryNote": "Upscales and cutouts land side by side, so the before-and-after is always one glance away.",
+    "openGallery": "Open the gallery",
+    "anonymousCreator": "Anonymous Creator",
+    "studioProfile": "Studio profile · Local",
+    "processingEngines": "Processing Engines",
+    "aiUpscaler": "AI Upscaler",
+    "bgRemover": "BG Remover",
+    "webgpuSupport": "WebGPU Support",
+    "available": "Available",
+    "cacheNote": "Models cache locally on your machine in IndexedDB.",
+    "clearModels": "Clear models",
+    "learnWebgpu": "Learn WebGPU",
+    "format": "Format",
+    "summaryModel": "Model",
+    "summaryOutput": "Output",
+    "summaryFile": "File",
+    "download": "Download",
+    "saved": "Saved",
+    "modelLabel": "Model",
+    "cutoutModelLabel": "Cutout model",
+    "scaleFactor": "Scale factor",
+    "edgeFeather": "Edge feather",
+    "sharpness": "Sharpness",
+    "denoise": "Denoise",
+    "matteContrast": "Matte contrast"
+  },
+  "workflowSection": {
+    "toolsEyebrow": "Post-Processing Tools",
+    "toolsTitle": "From clean cutout to finished composition",
+    "toolsLede": "Backdrops, edge shadows, aspect ratio crops, and typography layers live in one focused canvas.",
+    "toolsShotbarTitle": "BG Remover · tools",
+    "toolsShotbarTag": "4 tabs · one mask",
+    "workflowEyebrow": "Made for every creative workflow",
+    "workflowTitle": "Your work. Your vision. Pixelify.",
+    "workflowLede": "From student projects to professional designs, Pixelify helps you remove backgrounds and upscale images without slowing down your creativity.",
+    "exploreTools": "Explore the tools",
+    "carouselShotbarTitle": "Pixelify · Made for you",
+    "carouselShotbarTag": "Every image has a purpose",
+    "carouselHeading": "Different people. Different possibilities.",
+    "carouselBody": "Whether you're creating, designing, studying, or running a business, there's a place for Pixelify in your workflow.",
+    "carouselMetaSide": "Better cutouts. Sharper images. More room to create. All in one simple workspace.",
+    "carouselLink": "Explore what Pixelify can do",
+    "toolTabs": {
+      "backdrop": {
+        "label": "Backdrop",
+        "copy": "Photo, colour or the blurred original behind the cutout."
+      },
+      "effects": {
+        "label": "Effects",
+        "copy": "Drop shadow, edge stroke and exposure on the subject alone."
+      },
+      "crop": {
+        "label": "Crop",
+        "copy": "Transform, mirror and lock to a social ratio without re-cutting."
+      },
+      "design": {
+        "label": "Design",
+        "copy": "Headline, sticker and layers export with the image."
+      },
+      "designLine": "Studio Sound. Pure Focus.",
+      "designTag": "Headline · Sticker Layer",
+      "stickerVal": "50% OFF",
+      "stickerLabel": "DEAL"
+    }
+  },
+  "platformBento": {
+    "headerTitle": "One studio for the complete image workflow",
+    "headerLede": "Everything you need from a photo editor upscaling, cutout, backdrops, formats and privacy built into one browser tab.",
+    "allFeatures": "All features",
+    "speedCard": {
+      "title": "Preview edits without the wait",
+      "copy": "Hardware acceleration when the browser has it, a WASM fallback when it doesn't.",
+      "metricsHead": "Upscale speed",
+      "badge": "WebGPU",
+      "vitality": "4× · Vitality",
+      "vitalityMeta": "1.9 MB model",
+      "tiled": "8× · tiled",
+      "tiledMeta": "In memory",
+      "instant": "2× · instant",
+      "instantMeta": "1 pass",
+      "foot": "Upscale"
+    },
+    "unlimitedCard": {
+      "title": "Unlimited Generations",
+      "copy": "No $40/month subscriptions, no credit tokens, and no forced downscaling. Generate as many cutouts and upscales as you need.",
+      "engine": "Local Neural Engine",
+      "badge": "Zero Paywalls",
+      "metricGen": "Generations",
+      "metricGenVal": "Unlimited",
+      "metricCredits": "Credits & Tokens",
+      "metricWatermarks": "Watermarks",
+      "metricWatermarksVal": "None",
+      "subNote": "No $40/mo subscription or token meters",
+      "freeForever": "Free forever",
+      "foot": "Unlimited"
+    },
+    "cutoutCard": {
+      "title": "Preserve fine edges and detail",
+      "copy": "A segmentation pass for the subject, then brushes for the edges you want to keep.",
+      "chipMatte": "Alpha matte",
+      "foot": "Cutout"
+    },
+    "privacyCard": {
+      "stat": "0 B",
+      "sub": "uploaded. Every file stays in this browser tab.",
+      "row1": "Files stay on device",
+      "row2": "No account required",
+      "row3": "No tracking pixels",
+      "foot": "Privacy"
+    },
+    "resolutionCard": {
+      "badge": "Professional quality",
+      "stat": "8×",
+      "label": "resolution, rendered on your own machine.",
+      "foot": "Resolution"
+    },
+    "offlineCard": {
+      "title": "Anywhere, Even Airplane Mode",
+      "copy": "Model weights cache automatically in your browser. Once loaded once, upscale and edit seamlessly without an active internet connection.",
+      "engine": "Offline Engine",
+      "badge": "Cached",
+      "weights": "Model Weights",
+      "traffic": "Network Traffic",
+      "status": "Status",
+      "worksOffline": "Works Offline",
+      "foot": "Offline"
+    },
+    "instantCard": {
+      "title": "Zero Queues, Zero Waiting",
+      "copy": "No waiting in cloud server queues behind other users. Processing begins immediately on your device the moment you drop an image.",
+      "engine": "Queue Latency",
+      "badge": "Instant",
+      "pos": "Queue Position",
+      "posVal": "#1 · Immediate",
+      "delay": "Waitlist Delay",
+      "delayVal": "0.0s (None)",
+      "compute": "Compute",
+      "computeVal": "Dedicated GPU",
+      "foot": "Instant"
+    },
+    "speedChartCard": {
+      "title": "Works across modern browsers",
+      "copy": "The runtime picks the best backend it can find, then reports the pass time right in the panel.",
+      "foot": "Speed"
+    },
+    "compareCard": {
+      "title": "Inspect every image before and after",
+      "copy": "Drag the slider on any result and inspect the pixels at 100%, 200% or 400%.",
+      "foot": "Compare",
+      "beforeLabel": "Original",
+      "afterLabel": "4× · Pixel-Dance"
+    },
+    "batchCard": {
+      "title": "Batch isolate across any subject",
+      "copy": "Remove backgrounds across commercial footwear, high-resolution athlete portraits, and multi-character film stills in a single automated pass. Processed simultaneously with zero cloud wait.",
+      "engine": "Batch Cutout Engine",
+      "badge": "Batch Ready",
+      "footwear": "Footwear",
+      "footwearMeta": "E-Commerce",
+      "athlete": "Athlete",
+      "athleteMeta": "Editorial",
+      "cinematic": "Cinematic",
+      "cinematicMeta": "Action Key",
+      "processed": "3 of 3 processed in parallel",
+      "telemetry": "100% On-Device · Zero Queue",
+      "foot": "Batch Cutout"
+    }
+  },
+  "resultsGallery": {
+    "eyebrow": "Results · Studio Gallery",
+    "title": "See the detail in every finished image",
+    "lede": "Sample renders from the on-device AI models. Upscales, alpha mattes and backdrops, all processed locally in the browser tab.",
+    "tabs": {
+      "all": "All Work",
+      "cutouts": "Cutouts · BG Remover",
+      "upscaler": "AI Upscaler · 8× Detail"
+    },
+    "tags": {
+      "cutout": "Cutout",
+      "upscaled": "Upscaled"
+    }
+  },
+  "truckHero": {
+    "titleLine1": "Keep Pixels",
+    "titleLine2": "On Track",
+    "asideText": "Take every image the last mile. Upscale to 8×, cut out the subject and finish the frame, all on-device.",
+    "startNow": "Start now",
+    "badgeStudio": "STUDIO ENGINE",
+    "cardBgTitle": "Background Removal",
+    "cardBgCopy": "Lift any subject out with edge-aware alpha mattes. Hair, fur and glass keep their detail, no green screen required.",
+    "cardBgCta": "Try cutout",
+    "cardUpscaleTitle": "8× Upscale",
+    "cardUpscaleCopy": "Resolve small frames into print-ready detail with Vitality and Pixel-Dance. Fast, tiled and shaped for real photos.",
+    "cardUpscaleCta": "Upscale now",
+    "cardStudioTitle": "Studio Finish",
+    "cardStudioCopy": "Backdrops, shadows, crops and type live in one canvas. Compose the frame and export it without leaving the tab.",
+    "cardStudioCta": "Open studio",
+    "dialText": "Explore more · Explore more · ",
+    "dialAria": "Explore the studio",
+    "statDelivered": "Images delivered at full resolution"
+  },
+  "proofSection": {
+    "title": "Professional results, with every file kept local",
+    "lede": "Explore workflow guides, on-device neural specifications, and integration documentation for teams that require files to stay strictly local.",
+    "readDocs": "Read the docs",
+    "cases": {
+      "photography": {
+        "kicker": "Photography",
+        "title": "Rescue detail from old shoots.",
+        "copy": "8× tiled upscaling holds texture in faces, fabric and film grain - without sending originals to a cloud."
+      },
+      "ecommerce": {
+        "kicker": "E-commerce",
+        "title": "Cut products out on the spot.",
+        "copy": "Chopper isolates the subject, then Backdrop places it on a clean scene, a solid colour or the blurred original."
+      },
+      "social": {
+        "kicker": "Social",
+        "title": "Sharpen before it posts.",
+        "copy": "Upscale stills and frames to 8×, then crop and set type on the same canvas before exporting."
+      },
+      "archives": {
+        "kicker": "Archives",
+        "title": "Restore without cloud uploads.",
+        "copy": "Family photos and scans stay on the machine with zero cloud uploads. The model is cached after the first run, so the next pass is faster."
+      }
+    }
+  },
+  "instantDemos": {
+    "eyebrow": "Instant Demos",
+    "title": "Try sample assets with a single click",
+    "lede": "Test on-device AI models on real pre-loaded images. Nothing uploaded, no waitlist, zero account required.",
+    "openStudio": "Open studio",
+    "tryDemo": "Try demo",
+    "loading": "Loading...",
+    "samples": {
+      "sports": {
+        "name": "Sports Cutout",
+        "tag": "Cutout",
+        "description": "Sub-pixel edge matting and background removal with zero upload latency."
+      },
+      "anime": {
+        "name": "Anime Arts",
+        "tag": "Cutout",
+        "description": "Anime background removal with high precision and natural hair matting."
+      },
+      "ocean": {
+        "name": "Ocean Life",
+        "tag": "Upscale",
+        "description": "High-frequency micro-texture reconstruction for fine organic details."
+      },
+      "vintage": {
+        "name": "Vintage Archive",
+        "tag": "Upscale",
+        "description": "Natural portrait restoration, cleaning film grain and compression artifacts."
+      }
+    }
+  },
+  "finalCta": {
+    "titleLine1": "Bring every image",
+    "titleLine2": "into focus",
+    "copy": "Drop a photo, pick a model, and watch it resolve at 8×. Or cut the subject out and design the frame, all before an upload bar would have moved.",
+    "openUpscaler": "Open the upscaler",
+    "removeBackground": "Remove a background",
+    "finePrint": "Runs completely on-device in all modern web browsers"
+  },
+  "leaderboard": {
+    "eyebrow": "Community",
+    "title": "Leaderboard",
+    "heroText": "A little recognition for every image made better. Process with Pixelify to earn points, climb the ranks, and unlock badges.",
+    "howItWorks": "How it works",
+    "myActivity": "My activity",
+    "howCardTitle": "Make something better, earn a point.",
+    "howCardText": "Finish a background removal or AI upscale. Each successful operation earns one point and appears in your activity history.",
+    "totalParticipants": "Total participants",
+    "allTimeCommunity": "All time\ncommunity",
+    "topUsers": "Top Users",
+    "topUsersSub": "Community leaders ranked by points",
+    "periods": {
+      "all": "All time",
+      "week": "This week",
+      "month": "This month"
+    },
+    "loadError": "Leaderboard data could not be loaded right now.",
+    "tryAgain": "Try again",
+    "emptyTitle": "The board is ready for its first champion.",
+    "emptyText": "Process an image to earn the first point.",
+    "yourPosition": "Your position",
+    "yourPlace": "Your place in the community",
+    "leadingCommunity": "You are leading the community.",
+    "rankedInCommunity": "Ranked {rank} in the community.",
+    "completeToEarn": "Complete an image operation to earn your first point.",
+    "rankWillAppear": "Your rank will appear here.",
+    "yourProfile": "Your Pixelify profile",
+    "anonymousPlayer": "Anonymous player",
+    "you": "You",
+    "unranked": "Unranked",
+    "rankNumber": "Rank #{rank}",
+    "points": "{count} points",
+    "operations": "{count} operations",
+    "memberSince": "Member since {date}",
+    "joinUnavailable": "Join date unavailable",
+    "seeActivityHistory": "See your activity history",
+    "backToTop": "Back to top users",
+    "pointsUnit": "PTS",
+    "pointEarned": "Point earned",
+    "pointsEarned": "Points earned",
+    "addedToLeaderboard": "Added to leaderboard",
+    "savedOnDevice": "Saved on this device",
+    "waitingToSync": "{count} {unit} waiting to sync",
+    "pointUnit": "point",
+    "pointsPluralUnit": "points"
+  },
+  "leaderboardActivity": {
+    "navLabel": "Private dashboard",
+    "backToLeaderboard": "Public leaderboard",
+    "personalDashboard": "Personal dashboard",
+    "title": "My Activity",
+    "subtitle": "Every image improved, every point earned. Your Pixelify journey in one place.",
+    "anonymousProfile": "Anonymous profile",
+    "unranked": "Unranked",
+    "rankNumber": "Rank #{rank}",
+    "stats": {
+      "totalPoints": "Total points",
+      "backgroundsRemoved": "Backgrounds removed",
+      "imagesUpscaled": "Images upscaled",
+      "totalActivities": "Total activities"
+    },
+    "milestones": "Milestones",
+    "achievementsTitle": "Your achievements",
+    "unlockedCount": "{unlocked} / {total} unlocked",
+    "basedOnActivity": "Based on your activity",
+    "statusEarned": "Earned",
+    "statusLocked": "Locked",
+    "badges": {
+      "firstImage": {
+        "title": "First image",
+        "description": "Complete your first image operation."
+      },
+      "bgExpert": {
+        "title": "Background expert",
+        "description": "Remove 10 backgrounds."
+      },
+      "upscaleExpert": {
+        "title": "Upscaling expert",
+        "description": "Upscale 10 images."
+      },
+      "creativeExplorer": {
+        "title": "Creative explorer",
+        "description": "Use both Pixelify tools."
+      },
+      "risingStar": {
+        "title": "Rising star",
+        "description": "Complete 25 image operations."
+      },
+      "champion": {
+        "title": "Pixelify champion",
+        "description": "Complete 100 image operations."
+      }
+    },
+    "history": "Your history",
+    "recentActivity": "Recent activity",
+    "matchingRecords": "{count} matching records",
+    "privateToYou": "Private to you",
+    "activityType": "Activity type",
+    "timePeriod": "Time period",
+    "onlyYouNotice": "Only you can see this activity",
+    "types": {
+      "all": "All activities",
+      "bg": "Background removal",
+      "upscale": "AI upscaling"
+    },
+    "periods": {
+      "all": "All time",
+      "today": "Today",
+      "week": "This week",
+      "month": "This month"
+    },
+    "errorTitle": "Could not load your activity.",
+    "retry": "Retry",
+    "emptyTitle": "Your journey starts here.",
+    "emptyText": "Improve your first image with Pixelify and earn your first points.",
+    "tryBg": "Try BG Remover",
+    "tryUpscaler": "Try AI Upscaler",
+    "noMatchTitle": "No activity matches these filters.",
+    "noMatchText": "Choose another activity type or time period to see your history.",
+    "itemBgTitle": "Background removed",
+    "itemBgText": "Successfully removed an image background.",
+    "itemUpTitle": "AI image upscaled",
+    "itemUpText": "Successfully enhanced an image with AI upscaling.",
+    "success": "Success",
+    "pageIndicator": "Page {page} of {total}",
+    "prev": "Previous",
+    "next": "Next",
+    "returnLeaderboard": "Return to public leaderboard",
+    "footerNote": "Private activity · Visible only to this browser profile"
   }
 }

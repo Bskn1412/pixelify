@@ -13,7 +13,7 @@ interface UploadAreaProps {
   afterImage?: string;
 
   // Image used for the visual demo shown before upload.
-  // Example: "/images/upscale-demo.jpg"
+  // Example: "/upscale-demo.jpg"
   previewImage?: string;
   maxSizeMB?: number;
 }

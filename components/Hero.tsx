@@ -179,12 +179,12 @@ export default function PixelifyHero({
       {/* =====================================================
         LEADERBOARD ANNOUNCEMENT BADGE & LINK (TOP OF HERO)
         ===================================================== */}
-      <div className="w-full flex items-center justify-center pt-4 pb-2.5 sm:pt-5 sm:pb-3.5 relative z-20">
+      <div className="w-full bg-[#050507] flex items-center justify-center pt-4 pb-2.5 sm:pt-5 sm:pb-3.5 relative z-20">
         <div className="hero-badge-wrap flex items-center justify-center gap-3">
           <MetalBadge label="New" />
           <Link
             href="/leaderboard/"
-            className="hero-leaderboard-link group inline-flex items-center gap-1.5 text-white/90 transition-colors"
+            className="hero-leaderboard-link group inline-flex items-center gap-1.5 transition-colors"
             aria-label="Check out the community leaderboard"
           >
             <span>Checkout Leaderboard</span>

@@ -21,8 +21,8 @@ export const MODEL_RESULTS: Record<string, ModelResult> = {
   Diablo: { src: '/home/results/diablo-cutout.webp', cutout: true },
 };
 
-const FALLBACK_UPSCALE = '/home/studio/live-up-after.jpg';
-const FALLBACK_CUTOUT = '/home/studio/live-cut-after.webp';
+const FALLBACK_UPSCALE = '/home/results/live-up-after.webp';
+const FALLBACK_CUTOUT = '/home/results/live-cut-after.webp';
 
 /** The result frame for a model, with the neutral demo frame as a fallback. */
 export function resultFor(model: string, cutout = false) {

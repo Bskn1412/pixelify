@@ -811,7 +811,6 @@
     line-height: 1.35;
   }
 
-  .ts-hero .ts-dial,
   .ts-hero .ts-vertical {
     display: none;
   }
@@ -819,15 +818,19 @@
 
 @media (max-width: 640px) {
   .ts-hero .ts-cards {
-    transform: scale(0.7);
+    transform: scale(clamp(0.46, calc((100vw - 32px) / 680), 0.75));
     transform-origin: left top;
-    width: 480px;
-    height: 190px;
-    margin-left: 22px;
+    width: 680px;
+    height: calc(290px * clamp(0.46, calc((100vw - 32px) / 680), 0.75));
+    margin: 8px 16px 0;
   }
 
   .ts-hero .ts-card:nth-child(3) {
-    display: none;
+    display: block;
+  }
+
+  .ts-hero .ts-dial {
+    display: grid;
   }
 
   .ts-hero .ts-stage {

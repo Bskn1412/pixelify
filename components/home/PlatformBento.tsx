@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowRight, Check, Lock, ShieldCheck } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Check, Clock, Infinity as InfinityIcon, Lock, ShieldCheck, WifiOff, Zap } from 'lucide-react';
 import { Reveal } from './Reveal';
 import { ImageCompare } from './ImageCompare';
+import { useTranslation } from '@/locales';
 
 interface MiniRow {
   label: string;
@@ -214,16 +215,16 @@ function BentoCard({
   return <Reveal className={`fh-bento-card ${className}`}>{children}</Reveal>;
 }
 
-function CardFoot({ label, href }: { label: string; href?: string }) {
+function CardFoot({ label, href, noBorder }: { label: string; href?: string; noBorder?: boolean }) {
   return (
-    <div className="fh-bento-foot">
+    <div className={`fh-bento-foot relative z-10 ${noBorder ? '!border-t-0' : ''}`}>
       {href ? (
-        <Link href={href} className="fh-bento-link">
-          {label}
+        <Link href={href} className="fh-bento-link text-white font-medium hover:text-[#0099ff] transition-colors">
+          <span>{label}</span>
           <ArrowRight size={12} aria-hidden="true" />
         </Link>
       ) : (
-        <span className="fh-bento-link">{label}</span>
+        <span className="fh-bento-link text-white font-medium">{label}</span>
       )}
     </div>
   );
@@ -231,19 +232,20 @@ function CardFoot({ label, href }: { label: string; href?: string }) {
 
 /** Framer's "not just vibes, a full platform" bento, rebuilt from real Pixelify features. */
 export function PlatformBento() {
+  const { t } = useTranslation();
+
   return (
     <section className="fh-section fh-platform" id="platform">
       <div className="fh-container">
         <Reveal className="fh-section-header">
           <div className="fh-section-header-copy">
-            <h2 className="fh-h2">Not just filters, a full studio</h2>
+            <h2 className="fh-h2">{t.platformBento?.headerTitle || 'One studio for the complete image workflow'}</h2>
             <p className="fh-section-lede">
-              Everything you need from a photo editor — upscaling, cutout,
-              backdrops, formats and privacy — built into one browser tab.
+              {t.platformBento?.headerLede || 'Everything you need from a photo editor upscaling, cutout, backdrops, formats and privacy built into one browser tab.'}
             </p>
           </div>
           <Link href="/products/" className="fh-pill fh-pill-secondary fh-section-action">
-            All features
+            {t.platformBento?.allFeatures || 'All features'}
           </Link>
         </Reveal>
 
@@ -253,55 +255,80 @@ export function PlatformBento() {
             <div className="fh-bento-demo">
               <div className="fh-metrics">
                 <div className="fh-metrics-head">
-                  <span>Upscale speed</span>
-                  <span className="fh-badge-good">WebGPU</span>
+                  <span>{t.platformBento?.speedCard?.metricsHead || 'Upscale speed'}</span>
+                  <span className="fh-badge-good">{t.platformBento?.speedCard?.badge || 'WebGPU'}</span>
                 </div>
                 <div className="fh-metric-row">
                   <div className="fh-metric-label">
-                    <span>4× · Vitality</span>
-                    <b>1.9 MB model</b>
+                    <span>{t.platformBento?.speedCard?.vitality || '4× · Vitality'}</span>
+                    <b>{t.platformBento?.speedCard?.vitalityMeta || '1.9 MB model'}</b>
                   </div>
                   <MetricBar width={94} delay={0.05} />
                 </div>
                 <div className="fh-metric-row">
                   <div className="fh-metric-label">
-                    <span>8× · tiled</span>
-                    <b>In memory</b>
+                    <span>{t.platformBento?.speedCard?.tiled || '8× · tiled'}</span>
+                    <b>{t.platformBento?.speedCard?.tiledMeta || 'In memory'}</b>
                   </div>
                   <MetricBar width={78} delay={0.18} />
                 </div>
                 <div className="fh-metric-row">
                   <div className="fh-metric-label">
-                    <span>2× · instant</span>
-                    <b>1 pass</b>
+                    <span>{t.platformBento?.speedCard?.instant || '2× · instant'}</span>
+                    <b>{t.platformBento?.speedCard?.instantMeta || '1 pass'}</b>
                   </div>
                   <MetricBar width={56} delay={0.31} />
                 </div>
               </div>
             </div>
             <div>
-              <h3 className="fh-bento-title">Fast by default</h3>
+              <h3 className="fh-bento-title">{t.platformBento?.speedCard?.title || 'Preview edits without the wait'}</h3>
               <p className="fh-bento-copy">
-                Hardware acceleration when the browser has it, a WASM fallback when
-                it doesn&apos;t.
+                {t.platformBento?.speedCard?.copy || "Hardware acceleration when the browser has it, a WASM fallback when it doesn't."}
               </p>
             </div>
-            <CardFoot label="Upscale" href="/upscaler/" />
+            <CardFoot label={t.platformBento?.speedCard?.foot || 'Upscale'} href="/upscaler/" />
           </BentoCard>
 
-          {/* Models */}
+          {/* Unlimited Generations */}
           <BentoCard className="fh-bento-span-7 fh-bento-card--lg">
             <div className="fh-bento-demo">
-              <MiniDb tabs={MODEL_TABS} label="Models" autoplay />
+              <div className="flex flex-col gap-3 p-4 rounded-xl bg-white/[0.02]">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-white/90">{t.platformBento?.unlimitedCard?.engine || 'Local Neural Engine'}</span>
+                  </div>
+                  <span className="fh-badge-good">{t.platformBento?.unlimitedCard?.badge || 'Zero Paywalls'}</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-1">
+                  <div className="p-2.5 rounded-lg bg-white/[0.02]">
+                    <span className="block text-[10px] text-white/40 uppercase tracking-wider">{t.platformBento?.unlimitedCard?.metricGen || 'Generations'}</span>
+                    <span className="text-xl font-bold text-white flex items-center gap-1">
+                      <InfinityIcon size={18} className="text-[#00FF85]" /> {t.platformBento?.unlimitedCard?.metricGenVal || 'Unlimited'}
+                    </span>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-white/[0.02]">
+                    <span className="block text-[10px] text-white/40 uppercase tracking-wider">{t.platformBento?.unlimitedCard?.metricCredits || 'Credits & Tokens'}</span>
+                    <span className="text-xl font-bold text-white">$0.00</span>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-white/[0.02] col-span-2 sm:col-span-1">
+                    <span className="block text-[10px] text-white/40 uppercase tracking-wider">{t.platformBento?.unlimitedCard?.metricWatermarks || 'Watermarks'}</span>
+                    <span className="text-xl font-bold text-[#00FF85]">{t.platformBento?.unlimitedCard?.metricWatermarksVal || 'None'}</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between text-[11px] text-white/50 pt-1">
+                  <span>{t.platformBento?.unlimitedCard?.subNote || 'No $40/mo subscription or token meters'}</span>
+                  <span className="text-[#00FF85] font-medium">{t.platformBento?.unlimitedCard?.freeForever || 'Free forever'}</span>
+                </div>
+              </div>
             </div>
             <div>
-              <h3 className="fh-bento-title">Every model in one place</h3>
+              <h3 className="fh-bento-title">{t.platformBento?.unlimitedCard?.title || 'Unlimited Generations'}</h3>
               <p className="fh-bento-copy">
-                Three upscalers and two cutout models, downloadable once and cached
-                for the next run.
+                {t.platformBento?.unlimitedCard?.copy || 'No $40/month subscriptions, no credit tokens, and no forced downscaling. Generate as many cutouts and upscales as you need.'}
               </p>
             </div>
-            <CardFoot label="Models" href="/products/" />
+            <CardFoot label={t.platformBento?.unlimitedCard?.foot || 'Unlimited'} href="/upscaler/" />
           </BentoCard>
 
           {/* Cutout */}
@@ -309,120 +336,155 @@ export function PlatformBento() {
             <div className="fh-bento-demo">
               <div className="fh-cutout-demo">
                 <img
-                  src="/home/studio/live-cut-subject.webp"
-                  alt="A pair of headphones cut out by Pixelify"
+                  src="/home/gallery/cosmetic-cutout.webp"
+                  alt="Cosmetic cutout"
                   loading="lazy"
                 />
               </div>
               <div className="fh-cutout-chips">
                 <span className="fh-chip-sm is-green">Chopper</span>
-                <span className="fh-chip-sm">Alpha matte</span>
+                <span className="fh-chip-sm">{t.platformBento?.cutoutCard?.chipMatte || 'Alpha matte'}</span>
                 <span className="fh-chip-sm">PNG</span>
               </div>
             </div>
             <div style={{ marginTop: 18 }}>
-              <h3 className="fh-bento-title">The subject stays</h3>
+              <h3 className="fh-bento-title">{t.platformBento?.cutoutCard?.title || 'Preserve fine edges and detail'}</h3>
               <p className="fh-bento-copy">
-                A segmentation pass for the subject, then brushes for the edges you
-                want to keep.
+                {t.platformBento?.cutoutCard?.copy || 'A segmentation pass for the subject, then brushes for the edges you want to keep.'}
               </p>
             </div>
-            <CardFoot label="Cutout" href="/bg_remove/" />
+            <CardFoot label={t.platformBento?.cutoutCard?.foot || 'Cutout'} href="/bg_remove/" />
           </BentoCard>
 
           {/* Privacy */}
-          <BentoCard className="fh-bento-span-3">
-            <div className="fh-bento-demo">
+          <BentoCard className="fh-bento-span-3 relative overflow-hidden group flex flex-col justify-between">
+            <div
+              className="absolute inset-0 z-0 bg-cover bg-center opacity-30 transition-transform duration-700 group-hover:scale-105 pointer-events-none"
+              style={{
+                backgroundImage: 'url(/home/shots/security.webp)',
+              }}
+            />
+            <div className="absolute inset-0 z-0 bg-gradient-to-t from-[#0e0e0e] via-[#0e0e0e]/85 to-[#0e0e0e]/50 pointer-events-none" />
+            <div className="fh-bento-demo relative z-10 mb-2">
               <div className="fh-privacy-stat">
                 <Lock size={20} strokeWidth={1.6} aria-hidden="true" />
-                0 B
+                {t.platformBento?.privacyCard?.stat || '0 B'}
               </div>
-              <p className="fh-privacy-sub">
-                uploaded. Every file stays in this browser tab.
+              <p className="fh-privacy-sub" style={{ margin: '8px 0 12px' }}>
+                {t.platformBento?.privacyCard?.sub || 'uploaded. Every file stays in this browser tab.'}
               </p>
               <div className="fh-privacy-list">
-                <span className="fh-privacy-row">
+                <span className="fh-privacy-row" style={{ padding: '6px 0' }}>
                   <Check size={12} aria-hidden="true" />
-                  Files stay on device
+                  {t.platformBento?.privacyCard?.row1 || 'Files stay on device'}
                 </span>
-                <span className="fh-privacy-row">
+                <span className="fh-privacy-row" style={{ padding: '6px 0' }}>
                   <Check size={12} aria-hidden="true" />
-                  No account required
+                  {t.platformBento?.privacyCard?.row2 || 'No account required'}
                 </span>
-                <span className="fh-privacy-row">
+                <span className="fh-privacy-row" style={{ padding: '6px 0' }}>
                   <Check size={12} aria-hidden="true" />
-                  No tracking pixels
+                  {t.platformBento?.privacyCard?.row3 || 'No tracking pixels'}
                 </span>
               </div>
             </div>
-            <CardFoot label="Privacy" href="/privacy/" />
+            <CardFoot label={t.platformBento?.privacyCard?.foot || 'Privacy'} href="/privacy/" />
           </BentoCard>
 
-          {/* Spotlight */}
-          <BentoCard className="fh-bento-span-4 fh-bento-card--spotlight">
-            <div className="fh-spotlight-content">
+          {/* 8× Resolution */}
+          <BentoCard className="fh-bento-span-4 fh-bento-card--spotlight relative overflow-hidden group flex flex-col justify-between">
+            <div
+              className="absolute inset-0 z-0 bg-cover bg-center opacity-40 transition-all duration-500 group-hover:opacity-85 group-hover:scale-105 pointer-events-none"
+              style={{
+                backgroundImage: 'url(/home/shots/8x.webp)',
+                backgroundPosition: 'center 20%',
+              }}
+            />
+            <div className="absolute inset-0 z-0 bg-gradient-to-t from-[#002a6b]/90 via-[#0059c9]/40 to-transparent transition-opacity duration-500 group-hover:opacity-75 pointer-events-none" />
+            <div className="absolute top-4 right-4 z-20 inline-flex items-center px-2.5 py-1 rounded-full border border-white/20 bg-white/15 text-white text-[11px] font-medium backdrop-blur-md">
+              {t.platformBento?.resolutionCard?.badge || 'Professional quality'}
+            </div>
+            <div className="fh-spotlight-content relative z-10 flex-1 flex flex-col justify-between">
               <div>
-                <div className="fh-spotlight-stat">8×</div>
+                <div className="fh-spotlight-stat">{t.platformBento?.resolutionCard?.stat || '8×'}</div>
                 <p className="fh-spotlight-label" style={{ marginTop: 12 }}>
-                  resolution, rendered
-                  <br />
-                  on your own machine.
+                  {t.platformBento?.resolutionCard?.label || 'resolution, rendered on your own machine.'}
                 </p>
               </div>
-              <div className="fh-bento-foot">
-                <Link href="/upscaler/" className="fh-bento-link">
-                  Resolution
-                  <ArrowRight size={12} aria-hidden="true" />
-                </Link>
-              </div>
             </div>
+            <CardFoot label={t.platformBento?.resolutionCard?.foot || 'Resolution'} href="/upscaler/" noBorder />
           </BentoCard>
 
-          {/* Formats */}
+          {/* Anywhere, Even Airplane Mode */}
           <BentoCard className="fh-bento-span-3">
             <div className="fh-bento-demo">
-              <div className="fh-format-rows">
-                <span className="fh-format-row">
-                  <span>
-                    PNG <small>· transparent</small>
-                  </span>
-                  <span>Lossless</span>
+              <div className="flex items-center justify-between mb-3.5">
+                <span className="flex items-center gap-2 text-xs font-medium text-neutral-300">
+                  <WifiOff size={14} className="text-neutral-400" />
+                  <span>{t.platformBento?.offlineCard?.engine || 'Offline Engine'}</span>
                 </span>
-                <span className="fh-format-row">
-                  <span>
-                    WebP <small>· small</small>
+                <span className="fh-badge-good">{t.platformBento?.offlineCard?.badge || 'Cached'}</span>
+              </div>
+              <div className="flex flex-col gap-2 p-3 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-neutral-400">{t.platformBento?.offlineCard?.weights || 'Model Weights'}</span>
+                  <span className="font-mono text-emerald-400 font-semibold text-[11px]">IndexedDB</span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-neutral-400">{t.platformBento?.offlineCard?.traffic || 'Network Traffic'}</span>
+                  <span className="font-mono text-neutral-400 text-[11px]">0 B / sec</span>
+                </div>
+                <div className="flex items-center justify-between text-xs pt-1.5 border-t border-white/[0.05]">
+                  <span className="text-neutral-400">{t.platformBento?.offlineCard?.status || 'Status'}</span>
+                  <span className="text-neutral-200 text-[11px] font-medium flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> {t.platformBento?.offlineCard?.worksOffline || 'Works Offline'}
                   </span>
-                  <span>Lossy</span>
-                </span>
-                <span className="fh-format-row">
-                  <span>
-                    JPG <small>· universal</small>
-                  </span>
-                  <span>High</span>
-                </span>
+                </div>
               </div>
             </div>
             <div style={{ marginTop: 16 }}>
-              <h3 className="fh-bento-title">Export how you need it</h3>
+              <h3 className="fh-bento-title">{t.platformBento?.offlineCard?.title || 'Anywhere, Even Airplane Mode'}</h3>
+              <p className="fh-bento-copy">
+                {t.platformBento?.offlineCard?.copy || 'Model weights cache automatically in your browser. Once loaded once, upscale and edit seamlessly without an active internet connection.'}
+              </p>
             </div>
-            <CardFoot label="Formats" href="/docs/" />
+            <CardFoot label={t.platformBento?.offlineCard?.foot || 'Offline'} href="/bg_remove/" />
           </BentoCard>
 
-          {/* Security / no signup */}
+          {/* Zero Queue */}
           <BentoCard className="fh-bento-span-3">
             <div className="fh-bento-demo">
-              <div className="fh-urlbar">
-                <span className="fh-url-lock">
-                  <ShieldCheck size={10} aria-hidden="true" />
+              <div className="flex items-center justify-between mb-3.5">
+                <span className="flex items-center gap-2 text-xs font-medium text-neutral-300">
+                  <Zap size={14} className="text-[#0099ff]" />
+                  <span>{t.platformBento?.instantCard?.engine || 'Queue Latency'}</span>
                 </span>
-                <span>pixelify.me/upscaler</span>
+                <span className="fh-badge-good">{t.platformBento?.instantCard?.badge || 'Instant'}</span>
               </div>
-              <UrlToggle />
+              <div className="flex flex-col gap-2 p-3 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-neutral-400">{t.platformBento?.instantCard?.pos || 'Queue Position'}</span>
+                  <span className="font-mono text-emerald-400 font-semibold text-[11px]">{t.platformBento?.instantCard?.posVal || '#1 · Immediate'}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-neutral-400">{t.platformBento?.instantCard?.delay || 'Waitlist Delay'}</span>
+                  <span className="font-mono text-neutral-400 text-[11px]">{t.platformBento?.instantCard?.delayVal || '0.0s (None)'}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs pt-1.5 border-t border-white/[0.05]">
+                  <span className="text-neutral-400">{t.platformBento?.instantCard?.compute || 'Compute'}</span>
+                  <span className="text-neutral-200 text-[11px] font-medium flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#0099ff]" /> {t.platformBento?.instantCard?.computeVal || 'Dedicated GPU'}
+                  </span>
+                </div>
+              </div>
             </div>
             <div style={{ marginTop: 16 }}>
-              <h3 className="fh-bento-title">Nothing to sign up for</h3>
+              <h3 className="fh-bento-title">{t.platformBento?.instantCard?.title || 'Zero Queues, Zero Waiting'}</h3>
+              <p className="fh-bento-copy">
+                {t.platformBento?.instantCard?.copy || 'No waiting in cloud server queues behind other users. Processing begins immediately on your device the moment you drop an image.'}
+              </p>
             </div>
-            <CardFoot label="No account" href="/upscaler/" />
+            <CardFoot label={t.platformBento?.instantCard?.foot || 'Instant'} href="/upscaler/" />
           </BentoCard>
 
           {/* Speed chart */}
@@ -481,51 +543,105 @@ export function PlatformBento() {
               </div>
             </div>
             <div style={{ marginTop: 14 }}>
-              <h3 className="fh-bento-title">Fast on any browser</h3>
+              <h3 className="fh-bento-title">{t.platformBento?.speedChartCard?.title || 'Works across modern browsers'}</h3>
               <p className="fh-bento-copy">
-                The runtime picks the best backend it can find, then reports the pass
-                time right in the panel.
+                {t.platformBento?.speedChartCard?.copy || 'The runtime picks the best backend it can find, then reports the pass time right in the panel.'}
               </p>
             </div>
-            <CardFoot label="Speed" href="/docs/" />
+            <CardFoot label={t.platformBento?.speedChartCard?.foot || 'Speed'} href="/docs/" />
           </BentoCard>
 
           {/* Before / after */}
           <BentoCard className="fh-bento-span-6">
             <div className="fh-bento-demo">
               <ImageCompare
-                before="/home/studio/live-compare-before.jpg"
-                after="/home/studio/live-compare-after.jpg"
+                before="/home/shots/live-compare-before.webp"
+                after="/home/shots/live-compare-after.webp"
                 alt="A car photograph upscaled 4× with Pixelify"
-                beforeLabel="Original"
-                afterLabel="4× · Pixel-Dance"
-                aspect="16 / 6"
-                start={56}
+                beforeLabel={t.platformBento?.compareCard?.beforeLabel || 'Original'}
+                afterLabel={t.platformBento?.compareCard?.afterLabel || '4× · Pixel-Dance'}
+                aspect="16 / 9"
+                start={50}
               />
             </div>
             <div style={{ marginTop: 18 }}>
-              <h3 className="fh-bento-title">Before / after, live</h3>
+              <h3 className="fh-bento-title">{t.platformBento?.compareCard?.title || 'Inspect every image before and after'}</h3>
               <p className="fh-bento-copy">
-                Drag the slider on any result and inspect the pixels at 100%, 200%
-                or 400%.
+                {t.platformBento?.compareCard?.copy || 'Drag the slider on any result and inspect the pixels at 100%, 200% or 400%.'}
               </p>
             </div>
-            <CardFoot label="Compare" href="/upscaler/" />
+            <CardFoot label={t.platformBento?.compareCard?.foot || 'Compare'} href="/upscaler/" />
           </BentoCard>
 
-          {/* Design layers */}
+          {/* Save time and money - Batch Ready */}
           <BentoCard className="fh-bento-span-6">
             <div className="fh-bento-demo">
-              <MiniDb tabs={DESIGN_TABS} label="Design layers" />
+              <div className="p-3.5 sm:p-4 rounded-xl bg-white/[0.02] flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Clock size={13} className="text-[#0099ff]" />
+                    <span className="text-xs font-semibold text-white">{t.platformBento?.batchCard?.engine || 'Batch Cutout Engine'}</span>
+                  </div>
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#0099ff]/15 border border-[#0099ff]/30 text-[#0099ff] text-[11px] font-semibold">
+                    {t.platformBento?.batchCard?.badge || 'Batch Ready'}
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
+                  <div className="relative rounded-xl overflow-hidden border border-white/10 bg-black/40 p-2 flex flex-col items-center">
+                    <div className="w-full h-20 sm:h-24 flex items-center justify-center p-1">
+                      <img
+                        src="/home/gallery/shoes2-cutout.webp"
+                        alt="Footwear product cutout"
+                        className="max-h-full max-w-full w-auto h-auto object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.6)]"
+                      />
+                    </div>
+                    <div className="w-full pt-1.5 border-t border-white/5 flex flex-col items-center gap-0.5 text-center">
+                      <span className="text-[11px] text-white font-medium truncate w-full">{t.platformBento?.batchCard?.footwear || 'Footwear'}</span>
+                      <span className="text-[9px] text-[#0099ff] font-mono tracking-wide uppercase">{t.platformBento?.batchCard?.footwearMeta || 'E-Commerce'}</span>
+                    </div>
+                  </div>
+
+                  <div className="relative rounded-xl overflow-hidden border border-white/10 bg-black/40 p-2 flex flex-col items-center">
+                    <div className="w-full h-20 sm:h-24 flex items-center justify-center p-1">
+                      <img
+                        src="/home/gallery/virat-cutout.webp"
+                        alt="Athlete portrait cutout"
+                        className="max-h-full max-w-full w-auto h-auto object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.6)]"
+                      />
+                    </div>
+                    <div className="w-full pt-1.5 border-t border-white/5 flex flex-col items-center gap-0.5 text-center">
+                      <span className="text-[11px] text-white font-medium truncate w-full">{t.platformBento?.batchCard?.athlete || 'Athlete'}</span>
+                      <span className="text-[9px] text-[#0099ff] font-mono tracking-wide uppercase">{t.platformBento?.batchCard?.athleteMeta || 'Editorial'}</span>
+                    </div>
+                  </div>
+
+                  <div className="relative rounded-xl overflow-hidden border border-white/10 bg-black/40 p-2 flex flex-col items-center">
+                    <div className="w-full h-20 sm:h-24 flex items-center justify-center p-1">
+                      <img
+                        src="/home/gallery/bd2-cutout.webp"
+                        alt="Action cinematic cutout"
+                        className="max-h-full max-w-full w-auto h-auto object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.6)]"
+                      />
+                    </div>
+                    <div className="w-full pt-1.5 border-t border-white/5 flex flex-col items-center gap-0.5 text-center">
+                      <span className="text-[11px] text-white font-medium truncate w-full">{t.platformBento?.batchCard?.cinematic || 'Cinematic'}</span>
+                      <span className="text-[9px] text-[#0099ff] font-mono tracking-wide uppercase">{t.platformBento?.batchCard?.cinematicMeta || 'Action Key'}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between text-[11px] text-white/50 pt-1">
+                  <span>{t.platformBento?.batchCard?.processed || '3 of 3 processed in parallel'}</span>
+                  <span className="text-[#0099ff] font-medium">{t.platformBento?.batchCard?.telemetry || '100% On-Device · Zero Queue'}</span>
+                </div>
+              </div>
             </div>
             <div style={{ marginTop: 18 }}>
-              <h3 className="fh-bento-title">Finish it on the canvas</h3>
+              <h3 className="fh-bento-title">{t.platformBento?.batchCard?.title || 'Batch isolate across any subject'}</h3>
               <p className="fh-bento-copy">
-                Backdrops, shadows, crops, text and vector layers — all export with
-                the image.
+                {t.platformBento?.batchCard?.copy || 'Remove backgrounds across commercial footwear, high-resolution athlete portraits, and multi-character film stills in a single automated pass. Processed simultaneously with zero cloud wait.'}
               </p>
             </div>
-            <CardFoot label="Design" href="/bg_remove/" />
+            <CardFoot label={t.platformBento?.batchCard?.foot || 'Batch Cutout'} href="/bg_remove/" />
           </BentoCard>
         </div>
       </div>

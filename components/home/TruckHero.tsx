@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useTranslation } from '@/locales';
 
 /**
  * Full-bleed "Keep Pixels On Track" showcase: the tow truck carrying the
@@ -9,6 +10,7 @@ import Link from 'next/link';
  * rotating studio dial. The 3D work lives in ./truck-scene.
  */
 export function TruckHero() {
+  const { t } = useTranslation();
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -76,18 +78,17 @@ export function TruckHero() {
     >
       <div className="ts-copy">
         <h2 className="ts-title" id="truck-hero-title">
-          <span className="line">Keep Pixels</span>
-          <span className="line">On Track</span>
+          <span className="line">{t.truckHero?.titleLine1 || 'Keep Pixels'}</span>
+          <span className="line">{t.truckHero?.titleLine2 || 'On Track'}</span>
         </h2>
       </div>
 
       <aside className="ts-aside">
         <p>
-          Take every image the last mile. Upscale to 8×, cut out the subject
-          and finish the frame — all on-device.
+          {t.truckHero?.asideText || 'Take every image the last mile. Upscale to 8×, cut out the subject and finish the frame, all on-device.'}
         </p>
         <Link className="ts-cta" href="/upscaler/">
-          Start now
+          {t.truckHero?.startNow || 'Start now'}
           <svg
             width="15"
             height="15"
@@ -112,7 +113,7 @@ export function TruckHero() {
           aria-label="Pixelify tow truck carrying the Pixelify wordmark"
         />
         <span className="ts-vertical" aria-hidden="true">
-          STUDIO ENGINE
+          {t.truckHero?.badgeStudio || 'STUDIO ENGINE'}
         </span>
       </div>
 
@@ -138,18 +139,21 @@ export function TruckHero() {
               </svg>
             </span>
             <h3>
-              Background
-              <br />
-              Removal
+              {t.truckHero?.cardBgTitle || (
+                <>
+                  Background
+                  <br />
+                  Removal
+                </>
+              )}
             </h3>
           </div>
           <p>
-            Lift any subject out with edge-aware alpha mattes. Hair, fur and
-            glass keep their detail — no green screen.
+            {t.truckHero?.cardBgCopy || 'Lift any subject out with edge-aware alpha mattes. Hair, fur and glass keep their detail, no green screen required.'}
           </p>
           <div className="ts-card-foot">
             <Link className="ts-card-pill" href="/bg_remove/">
-              Try cutout
+              {t.truckHero?.cardBgCta || 'Try cutout'}
             </Link>
             <span className="ts-card-arrow" aria-hidden="true">
               <svg
@@ -184,15 +188,14 @@ export function TruckHero() {
                 <path d="M4 14h3v6H5a1 1 0 0 1-1-1v-5ZM20 14h-3v6h2a1 1 0 0 0 1-1v-5Z" />
               </svg>
             </span>
-            <h3>8× Upscale</h3>
+            <h3>{t.truckHero?.cardUpscaleTitle || '8× Upscale'}</h3>
           </div>
           <p>
-            Resolve small frames into print-ready detail with Vitality and
-            Pixel-Dance. Fast, tiled and shaped for real photos.
+            {t.truckHero?.cardUpscaleCopy || 'Resolve small frames into print-ready detail with Vitality and Pixel-Dance. Fast, tiled and shaped for real photos.'}
           </p>
           <div className="ts-card-foot">
             <Link className="ts-card-pill" href="/upscaler/">
-              Upscale now
+              {t.truckHero?.cardUpscaleCta || 'Upscale now'}
             </Link>
             <span className="ts-card-arrow" aria-hidden="true">
               <svg
@@ -228,18 +231,21 @@ export function TruckHero() {
               </svg>
             </span>
             <h3>
-              Studio
-              <br />
-              Finish
+              {t.truckHero?.cardStudioTitle || (
+                <>
+                  Studio
+                  <br />
+                  Finish
+                </>
+              )}
             </h3>
           </div>
           <p>
-            Backdrops, shadows, crops and type live in one canvas. Compose the
-            frame and export it without leaving the tab.
+            {t.truckHero?.cardStudioCopy || 'Backdrops, shadows, crops and type live in one canvas. Compose the frame and export it without leaving the tab.'}
           </p>
           <div className="ts-card-foot">
             <Link className="ts-card-pill" href="/bg_remove/">
-              Open studio
+              {t.truckHero?.cardStudioCta || 'Open studio'}
             </Link>
             <span className="ts-card-arrow" aria-hidden="true">
               <svg
@@ -259,7 +265,7 @@ export function TruckHero() {
         <Link
           className="ts-dial"
           href="/upscaler/"
-          aria-label="Explore the studio"
+          aria-label={t.truckHero?.dialAria || 'Explore the studio'}
         >
           <svg className="ring-text" viewBox="0 0 114 114" aria-hidden="true">
             <defs>
@@ -270,7 +276,7 @@ export function TruckHero() {
             </defs>
             <text>
               <textPath href="#truck-hero-dial-path" startOffset="0%">
-                Explore more · Explore more ·{' '}
+                {t.truckHero?.dialText || 'Explore more · Explore more · '}
               </textPath>
             </text>
           </svg>
@@ -295,7 +301,7 @@ export function TruckHero() {
 
       <div className="ts-stat">
         <div className="ts-stat-row">
-          <span className="ts-stat-number">1.2M</span>
+          <span className="ts-stat-number">1.2K</span>
           <span className="ts-avatars" aria-hidden="true">
             <span className="ts-avatar ts-avatar--1">A</span>
             <span className="ts-avatar ts-avatar--2">M</span>
@@ -305,7 +311,7 @@ export function TruckHero() {
         </div>
         <div className="ts-stat-copy">
           <i className="dot" />
-          Images delivered at full resolution
+          {t.truckHero?.statDelivered || 'Images delivered at full resolution'}
         </div>
       </div>
     </section>

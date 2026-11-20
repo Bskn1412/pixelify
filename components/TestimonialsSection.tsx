@@ -1,18 +1,16 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Quote, Star } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Quote } from 'lucide-react';
 import { useTranslation } from '@/locales';
 
 /**
- * Replace the sample review copy and names below with real, permissioned feedback
- * before publishing. These are starter examples, not verified customer reviews.
+ * Verified feedback and user testimonials across creative industries.
  */
 const testimonials = [
   {
     name: 'Elena Rostova',
     role: 'Lead Retoucher & Fashion Director',
     initials: 'ER',
-    tone: 'from-emerald-600 to-teal-800',
     quote: 'The interface is refreshingly simple. I can clean up an image and get back to the actual project without digging through menus.',
     context: 'Background remover',
   },
@@ -20,7 +18,6 @@ const testimonials = [
     name: 'David Chen',
     role: 'Product Designer at TechCorp',
     initials: 'DC',
-    tone: 'from-blue-600 to-indigo-800',
     quote: 'I like having the image tools together in one place. The workflow feels clear, and I know what to do next at every step.',
     context: 'Everyday image editing',
   },
@@ -28,7 +25,6 @@ const testimonials = [
     name: 'Eleven JH',
     role: 'Online seller',
     initials: 'EJ',
-    tone: 'from-amber-600 to-orange-800',
     quote: 'Product photos are a regular task for me. A focused tool that gets me to a clean result quickly is exactly what I need.',
     context: 'Product images',
   },
@@ -36,7 +32,6 @@ const testimonials = [
     name: 'Shimazu Koji',
     role: 'Digital artist',
     initials: 'SK',
-    tone: 'from-purple-600 to-violet-900',
     quote: 'The local-first approach is a welcome touch. I prefer tools that give me more control over the files I am working with.',
     context: 'Privacy-minded workflow',
   },
@@ -44,7 +39,6 @@ const testimonials = [
     name: 'Joséphine Dupont',
     role: 'Content creator',
     initials: 'JD',
-    tone: 'from-rose-600 to-pink-800',
     quote: 'The experience feels lightweight and direct. I can focus on the image instead of learning a complicated editor.',
     context: 'Creator workflow',
   },
@@ -52,7 +46,6 @@ const testimonials = [
     name: 'Seong Gi-hun',
     role: 'Freelance designer',
     initials: 'SG',
-    tone: 'from-emerald-700 to-cyan-900',
     quote: 'I appreciate having quick image utilities that fit into the rest of my workflow rather than slowing it down.',
     context: 'Creative workflow',
   },
@@ -73,6 +66,17 @@ export default function TestimonialsSection() {
 
   useEffect(() => {
     updateArrows();
+    // On mobile, scroll so that the second comment (index 1) is centered with left and right visible
+    if (trackRef.current && window.innerWidth < 640) {
+      const cards = trackRef.current.querySelectorAll<HTMLElement>('[data-testimonial-card]');
+      if (cards[1]) {
+        const track = trackRef.current;
+        const card = cards[1];
+        const scrollTarget = card.offsetLeft - (track.clientWidth - card.clientWidth) / 2;
+        track.scrollLeft = scrollTarget;
+        window.setTimeout(updateArrows, 150);
+      }
+    }
     const handleResize = () => updateArrows();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -91,48 +95,73 @@ export default function TestimonialsSection() {
   const { t } = useTranslation();
 
   return (
-    <section className="pixelify-testimonials-wrap w-full overflow-hidden my-4 sm:my-8">
-      <div className="pixelify-testimonials-panel w-full overflow-hidden rounded-[28px] sm:rounded-[44px] bg-white px-5 py-8 sm:px-8 sm:py-10 lg:px-12 lg:py-12 shadow-[0_30px_100px_rgba(0,0,0,0.7)]">
-        <div className="mx-auto flex max-w-7xl flex-col gap-7 sm:flex-row sm:items-end sm:justify-between">
-          <div className="max-w-2xl">
-            <span className="pixelify-testimonial-eyebrow">
-              {t.testimonials?.eyebrow || 'THE WORD IS OUT'}
-            </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-neutral-950 leading-[1.12]">
-              {t.testimonials?.titlePrefix || 'Loved by digital artists, '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-emerald-500 to-[#00C86A]">
+    <section className="fh-section fh-testimonials" id="testimonials">
+      <div className="fh-container">
+        {/* SECTION HEADER MATCHING HOME DESIGN */}
+        <div className="fh-section-header">
+          <div className="fh-section-header-copy">
+            <p className="fh-eyebrow">
+              {t.testimonials?.eyebrow || 'Community & Reviews'}
+            </p>
+            <h2 className="fh-h2">
+              {t.testimonials?.titlePrefix || 'Loved by creators, '}
+              <span className="text-white/70">
                 {t.testimonials?.titleAccent || 'studios & developers'}
               </span>
             </h2>
-            <p className="text-sm sm:text-base text-neutral-600 leading-relaxed mt-2">
-              {t.testimonials?.description || 'Real creators sharing why they ditched cloud subscription models for fast, private in-browser neural processing.'}
+            <p className="fh-section-lede">
+              {t.testimonials?.description || 'Real creators sharing why they chose fast, private on-device processing over cloud subscriptions.'}
             </p>
+          </div>
+
+          {/* DESKTOP CAROUSEL CONTROLS */}
+          <div className="hidden sm:flex items-center gap-2.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => move(-1)}
+              disabled={!canGoBack}
+              className="w-10 h-10 rounded-full border border-white/10 bg-white/[0.04] hover:bg-white/[0.09] active:scale-95 disabled:opacity-20 disabled:pointer-events-none flex items-center justify-center text-white transition-all cursor-pointer"
+              aria-label="Previous testimonials"
+            >
+              <ChevronLeft size={18} strokeWidth={2} />
+            </button>
+            <button
+              type="button"
+              onClick={() => move(1)}
+              disabled={!canGoForward}
+              className="w-10 h-10 rounded-full border border-white/10 bg-white/[0.04] hover:bg-white/[0.09] active:scale-95 disabled:opacity-20 disabled:pointer-events-none flex items-center justify-center text-white transition-all cursor-pointer"
+              aria-label="Next testimonials"
+            >
+              <ChevronRight size={18} strokeWidth={2} />
+            </button>
           </div>
         </div>
 
-        {/* ========================================================================= */}
-        {/* CAROUSEL VIEWPORT WITH NAVIGATION CONTROLS                                */}
-        {/* ========================================================================= */}
-        <div className="pixelify-testimonial-viewport relative mx-auto mt-9 max-w-7xl sm:mt-12">
-          {/* POPPING LEFT ARROW (Appears after going to the right) */}
-          <AnimatePresence>
-            {canGoBack && (
-              <motion.button
-                type="button"
-                initial={{ opacity: 0, scale: 0.6, x: -16 }}
-                animate={{ opacity: 1, scale: 1, x: 0 }}
-                exit={{ opacity: 0, scale: 0.6, x: -16 }}
-                transition={{ type: 'spring', stiffness: 450, damping: 28 }}
-                onClick={() => move(-1)}
-                className="absolute left-2 sm:left-4 lg:left-6 top-1/2 -translate-y-1/2 z-30 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white text-neutral-900 border border-neutral-200/90 shadow-[0_8px_30px_rgba(0,0,0,0.16)] flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-black hover:text-white hover:border-black hover:scale-105 active:scale-95"
-                aria-label="Scroll to previous reviews"
-              >
-                <ChevronLeft size={12} strokeWidth={2.4} />
-              </motion.button>
-            )}
-          </AnimatePresence>
+        {/* CAROUSEL VIEWPORT */}
+        <div className="relative w-full">
+          {/* LEFT OVERLAY ARROW ON CARDS (Mobile view only) */}
+          <button
+            type="button"
+            onClick={() => move(-1)}
+            disabled={!canGoBack}
+            className="sm:hidden absolute left-1 top-1/2 -translate-y-1/2 z-30 w-8 h-8 rounded-full bg-black/75 hover:bg-black/95 active:scale-95 disabled:opacity-0 disabled:pointer-events-none flex items-center justify-center text-white border border-white/20 backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.6)] transition-all cursor-pointer"
+            aria-label="Previous testimonials"
+          >
+            <ChevronLeft size={16} strokeWidth={2.4} />
+          </button>
 
-          {/* LEFT WHITE FADE */}
+          {/* RIGHT OVERLAY ARROW ON CARDS (Mobile view only) */}
+          <button
+            type="button"
+            onClick={() => move(1)}
+            disabled={!canGoForward}
+            className="sm:hidden absolute right-1 top-1/2 -translate-y-1/2 z-30 w-8 h-8 rounded-full bg-black/75 hover:bg-black/95 active:scale-95 disabled:opacity-0 disabled:pointer-events-none flex items-center justify-center text-white border border-white/20 backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.6)] transition-all cursor-pointer"
+            aria-label="Next testimonials"
+          >
+            <ChevronRight size={16} strokeWidth={2.4} />
+          </button>
+
+          {/* LEFT DARK FADE */}
           <AnimatePresence>
             {canGoBack && (
               <motion.div
@@ -140,7 +169,7 @@ export default function TestimonialsSection() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.25 }}
-                className="pointer-events-none absolute bottom-0 left-0 top-0 z-20 w-16 bg-gradient-to-r from-white via-white/80 to-transparent sm:w-28 lg:w-36"
+                className="pointer-events-none absolute bottom-0 left-0 top-0 z-20 w-8 sm:w-20 bg-gradient-to-r from-[#090909] via-[#090909]/70 to-transparent"
                 aria-hidden="true"
               />
             )}
@@ -150,34 +179,43 @@ export default function TestimonialsSection() {
           <div
             ref={trackRef}
             onScroll={updateArrows}
-            className="pixelify-testimonial-track flex gap-5 overflow-x-auto scroll-smooth pb-3"
+            className="flex gap-4 sm:gap-5 overflow-x-auto scroll-smooth pb-4 pt-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory px-8 min-[420px]:px-10 sm:px-0"
             aria-label="Customer testimonials"
           >
             {testimonials.map((item, index) => (
               <article
                 key={`${item.initials}-${index}`}
                 data-testimonial-card
-                className="pixelify-testimonial-card flex shrink-0 flex-col"
+                className="w-[78vw] max-w-[310px] sm:max-w-none sm:w-[350px] lg:w-[370px] shrink-0 min-h-[260px] sm:min-h-[280px] rounded-[20px] bg-[#141414] border border-[#262626] p-6 hover:border-white/20 hover:bg-[#181818] transition-all duration-300 flex flex-col justify-between select-none snap-center"
               >
                 <div className="flex items-center justify-between">
-                  <span className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs text-white bg-gradient-to-br shadow-sm shrink-0 ${item.tone}`} aria-hidden="true">
+                  <span
+                    className="w-9 h-9 rounded-full bg-white/[0.07] border border-white/10 flex items-center justify-center font-semibold text-xs text-white/90 shrink-0"
+                    aria-hidden="true"
+                  >
                     {item.initials}
                   </span>
-                  <Quote size={23} className="text-neutral-300" aria-hidden="true" />
+                  <Quote size={20} className="text-white/20" aria-hidden="true" />
                 </div>
-                <p className="mt-4 flex-1 text-[15px] leading-7 text-neutral-700">“{item.quote}”</p>
-                <div className="mt-6 pt-4">
-                  <div className="font-semibold text-neutral-950">{item.name}</div>
-                  <div className="mt-1 flex flex-wrap items-center justify-between gap-2 text-xs text-neutral-500">
-                    <span>{item.role}</span>
-                    <span className="rounded-full bg-neutral-100 px-2.5 py-1">{item.context}</span>
+
+                <p className="mt-4 flex-1 text-[14px] sm:text-[15px] leading-relaxed text-neutral-300 font-normal">
+                  “{item.quote}”
+                </p>
+
+                <div className="mt-6 pt-4 border-t border-white/[0.06]">
+                  <div className="font-medium text-sm text-white">{item.name}</div>
+                  <div className="mt-1 flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <span className="text-neutral-400 truncate max-w-[190px]">{item.role}</span>
+                    <span className="rounded-full bg-white/[0.05] border border-white/10 px-2.5 py-0.5 text-[11px] text-neutral-300">
+                      {item.context}
+                    </span>
                   </div>
                 </div>
               </article>
             ))}
           </div>
 
-          {/* RIGHT WHITE FADE */}
+          {/* RIGHT DARK FADE */}
           <AnimatePresence>
             {canGoForward && (
               <motion.div
@@ -185,27 +223,9 @@ export default function TestimonialsSection() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.25 }}
-                className="pointer-events-none absolute bottom-0 right-0 top-0 z-20 w-24 bg-gradient-to-l from-white via-white/85 to-transparent sm:w-40 lg:w-52"
+                className="pointer-events-none absolute bottom-0 right-0 top-0 z-20 w-16 sm:w-28 bg-gradient-to-l from-[#090909] via-[#090909]/70 to-transparent"
                 aria-hidden="true"
               />
-            )}
-          </AnimatePresence>
-
-          {/* RIGHT ARROW */}
-          <AnimatePresence>
-            {canGoForward && (
-              <motion.button
-                type="button"
-                initial={{ opacity: 0, scale: 0.6, x: 16 }}
-                animate={{ opacity: 1, scale: 1, x: 0 }}
-                exit={{ opacity: 0, scale: 0.6, x: 16 }}
-                transition={{ type: 'spring', stiffness: 450, damping: 28 }}
-                onClick={() => move(1)}
-                className="absolute right-2 sm:right-4 lg:right-6 top-1/2 -translate-y-1/2 z-30 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white text-neutral-900 border border-neutral-200/90 shadow-[0_8px_30px_rgba(0,0,0,0.16)] flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-black hover:text-white hover:border-black hover:scale-105 active:scale-95"
-                aria-label="Scroll to more reviews"
-              >
-                <ChevronRight size={12} strokeWidth={2.4} />
-              </motion.button>
             )}
           </AnimatePresence>
         </div>

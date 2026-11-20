@@ -184,7 +184,7 @@ export default function AIUpscalerSection({ onLaunchUpscaler }: AIUpscalerSectio
     }, []);
 
     return (
-        <section ref={sectionRef} className="w-full pt-10 sm:pt-16 lg:pt-160 pb-20 sm:pb-24 lg:pb-32 overflow-hidden">
+        <section ref={sectionRef} className="w-full pt-10 sm:pt-16 lg:pt-20 pb-20 sm:pb-24 lg:pb-32 overflow-hidden">
             {/* The card stage is visually scaled (0.58–1.0) but a transform never
                 shrinks its layout box, which used to leave ~90px of dead air above
                 and below the cards on phones. These margins subtract the invisible
@@ -203,44 +203,45 @@ export default function AIUpscalerSection({ onLaunchUpscaler }: AIUpscalerSectio
         @media (min-width: 1024px) { .ai-stage { margin-top:  0; margin-bottom: 0; } }
       `}} />
             {/* Centered Inner Container with balanced height */}
-            <div className="max-w-[1300px] mx-auto w-full relative z-10 lg:min-h-[560px] flex flex-col lg:flex-row items-center lg:items-start justify-between gap-8 lg:gap-4">
+            <div className="fh-container relative z-10 lg:min-h-[560px] flex flex-col lg:flex-row items-center lg:items-start justify-between gap-12 lg:gap-4">
                 {/* ========================================================================= */}
                 {/* LEFT: CONTENT (Features, Models Showcase, and Launch CTA)                */}
                 {/* ========================================================================= */}
                 {/* Responsive padding and alignment for mobile & desktop */}
-                <div className="flex flex-col gap-4 max-w-md lg:max-w-[380px] min-[1150px]:max-w-[430px] xl:max-w-lg pt-12 sm:pt-16 lg:pt-12 xl:pt-20 z-30 text-center lg:text-left items-center lg:items-start">                    {/* Title - reference style: flat green lead word + big bold white text */}
-                    <h2 className="text-2xl sm:text-3xl lg:text-[28px] min-[1150px]:text-[32px] xl:text-[38px] 2xl:text-[40px] font-extrabold tracking-tight text-white leading-[1.18]">
-                        {t.aiUpscalerSection?.titleLead || 'Upscale images on your device'}{' '}
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00FF85] via-[#00C86A] to-[#38ef7d]">
+                <div className="flex flex-col gap-5 sm:gap-6 max-w-full lg:max-w-[460px] xl:max-w-[500px] pt-16 sm:pt-20 lg:pt-24 xl:pt-28 z-30 text-left items-start shrink-0">
+                    {/* Keep the established bold sans heading while splitting the title onto two lines. */}
+                    <h2 className="ai-upscaler-title w-full text-[19px] min-[380px]:text-[22px] sm:text-[26px] md:text-3xl lg:text-[26px] min-[1150px]:text-[30px] xl:text-[36px] 2xl:text-[38px] font-extrabold tracking-tight text-white leading-[1.18] text-left">
+                        <span className="block whitespace-nowrap">{t.aiUpscalerSection?.titleLead || 'Upscale images on your device'}</span>
+                        <span className="block mt-1.5 sm:mt-2 whitespace-nowrap text-transparent bg-clip-text bg-gradient-to-r from-[#0099ff] via-[#54b8ff] to-[#a8dcff]">
                             {t.aiUpscalerSection?.titleAccent || 'with AI'}
                         </span>
                     </h2>
-                    {/* Description text with constrained max-width so it wraps before touching Vitality */}
+                    {/* Description text - normal paragraph, left-aligned, cleanly clear of images */}
                     <motion.p
                         initial={{ opacity: 0, y: 16 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true, amount: 0.4 }}
                         transition={{ duration: 0.6, delay: 0.15, ease: 'easeOut' }}
-                        className="mt-2 text-xs sm:text-sm text-neutral-400 font-normal leading-relaxed max-w-[310px] sm:max-w-[330px] lg:max-w-[330px] min-[1150px]:max-w-[380px] xl:max-w-[460px] mx-auto lg:mx-0"
+                        className="mt-1 sm:mt-2 text-xs sm:text-sm text-neutral-400 font-normal leading-relaxed max-w-[300px] sm:max-w-[340px] lg:max-w-[330px] min-[1150px]:max-w-[370px] xl:max-w-[410px] text-left"
                     >
                         {t.aiUpscalerSection?.desc || 'Enlarge photos, anime, product images, portraits, and old pictures by 2x, 4x or 8x. AI Upscaler improves clarity and generates cleaner detail in a fast offline workflow.'}
                     </motion.p>
                     {/* Launch Studio CTA (Desktop only, positioned under text) */}
-                    <div className="hidden lg:flex pt-8 sm:pt-10 lg:pt-14 flex-col sm:flex-row items-center lg:items-start gap-3 sm:gap-4 w-full sm:w-auto">
+                    <div className="hidden lg:flex pt-5 sm:pt-6 flex-col sm:flex-row items-start gap-3 sm:gap-4 w-full">
                         <button
                             onClick={onLaunchUpscaler}
                             onMouseEnter={() => warmup('upscaler')}
-                            className="w-fit justify-center px-6 py-3.5 rounded-full bg-[#00FF85] hover:bg-[#00E575] text-black font-extrabold text-xs sm:text-sm shadow-[0_0_25px_rgba(0,255,133,0.35)] hover:shadow-[0_0_35px_rgba(0,255,133,0.55)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2 group cursor-pointer"
+                            className="w-fit justify-center px-6 py-3.5 rounded-full bg-white hover:bg-neutral-200 text-black font-semibold text-xs sm:text-sm shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2 group cursor-pointer"
                         >
                             <span>{t.aiUpscalerSection?.exploreButton || 'Explore AI Upscaler'}</span>
-                            <span className="group-hover:translate-x-1 transition-transform">→</span>
+                            <span className="text-[#0099ff] group-hover:translate-x-1 transition-transform">→</span>
                         </button>
                     </div>
                 </div>
                 {/* ========================================================================= */}
                 {/* RIGHT: CARDS CLUSTER (Card 3 Hero, Card 2 Overlapping, Card 1 Centered)   */}
                 {/* ========================================================================= */}
-                <div className="flex flex-col items-center lg:items-end w-full lg:w-auto">
+                <div className="flex flex-col items-center lg:items-end w-full lg:w-auto lg:pl-28 min-[1150px]:pl-36 xl:pl-44">
                     <div ref={stageRef} className="ai-stage relative shrink-0 flex items-start justify-start lg:justify-end scale-[0.58] min-[420px]:scale-[0.66] sm:scale-[0.8] md:scale-[0.9] lg:scale-[0.74] min-[1150px]:scale-[0.82] xl:scale-[0.92] 2xl:scale-100 origin-center lg:origin-top-right lg:translate-x-0 h-[450px] sm:h-[490px] lg:h-auto">
                         <div className="ai-stage-inner relative">
                             {/* ----------------------------------------------------------------- */}
@@ -376,7 +377,7 @@ export default function AIUpscalerSection({ onLaunchUpscaler }: AIUpscalerSectio
                                             viewBox="0 0 68 30"
                                             fill="none"
                                             xmlns="http://www.w3.org/2000/svg"
-                                            className="text-[#00C86A] drop-shadow-[0_0_6px_rgba(0,200,106,0.5)] translate-x-3"
+                                            className="text-[#0099ff] drop-shadow-[0_0_6px_rgba(0,153,255,0.45)] translate-x-3"
                                         >
                                             <path
                                                 d="M 6 6 C 18 22, 42 26, 60 18"
@@ -404,10 +405,10 @@ export default function AIUpscalerSection({ onLaunchUpscaler }: AIUpscalerSectio
                             onClick={onLaunchUpscaler}
                             onMouseEnter={() => warmup('upscaler')}
                             onTouchStart={() => warmup('upscaler')}
-                            className="w-fit justify-center px-6 py-3.5 rounded-full bg-[#00FF85] hover:bg-[#00E575] text-black font-extrabold text-xs sm:text-sm shadow-[0_0_25px_rgba(0,255,133,0.35)] hover:shadow-[0_0_35px_rgba(0,255,133,0.55)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2 group cursor-pointer"
+                            className="w-fit justify-center px-6 py-3.5 rounded-full bg-white hover:bg-neutral-200 text-black font-semibold text-xs sm:text-sm shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2 group cursor-pointer"
                         >
                             <span>{t.aiUpscalerSection?.exploreButton || 'Explore AI Upscaler'}</span>
-                            <span className="group-hover:translate-x-1 transition-transform">→</span>
+                            <span className="text-[#0099ff] group-hover:translate-x-1 transition-transform">→</span>
                         </button>
                     </div>
                 </div>

@@ -7,14 +7,13 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, ArrowUpRight, CheckCircle2, Clock3, ImageMinus, RefreshCw, Sparkles, Trophy, WandSparkles } from 'lucide-react';
 import { syncVisitorIdentity } from '@/lib/visitor';
 import { getSavedDisplayName } from '@/lib/visitor-profile';
+import { useTranslation } from '@/locales';
 
 type ActivityType = 'all' | 'background_removal' | 'upscale';
 type Period = 'all' | 'today' | 'week' | 'month';
 type Activity = { id: number; action: Exclude<ActivityType, 'all'>; points: number; created_at: string };
 type Data = { activities: Activity[]; totalFiltered: number; summary: { points: number; total: number; backgrounds: number; upscales: number }; position: { rank: number; score: number } | null };
 const perPage = 12;
-const typeLabels: Record<ActivityType, string> = { all: 'All activities', background_removal: 'Background removal', upscale: 'AI upscaling' };
-const periodLabels: Record<Period, string> = { all: 'All time', today: 'Today', week: 'This week', month: 'This month' };
 
 function formatDate(value: string) { return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)); }
 
@@ -28,6 +27,9 @@ const achievements = [
 ];
 
 export default function MyActivityPage() {
+  const { t } = useTranslation();
+  const act = t.leaderboardActivity;
+
   const [data, setData] = useState<Data | null>(null);
   const [type, setType] = useState<ActivityType>('all');
   const [period, setPeriod] = useState<Period>('all');
@@ -38,6 +40,28 @@ export default function MyActivityPage() {
   const [error, setError] = useState('');
   const reduced = useReducedMotion();
 
+  const typeLabels: Record<ActivityType, string> = {
+    all: act?.types?.all || 'All activities',
+    background_removal: act?.types?.bg || 'Background removal',
+    upscale: act?.types?.upscale || 'AI upscaling',
+  };
+
+  const periodLabels: Record<Period, string> = {
+    all: act?.periods?.all || 'All time',
+    today: act?.periods?.today || 'Today',
+    week: act?.periods?.week || 'This week',
+    month: act?.periods?.month || 'This month',
+  };
+
+  const badgeKeyMap: Record<string, keyof NonNullable<typeof act>['badges']> = {
+    'first-image': 'firstImage',
+    'bg-removal-expert': 'bgExpert',
+    'upscaling-expert': 'upscaleExpert',
+    'creative-explorer': 'creativeExplorer',
+    'rising-star': 'risingStar',
+    'champion': 'champion',
+  };
+
   const load = useCallback(async () => {
     setLoading(true); setError('');
     try {
@@ -45,12 +69,12 @@ export default function MyActivityPage() {
       setVisitorId(id);
       const response = await fetch(`/api/activity?type=${type}&period=${period}&page=${page}`, { cache: 'no-store' });
       const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'Your activity history could not be loaded.');
+      if (!response.ok) throw new Error(result.error || act?.errorTitle || 'Your activity history could not be loaded.');
       setData(result);
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : 'Your activity history could not be loaded.');
+      setError(reason instanceof Error ? reason.message : (act?.errorTitle || 'Your activity history could not be loaded.'));
     } finally { setLoading(false); }
-  }, [type, period, page]);
+  }, [type, period, page, act?.errorTitle]);
 
   useEffect(() => { setDisplayName(getSavedDisplayName() || 'Pixelify member'); void load(); }, [load]);
   useEffect(() => {
@@ -65,46 +89,50 @@ export default function MyActivityPage() {
   return <main className="activity-page">
     <div className="activity-glow" aria-hidden="true" />
     <div className="activity-shell">
-      <nav className="activity-nav" aria-label="Activity navigation"><span className="activity-page-label">Private dashboard</span><Link href="/leaderboard/" className="activity-back"><ArrowLeft size={15} /> Public leaderboard</Link></nav>
+      <nav className="activity-nav" aria-label="Activity navigation"><span className="activity-page-label">{act?.navLabel || 'Private dashboard'}</span><Link href="/leaderboard/" className="activity-back"><ArrowLeft size={15} /> {act?.backToLeaderboard || 'Public leaderboard'}</Link></nav>
       <header className="activity-hero">
         <div className="activity-avatar">{displayName.slice(0, 1).toUpperCase()}</div>
-        <div className="activity-hero-copy"><p className="activity-eyebrow"><Trophy size={14} /> Personal dashboard</p><h1>My Activity<span>.</span></h1><p>Every image improved, every point earned. Your Pixelify journey in one place.</p></div>
-        <div className="activity-hero-meta"><span>{displayName}</span><span>{visitorId ? `${visitorId.slice(0, 8)}…${visitorId.slice(-4)}` : 'Anonymous profile'}</span><b>{data?.position ? `Rank #${data.position.rank}` : 'Unranked'}</b></div>
+        <div className="activity-hero-copy"><p className="activity-eyebrow"><Trophy size={14} /> {act?.personalDashboard || 'Personal dashboard'}</p><h1>{act?.title || 'My Activity'}<span>.</span></h1><p>{act?.subtitle || 'Every image improved, every point earned. Your Pixelify journey in one place.'}</p></div>
+        <div className="activity-hero-meta"><span>{displayName}</span><span>{visitorId ? `${visitorId.slice(0, 8)}…${visitorId.slice(-4)}` : (act?.anonymousProfile || 'Anonymous profile')}</span><b>{data?.position ? (act?.rankNumber?.replace('{rank}', String(data.position.rank)) || `Rank #${data.position.rank}`) : (act?.unranked || 'Unranked')}</b></div>
       </header>
 
       <section className="activity-stats" aria-label="Your activity statistics">
         {[
-          { title: 'Total points', value: data?.summary.points, icon: <Trophy size={19} />, tone: 'gold' },
-          { title: 'Backgrounds removed', value: data?.summary.backgrounds, icon: <ImageMinus size={19} />, tone: 'cyan' },
-          { title: 'Images upscaled', value: data?.summary.upscales, icon: <ArrowUpRight size={19} />, tone: 'purple' },
-          { title: 'Total activities', value: data?.summary.total, icon: <WandSparkles size={19} />, tone: 'pink' },
+          { title: act?.stats?.totalPoints || 'Total points', value: data?.summary.points, icon: <Trophy size={19} />, tone: 'gold' },
+          { title: act?.stats?.backgroundsRemoved || 'Backgrounds removed', value: data?.summary.backgrounds, icon: <ImageMinus size={19} />, tone: 'cyan' },
+          { title: act?.stats?.imagesUpscaled || 'Images upscaled', value: data?.summary.upscales, icon: <ArrowUpRight size={19} />, tone: 'purple' },
+          { title: act?.stats?.totalActivities || 'Total activities', value: data?.summary.total, icon: <WandSparkles size={19} />, tone: 'pink' },
         ].map((item) => <motion.article key={item.title} className={`activity-stat ${item.tone}`} initial={reduced ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .45 }}><span>{item.icon}</span><small>{item.title}</small><strong>{loading && !data ? '—' : (item.value ?? 0).toLocaleString()}</strong></motion.article>)}
       </section>
 
-      <section className="achievement-section" aria-labelledby="achievement-heading"><div className="section-heading"><div><p className="activity-eyebrow"><Trophy size={14} /> Milestones</p><h2 id="achievement-heading">Your achievements</h2></div><span>{data ? `${achievements.filter((a) => a.earned(data)).length} / ${achievements.length} unlocked` : 'Based on your activity'}</span></div>
+      <section className="achievement-section" aria-labelledby="achievement-heading"><div className="section-heading"><div><p className="activity-eyebrow"><Trophy size={14} /> {act?.milestones || 'Milestones'}</p><h2 id="achievement-heading">{act?.achievementsTitle || 'Your achievements'}</h2></div><span>{data ? (act?.unlockedCount?.replace('{unlocked}', String(achievements.filter((a) => a.earned(data)).length)).replace('{total}', String(achievements.length)) || `${achievements.filter((a) => a.earned(data)).length} / ${achievements.length} unlocked`) : (act?.basedOnActivity || 'Based on your activity')}</span></div>
         <div className="achievement-grid">{achievements.map((badge) => {
           const unlocked = Boolean(data && badge.earned(data));
-          return <article key={badge.key} className={`achievement-card${unlocked ? ' unlocked' : ''}`} aria-label={`${badge.title}, ${unlocked ? 'unlocked' : 'locked'}`}><Image src={`/images/leaderboard/badges/${badge.key}.svg`} alt="" width={54} height={54} /><div><strong>{badge.title}</strong><span>{badge.description}</span></div><i>{unlocked ? 'Earned' : 'Locked'}</i></article>;
+          const badgeKey = badgeKeyMap[badge.key];
+          const bTrans = badgeKey && act?.badges ? act.badges[badgeKey] : undefined;
+          const bTitle = bTrans?.title || badge.title;
+          const bDesc = bTrans?.description || badge.description;
+          return <article key={badge.key} className={`achievement-card${unlocked ? ' unlocked' : ''}`} aria-label={`${bTitle}, ${unlocked ? 'unlocked' : 'locked'}`}><Image src={`/leaderboard/badges/${badge.key}.svg`} alt="" width={54} height={54} /><div><strong>{bTitle}</strong><span>{bDesc}</span></div><i>{unlocked ? (act?.statusEarned || 'Earned') : (act?.statusLocked || 'Locked')}</i></article>;
         })}</div>
       </section>
 
       <section className="activity-history" aria-labelledby="history-heading">
-        <div className="section-heading history-heading"><div><p className="activity-eyebrow"><Clock3 size={14} /> Your history</p><h2 id="history-heading">Recent activity</h2></div><span>{data ? `${data.totalFiltered.toLocaleString()} matching records` : 'Private to you'}</span></div>
+        <div className="section-heading history-heading"><div><p className="activity-eyebrow"><Clock3 size={14} /> {act?.history || 'Your history'}</p><h2 id="history-heading">{act?.recentActivity || 'Recent activity'}</h2></div><span>{data ? (act?.matchingRecords?.replace('{count}', data.totalFiltered.toLocaleString()) || `${data.totalFiltered.toLocaleString()} matching records`) : (act?.privateToYou || 'Private to you')}</span></div>
         <div className="activity-filters">
-          <label>Activity type<select value={type} onChange={(event) => { setPage(1); setType(event.target.value as ActivityType); }}>{(Object.keys(typeLabels) as ActivityType[]).map((key) => <option value={key} key={key}>{typeLabels[key]}</option>)}</select></label>
-          <label>Time period<select value={period} onChange={(event) => { setPage(1); setPeriod(event.target.value as Period); }}>{(Object.keys(periodLabels) as Period[]).map((key) => <option value={key} key={key}>{periodLabels[key]}</option>)}</select></label>
-          <span className="private-note"><span /> Only you can see this activity</span>
+          <label>{act?.activityType || 'Activity type'}<select value={type} onChange={(event) => { setPage(1); setType(event.target.value as ActivityType); }}>{(Object.keys(typeLabels) as ActivityType[]).map((key) => <option value={key} key={key}>{typeLabels[key]}</option>)}</select></label>
+          <label>{act?.timePeriod || 'Time period'}<select value={period} onChange={(event) => { setPage(1); setPeriod(event.target.value as Period); }}>{(Object.keys(periodLabels) as Period[]).map((key) => <option value={key} key={key}>{periodLabels[key]}</option>)}</select></label>
+          <span className="private-note"><span /> {act?.onlyYouNotice || 'Only you can see this activity'}</span>
         </div>
 
-        {error ? <div className="activity-message error" role="alert"><strong>Could not load your activity.</strong><p>{error}</p><button onClick={() => void load()}><RefreshCw size={15} /> Retry</button></div> : loading && !data ? <div className="activity-skeleton" aria-label="Loading your activity">{Array.from({ length: 4 }, (_, i) => <div key={i}><i /><span /><b /></div>)}</div> : noHistory ? <div className="activity-empty"><div className="empty-art"><span /><span /><Sparkles /></div><h3>Your journey starts here.</h3><p>Improve your first image with Pixelify and earn your first points.</p><div><Link href="/bg_remove/" className="activity-cta">Try BG Remover <ArrowRight size={15} /></Link><Link href="/upscaler/" className="activity-cta secondary">Try AI Upscaler <ArrowRight size={15} /></Link></div></div> : data && data.activities.length === 0 ? <div className="activity-message"><strong>No activity matches these filters.</strong><p>Choose another activity type or time period to see your history.</p></div> : <>
+        {error ? <div className="activity-message error" role="alert"><strong>{act?.errorTitle || 'Could not load your activity.'}</strong><p>{error}</p><button onClick={() => void load()}><RefreshCw size={15} /> {act?.retry || 'Retry'}</button></div> : loading && !data ? <div className="activity-skeleton" aria-label="Loading your activity">{Array.from({ length: 4 }, (_, i) => <div key={i}><i /><span /><b /></div>)}</div> : noHistory ? <div className="activity-empty"><div className="empty-art"><span /><span /><Sparkles /></div><h3>{act?.emptyTitle || 'Your journey starts here.'}</h3><p>{act?.emptyText || 'Improve your first image with Pixelify and earn your first points.'}</p><div><Link href="/bg_remove/" className="activity-cta">{act?.tryBg || 'Try BG Remover'} <ArrowRight size={15} /></Link><Link href="/upscaler/" className="activity-cta secondary">{act?.tryUpscaler || 'Try AI Upscaler'} <ArrowRight size={15} /></Link></div></div> : data && data.activities.length === 0 ? <div className="activity-message"><strong>{act?.noMatchTitle || 'No activity matches these filters.'}</strong><p>{act?.noMatchText || 'Choose another activity type or time period to see your history.'}</p></div> : <>
           <div className="activity-timeline">{data?.activities.map((item, index) => {
             const isBg = item.action === 'background_removal';
-            return <motion.article key={item.id} className="activity-item" initial={reduced ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .38, delay: reduced ? 0 : Math.min(index * .035, .3) }}><div className={`activity-icon ${isBg ? 'bg' : 'up'}`}>{isBg ? <ImageMinus size={17} /> : <ArrowUpRight size={18} />}</div><div className="activity-item-copy"><strong>{isBg ? 'Background removed' : 'AI image upscaled'}</strong><p>{isBg ? 'Successfully removed an image background.' : 'Successfully enhanced an image with AI upscaling.'}</p><time dateTime={item.created_at}>{formatDate(item.created_at)}</time></div><div className="activity-item-status"><span><CheckCircle2 size={14} /> Success</span><b>+{item.points} PT</b></div></motion.article>;
+            return <motion.article key={item.id} className="activity-item" initial={reduced ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .38, delay: reduced ? 0 : Math.min(index * .035, .3) }}><div className={`activity-icon ${isBg ? 'bg' : 'up'}`}>{isBg ? <ImageMinus size={17} /> : <ArrowUpRight size={18} />}</div><div className="activity-item-copy"><strong>{isBg ? (act?.itemBgTitle || 'Background removed') : (act?.itemUpTitle || 'AI image upscaled')}</strong><p>{isBg ? (act?.itemBgText || 'Successfully removed an image background.') : (act?.itemUpText || 'Successfully enhanced an image with AI upscaling.')}</p><time dateTime={item.created_at}>{formatDate(item.created_at)}</time></div><div className="activity-item-status"><span><CheckCircle2 size={14} /> {act?.success || 'Success'}</span><b>+{item.points} PT</b></div></motion.article>;
           })}</div>
-          <div className="activity-pagination"><span>Page {page} of {totalPages}</span><div><button disabled={page <= 1 || loading} onClick={() => setPage((value) => Math.max(1, value - 1))}><ArrowLeft size={14} /> Previous</button><button disabled={page >= totalPages || loading} onClick={() => setPage((value) => value + 1)}>Next <ArrowRight size={14} /></button></div></div>
+          <div className="activity-pagination"><span>{act?.pageIndicator?.replace('{page}', String(page)).replace('{total}', String(totalPages)) || `Page ${page} of ${totalPages}`}</span><div><button disabled={page <= 1 || loading} onClick={() => setPage((value) => Math.max(1, value - 1))}><ArrowLeft size={14} /> {act?.prev || 'Previous'}</button><button disabled={page >= totalPages || loading} onClick={() => setPage((value) => value + 1)}>{act?.next || 'Next'} <ArrowRight size={14} /></button></div></div>
         </>}
       </section>
-      <footer className="activity-footer"><Link href="/leaderboard/"><ArrowLeft size={14} /> Return to public leaderboard</Link><span>Private activity · Visible only to this browser profile</span></footer>
+      <footer className="activity-footer"><Link href="/leaderboard/"><ArrowLeft size={14} /> {act?.returnLeaderboard || 'Return to public leaderboard'}</Link><span>{act?.footerNote || 'Private activity · Visible only to this browser profile'}</span></footer>
     </div>
   </main>;
 }

@@ -62,13 +62,13 @@ export function StudioDemo({ scale, model, zoom = 100 }: StudioDemoProps) {
     <div className="fh-studio-demo" ref={ref}>
       <div className="fh-studio-frame">
         <ImageCompare
-          before="/home/studio/live-up-before.jpg"
+          before="/home/results/live-up-before.webp"
           after={resultFor(model)}
           alt={`A macro portrait of an eye upscaled ${scale}× with ${model} in the Pixelify studio`}
           beforeLabel="Original"
           afterLabel={`${scale}× · ${model}`}
           aspect="756 / 605"
-          start={62}
+          start={50}
           zoom={zoom}
         />
       </div>

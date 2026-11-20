@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Plus } from 'lucide-react';
 import { useTranslation } from '@/locales';
 
@@ -12,7 +13,7 @@ interface FaqItem {
 const FAQ_ITEMS: FaqItem[] = [
   {
     q: 'How does Pixelify process images without uploading to cloud servers?',
-    a: 'The AI runs right in your browser using WebGPU and ONNX Runtime, so your images stay on your device, not on someone else’s server.',
+    a: 'The AI runs right in your browser using WebGPU and ONNX Runtime, so your images stay on your device-not on someone else’s server.',
   },
   {
     q: 'Is Pixelify really 100% free with no watermarks or subscriptions?',
@@ -45,31 +46,16 @@ const FAQ_ITEMS: FaqItem[] = [
 ];
 
 export default function HomeFaq() {
-  const rootRef = useRef<HTMLElement>(null);
   const [openIdx, setOpenIdx] = useState<number | null>(0);
   const { t } = useTranslation();
   const faqItems = t.homeFaq?.items || FAQ_ITEMS;
 
-  useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            root.classList.add('pb-in');
-            io.disconnect();
-          }
-        });
-      },
-      { threshold: 0.08 }
-    );
-    io.observe(root);
-    return () => io.disconnect();
-  }, []);
+  const title = t.homeFaq
+    ? `${t.homeFaq.titlePrefix || 'Frequently'} ${t.homeFaq.titleMiddle || 'Asked'} ${t.homeFaq.titleSuffix || 'Questions'}`.trim()
+    : 'Frequently Asked Questions';
 
   return (
-    <section className="uc-faq uc-faq--home" id="home-faq" ref={rootRef}>
+    <section className="fh-section relative overflow-hidden py-20 sm:py-28" id="home-faq">
       {/* FAQPage structured data for search engines */}
       <script
         type="application/ld+json"
@@ -87,44 +73,85 @@ export default function HomeFaq() {
         }}
       />
 
-      <div className="uc-glow uc-glow-a" aria-hidden="true" />
+      {/* Subtle ambient lighting washing across the section header and questions */}
+      <div className="pointer-events-none absolute -top-16 right-0 w-[600px] sm:w-[800px] h-[520px] sm:h-[650px] bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.22)_0%,rgba(255,255,255,0.13)_28%,rgba(255,255,255,0.04)_55%,transparent_75%)] blur-2xl"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute top-4 right-4 sm:right-16 w-[400px] sm:w-[520px] h-[340px] sm:h-[420px] bg-[radial-gradient(circle_at_75%_25%,rgba(255,255,255,0.16)_0%,rgba(255,255,255,0.06)_42%,transparent_72%)] blur-xl"
+      />
 
-      <div className="uc-faq-inner">
-        {/* ---------- TOP: centered header ---------- */}
-        <header className="uc-faq-head">
-          <h2 className="uc-faq-title pb-reveal" style={{ '--rv-i': 1 } as React.CSSProperties}>
-            <span className="text-[#00ff85]">{t.homeFaq.titlePrefix}</span>{' '}
-            <span className="text-[#00ff85]">{t.homeFaq.titleMiddle}</span>{' '}
-            {t.homeFaq.titleSuffix && <span className="text-[#00ff85]">{t.homeFaq.titleSuffix}</span>}
+      {/* Constrained container matching 740px layout so close button aligns directly over the end of the first answer line */}
+      <div
+        className="fh-faq-container relative z-10 w-full mx-auto px-4 sm:px-5"
+        style={{ maxWidth: '740px' }}
+      >
+        {/* TITLE MATCHING ATTACHED SCREENSHOT */}
+        <div className="text-center mb-10 sm:mb-14">
+          <h2 className="text-3xl sm:text-4xl md:text-[42px] font-bold tracking-tight text-white leading-tight">
+            {title}
           </h2>
-        </header>
+        </div>
 
-        {/* ---------- ACCORDION LIST ---------- */}
-        <div className="uc-faq-list">
+        {/* LINE-SEPARATED ACCORDION LIST MATCHING SCREENSHOT */}
+        <div className="w-full border-t border-white/10">
           {faqItems.map((item, idx) => {
             const isOpen = openIdx === idx;
             return (
               <article
                 key={idx}
-                className={`uc-faq-item pb-reveal ${isOpen ? 'is-open' : ''}`}
-                style={{ '--rv-i': idx + 2 } as React.CSSProperties}
+                className="border-b border-white/10 transition-colors duration-200"
               >
                 <button
                   type="button"
-                  className="uc-faq-q"
+                  className="uc-faq-q group focus:outline-none focus-visible:ring-1 focus-visible:ring-white/40"
                   aria-expanded={isOpen}
                   onClick={() => setOpenIdx(isOpen ? null : idx)}
                 >
-                  <span className="uc-faq-qtext">{item.q}</span>
-                  <span className="uc-faq-plus" aria-hidden="true">
-                    <Plus size={16} strokeWidth={2.4} />
+                  <span className="uc-faq-qtext text-[14.5px] sm:text-[16px] font-semibold text-white/95 leading-snug group-hover:text-white transition-colors">
+                    {item.q}
+                  </span>
+
+                  {/* Circular button: glowing white circle with solid black icon across all questions */}
+                  <span
+                    className={`uc-faq-plus shrink-0 w-7 h-7 sm:w-[32px] sm:h-[32px] rounded-full flex items-center justify-center justify-self-end transition-all duration-300 
+                      ${isOpen
+                        ? 'bg-white shadow-[0_0_20px_rgba(255,255,255,0.7),0_0_8px_rgba(255,255,255,0.9)]'
+                        : 'bg-white shadow-[0_0_10px_rgba(255,255,255,0.2)] hover:shadow-[0_0_16px_rgba(255,255,255,0.45)]'
+                      }`}
+                    style={{
+                      backgroundColor: '#151313ff',
+                      color: '#ffffffff',
+                      border: '1px solid rgba(255, 255, 255, 0.4)',
+                    }}
+                    aria-hidden="true"
+                  >
+                    <Plus
+                      size={15}
+                      strokeWidth={isOpen ? 3 : 2.5}
+                      color="#ffffffff"
+                      style={{ stroke: '#ffffffff' }}
+                      className={`transition-transform duration-300 text-black ${isOpen ? 'rotate-45' : ''}`}
+                    />
                   </span>
                 </button>
-                <div className="uc-faq-a" role="region">
-                  <div className="uc-faq-a-inner">
-                    <p>{item.a}</p>
-                  </div>
-                </div>
+
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      key="answer"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+                      className="overflow-hidden"
+                    >
+                      <div className="pb-5 pt-0 text-[13.5px] sm:text-[14px] text-neutral-400 font-normal leading-relaxed pr-2">
+                        <p>{item.a}</p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </article>
             );
           })}

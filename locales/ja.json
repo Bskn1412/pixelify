@@ -778,5 +778,477 @@
     "upscalerReady": "アップスケーラー準備完了。他のモデルは使用時に読み込まれます",
     "modelsCleared": "モデルを消去しました。必要時に再ダウンロードされます",
     "preparingBackground": "バックグラウンドでAIモデルを準備中"
+  },
+  "customerLogos": {
+    "ariaLabel": "Pixelify はオープンウェブテクノロジーで動作します"
+  },
+  "studioIntro": {
+    "title": "デバイス上で動作する、完結した画像スタジオ",
+    "lede": "最大8倍のアップスケール、被写体の切り抜き、構図の仕上げまで、すべてサーバーへアップロードすることなくデバイス上で実行できます。",
+    "openUpscaler": "アップスケーラーを開く",
+    "tryBgRemover": "背景削除を試す",
+    "features": {
+      "start": {
+        "title": "どんな画像からでも開始可能",
+        "copy": "PNG、JPG、WebPをドロップするか、クリップボードから直接貼り付け。最大20MBのファイルも瞬時に展開されます。"
+      },
+      "refine": {
+        "title": "スタジオ内で細部を調整",
+        "copy": "モデルと倍率を選択し、処理前にシャープネス、ノイズ除去、顔のディテールを調整できます。"
+      },
+      "export": {
+        "title": "ワンクリックで書き出し",
+        "copy": "フル解像度の結果または透過切り抜きをダウンロード。アカウント登録や透かしは一切不要です。"
+      }
+    },
+    "seeAll": "スタジオの全機能を見る"
+  },
+  "studioCanvas": {
+    "brand": "Pixelify Studio",
+    "tabs": {
+      "canvas": "キャンバス",
+      "models": "モデル",
+      "export": "書き出し"
+    },
+    "pages": {
+      "home": "ホーム",
+      "upscaler": "アップスケーラー",
+      "bg": "背景削除",
+      "models": "モデル一覧",
+      "gallery": "ギャラリー"
+    },
+    "railNote": {
+      "title": "オンデバイス処理",
+      "copy": "データがこのタブから外部へ出ることはありません。アップロードの待機列もアカウントも不要です。"
+    },
+    "stageHead": "違いをその目で確認",
+    "tools": {
+      "fit": "キャンバスに合わせる",
+      "zoomIn": "拡大表示",
+      "resetZoom": "ズームをリセット"
+    },
+    "panelHeadings": {
+      "export": {
+        "title": "書き出し",
+        "sub": "フォーマットと倍率"
+      },
+      "models": {
+        "title": "モデル",
+        "sub": "5種類のオンデバイスモデル"
+      },
+      "gallery": {
+        "title": "ギャラリー",
+        "sub": "最近の処理結果"
+      },
+      "home": {
+        "title": "設定",
+        "sub": "スタジオとエンジンの設定"
+      },
+      "cutout": {
+        "title": "切り抜き",
+        "sub": "アルファマットと境界線"
+      },
+      "upscale": {
+        "title": "アップスケール",
+        "sub": "AI解像度とディテール"
+      }
+    },
+    "reset": "リセット",
+    "galleryNote": "アップスケールと切り抜きが左右に並んで表示されるため、ビフォーアフターを一瞬で比較できます。",
+    "openGallery": "ギャラリーを開く",
+    "anonymousCreator": "匿名クリエイター",
+    "studioProfile": "スタジオプロファイル · ローカル",
+    "processingEngines": "処理エンジン",
+    "aiUpscaler": "AIアップスケーラー",
+    "bgRemover": "背景削除",
+    "webgpuSupport": "WebGPUサポート",
+    "available": "利用可能",
+    "cacheNote": "モデルはIndexedDBを使ってお使いのマシンにローカルキャッシュされます。",
+    "clearModels": "モデルキャッシュを消去",
+    "learnWebgpu": "WebGPUについて学ぶ",
+    "format": "フォーマット",
+    "summaryModel": "使用モデル",
+    "summaryOutput": "出力サイズ",
+    "summaryFile": "ファイル名",
+    "download": "ダウンロード",
+    "saved": "保存完了",
+    "modelLabel": "モデル",
+    "cutoutModelLabel": "切り抜きモデル",
+    "scaleFactor": "倍率",
+    "edgeFeather": "境界線のぼかし",
+    "sharpness": "シャープネス",
+    "denoise": "ノイズ除去",
+    "matteContrast": "マットコントラスト"
+  },
+  "workflowSection": {
+    "toolsEyebrow": "後処理スタジオツール",
+    "toolsTitle": "綺麗な切り抜きから完成した構図まで",
+    "toolsLede": "背景、境界線の影、アスペクト比の切り抜き、テキストレイヤーがひとつの集中できるキャンバスに揃っています。",
+    "toolsShotbarTitle": "背景削除 · ツール",
+    "toolsShotbarTag": "4つのタブ · ひとつのマスク",
+    "workflowEyebrow": "あらゆるクリエイティブワークフローのために",
+    "workflowTitle": "あなたの作品。あなたのビジョン。Pixelify。",
+    "workflowLede": "学生のプロジェクトからプロのデザインワークまで、Pixelifyは創造力を止めることなく背景削除や高画質化を支援します。",
+    "exploreTools": "ツールを探索する",
+    "carouselShotbarTitle": "Pixelify · あなたのために",
+    "carouselShotbarTag": "すべての画像に目的がある",
+    "carouselHeading": "多様なクリエイター。無限の可能性。",
+    "carouselBody": "創作、デザイン、学習、ビジネス運営など、あらゆるワークフローにPixelifyの活躍する場があります。",
+    "carouselMetaSide": "より高精度な切り抜き。より鮮明な画質。広がる創造空間。すべてがシンプルなワークスペースに。",
+    "carouselLink": "Pixelifyでできることを見る",
+    "toolTabs": {
+      "backdrop": {
+        "label": "背景",
+        "copy": "切り抜いた被写体の背後に写真、単色、または元画像のぼかしを配置できます。"
+      },
+      "effects": {
+        "label": "エフェクト",
+        "copy": "被写体のみに対してドロップシャドウ、境界線ストローク、露出調整を適用。"
+      },
+      "crop": {
+        "label": "切り抜き",
+        "copy": "再切り抜きすることなく変形、反転、SNS向け比率への固定が可能。"
+      },
+      "design": {
+        "label": "デザイン",
+        "copy": "見出し、ステッカー、レイヤーを画像とまとめて一緒に書き出せます。"
+      },
+      "designLine": "スタジオサウンド。純粋な集中。",
+      "designTag": "見出し · ステッカーレイヤー",
+      "stickerVal": "50% OFF",
+      "stickerLabel": "限定特価"
+    }
+  },
+  "platformBento": {
+    "headerTitle": "完全な画像ワークフローのための単一スタジオ",
+    "headerLede": "画像エディターに求められるアップスケール、切り抜き、背景、フォーマット、プライバシー保護のすべてがひとつのブラウザタブに集約されています。",
+    "allFeatures": "すべての機能を見る",
+    "speedCard": {
+      "title": "待たずに編集結果をプレビュー",
+      "copy": "ブラウザが対応していればハードウェアアクセラレーションを使用し、非対応の場合はWASMへ自動フォールバック。",
+      "metricsHead": "アップスケール速度",
+      "badge": "WebGPU",
+      "vitality": "4× · Vitality",
+      "vitalityMeta": "1.9 MB 超軽量モデル",
+      "tiled": "8× · タイル分割",
+      "tiledMeta": "オンメモリ処理",
+      "instant": "2× · 即時",
+      "instantMeta": "1パス処理",
+      "foot": "アップスケール"
+    },
+    "unlimitedCard": {
+      "title": "無制限の生成体験",
+      "copy": "月額40ドルのサブスクリプションもクレジット消費も強制的なダウンスケールもありません。必要なだけ切り抜きやアップスケールを行えます。",
+      "engine": "ローカルニューラルエンジン",
+      "badge": "課金ウォールなし",
+      "metricGen": "生成回数",
+      "metricGenVal": "無制限",
+      "metricCredits": "クレジット＆トークン",
+      "metricWatermarks": "透かし",
+      "metricWatermarksVal": "なし",
+      "subNote": "月額40ドルの定期購入やトークン制限なし",
+      "freeForever": "完全無料",
+      "foot": "無制限"
+    },
+    "cutoutCard": {
+      "title": "繊細な輪郭とディテールを保持",
+      "copy": "被写体をセグメンテーション処理し、残したい境界線を細部まで保持します。",
+      "chipMatte": "アルファマット",
+      "foot": "切り抜き"
+    },
+    "privacyCard": {
+      "stat": "0 B",
+      "sub": "アップロード。すべてのファイルはこのブラウザタブ内にとどまります。",
+      "row1": "ファイルは端末内に保持",
+      "row2": "アカウント登録不要",
+      "row3": "トラッキングピクセルなし",
+      "foot": "プライバシー"
+    },
+    "resolutionCard": {
+      "badge": "プロフェッショナル品質",
+      "stat": "8×",
+      "label": "の解像度を、ご自身のマシン上でレンダリング。",
+      "foot": "高解像度"
+    },
+    "offlineCard": {
+      "title": "飛行機内でも、どこでも動作",
+      "copy": "モデルの重みはブラウザに自動キャッシュされます。一度読み込めば、ネット接続なしでも快適に拡大と編集が行えます。",
+      "engine": "オフラインエンジン",
+      "badge": "キャッシュ済み",
+      "weights": "モデルの重み",
+      "traffic": "ネットワークトラフィック",
+      "status": "ステータス",
+      "worksOffline": "オフライン動作中",
+      "foot": "オフライン"
+    },
+    "instantCard": {
+      "title": "待ち行列ゼロ、待ち時間ゼロ",
+      "copy": "他のユーザーの後ろでクラウドサーバーの順番を待つ必要はありません。画像をドロップした瞬間に端末上で処理が始まります。",
+      "engine": "キューレイテンシ",
+      "badge": "即時処理",
+      "pos": "キュー順位",
+      "posVal": "#1 · 即時開始",
+      "delay": "待機遅延",
+      "delayVal": "0.0秒 (なし)",
+      "compute": "計算リソース",
+      "computeVal": "専用GPU",
+      "foot": "即時開始"
+    },
+    "speedChartCard": {
+      "title": "最新の主要ブラウザに対応",
+      "copy": "ランタイムが利用可能な最適なバックエンドを自動選定し、パネルに処理時間を即座にレポートします。",
+      "foot": "処理スピード"
+    },
+    "compareCard": {
+      "title": "すべてのビフォーアフターを検証",
+      "copy": "スライダーをドラッグして、100%、200%、400%の倍率でピクセル単位の細部まで確認できます。",
+      "foot": "比較",
+      "beforeLabel": "オリジナル",
+      "afterLabel": "4× · Pixel-Dance"
+    },
+    "batchCard": {
+      "title": "あらゆる被写体を一括切り抜き",
+      "copy": "商品スニーカー、高解像度のアスリート写真、映画のスチル写真の背景削除を一度の自動パスで完了。クラウド待ちなしで並列処理。",
+      "engine": "バッチ切り抜きエンジン",
+      "badge": "バッチ対応",
+      "footwear": "フットウェア",
+      "footwearMeta": "Eコマース",
+      "athlete": "アスリート",
+      "athleteMeta": "エディトリアル",
+      "cinematic": "シネマティック",
+      "cinematicMeta": "アクションスチル",
+      "processed": "3件を並列処理完了",
+      "telemetry": "100% オンデバイス · 待機列ゼロ",
+      "foot": "バッチ切り抜き"
+    }
+  },
+  "resultsGallery": {
+    "eyebrow": "作品集 · スタジオギャラリー",
+    "title": "仕上がった画像の圧倒的なディテール",
+    "lede": "オンデバイスAIモデルによるレンダリング例。アップスケール、アルファマット、背景合成のすべてがブラウザ内で完結します。",
+    "tabs": {
+      "all": "すべての作品",
+      "cutouts": "切り抜き · 背景削除",
+      "upscaler": "AIアップスケーラー · 8×ディテール"
+    },
+    "tags": {
+      "cutout": "切り抜き",
+      "upscaled": "アップスケール"
+    }
+  },
+  "truckHero": {
+    "titleLine1": "ピクセルを",
+    "titleLine2": "確実に届ける",
+    "asideText": "すべての画像を最後の1マイルまで完璧に。最大8倍の拡大、被写体の切り抜き、構図の仕上げをすべて端末内で実行。",
+    "startNow": "今すぐ開始",
+    "badgeStudio": "スタジオエンジン",
+    "cardBgTitle": "背景削除",
+    "cardBgCopy": "輪郭を精密に認識するアルファマットで被写体を瞬時に抽出。髪の毛、動物の毛、ガラスの質感もグリーンスクリーンなしで維持。",
+    "cardBgCta": "切り抜きを試す",
+    "cardUpscaleTitle": "8× アップスケール",
+    "cardUpscaleCopy": "VitalityとPixel-Danceにより、小さな画像を印刷品質の鮮明さへ再構成。高速かつ実写写真に最適化。",
+    "cardUpscaleCta": "今すぐ拡大",
+    "cardStudioTitle": "スタジオフィニッシュ",
+    "cardStudioCopy": "背景、影、クロップ、文字入れがひとつのキャンバスに集約。タブを離れることなく完成させて書き出し可能。",
+    "cardStudioCta": "スタジオを開く",
+    "dialText": "もっと詳しく · もっと詳しく · ",
+    "dialAria": "スタジオの機能を探索",
+    "statDelivered": "フル解像度で書き出された画像"
+  },
+  "proofSection": {
+    "title": "すべてのファイルをローカルに保ちながら、プロの仕上がりを",
+    "lede": "ワークフローガイド、オンデバイスニューラル仕様、ファイルが端末外に出ないことを求めるプロチーム向けの統合ドキュメントをご確認ください。",
+    "readDocs": "ドキュメントを読む",
+    "cases": {
+      "photography": {
+        "kicker": "写真撮影",
+        "title": "古い撮影素材からディテールを蘇らせる。",
+        "copy": "8倍タイル分割アップスケールにより、顔の肌感、服の質感、フィルムの粒状感を保ちます。原盤をクラウドに送る必要はありません。"
+      },
+      "ecommerce": {
+        "kicker": "Eコマース",
+        "title": "商品画像をその場で即座に切り抜く。",
+        "copy": "Chopperが被写体を瞬時に切り抜き、Backdrop機能でクリーンな背景、単色カラー、または元画像のぼかしに配置できます。"
+      },
+      "social": {
+        "kicker": "ソーシャルメディア",
+        "title": "投稿前にシャープネスを極限まで引き上げる。",
+        "copy": "静止画やフレームを8倍に拡大し、同じキャンバス上でトリミングと文字入れを行ってから直接書き出せます。"
+      },
+      "archives": {
+        "kicker": "アーカイブ",
+        "title": "クラウドへ送信することなく復元。",
+        "copy": "家族の写真やスキャン画像もクラウドへ一切送信されません。初回の実行後にモデルがキャッシュされるため、次回からはさらに高速です。"
+      }
+    }
+  },
+  "instantDemos": {
+    "eyebrow": "インスタントデモ",
+    "title": "ワンクリックでサンプル画像を試す",
+    "lede": "あらかじめ用意された実際の画像でオンデバイスAIモデルをテスト。アップロード不要、順番待ちなし、アカウント不要。",
+    "openStudio": "スタジオを開く",
+    "tryDemo": "デモを試す",
+    "loading": "読み込み中...",
+    "samples": {
+      "sports": {
+        "name": "スポーツ選手の切り抜き",
+        "tag": "切り抜き",
+        "description": "アップロード遅延ゼロのサブピクセルエッジマットと背景削除。"
+      },
+      "anime": {
+        "name": "アニメアート",
+        "tag": "切り抜き",
+        "description": "繊細な髪の毛も自然に切り抜く高精度アニメ背景削除。"
+      },
+      "ocean": {
+        "name": "海洋生物",
+        "tag": "アップスケール",
+        "description": "微細な有機的ディテールを再構築する高周波マイクロテクスチャ復元。"
+      },
+      "vintage": {
+        "name": "ヴィンテージアーカイブ",
+        "tag": "アップスケール",
+        "description": "フィルム粒子や圧縮ノイズを自然に補正するポートレート復元。"
+      }
+    }
+  },
+  "finalCta": {
+    "titleLine1": "すべての画像に、",
+    "titleLine2": "圧倒的な鮮明さを",
+    "copy": "写真をドロップしてモデルを選ぶだけで、8倍の鮮明さに生まれ変わります。通常のアップロードバーが動き始める前に、被写体を切り抜いて構図を完成させましょう。",
+    "openUpscaler": "アップスケーラーを開く",
+    "removeBackground": "背景を削除する",
+    "finePrint": "最新のすべてのWebブラウザ上で完全に端末内で動作します"
+  },
+  "leaderboard": {
+    "eyebrow": "コミュニティ",
+    "title": "リーダーボード",
+    "heroText": "より良い画像を生み出すたびにスコアを獲得。Pixelifyで画像を処理してポイントを獲得し、ランクを上げてバッジを解除しましょう。",
+    "howItWorks": "仕組みを見る",
+    "myActivity": "マイアクティビティ",
+    "howCardTitle": "画像を改善してポイントを獲得。",
+    "howCardText": "背景削除またはAIアップスケールを完了するごとに1ポイント獲得でき、アクティビティ履歴に反映されます。",
+    "totalParticipants": "総参加者数",
+    "allTimeCommunity": "累計コミュニティ\n参加者",
+    "topUsers": "トップユーザー",
+    "topUsersSub": "ポイント順でランク付けされたコミュニティリーダー",
+    "periods": {
+      "all": "全期間",
+      "week": "今週",
+      "month": "今月"
+    },
+    "loadError": "現在リーダーボードデータを読み込めません。",
+    "tryAgain": "再試行",
+    "emptyTitle": "最初のチャンピオンの誕生をお待ちしています。",
+    "emptyText": "画像を処理して最初のポイントを獲得しましょう。",
+    "yourPosition": "あなたの順位",
+    "yourPlace": "コミュニティでのあなたの順位",
+    "leadingCommunity": "あなたがコミュニティのトップを走っています！",
+    "rankedInCommunity": "コミュニティ内で第 {rank} 位です。",
+    "completeToEarn": "画像処理を完了して最初のポイントを獲得しましょう。",
+    "rankWillAppear": "あなたのランクはここに表示されます。",
+    "yourProfile": "あなたのPixelifyプロファイル",
+    "anonymousPlayer": "匿名プレイヤー",
+    "you": "あなた",
+    "unranked": "ランク外",
+    "rankNumber": "ランク #{rank}",
+    "points": "{count} ポイント",
+    "operations": "{count} 回の処理",
+    "memberSince": "参加日: {date}",
+    "joinUnavailable": "参加日不明",
+    "seeActivityHistory": "アクティビティ履歴を見る",
+    "backToTop": "トップユーザーに戻る",
+    "pointsUnit": "PTS",
+    "pointEarned": "ポイント獲得",
+    "pointsEarned": "ポイント獲得",
+    "addedToLeaderboard": "リーダーボードに反映されました",
+    "savedOnDevice": "この端末に保存されました",
+    "waitingToSync": "{count} {unit} の同期待ち",
+    "pointUnit": "ポイント",
+    "pointsPluralUnit": "ポイント"
+  },
+  "leaderboardActivity": {
+    "navLabel": "専用ダッシュボード",
+    "backToLeaderboard": "公開リーダーボード",
+    "personalDashboard": "個人ダッシュボード",
+    "title": "マイアクティビティ",
+    "subtitle": "改善した画像、獲得したポイント。Pixelifyでの歩みをここに集約。",
+    "anonymousProfile": "匿名プロファイル",
+    "unranked": "ランク外",
+    "rankNumber": "ランク #{rank}",
+    "stats": {
+      "totalPoints": "獲得総ポイント",
+      "backgroundsRemoved": "背景削除完了数",
+      "imagesUpscaled": "アップスケール完了数",
+      "totalActivities": "総アクティビティ数"
+    },
+    "milestones": "マイルストーン",
+    "achievementsTitle": "実績一覧",
+    "unlockedCount": "{unlocked} / {total} 解除済み",
+    "basedOnActivity": "あなたのアクティビティに基づく",
+    "statusEarned": "獲得済み",
+    "statusLocked": "未解除",
+    "badges": {
+      "firstImage": {
+        "title": "最初の画像",
+        "description": "初めての画像処理を完了する。"
+      },
+      "bgExpert": {
+        "title": "背景削除のエキスパート",
+        "description": "背景を10回削除する。"
+      },
+      "upscaleExpert": {
+        "title": "拡大のエキスパート",
+        "description": "画像を10回アップスケールする。"
+      },
+      "creativeExplorer": {
+        "title": "クリエイティブ探索者",
+        "description": "Pixelifyの2つのツールを両方使用する。"
+      },
+      "risingStar": {
+        "title": "期待の星",
+        "description": "画像処理を25回完了する。"
+      },
+      "champion": {
+        "title": "Pixelifyチャンピオン",
+        "description": "画像処理を100回完了する。"
+      }
+    },
+    "history": "履歴",
+    "recentActivity": "最近のアクティビティ",
+    "matchingRecords": "該当する記録 {count} 件",
+    "privateToYou": "あなたのみに表示",
+    "activityType": "アクティビティの種類",
+    "timePeriod": "期間",
+    "onlyYouNotice": "このアクティビティはあなたにのみ表示されます",
+    "types": {
+      "all": "すべてのアクティビティ",
+      "bg": "背景削除",
+      "upscale": "AIアップスケール"
+    },
+    "periods": {
+      "all": "全期間",
+      "today": "今日",
+      "week": "今週",
+      "month": "今月"
+    },
+    "errorTitle": "アクティビティを読み込めませんでした。",
+    "retry": "再試行",
+    "emptyTitle": "ここから旅が始まります。",
+    "emptyText": "Pixelifyで最初の画像を改善してポイントを獲得しましょう。",
+    "tryBg": "背景削除を試す",
+    "tryUpscaler": "AIアップスケーラーを試す",
+    "noMatchTitle": "条件に一致するアクティビティはありません。",
+    "noMatchText": "別の種類または期間を選択して履歴をご確認ください。",
+    "itemBgTitle": "背景を削除しました",
+    "itemBgText": "画像の背景削除が正常に完了しました。",
+    "itemUpTitle": "AI画像を拡大しました",
+    "itemUpText": "AIアップスケールによる高解像度化が正常に完了しました。",
+    "success": "成功",
+    "pageIndicator": "ページ {page} / {total}",
+    "prev": "前へ",
+    "next": "次へ",
+    "returnLeaderboard": "公開リーダーボードに戻る",
+    "footerNote": "非公開アクティビティ · このブラウザプロファイルのみに表示"
   }
 }

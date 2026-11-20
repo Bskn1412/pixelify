@@ -5,6 +5,11 @@ import React, { useEffect } from 'react';
 import Footer from './Footer';
 import type { ViewTab } from '../types';
 import Hero from './Hero';
+import BGRemoverSection from './BGRemoverSection';
+import AIUpscalerSection from './AIUpscalerSection';
+import PixelifyStory from './PixelifyStory';
+import Testimonials from './TestimonialsSection';
+import HomeFaq from './HomeFaq';
 import { CustomerLogos } from './home/CustomerLogos';
 import { StudioIntro } from './home/StudioIntro';
 import { WorkflowSection } from './home/WorkflowSection';
@@ -12,16 +17,14 @@ import { PlatformBento } from './home/PlatformBento';
 import { ResultsGallery } from './home/ResultsGallery';
 import { TruckHero } from './home/TruckHero';
 import { ProofSection } from './home/ProofSection';
-import { StudioMarketplace } from './home/StudioMarketplace';
+import { InstantDemos } from './home/InstantDemos';
 import { FinalCta } from './home/FinalCta';
-import '@/styles/home.css';
 import '@/styles/framer-home.css';
 import '@/styles/truck-hero.css';
 
 interface HomePageProps {
   onLaunchUpscaler: () => void;
   onLaunchBGRemove: () => void;
-  onSelectSample: (sampleUrl: string, type: 'upscale' | 'bg_remove') => void;
   onTabChange: (tab: ViewTab) => void;
 }
 
@@ -54,12 +57,17 @@ export default function HomePage({
       <div id="home-content" className="relative z-10">
         <CustomerLogos />
         <StudioIntro />
+        <BGRemoverSection onLaunchBGRemove={onLaunchBGRemove} />
+        <AIUpscalerSection onLaunchUpscaler={onLaunchUpscaler} />
         <WorkflowSection />
         <PlatformBento />
         <ResultsGallery />
+        <PixelifyStory />
         <TruckHero />
         <ProofSection />
-        <StudioMarketplace />
+        <Testimonials />
+        <InstantDemos />
+        <HomeFaq />
         <FinalCta />
       </div>
 

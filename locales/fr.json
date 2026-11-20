@@ -778,5 +778,477 @@
     "upscalerReady": "Modèle d'agrandissement prêt ; les autres chargeront à l'usage",
     "modelsCleared": "Modèles effacés ; ils seront re-téléchargés si nécessaire",
     "preparingBackground": "Préparation des modèles d'IA en arrière-plan"
+  },
+  "customerLogos": {
+    "ariaLabel": "Pixelify fonctionne sur les technologies web ouvertes"
+  },
+  "studioIntro": {
+    "title": "Un studio d'image complet, exécuté sur votre appareil",
+    "lede": "Mettez à l'échelle jusqu'à 8×, détourer n'importe quel sujet et peaufinez le cadre, le tout sur votre appareil, sans rien téléverser sur un serveur.",
+    "openUpscaler": "Ouvrir l'upscaler",
+    "tryBgRemover": "Essayer le détourage",
+    "features": {
+      "start": {
+        "title": "Commencez avec n'importe quelle image",
+        "copy": "Déposez un PNG, JPG ou WebP ou collez directement depuis le presse-papier. Fichiers jusqu'à 20 Mo ouverts instantanément."
+      },
+      "refine": {
+        "title": "Peaufinez dans le studio",
+        "copy": "Choisissez un modèle et une échelle, puis ajustez la netteté, le débruitage et les détails du visage avant le traitement."
+      },
+      "export": {
+        "title": "Exportez en un clic",
+        "copy": "Téléchargez le résultat en pleine résolution ou un détourage transparent. Sans compte, sans filigrane."
+      }
+    },
+    "seeAll": "Découvrir tout ce que le studio peut faire"
+  },
+  "studioCanvas": {
+    "brand": "Pixelify Studio",
+    "tabs": {
+      "canvas": "Canevas",
+      "models": "Modèles",
+      "export": "Exporter"
+    },
+    "pages": {
+      "home": "Accueil",
+      "upscaler": "Upscaler",
+      "bg": "Suppresseur d'arrière-plan",
+      "models": "Modèles",
+      "gallery": "Galerie"
+    },
+    "railNote": {
+      "title": "Sur l'appareil",
+      "copy": "Rien ne quitte cet onglet. Pas de file d'attente, pas de compte."
+    },
+    "stageHead": "Voyez la différence",
+    "tools": {
+      "fit": "Ajuster au canevas",
+      "zoomIn": "Zoomer",
+      "resetZoom": "Réinitialiser le zoom"
+    },
+    "panelHeadings": {
+      "export": {
+        "title": "Exporter",
+        "sub": "format et échelle"
+      },
+      "models": {
+        "title": "Modèles",
+        "sub": "5 modèles, sur l'appareil"
+      },
+      "gallery": {
+        "title": "Galerie",
+        "sub": "Résultats récents"
+      },
+      "home": {
+        "title": "Paramètres",
+        "sub": "Préférences du studio et du moteur"
+      },
+      "cutout": {
+        "title": "Détourage",
+        "sub": "Masque alpha et contours"
+      },
+      "upscale": {
+        "title": "Upscale",
+        "sub": "Résolution IA et détails"
+      }
+    },
+    "reset": "Réinitialiser",
+    "galleryNote": "Les upscales et détourages apparaissent côte à côte pour comparer l'avant-après d'un seul coup d'œil.",
+    "openGallery": "Ouvrir la galerie",
+    "anonymousCreator": "Créateur anonyme",
+    "studioProfile": "Profil studio · Local",
+    "processingEngines": "Moteurs de traitement",
+    "aiUpscaler": "Upscaler IA",
+    "bgRemover": "Suppresseur d'arrière-plan",
+    "webgpuSupport": "Support WebGPU",
+    "available": "Disponible",
+    "cacheNote": "Les modèles sont mis en cache localement dans IndexedDB.",
+    "clearModels": "Effacer les modèles",
+    "learnWebgpu": "En savoir plus sur WebGPU",
+    "format": "Format",
+    "summaryModel": "Modèle",
+    "summaryOutput": "Sortie",
+    "summaryFile": "Fichier",
+    "download": "Télécharger",
+    "saved": "Enregistré",
+    "modelLabel": "Modèle",
+    "cutoutModelLabel": "Modèle de détourage",
+    "scaleFactor": "Facteur d'échelle",
+    "edgeFeather": "Adoucissement des contours",
+    "sharpness": "Netteté",
+    "denoise": "Débruitage",
+    "matteContrast": "Contraste du masque"
+  },
+  "workflowSection": {
+    "toolsEyebrow": "Outils de post-traitement",
+    "toolsTitle": "Du détourage net à la composition finale",
+    "toolsLede": "Arrière-plans, ombres portées, recadrages et couches typographiques dans un espace de travail dédié.",
+    "toolsShotbarTitle": "Suppresseur de fond · outils",
+    "toolsShotbarTag": "4 onglets · un masque",
+    "workflowEyebrow": "Conçu pour tous les flux de travail créatifs",
+    "workflowTitle": "Votre travail. Votre vision. Pixelify.",
+    "workflowLede": "Des projets étudiants aux designs professionnels, Pixelify vous aide à retirer les arrière-plans et agrandir vos images sans ralentir votre créativité.",
+    "exploreTools": "Explorer les outils",
+    "carouselShotbarTitle": "Pixelify · Fait pour vous",
+    "carouselShotbarTag": "Chaque image a un objectif",
+    "carouselHeading": "Différentes personnes. Différentes possibilités.",
+    "carouselBody": "Que vous créiez, conceviez, étudiiez ou dirigiez une entreprise, Pixelify trouve sa place dans votre flux de travail.",
+    "carouselMetaSide": "Meilleurs détourages. Images plus nettes. Plus d'espace pour créer. Le tout dans un espace de travail simple.",
+    "carouselLink": "Découvrez ce que Pixelify peut faire",
+    "toolTabs": {
+      "backdrop": {
+        "label": "Arrière-plan",
+        "copy": "Photo, couleur unie ou original flouté derrière le sujet détouré."
+      },
+      "effects": {
+        "label": "Effets",
+        "copy": "Ombre portée, liseré et exposition appliqués au seul sujet."
+      },
+      "crop": {
+        "label": "Recadrer",
+        "copy": "Transformez, retournez et verrouillez aux ratios des réseaux sans re-détourer."
+      },
+      "design": {
+        "label": "Design",
+        "copy": "Titre, autocollant et calques exportés directement avec l'image."
+      },
+      "designLine": "Son Studio. Focus Pur.",
+      "designTag": "Titre · Calque d'autocollant",
+      "stickerVal": "-50%",
+      "stickerLabel": "OFFRE"
+    }
+  },
+  "platformBento": {
+    "headerTitle": "Un seul studio pour l'ensemble du flux d'images",
+    "headerLede": "Tout ce dont vous avez besoin d'un éditeur photo : upscaling, détourage, fonds, formats et confidentialité dans un seul onglet de navigateur.",
+    "allFeatures": "Toutes les fonctionnalités",
+    "speedCard": {
+      "title": "Prévisualisez vos retouches sans attendre",
+      "copy": "Accélération matérielle lorsque le navigateur le permet, solution WASM de secours dans le cas contraire.",
+      "metricsHead": "Vitesse d'upscaling",
+      "badge": "WebGPU",
+      "vitality": "4× · Vitality",
+      "vitalityMeta": "Modèle de 1,9 Mo",
+      "tiled": "8× · tuilé",
+      "tiledMeta": "En mémoire",
+      "instant": "2× · instantané",
+      "instantMeta": "1 passe",
+      "foot": "Upscale"
+    },
+    "unlimitedCard": {
+      "title": "Générations illimitées",
+      "copy": "Pas d'abonnements à 40 $/mois, pas de crédits ni de réduction forcée de résolution. Générez autant de détourages et d'upscales que nécessaire.",
+      "engine": "Moteur neuronal local",
+      "badge": "Zéro barrière payante",
+      "metricGen": "Générations",
+      "metricGenVal": "Illimitées",
+      "metricCredits": "Crédits et jetons",
+      "metricWatermarks": "Filigranes",
+      "metricWatermarksVal": "Aucun",
+      "subNote": "Pas d'abonnement à 40 $/mois ni de compteur de jetons",
+      "freeForever": "Gratuit pour toujours",
+      "foot": "Illimité"
+    },
+    "cutoutCard": {
+      "title": "Préservez les contours fins et les détails",
+      "copy": "Une passe de segmentation pour le sujet, puis des pinceaux pour affiner les contours à conserver.",
+      "chipMatte": "Masque alpha",
+      "foot": "Détourage"
+    },
+    "privacyCard": {
+      "stat": "0 o",
+      "sub": "téléversé. Chaque fichier reste dans cet onglet de navigateur.",
+      "row1": "Les fichiers restent sur l'appareil",
+      "row2": "Aucun compte requis",
+      "row3": "Aucun pixel espion",
+      "foot": "Confidentialité"
+    },
+    "resolutionCard": {
+      "badge": "Qualité professionnelle",
+      "stat": "8×",
+      "label": "de résolution, calculée sur votre propre machine.",
+      "foot": "Résolution"
+    },
+    "offlineCard": {
+      "title": "Partout, même en mode avion",
+      "copy": "Les poids des modèles sont mis en cache automatiquement dans votre navigateur. Une fois chargés, agrandissez et retouchez sans connexion internet.",
+      "engine": "Moteur hors-ligne",
+      "badge": "En cache",
+      "weights": "Poids du modèle",
+      "traffic": "Trafic réseau",
+      "status": "Statut",
+      "worksOffline": "Fonctionne hors-ligne",
+      "foot": "Hors-ligne"
+    },
+    "instantCard": {
+      "title": "Zéro file d'attente, zéro attente",
+      "copy": "Pas d'attente sur des serveurs cloud derrière d'autres utilisateurs. Le traitement démarre instantanément sur votre machine dès le dépôt de l'image.",
+      "engine": "Latence de file",
+      "badge": "Instantané",
+      "pos": "Position dans la file",
+      "posVal": "#1 · Immédiate",
+      "delay": "Délai d'attente",
+      "delayVal": "0.0s (Aucun)",
+      "compute": "Calcul",
+      "computeVal": "GPU dédié",
+      "foot": "Instantané"
+    },
+    "speedChartCard": {
+      "title": "Fonctionne sur les navigateurs modernes",
+      "copy": "Le moteur d'exécution sélectionne le meilleur composant disponible et affiche le temps de calcul directement dans le panneau.",
+      "foot": "Vitesse"
+    },
+    "compareCard": {
+      "title": "Inspectez chaque avant et après",
+      "copy": "Glissez le curseur sur n'importe quel résultat et inspectez les pixels à 100 %, 200 % ou 400 %.",
+      "foot": "Comparer",
+      "beforeLabel": "Original",
+      "afterLabel": "4× · Pixel-Dance"
+    },
+    "batchCard": {
+      "title": "Isolation par lot pour tout type de sujet",
+      "copy": "Supprimez les arrière-plans de chaussures de catalogue, portraits d'athlètes en haute définition et scènes cinématographiques en une seule passe. Traitement simultané sans attente cloud.",
+      "engine": "Moteur de détourage par lot",
+      "badge": "Prêt pour le lot",
+      "footwear": "Chaussures",
+      "footwearMeta": "E-Commerce",
+      "athlete": "Athlète",
+      "athleteMeta": "Éditorial",
+      "cinematic": "Cinématique",
+      "cinematicMeta": "Plan d'action",
+      "processed": "3 sur 3 traités en parallèle",
+      "telemetry": "100 % sur l'appareil · Zéro file",
+      "foot": "Détourage par lot"
+    }
+  },
+  "resultsGallery": {
+    "eyebrow": "Résultats · Galerie Studio",
+    "title": "Observez le détail dans chaque image terminée",
+    "lede": "Exemples de rendus traités par les modèles d'IA sur l'appareil. Agrandissements, masques alpha et arrière-plans, tous traités localement dans l'onglet.",
+    "tabs": {
+      "all": "Tous les travaux",
+      "cutouts": "Détourages · Suppresseur de fond",
+      "upscaler": "Upscaler IA · Détail 8×"
+    },
+    "tags": {
+      "cutout": "Détourage",
+      "upscaled": "Agrandie"
+    }
+  },
+  "truckHero": {
+    "titleLine1": "Gardez les pixels",
+    "titleLine2": "sur la bonne voie",
+    "asideText": "Accompagnez chaque image jusqu'au bout. Agrandissez jusqu'à 8×, découpez le sujet et finalisez le cadre, le tout sur votre appareil.",
+    "startNow": "Commencer",
+    "badgeStudio": "MOTEUR STUDIO",
+    "cardBgTitle": "Suppression d'arrière-plan",
+    "cardBgCopy": "Extrayez n'importe quel sujet grâce à des masques alpha précis. Cheveux, fourrure et reflets conservent leur finesse sans fond vert.",
+    "cardBgCta": "Tester le détourage",
+    "cardUpscaleTitle": "Upscale 8×",
+    "cardUpscaleCopy": "Révélez les micro-détails prêts pour l'impression avec Vitality et Pixel-Dance. Rapide, tuilé et optimisé pour de vraies photos.",
+    "cardUpscaleCta": "Agrandir maintenant",
+    "cardStudioTitle": "Finition Studio",
+    "cardStudioCopy": "Fonds, ombres, recadrages et texte réunis sur un même canevas. Composez le cadre et exportez sans quitter l'onglet.",
+    "cardStudioCta": "Ouvrir le studio",
+    "dialText": "Explorer plus · Explorer plus · ",
+    "dialAria": "Explorer le studio",
+    "statDelivered": "Images délivrées en pleine résolution"
+  },
+  "proofSection": {
+    "title": "Des résultats professionnels, avec chaque fichier conservé en local",
+    "lede": "Découvrez nos guides de flux de travail, spécifications neuronales sur l'appareil et documentations pour les équipes qui exigent que leurs fichiers restent strictement locaux.",
+    "readDocs": "Lire la documentation",
+    "cases": {
+      "photography": {
+        "kicker": "Photographie",
+        "title": "Sauvez les détails d'anciennes prises de vue.",
+        "copy": "L'upscaling 8× par tuiles préserve le grain, les visages et les textures de tissu, sans envoyer les originaux dans le cloud."
+      },
+      "ecommerce": {
+        "kicker": "E-commerce",
+        "title": "Détourez les produits sur le champ.",
+        "copy": "Chopper isole le sujet, puis l'outil d'arrière-plan le place dans un décor épuré, un fond uni ou l'original flouté."
+      },
+      "social": {
+        "kicker": "Réseaux sociaux",
+        "title": "Augmentez la netteté avant de publier.",
+        "copy": "Agrandissez images et captures à 8×, puis recadrez et ajoutez du texte sur le même canevas avant d'exporter."
+      },
+      "archives": {
+        "kicker": "Archives",
+        "title": "Restaurez sans transfert cloud.",
+        "copy": "Photos de famille et numérisations restent sur votre machine sans téléversement. Le modèle est mis en cache dès la première utilisation."
+      }
+    }
+  },
+  "instantDemos": {
+    "eyebrow": "Démos instantanées",
+    "title": "Essayez des images d'exemple en un clic",
+    "lede": "Testez les modèles d'IA sur l'appareil avec de vraies images préchargées. Rien n'est envoyé, sans liste d'attente, sans inscription.",
+    "openStudio": "Ouvrir le studio",
+    "tryDemo": "Essayer la démo",
+    "loading": "Chargement...",
+    "samples": {
+      "sports": {
+        "name": "Détourage sportif",
+        "tag": "Détourage",
+        "description": "Détourage ultra-précis des contours et suppression d'arrière-plan sans latence de transfert."
+      },
+      "anime": {
+        "name": "Art anime",
+        "tag": "Détourage",
+        "description": "Suppression d'arrière-plan pour dessins animés avec contours nets et découpage précis des cheveux."
+      },
+      "ocean": {
+        "name": "Vie marine",
+        "tag": "Upscale",
+        "description": "Reconstruction de micro-textures haute fréquence pour les détails organiques délicats."
+      },
+      "vintage": {
+        "name": "Archive vintage",
+        "tag": "Upscale",
+        "description": "Restauration naturelle de portraits, atténuation du grain argentique et des artefacts de compression."
+      }
+    }
+  },
+  "finalCta": {
+    "titleLine1": "Donnez à chaque image",
+    "titleLine2": "toute sa netteté",
+    "copy": "Déposez une photo, choisissez un modèle et admirez le résultat en 8×. Ou détourer le sujet et concevez votre visuel, le tout avant qu'une barre de téléversement n'ait commencé à bouger.",
+    "openUpscaler": "Ouvrir l'upscaler",
+    "removeBackground": "Supprimer un arrière-plan",
+    "finePrint": "Fonctionne entièrement sur l'appareil dans tous les navigateurs web modernes"
+  },
+  "leaderboard": {
+    "eyebrow": "Communauté",
+    "title": "Classement",
+    "heroText": "Une reconnaissance pour chaque image améliorée. Traitez avec Pixelify pour gagner des points, grimper au classement et débloquer des badges.",
+    "howItWorks": "Comment ça marche",
+    "myActivity": "Mon activité",
+    "howCardTitle": "Améliorez une création, gagnez un point.",
+    "howCardText": "Finalisez un détourage ou un agrandissement par IA. Chaque opération réussie vous rapporte un point et s'inscrit dans votre historique.",
+    "totalParticipants": "Participants totaux",
+    "allTimeCommunity": "Communauté de\ntous les temps",
+    "topUsers": "Meilleurs utilisateurs",
+    "topUsersSub": "Leaders de la communauté classés par points",
+    "periods": {
+      "all": "Tous les temps",
+      "week": "Cette semaine",
+      "month": "Ce mois-ci"
+    },
+    "loadError": "Les données du classement ne peuvent pas être chargées actuellement.",
+    "tryAgain": "Réessayer",
+    "emptyTitle": "Le tableau attend son premier champion.",
+    "emptyText": "Traitez une image pour marquer le premier point.",
+    "yourPosition": "Votre position",
+    "yourPlace": "Votre place dans la communauté",
+    "leadingCommunity": "Vous êtes en tête de la communauté.",
+    "rankedInCommunity": "Classé #{rank} dans la communauté.",
+    "completeToEarn": "Traitez une image pour gagner votre premier point.",
+    "rankWillAppear": "Votre rang apparaîtra ici.",
+    "yourProfile": "Votre profil Pixelify",
+    "anonymousPlayer": "Joueur anonyme",
+    "you": "Vous",
+    "unranked": "Non classé",
+    "rankNumber": "Rang #{rank}",
+    "points": "{count} points",
+    "operations": "{count} opérations",
+    "memberSince": "Membre depuis {date}",
+    "joinUnavailable": "Date d'inscription indisponible",
+    "seeActivityHistory": "Voir votre historique d'activité",
+    "backToTop": "Retour aux meilleurs utilisateurs",
+    "pointsUnit": "PTS",
+    "pointEarned": "Point gagné",
+    "pointsEarned": "Points gagnés",
+    "addedToLeaderboard": "Ajouté au classement",
+    "savedOnDevice": "Enregistré sur cet appareil",
+    "waitingToSync": "{count} {unit} en attente de synchronisation",
+    "pointUnit": "point",
+    "pointsPluralUnit": "points"
+  },
+  "leaderboardActivity": {
+    "navLabel": "Tableau de bord privé",
+    "backToLeaderboard": "Classement public",
+    "personalDashboard": "Tableau de bord personnel",
+    "title": "Mon activité",
+    "subtitle": "Chaque image améliorée, chaque point gagné. Tout votre parcours Pixelify au même endroit.",
+    "anonymousProfile": "Profil anonyme",
+    "unranked": "Non classé",
+    "rankNumber": "Rang #{rank}",
+    "stats": {
+      "totalPoints": "Total des points",
+      "backgroundsRemoved": "Arrière-plans supprimés",
+      "imagesUpscaled": "Images agrandies",
+      "totalActivities": "Total des activités"
+    },
+    "milestones": "Étapes clés",
+    "achievementsTitle": "Vos accomplissements",
+    "unlockedCount": "{unlocked} / {total} débloqués",
+    "basedOnActivity": "Basé sur votre activité",
+    "statusEarned": "Obtenu",
+    "statusLocked": "Verrouillé",
+    "badges": {
+      "firstImage": {
+        "title": "Première image",
+        "description": "Réalisez votre première opération d'image."
+      },
+      "bgExpert": {
+        "title": "Expert en détourage",
+        "description": "Supprimez 10 arrière-plans."
+      },
+      "upscaleExpert": {
+        "title": "Expert en upscaling",
+        "description": "Agrandissez 10 images."
+      },
+      "creativeExplorer": {
+        "title": "Explorateur créatif",
+        "description": "Utilisez les deux outils de Pixelify."
+      },
+      "risingStar": {
+        "title": "Étoile montante",
+        "description": "Complétez 25 opérations d'image."
+      },
+      "champion": {
+        "title": "Champion Pixelify",
+        "description": "Complétez 100 opérations d'image."
+      }
+    },
+    "history": "Votre historique",
+    "recentActivity": "Activité récente",
+    "matchingRecords": "{count} enregistrements correspondants",
+    "privateToYou": "Visible uniquement par vous",
+    "activityType": "Type d'activité",
+    "timePeriod": "Période",
+    "onlyYouNotice": "Vous seul pouvez voir cette activité",
+    "types": {
+      "all": "Toutes les activités",
+      "bg": "Suppression d'arrière-plan",
+      "upscale": "Upscaling IA"
+    },
+    "periods": {
+      "all": "Tous les temps",
+      "today": "Aujourd'hui",
+      "week": "Cette semaine",
+      "month": "Ce mois-ci"
+    },
+    "errorTitle": "Impossible de charger votre activité.",
+    "retry": "Réessayer",
+    "emptyTitle": "Votre aventure commence ici.",
+    "emptyText": "Améliorez votre première image avec Pixelify et gagnez vos premiers points.",
+    "tryBg": "Essayer le détourage",
+    "tryUpscaler": "Essayer l'upscaler IA",
+    "noMatchTitle": "Aucune activité ne correspond à ces critères.",
+    "noMatchText": "Sélectionnez un autre type d'activité ou une autre période pour consulter votre historique.",
+    "itemBgTitle": "Arrière-plan supprimé",
+    "itemBgText": "Arrière-plan supprimé avec succès.",
+    "itemUpTitle": "Image agrandie par IA",
+    "itemUpText": "Image agrandie avec succès grâce à l'IA.",
+    "success": "Succès",
+    "pageIndicator": "Page {page} sur {total}",
+    "prev": "Précédent",
+    "next": "Suivant",
+    "returnLeaderboard": "Retour au classement public",
+    "footerNote": "Activité privée · Visible uniquement sur ce profil de navigateur"
   }
 }

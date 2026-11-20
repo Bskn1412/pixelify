@@ -4,13 +4,12 @@ import HomePage from '../HomePage';
 import { useApp } from '../AppProvider';
 
 export default function HomeView() {
-  const { navigateTo, onSelectSample } = useApp();
+  const { navigateTo } = useApp();
 
   return (
     <HomePage
       onLaunchUpscaler={() => navigateTo('upscaler')}
       onLaunchBGRemove={() => navigateTo('bg_remove')}
-      onSelectSample={onSelectSample}
       onTabChange={navigateTo}
     />
   );

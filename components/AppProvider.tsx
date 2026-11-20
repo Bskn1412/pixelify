@@ -70,7 +70,7 @@ interface AppContextValue {
   bgEngine: 'wasm' | 'webgpu' | null;
   setBgEngine: React.Dispatch<React.SetStateAction<'wasm' | 'webgpu' | null>>;
   setBgWebgpuAvailable: React.Dispatch<React.SetStateAction<boolean>>;
-  handleBGFiles: (fileList: FileList | File[]) => void;
+  handleBGFiles: (fileList: FileList | File[], showToast?: boolean) => void;
   loadBgSample: (sampleUrl: string, name: string) => Promise<void>;
   onSelectSample: SelectSampleHandler;
 
@@ -79,7 +79,7 @@ interface AppContextValue {
   items: UpscaleItem[];
   selectedId: string | null;
   setSelectedId: React.Dispatch<React.SetStateAction<string | null>>;
-  addUpscaleFile: (file: File) => void;
+  addUpscaleFile: (file: File, autoProcess?: boolean) => void;
   modelLoading: boolean;
   modelProgress: number | null;
   execEngine: 'wasm' | 'webgpu' | null;
@@ -108,12 +108,16 @@ interface AppContextValue {
   setCurrentLang: (lang: string) => void;
 }
 
-const AppContext = createContext<AppContextValue | null>(null);
+export const AppContext = createContext<AppContextValue | null>(null);
 
 export function useApp(): AppContextValue {
   const ctx = useContext(AppContext);
   if (!ctx) throw new Error('useApp must be used within <AppProvider>');
   return ctx;
+}
+
+export function useAppOptional(): AppContextValue | null {
+  return useContext(AppContext);
 }
 
 export default function AppProvider({ children }: { children: React.ReactNode }) {
@@ -319,6 +323,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
   const [step, setStep] = useState<Step>('upload');
   const [items, setItems] = useState<UpscaleItem[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const pendingAutoUpscaleIdRef = useRef<string | null>(null);
 
   // Network connection state (Offline / Online detection)
   const [isOnline, setIsOnline] = useState<boolean>(() => {
@@ -685,7 +690,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
   /* ----------------------------------------------------------
      ADD UPSCALE FILE (Creates individual UpscaleItem)
      ---------------------------------------------------------- */
-  const addUpscaleFile = useCallback((file: File) => {
+  const addUpscaleFile = useCallback((file: File, autoProcess = false) => {
     if (file.size > MAX_UPSCALER_FILE_SIZE) {
       addToast('error', 'Please choose an image under 15 MB.');
       return;
@@ -704,8 +709,9 @@ export default function AppProvider({ children }: { children: React.ReactNode })
             : `Choose 2x to stay under the limit.`
         );
       }
+      const newItemId = makeId();
       const newItem: UpscaleItem = {
-        id: makeId(),
+        id: newItemId,
         file,
         name: file.name,
         url,
@@ -721,9 +727,12 @@ export default function AppProvider({ children }: { children: React.ReactNode })
         modelKey: 'vitality',
       };
       setItems((prev) => [...prev, newItem]);
-      setSelectedId(newItem.id);
+      setSelectedId(newItemId);
       setStep('config');
       setActiveUpscalerModel('vitality');
+      if (autoProcess) {
+        pendingAutoUpscaleIdRef.current = newItemId;
+      }
       void loadModel('vitality', { silentIfCached: true, background:true });
       scrollToTop();
     };
@@ -934,6 +943,17 @@ export default function AppProvider({ children }: { children: React.ReactNode })
     [items, modelLoading, upscale, addToast]
   );
 
+  useEffect(() => {
+    if (pendingAutoUpscaleIdRef.current) {
+      const targetId = pendingAutoUpscaleIdRef.current;
+      const targetItem = items.find((i) => i.id === targetId);
+      if (targetItem && targetItem.status === 'idle') {
+        pendingAutoUpscaleIdRef.current = null;
+        void handleUpscaleItem(targetId);
+      }
+    }
+  }, [items, handleUpscaleItem]);
+
   /* ----------------------------------------------------------
      CANCEL UPSCALE (Per item)
      ---------------------------------------------------------- */
@@ -1054,7 +1074,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
   );
 
   // Global File Picker Handler for BG Remove
-  const handleBGFiles = useCallback((fileList: FileList | File[]) => {
+  const handleBGFiles = useCallback((fileList: FileList | File[], showToast = true) => {
     const files = Array.from(fileList);
     const valid = files.filter((f) => f.type.startsWith('image/') && f.size <= MAX_BG_FILE_SIZE);
     if (!valid.length) {
@@ -1077,9 +1097,10 @@ export default function AppProvider({ children }: { children: React.ReactNode })
     }));
     setBgJobs((prev) => [...prev, ...additions]);
     navigateTo('bg_remove');
-    scrollToTop();
-    addToast('success', `${additions.length} image(s) added to Cutout Canvas.`);
-  }, [addToast, navigateTo, scrollToTop]);
+    if (showToast) {
+      addToast('success', `${additions.length} image(s) added to Cutout Canvas.`);
+    }
+  }, [addToast, navigateTo]);
 
   // Load a BG-remover sample image from the landing sections onto the canvas
   const loadBgSample = useCallback(async (sampleUrl: string, name: string) => {
@@ -1105,19 +1126,28 @@ export default function AppProvider({ children }: { children: React.ReactNode })
   const handleSelectSample: SelectSampleHandler = useCallback(async (sampleUrl: string, type: 'upscale' | 'bg_remove') => {
     if (isSelectingSampleRef.current) return;
     isSelectingSampleRef.current = true;
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('pixelify:navigation-start'));
+    }
     try {
       const res = await fetch(sampleUrl);
       if (!res.ok) throw new Error('Failed to load sample');
       const blob = await res.blob();
-      const file = new File([blob], 'sample.jpg', { type: blob.type || 'image/jpeg' });
-      scrollToTop();
+      const rawName = sampleUrl.split('/').pop() || 'sample.jpg';
+      const file = new File([blob], rawName, { type: blob.type || 'image/jpeg' });
       if (type === 'upscale') {
-        addUpscaleFile(file);
         navigateTo('upscaler');
+        addUpscaleFile(file, true);
+        setTimeout(() => {
+          addToast('success', `${rawName} added to AI Upscaler.`);
+        }, 350);
       } else {
-        handleBGFiles([file]);
+        navigateTo('bg_remove');
+        handleBGFiles([file], false);
+        setTimeout(() => {
+          addToast('success', `${rawName} added to Cutout Canvas.`);
+        }, 350);
       }
-      scrollToTop();
     } catch (err) {
       addToast('error', 'Could not load sample.');
       throw err;
@@ -1126,7 +1156,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
         isSelectingSampleRef.current = false;
       }, 600);
     }
-  }, [addToast, addUpscaleFile, handleBGFiles, navigateTo, scrollToTop]);
+  }, [addToast, addUpscaleFile, handleBGFiles, navigateTo]);
 
   const dict = useMemo(() => getDictionary(currentLang), [currentLang]);
   const ms = dict.modelStatus;
