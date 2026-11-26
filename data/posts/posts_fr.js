@@ -4,6 +4,89 @@
  */
 export const POSTS_FR = [
   {
+    slug: 'upscaler_how_it_works_b7c3e1',
+    title: 'Agrandissement par IA : Pourquoi votre image devient plus nette au lieu d\'être simplement plus grande',
+    description:
+      'L\'agrandissement traditionnel interpole les pixels et crée du flou. La super-résolution par IA reconstruit les détails. Voici ce que cela signifie, pourquoi cela fonctionne et ce qui se passe réellement entre votre fichier source et le résultat.',
+    tags: ['Agrandisseur', 'Fonctionnalités', 'IA Locale'],
+    date: '2026-11-26',
+    author: 'L\'équipe Pixelify',
+    cover: '/blog/upscaler-page.jpg',
+    coverAlt: 'Écran de téléversement de l\'agrandisseur Pixelify avec une comparaison avant-après d\'une chaussure',
+    blocks: [
+      {
+        type: 'p',
+        text: 'C\'est un moment que tout le monde connaît : vous avez trouvé l\'image parfaite, elle fait 600 pixels de large, et vous en avez besoin à 2400 pixels pour une présentation, une affiche ou un tirage. Vous la glissez dans un éditeur, tapez 4× dans la case de redimensionnement, et le résultat est plus grand mais étonnamment dégradé — la même information étalée plus faiblement, avec ce flou généralisé que nous acceptons tous silencieusement comme le prix à payer pour agrandir. Cette acceptation est dépassée. L\'agrandissement par IA n\'étale pas l\'information ; il réintroduit de la vraie de matière visuelle.',
+      },
+      { type: 'h2', text: 'Ce que fait réellement l\'agrandissement traditionnel' },
+      {
+        type: 'p',
+        text: 'Pour apprécier la nouvelle approche, il est utile de comprendre ce que faisait l\'ancienne. Lorsqu\'un logiciel agrandit une image par interpolation, il résout un problème honnête mais limité : chaque nouveau pixel se situe entre des pixels connus, il est donc estimé en réalisant un mélange de ses voisins. Les méthodes bilinéaires et bicubiques sont des mélanges plus intelligents, mais restent des mélanges. La conséquence est d\'ordre structurel. Les textures fines, les cils, la trame d\'un tissu ou le bord des feuilles tombent sous la grille d\'échantillonnage et se trouvent lissés en un gris moyen. L\'image change d\'échelle, pas le détail, et l\'œil perçoit ce décalage comme un flou.',
+      },
+      {
+        type: 'p',
+        text: 'Accentuer la netteté après coup ne compense que partiellement, car l\'accentuation amplifie des contours qui ont déjà été lissés. C\'est comme photocopier une photocopie et augmenter le contraste : l\'image devient plus vive, mais l\'information perdue lors de la première passe ne revient jamais. Pendant des décennies, c\'était simplement la limite physique du problème. Il n\'y avait pas plus d\'information dans le fichier, aucun algorithme ne pouvait donc honnêtement en produire davantage.',
+      },
+      { type: 'h2', text: 'La super-résolution : estimer avec de la connaissance' },
+      {
+        type: 'p',
+        text: 'Les outils d\'agrandissement par IA résolvent un problème différent. Au lieu de demander « quelle couleur doit avoir ce pixel intermédiaire compte tenu de ses voisins », ils demandent « compte tenu de tout ce que je sais sur l\'apparence des détails réels, quelle est l\'image haute résolution la plus probable qui aurait produit cette image basse résolution ? » Cette inversion constitue tout le principe. La connaissance provient de l\'entraînement : le réseau a étudié des millions de paires d\'images nettes et leurs versions réduites artificiellement, apprenant les relations statistiques qui distinguent un vrai cil du bruit, ou un vrai tissu d\'un flou.',
+      },
+      {
+        type: 'img',
+        src: '/blog/upscaler-sections.jpg',
+        alt: 'Présentation de l\'agrandissement montrant des comparaisons avant et après ainsi que des statistiques',
+        caption: 'Gain de résolution 4×, calculé de façon privée sur votre appareil, sans aucun téléversement.',
+      },
+      {
+        type: 'p',
+        text: 'Un modèle mental utile : l\'interpolation est un dessinateur qui recopie uniquement ce qui est visible dans le cadre ; la super-résolution est un portraitiste qui a dessiné dix mille visages et peut déduire la structure que le cadre ne fait que suggérer. Les deux effectuent des estimations. L\'un estime à partir de quatre pixels voisins ; l\'autre estime à partir d\'un modèle statistique de ce à quoi ressemble le monde. C\'est pourquoi le résultat peut afficher des cheveux nets qui n\'ont jamais été définis dans la source. Le réseau n\'invente pas au hasard ; il sélectionne le détail le plus probable compatible avec l\'image d\'origine.',
+      },
+      { type: 'h2', text: 'L\'interprétation créative : la réserve nécessaire' },
+      {
+        type: 'p',
+        text: 'Le même mécanisme qui produit de la netteté peut produire des éléments inexacts. Sur un visage, les connaissances préalables du réseau sont un atout : il sait comment se comportent les pores de la peau et les cils, et ses estimations restent très proches de la réalité. Sur des contenus où ses connaissances sont limitées, les estimations peuvent s\'écarter. Le texte dans une capture d\'écran est l\'échec classique : les caractères que la source n\'a pas définis ne peuvent pas être récupérés, et le réseau peut afficher des tracés plausibles mais incorrects. Des motifs de tissus qui n\'existaient pas peuvent apparaître. Des logos peuvent être légèrement déformés.',
+      },
+      {
+        type: 'p',
+        text: 'Ce n\'est pas un défaut à corriger ; c\'est la nature même de la reconstitution d\'informations qui n\'ont jamais été enregistrées. L\'implication pratique est une règle d\'usage : agrandissez librement les photographies, les illustrations et les images générales, mais traitez tout résultat comme une reconstruction lorsque les détails fins importent sur le plan juridique ou factuel. Pour les images contenant beaucoup de texte, une capture à la résolution native sera toujours supérieure à une reconstruction. Savoir quel type d\'image vous traitez est la compétence essentielle de l\'utilisateur.',
+      },
+      { type: 'h2', text: 'Tuiles, bords et raccords invisibles' },
+      {
+        type: 'p',
+        text: 'Une question pratique d\'ingénierie : une source 4K devient une sortie 16K, ce qui ne rentre pas d\'un coup dans la mémoire graphique ordinaire. La réponse réside dans le découpage en tuiles : l\'image est traitée sous forme de tuiles qui se chevauchent, chacune améliorée indépendamment, puis réassemblées avec des bordures fondues. Réalisé sans précaution, le découpage produit des coutures visibles et une texture incohérente le long des lignes d\'assemblage. Réalisé correctement, avec un mélange des chevauchements et une normalisation régulière, les raccords sont indétectables — ce qui explique pourquoi les utilisateurs ne voient jamais le mot « tuile » dans un produit abouti.',
+      },
+      {
+        type: 'p',
+        text: 'Le découpage en tuiles explique également pourquoi le facteur d\'agrandissement et la taille de l\'image multiplient la charge sur votre matériel. Une photo modeste agrandie à 4× et une très grande photo agrandie à 4× représentent des charges de calcul totalement différentes, car la seconde peut nécessiter le traitement simultané de dizaines de tuiles. C\'est la raison pratique pour laquelle bien dimensionner l\'échelle ne concerne pas seulement la qualité : un facteur plus raisonnable maintient l\'ensemble de travail dans des limites de mémoire confortables, évite les pics thermiques et se termine plus tôt. Trois gains issus d\'une seule décision.',
+      },
+      { type: 'h2', text: 'Améliorations complémentaires' },
+      {
+        type: 'p',
+        text: 'Les outils d\'agrandissement modernes s\'arrêtent rarement à la seule résolution. La réduction du bruit s\'exécute avant ou pendant la reconstruction, car le bruit de capteur perturbe l\'estimateur de détails : un motif de grain peut être confondu avec une texture et être « accentué » sous forme d\'artéfacts. L\'accentuation intervient après, restaurant le contraste local que la reconstruction a pu adoucir. L\'amélioration ciblée sur les visages applique des modèles plus stricts spécifiquement aux zones faciales, là où le risque d\'un rendu artificiel est le plus élevé et où la tolérance à une reconstruction trop agressive est la plus faible, la perception des visages chez l\'humain étant particulièrement exigeante.',
+      },
+      {
+        type: 'ul',
+        items: [
+          'Réduisez d\'abord le bruit lorsque la source présente du grain, car un bruit amplifié est un bruit conservé définitivement.',
+          'Utilisez des échelles modérées ; un agrandissement 4× à partir d\'une source correcte surpasse un 8× appliqué à une mauvaise image.',
+          'Vérifiez les visages à un zoom de 100 % avant d\'exporter, car les erreurs de perception se masquent dans les aperçus réduits.',
+          'Conservez le fichier original ; la reconstruction exprime un choix visuel, et toute nouvelle édition doit repartir de la source.',
+        ],
+      },
+      { type: 'h2', text: 'Pourquoi cet outil doit résider sur votre appareil et non sur un serveur' },
+      {
+        type: 'p',
+        text: 'L\'agrandissement possède une propriété particulière parmi les tâches d\'IA : l\'image d\'origine est souvent exactement celle que vous souhaitez le moins partager. Les scans familiaux anciens contiennent le seul exemplaire d\'un souvenir. Les photos de produits précèdent un lancement officiel. Les images médicales et juridiques sont sensibles par nature. Pendant ce temps, le calcul est de l\'arithmétique pure sur un ensemble fixe d\'instructions ; les fichiers du réseau sont les mêmes pour tous les utilisateurs, ce qui signifie que le réseau n\'a jamais besoin de voir l\'image pour l\'améliorer, et que l\'image n\'a jamais besoin de voyager pour être traitée.',
+      },
+      {
+        type: 'p',
+        text: 'L\'exécution locale modifie également l\'économie de l\'expérimentation. Les outils cloud facturent à l\'image, ce qui décourage la boucle d\'essais et de comparaisons qui produit de vrais bons résultats : tester deux échelles, deux réglages d\'amélioration, puis choisir le meilleur. En local, l\'itération est gratuite, les gens prennent donc le temps d\'itérer, et les résultats sont meilleurs. La technologie est impressionnante. Le flux de travail qu\'elle permet — sans comptage et sans surveillance — constitue discrètement la révolution la plus importante.',
+      },
+    ],
+  },
+
+{
     slug: 'local_ai_in_browser_d2f9c4',
     title: 'Comment l\'IA s\'exécute réellement dans l\'onglet de votre navigateur, et les solutions qu\'il a fallu concevoir',
     description:

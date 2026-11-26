@@ -4,6 +4,110 @@
  */
 export const POSTS_PT = [
   {
+  "slug": "upscaler_how_it_works_b7c3e1",
+  "title": "Upscaling com IA: por que sua imagem fica mais nítida em vez de apenas maior",
+  "description": "A ampliação tradicional interpola pixels e causa desfoque. A super-resolução por IA reconstrói detalhes. Saiba o que isso significa, por que funciona e o que realmente acontece entre a sua imagem original e o resultado.",
+  "tags": [
+    "Ampliador",
+    "Recursos",
+    "IA Local"
+  ],
+  "date": "2026-11-26",
+  "author": "A Equipe Pixelify",
+  "cover": "/blog/upscaler-page.jpg",
+  "coverAlt": "Tela de upload do ampliador Pixelify com uma comparação de antes e depois de um calçado",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "Há uma situação que todo mundo conhece: você encontrou a imagem perfeita, ela tem 600 pixels de largura e você precisa de 2400 para uma apresentação, um cartaz ou uma impressão. Você a arrasta para um editor, digita 4× no campo de redimensionamento e o resultado fica maior, mas de alguma forma pior: a mesma informação espalhada de forma mais rala, com aquele aspecto borrado que todos aceitamos silenciosamente como o preço de ampliar. Essa conformidade ficou para trás. O upscaling com IA não dilui a informação; ele adiciona informação de volta."
+    },
+    {
+      "type": "h2",
+      "text": "O que a ampliação tradicional realmente faz"
+    },
+    {
+      "type": "p",
+      "text": "Para entender a nova abordagem, ajuda saber o que a antiga fazia. Quando um software amplia uma imagem por interpolação, ele resolve um problema honesto, mas limitado: cada novo pixel fica entre pixels já conhecidos, então seu valor é estimado pela média de seus vizinhos. Os métodos bilinear e bicúbico são cálculos mais inteligentes, mas continuam sendo interpolações. A consequência é estrutural. Texturas sutis — cílios, tramas de tecido e bordas de folhas — caem abaixo da grade de amostragem e viram médias acinzentadas. A imagem cresce, os detalhes não, e os olhos percebem essa discrepância como desfoque."
+    },
+    {
+      "type": "p",
+      "text": "Aplicar nitidez depois do fato só compensa em parte, porque a nitidez apenas amplifica bordas que já foram promediadas. É como tirar uma cópia de uma fotocópia e aumentar o contraste: a imagem ganha mais impacto aparente, mas a informação perdida no primeiro passo nunca mais volta. Durante décadas isso era simplesmente a física do problema: não havia mais informação no arquivo, logo nenhum algoritmo conseguia criar mais."
+    },
+    {
+      "type": "h2",
+      "text": "Super-resolução: estimar com conhecimento"
+    },
+    {
+      "type": "p",
+      "text": "Os ampliadores por IA resolvem um problema totalmente diferente. Em vez de perguntar 'que cor este pixel intermediário deve ter, com base nos vizinhos?', eles perguntam: 'com base em tudo o que sei sobre como os detalhes reais se parecem, qual é a imagem de alta resolução mais provável que teria originado esta de baixa resolução?'. Essa inversão de raciocínio é o grande segredo. O conhecimento vem do treinamento: a rede estudou milhões de pares de imagens nítidas e suas versões reduzidas artificialmente, aprendendo as correlações estatísticas que diferenciam um cílio real de ruído digital, ou uma trama têxtil real de um borrão."
+    },
+    {
+      "type": "img",
+      "src": "/blog/upscaler-sections.jpg",
+      "alt": "Demonstração de upscaling exibindo comparações de antes e depois e estatísticas",
+      "caption": "Ganho de resolução de 4×, processado de forma privada no seu dispositivo, sem nenhum envio para a nuvem."
+    },
+    {
+      "type": "p",
+      "text": "Um modelo mental útil: a interpolação é como um desenhista que apenas decalca o que está visível no quadro; a super-resolução é como um artista forense que desenhou dez mil rostos e consegue deduzir a anatomia que a foto apenas sugere. Ambos estão fazendo suposições. Um deduz a partir de quatro pixels vizinhos; o outro deduz a partir de um modelo estatístico de como o mundo real se parece. É por isso que o resultado final pode exibir fios de cabelo nítidos que nunca foram capturados na fonte. A rede não alucina aleatoriamente; ela seleciona o detalhe mais provável compatível com a imagem original."
+    },
+    {
+      "type": "h2",
+      "text": "Alucinação: o aviso necessário"
+    },
+    {
+      "type": "p",
+      "text": "O mesmo mecanismo que gera nitidez pode criar ficção. Em um rosto, o conhecimento prévio da rede é uma vantagem enorme: ela sabe como se comportam os poros da pele e os cílios, e suas estimativas chegam muito perto da verdade. Já em conteúdos sobre os quais ela tem menos referências, as suposições podem se desviar. Texto em capturas de tela é o exemplo clássico de falha: caracteres que a fonte não registrou não podem ser recuperados, e a rede pode desenhar letras plausíveis, mas incorretas. Padrões de tecido que não existiam podem surgir, e logotipos podem ser sutilmente alterados."
+    },
+    {
+      "type": "p",
+      "text": "Isso não é um defeito a ser corrigido; é a própria natureza de tentar recuperar uma informação que nunca foi registrada. A consequência prática é uma regra de ouro: amplie fotografias, ilustrações e imagens artísticas livremente, mas trate o resultado como uma reconstrução quando os detalhes minuciosos tiverem valor legal ou factual. Para imagens ricas em texto, capturar em resolução nativa sempre será melhor do que reconstruir. Saber que tipo de imagem você tem nas mãos é a habilidade mais importante do usuário."
+    },
+    {
+      "type": "h2",
+      "text": "Fatiamento em blocos, bordas e por que as emendas não aparecem"
+    },
+    {
+      "type": "p",
+      "text": "Uma questão prática de engenharia: uma entrada de 4K vira uma saída de 16K, o que simplesmente não cabe de uma só vez na memória de vídeo de um computador comum. A resposta é o fatiamento em blocos (tiling): a imagem é processada em blocos sobrepostos, cada um melhorado individualmente, e depois reunidos com bordas suavizadas. Feito sem cuidado, o fatiamento cria emendas visíveis e texturas inconsistentes nas linhas de junção. Feito com excelência, usando mesclagem de sobreposição e normalização contínua, as emendas se tornam imperceptíveis, razão pela qual o usuário nunca vê a palavra 'bloco' em um produto bem acabado."
+    },
+    {
+      "type": "p",
+      "text": "O fatiamento também explica por que o fator de ampliação e o tamanho da imagem se multiplicam contra o seu hardware. Uma foto média a 4× e uma foto gigantesca a 4× são tarefas de processamento completamente diferentes, pois a segunda pode demandar dezenas de blocos em processamento sucessivo. Essa é a razão prática pela qual dimensionar a escala corretamente não é apenas uma questão de qualidade visual: um fator menor mantém o consumo de memória sob controle, evita picos de aquecimento térmico e conclui o trabalho muito mais rápido. Três vitórias com uma única decisão."
+    },
+    {
+      "type": "h2",
+      "text": "Aprimoramentos complementares ao redor do núcleo"
+    },
+    {
+      "type": "p",
+      "text": "Os ampliadores modernos raramente se limitam a aumentar a resolução. A redução de ruído atua antes ou durante a reconstrução, pois o ruído do sensor confunde o estimador de detalhes: um padrão de granulado pode ser confundido com textura e 'acentuado' em artefatos indesejados. O ajuste de nitidez atua ao final, restaurando o contraste local que a reconstrução possa ter suavizado. O aprimoramento facial aplica referências especializadas exclusivamente sobre rostos, onde o risco de criar um efeito bizarro ('vale da estranheza') é altíssimo e a tolerância a distorções é mínima, já que a percepção humana sobre feições é extremamente sensível."
+    },
+    {
+      "type": "ul",
+      "items": [
+        "Reduza o ruído primeiro se a foto de origem tiver granulação; ruído amplificado se torna defeito permanente.",
+        "Prefira escalas moderadas: 4× a partir de uma boa fonte supera com folga 8× a partir de uma foto ruim.",
+        "Confira os rostos em 100% de zoom antes de exportar, pois pequenos erros perceptivos se escondem nas miniaturas.",
+        "Guarde sempre o arquivo original: a reconstrução tem critérios próprios e novas edições devem sempre partir da matriz original."
+      ]
+    },
+    {
+      "type": "h2",
+      "text": "Por que esse processo pertence ao seu aparelho, não a um servidor"
+    },
+    {
+      "type": "p",
+      "text": "O upscaling tem uma particularidade marcante entre os recursos de IA: o arquivo enviado costuma ser exatamente aquele que você menos gostaria de expor na internet. Scans antigos de família guardam a única lembrança viva de um momento; fotos de catálogo pertencem a produtos sob sigilo comercial; imagens médicas e periciais falam por si sós. Enquanto isso, o processamento nada mais é do que pura aritmética sobre um conjunto fixo de parâmetros: o arquivo do modelo é igual para todos, o que significa que nenhum servidor precisa bisbilhotar a sua foto para aprimorá-la, e ela não precisa trafegar pela rede para ser transformada."
+    },
+    {
+      "type": "p",
+      "text": "Executar localmente também transforma a liberdade de experimentação. Plataformas na nuvem cobram créditos por imagem, o que desestimula aquele ciclo de teste e comparação que é fundamental para um bom resultado: comparar duas escalas, ajustar a nitidez e escolher a melhor saída. No seu próprio computador, tentar novamente custa zero, incentivando o capricho — e o resultado final agradece. A tecnologia da rede neural é impressionante; mas o fluxo de trabalho que ela inaugura — sem cobranças por foto e sem vigilância — é silenciosamente uma revolução ainda mais transformadora."
+    }
+  ]
+},
+
+{
   "slug": "local_ai_in_browser_d2f9c4",
   "title": "Como a IA realmente roda dentro da aba do seu navegador e os malabarismos técnicos necessários",
   "description": "Navegadores foram feitos para exibir documentos, não para rodar redes neurais. Conheça os bastidores da computação em GPU, Web Workers, divisão em blocos (tiling), cache e as soluções de engenharia que fazem a IA local parecer instantânea.",

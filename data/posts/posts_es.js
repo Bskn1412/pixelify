@@ -4,6 +4,110 @@
  */
 export const POSTS_ES = [
   {
+  "slug": "upscaler_how_it_works_b7c3e1",
+  "title": "Ampliación con IA: por qué tu imagen se vuelve más nítida en lugar de simplemente más grande",
+  "description": "La ampliación tradicional interpola píxeles y genera desenfoque. La superresolución por IA reconstruye el detalle. Descubre qué significa esto, por qué funciona y qué sucede realmente entre tu imagen inicial y el resultado.",
+  "tags": [
+    "Ampliador",
+    "Funciones",
+    "IA local"
+  ],
+  "date": "2026-11-26",
+  "author": "El equipo de Pixelify",
+  "cover": "/blog/upscaler-page.jpg",
+  "coverAlt": "Pantalla de subida del ampliador de Pixelify con una comparativa antes y después de una zapatilla",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "Hay una situación que todo el mundo reconoce: encuentras la imagen perfecta, mide 600 píxeles de ancho y la necesitas a 2400 para una presentación, un póster o una impresión. La arrastras a un editor, introduces 4× en el cuadro de escala y el resultado es más grande pero extrañamente peor: la misma información repartida en más espacio, con esa suavidad borrosa que todos aceptamos en silencio como el precio de ampliar. Esa resignación ha quedado obsoleta. La ampliación con IA no diluye la información; reconstruye y añade información nueva."
+    },
+    {
+      "type": "h2",
+      "text": "Qué hace realmente la ampliación tradicional"
+    },
+    {
+      "type": "p",
+      "text": "Para valorar el nuevo enfoque, resulta útil comprender qué hacía el método tradicional. Cuando un programa amplía una imagen mediante interpolación, resuelve un problema elemental pero limitado: cada nuevo píxel se sitúa entre píxeles conocidos, por lo que calcula su valor mezclando el de sus vecinos. Los métodos bilineal y bicúbico son mezclas más sofisticadas, pero siguen siendo mezclas. La consecuencia es estructural. Las texturas finas —pestañas, tejidos de tela o bordes de hojas— quedan por debajo de la cuadrícula de muestreo y se promedian en un tono grisáceo. La imagen crece de tamaño, pero el detalle no, y el ojo humano interpreta ese desfase como desenfoque."
+    },
+    {
+      "type": "p",
+      "text": "Aplicar enfoque a posteriori solo compensa parcialmente, porque el filtro de enfoque únicamente amplifica bordes que ya estaban promediados. Es como fotocopiar una fotocopia y aumentar el contraste: la imagen adquiere más fuerza visual, pero la información perdida en el primer paso jamás regresa. Durante décadas, este fue simplemente el límite físico del problema. El archivo no contenía más información, por lo que ningún algoritmo tradicional podía inventarla de forma fidedigna."
+    },
+    {
+      "type": "h2",
+      "text": "Superresolución: predecir a partir del conocimiento"
+    },
+    {
+      "type": "p",
+      "text": "Los ampliadores por IA resuelven un problema completamente distinto. En lugar de preguntarse «¿qué color debería tener este píxel intermedio a partir de sus vecinos?», se preguntan «a partir de todo lo que sé sobre cómo son los detalles reales en el mundo, ¿cuál es la imagen de alta resolución más probable que habría originado esta versión de baja resolución?». Esa inversión conceptual es la clave de todo. El conocimiento proviene del entrenamiento: la red neuronal ha analizado millones de pares de imágenes nítidas y sus respectivas versiones reducidas artificialmente, aprendiendo las relaciones estadísticas que diferencian una pestaña real del ruido visual, o un tejido real de una masa borrosa."
+    },
+    {
+      "type": "img",
+      "src": "/blog/upscaler-sections.jpg",
+      "alt": "Muestra de ampliación con comparativas de antes y después y estadísticas",
+      "caption": "Incremento de resolución a 4×, calculado de forma privada en tu dispositivo sin subidas a servidores."
+    },
+    {
+      "type": "p",
+      "text": "Una analogía útil: la interpolación es como un fotógrafo que solo calca lo que se vislumbra en el fotograma; la superresolución es como un retratista forense que ha dibujado diez mil rostros y puede deducir la estructura subyacente que el fotograma solo insinúa. Ambos están haciendo una estimación. Uno estima a partir de cuatro píxeles contiguos; el otro estima a partir de un modelo estadístico de cómo se estructuran las texturas del mundo. Por eso el resultado final puede mostrar mechones de cabello definidos que nunca llegaron a capturarse en el archivo de origen. La red no alucina al azar; selecciona el detalle más probable y coherente con la imagen de entrada."
+    },
+    {
+      "type": "h2",
+      "text": "Alucinación: la advertencia necesaria"
+    },
+    {
+      "type": "p",
+      "text": "El mismo mecanismo que produce nitidez puede generar ficción. En un rostro, el conocimiento previo de la red es una gran ventaja: sabe con exactitud cómo se comportan los poros de la piel y las pestañas, y sus estimaciones rozan la realidad. En contenidos sobre los que tiene menos referencias, las predicciones pueden desviarse. El texto en capturas de pantalla es el fallo clásico: los caracteres ilegibles en el origen no pueden recuperarse mágicamente, y la red puede trazar glifos verosímiles pero erróneos. Pueden surgir tramas de tejido inexistentes o logotipos ligeramente reinterpretados."
+    },
+    {
+      "type": "p",
+      "text": "Esto no es un defecto pendiente de corregir; es la naturaleza intrínseca de intentar recuperar información que jamás quedó registrada. La implicación práctica es una regla de uso clara: amplía fotografías, ilustraciones e imágenes generales con total libertad, pero trata el resultado como una reconstrucción artística si los detalles diminutos tienen relevancia legal o pericial. Para imágenes con mucho texto, capturar a resolución nativa siempre superará a cualquier reconstrucción. Reconocer qué tipo de imagen tienes entre manos es la habilidad más valiosa para el usuario."
+    },
+    {
+      "type": "h2",
+      "text": "Teselas, bordes y por qué no se aprecian las costuras"
+    },
+    {
+      "type": "p",
+      "text": "Una cuestión técnica esencial: una entrada a 4K escalada a 4× se convierte en una salida de 16K, lo que desbordaría de inmediato la memoria de vídeo de cualquier tarjeta gráfica convencional. La respuesta es el teselado (tiling): la imagen se divide en bloques solapados, cada uno se amplía por separado y luego se ensamblan mediante bordes difuminados. Si se hace de forma descuidada, el teselado deja costuras evidentes y texturas desiguales en las uniones. Si se ejecuta correctamente, con mezcla matemática de solapamiento y normalización uniforme, las costuras resultan invisibles, motivo por el cual los usuarios jamás encuentran la palabra «tesela» en una aplicación pulida."
+    },
+    {
+      "type": "p",
+      "text": "El teselado también explica por qué el factor de escala y el tamaño original se multiplican contra la capacidad de tu hardware. Una foto pequeña a 4× y una foto gigante a 4× representan tareas computacionales radicalmente distintas, ya que la segunda puede requerir procesar decenas de teselas consecutivas. Esta es la razón práctica por la que elegir la escala adecuada no es solo una cuestión de estética: un factor menor mantiene el uso de memoria en niveles óptimos, evita picos térmicos de temperatura y termina mucho más rápido. Tres ventajas en una sola decisión."
+    },
+    {
+      "type": "h2",
+      "text": "Mejoras adicionales alrededor del núcleo"
+    },
+    {
+      "type": "p",
+      "text": "Los ampliadores modernos rara vez se limitan a multiplicar píxeles. La reducción de ruido opera antes o durante la reconstrucción, ya que el ruido del sensor confunde al estimador de detalles: un patrón granulado puede interpretarse erróneamente como textura y convertirse en artefactos artificiales. El enfoque final interviene después, restaurando el contraste local que el proceso reconstructivo haya podido suavizar. La optimización facial aplica modelos de referencia específicos a los rostros, donde el riesgo de efecto 'valle inquietante' es mayor y la tolerancia a distorsiones es mínima, dado que la percepción humana de las caras es sumamente exigente."
+    },
+    {
+      "type": "ul",
+      "items": [
+        "Reduce el ruido primero si la imagen de origen tiene mucho grano; el ruido amplificado se convierte en defecto permanente.",
+        "Utiliza escalas moderadas: un 4× a partir de un archivo decente supera siempre a un 8× a partir de una mala toma.",
+        "Inspecciona los rostros al 100% de zoom antes de exportar, ya que los pequeños errores se ocultan en la vista previa.",
+        "Conserva siempre el archivo original: la reconstrucción es interpretativa y cualquier nuevo ajuste debe partir de la fuente original."
+      ]
+    },
+    {
+      "type": "h2",
+      "text": "Por qué este proceso debe residir en tu dispositivo y no en un servidor"
+    },
+    {
+      "type": "p",
+      "text": "La ampliación de imágenes presenta una singularidad dentro de la inteligencia artificial: el archivo de entrada suele ser exactamente la foto que menos desearías compartir con terceros. Los escaneos familiares antiguos guardan recuerdos irrepetibles; las fotografías de productos corresponden a prototipos bajo estricto embargo; las imágenes médicas o periciales contienen datos sumamente sensibles. Mientras tanto, el cómputo subyacente es pura aritmética sobre una serie fija de instrucciones: el modelo neural es idéntico para todos los usuarios, lo que significa que el servidor no necesita acceder a tu imagen para mejorarla, y tu imagen jamás necesita viajar por internet para ser procesada."
+    },
+    {
+      "type": "p",
+      "text": "Procesar en local también transforma por completo la dinámica de experimentación. Las herramientas en la nube cobran por imagen o crédito, lo que desincentiva el ciclo de prueba y comparación que realmente permite alcanzar un resultado óptimo: probar dos escalas, alternar ajustes de nitidez y elegir la mejor combinación. En tu máquina, iterar cuesta exactamente cero, por lo que experimentas con libertad y el resultado final es notablemente superior. La tecnología matemática es impresionante; pero el flujo de trabajo que hace posible —sin contadores de créditos y sin ojos ajenos observando— es, en silencio, una revolución aún mayor."
+    }
+  ]
+},
+
+{
   "slug": "local_ai_in_browser_d2f9c4",
   "title": "Cómo se ejecuta realmente la IA en la pestaña de tu navegador y las soluciones técnicas que requirió",
   "description": "Los navegadores se diseñaron para mostrar documentos, no para procesar redes neuronales. Un recorrido técnico por el cómputo en GPU, Web Workers, teselado, caché y los compromisos de ingeniería que hacen que la IA local parezca mágica.",

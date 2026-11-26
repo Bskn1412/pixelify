@@ -4,6 +4,89 @@
  */
 export const POSTS_EN = [
 {
+    slug: 'upscaler_how_it_works_b7c3e1',
+    title: 'AI Upscaling: Why Your Image Gets Sharper Instead of Just Bigger',
+    description:
+      'Traditional enlargement interpolates pixels and blurs. AI super-resolution reconstructs detail. Here is what that means, why it works, and what actually happens between your input and the result.',
+    tags: ['Upscaler', 'Features', 'Local AI'],
+    date: '2026-11-26',
+    author: 'The Pixelify Team',
+    cover: '/blog/upscaler-page.jpg',
+    coverAlt: 'Pixelify upscaler upload screen with a before-and-after shoe comparison',
+    blocks: [
+      {
+        type: 'p',
+        text: 'There is a moment everyone recognizes: you found the perfect image, it is 600 pixels wide, and you need it at 2400 for the slide deck, the poster, the print. You drag it into an editor, type 4× into the resize box, and the result is larger and somehow worse, the same information spread thinner, with the soft mushiness we all silently accept as the cost of going bigger. That acceptance is outdated. AI upscaling does not spread information thinner; it adds information back.',
+      },
+      { type: 'h2', text: 'What traditional enlargement actually does' },
+      {
+        type: 'p',
+        text: 'To appreciate the new approach, it helps to know what the old one was doing. When software enlarges an image by interpolation, it is solving an honest but limited problem: each new pixel sits between known pixels, so estimate it as a blend of its neighbors. Bilinear and bicubic methods are smarter blends, but blends nonetheless. The consequence is structural. Fine texture, eyelashes and fabric weave and leaf edges, falls below the sampling grid and gets averaged into gray. The image scales, the detail does not, and the eye reads the mismatch as blur.',
+      },
+      {
+        type: 'p',
+        text: 'Sharpening after the fact only partially compensates, because sharpening amplifies edges that are already averaged. It is like photocopying a photocopy and increasing the contrast: the picture gets punchier, but the information lost in the first pass never returns. For decades this was simply the physics of the problem. There was no more information in the file, so no algorithm could honestly produce more.',
+      },
+      { type: 'h2', text: 'Super-resolution: guessing with knowledge' },
+      {
+        type: 'p',
+        text: 'AI upscalers solve a different problem. Instead of asking "what color should this in-between pixel be, given its neighbors," they ask "given everything I know about what real detail looks like, what is the most probable high-resolution image that would have produced this low-resolution one?" That inversion is the whole trick. The knowledge comes from training: the network has studied millions of pairs of sharp images and their artificially downscaled versions, learning the statistical relationships that distinguish a real eyelash from noise, real fabric from mush.',
+      },
+      {
+        type: 'img',
+        src: '/blog/upscaler-sections.jpg',
+        alt: 'Upscale showcase showing before and after comparisons and statistics',
+        caption: '4× resolution gain, computed privately on your device, with no upload in the loop.',
+      },
+      {
+        type: 'p',
+        text: 'A useful mental model: interpolation is a photographer tracing only what is visible in the frame; super-resolution is a sketch artist who has drawn ten thousand faces and can infer the structure the frame only hints at. Both are guessing. One guesses from four neighboring pixels; the other guesses from a statistical model of what the world looks like. That is why the output can show crisp hair strands that were never resolved in the source. The network is not hallucinating at random; it is selecting the most probable detail consistent with the input.',
+      },
+      { type: 'h2', text: 'Hallucination: the honest caveat' },
+      {
+        type: 'p',
+        text: 'The same mechanism that produces crispness can produce fiction. On a face, the network\'s strong priors are an asset: it knows how skin pores and eyelashes behave, and its guesses land close to truth. On content its priors are weak about, guesses drift. Text in a screenshot is the classic failure: characters the source did not resolve cannot be recovered, and the network may render plausible-but-wrong glyphs. Fabric patterns may emerge that were not there. Logos can be subtly redrawn.',
+      },
+      {
+        type: 'p',
+        text: 'This is not a defect to be fixed; it is the nature of recovering information that was never recorded. The practical implication is a usage rule: upscale photographs, artwork, and general imagery freely, but treat any output as a reconstruction when the fine details matter legally or factually. For text-heavy images, capturing at native resolution will always beat reconstruction. Knowing which kind of image you have is the user-side skill that matters most.',
+      },
+      { type: 'h2', text: 'Tiles, edges, and why the seams do not show' },
+      {
+        type: 'p',
+        text: 'A practical engineering question: a 4K input becomes a 16K output, which does not fit in ordinary graphics memory at once. The answer is tiling, where the image is processed in overlapping tiles, each enhanced independently, then stitched with feathered boundaries. Done carelessly, tiling produces visible seams and inconsistent texture across the stitch lines. Done well, with overlap blending and consistent normalization, the seams are undetectable, which is why users never see the word "tile" in a polished product.',
+      },
+      {
+        type: 'p',
+        text: 'Tiling also explains why enlargement factor and image size multiply against your hardware. A modest photo at 4× and a huge photo at 4× are entirely different computational jobs, because the second may hold dozens of tiles in flight simultaneously. This is the practical reason right-sizing the scale is not just about quality: a smaller factor keeps the working set within comfortable memory bounds, avoids thermal peaks, and finishes sooner. Three wins from one decision.',
+      },
+      { type: 'h2', text: 'Enhancements around the core' },
+      {
+        type: 'p',
+        text: 'Modern upscalers rarely stop at resolution. Denoising runs before or during reconstruction, because sensor noise confuses the detail estimator: a grain pattern can be mistaken for texture and "sharpened" into artifacts. Sharpening runs after, restoring local contrast the reconstruction may have smoothed. Face-aware enhancement applies stronger priors specifically to facial regions, where the risk of uncanny output is highest and the tolerance for aggressive reconstruction is lowest, since human face perception is famously unforgiving.',
+      },
+      {
+        type: 'ul',
+        items: [
+          'Denoise first when the source is grainy, because noise amplified is noise preserved forever.',
+          'Use moderate scales; 4× from a decent source beats 8× from a bad one.',
+          'Check faces at 100% zoom before exporting, since perceptual errors hide in previews.',
+          'Keep the original file; reconstruction is opinionated, and re-editing starts from the source.',
+        ],
+      },
+      { type: 'h2', text: 'Why this belongs on your device, not a server' },
+      {
+        type: 'p',
+        text: 'Upscaling has an unusual property among AI tasks: the input is often exactly the image you least want to share. Old family scans carry the only copy of a memory. Product shots predate an embargo. Medical and legal imagery carries itself. Meanwhile the computation is pure arithmetic on a fixed set of instructions; the network files are the same for every user, which means the network never needs to see the image to improve it, and the image never needs to travel to be processed.',
+      },
+      {
+        type: 'p',
+        text: 'Running locally also changes the economics of experimentation. Cloud upscalers meter by the image, which discourages the try-and-compare loop that actually produces good results: two scales, two enhancement settings, pick the better one. Locally, iteration is free, so people iterate, and the results are better for it. The technology is impressive. The workflow it enables, un-metered and un-watched, is quietly the bigger revolution.',
+      },
+    ],
+  },
+
+{
     slug: 'local_ai_in_browser_d2f9c4',
     title: 'How AI Actually Runs Inside Your Browser Tab, and the Workarounds It Took',
     description:
